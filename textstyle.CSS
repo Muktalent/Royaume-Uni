@@ -393,7 +393,7 @@ footer {
 /* ==========================
    SOCIAL FLOATING PANEL
 ========================== */
-.social-panel {
+/*.social-panel {
   position: fixed;
   right: 20px;
   top: 50%;
@@ -574,4 +574,62 @@ footer {
 .btn-primary {
   font-weight: 500;
   letter-spacing: 0.3px;
+}
+/* ==========================
+   RESPONSIVE FIX
+========================== */
+
+@media (max-width: 1024px) {
+
+  .hero-layout {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .hero-left h1 {
+    font-size: 40px;
+  }
+
+  .video-card.large {
+    height: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .hero-left h1 {
+    font-size: 32px;
+  }
+
+  .hero {
+    padding: 40px 5%;
+  }
+
+  .nav {
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .video-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero-stats {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .hero-left h1 {
+    font-size: 26px;
+  }
+
+  .video-row {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    padding: 12px 5%;
+  }
 }
