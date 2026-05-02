@@ -114,6 +114,10 @@ body {
 /* ==========================
    BODY (FONDO PREMIUM)
 ========================== */
+html, body {
+  width: 100%;
+  overflow-x: hidden;
+}
 body {
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
@@ -125,14 +129,14 @@ body {
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
-
+padding-top: clamp(80px, 10vh, 110px);
   color: #2b2118;
 }
 
 /* ==========================
    SECTIONS (IMPORTANTE: DIFERENCIA VISUAL)
 ========================== */
-.section {
+/*.section {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -141,6 +145,13 @@ body {
 }
 
 /* HERO (más claro) */
+.section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px clamp(20px, 5vw, 80px);
+}
 .hero {
   background: rgba(255,255,255,0.55);
   backdrop-filter: blur(10px);
@@ -182,9 +193,7 @@ body {
 
 /* LEFT SIDE */
 .hero-left h1 {
-  font-size: 54px;
-  line-height: 1.05;
-  margin-bottom: 20px;
+  font-size: clamp(28px, 4vw, 54px);
 }
 
 .hero-left p {
@@ -246,7 +255,8 @@ body {
 .video-card.large {
   border-radius: 20px;
   overflow: hidden;
-  height: 360px;
+  aspect-ratio: 16 / 9;
+  width: 100%;
   box-shadow: 0 25px 60px rgba(0,0,0,0.25);
 }
 
