@@ -1,6 +1,14 @@
 /* ==========================
    RESET
 ========================== */
+html {
+  font-size: 16px;
+}
+
+body {
+  zoom: 1;
+  transform: none;
+}
 * {
   margin: 0;
   padding: 0;
