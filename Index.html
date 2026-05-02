@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tres Paneles Horizontales con Scroll</title>
+  <link rel="stylesheet" href="textstyle.css" />
+  
+</head>
+<body>
+<header class="header">
+  <div class="logo">
+  <img src="logo.png" alt="Maghreb UK Logo" />
+</div>
+
+  <nav class="nav">
+    <a href="#home">HOME</a>
+    <a href="#why">WHY UK</a>
+    <a href="#universities">UNIVERSITIES</a>
+    <a href="#contact">CONTACT</a>
+  </nav>
+
+  <div class="header-actions">
+    <button class="btn-secondary">Log in</button>
+    <a href="#contact" class="btn-primary">Apply Now</a>
+  </div>
+</header>
+
+<!-- 🌗 Theme + 🌍 Language Controls -->
+<div class="controls">
+  <button id="theme-toggle" class="control-btn">🌙</button>
+
+  <div class="lang-selector">
+    <button id="lang-btn" class="control-btn">EN ⌄</button>
+    <ul id="lang-menu" class="lang-menu">
+      <li data-lang="en">English</li>
+      <li data-lang="es">Español</li>
+      <li data-lang="ar">العربية</li>
+    </ul>
+  </div>
+</div>
+
+
+  <!-- Contenedor principal -->
+  <main>
+<!-- SOCIAL RIGHT BAR -->
+<div class="social-bar">
+
+  <a href="#" class="social-icon" aria-label="Tripadvisor">
+    ⌘
+  </a>
+
+  <a href="#" class="social-icon" aria-label="Facebook">
+    f
+  </a>
+
+  <a href="#" class="social-icon" aria-label="Instagram">
+    ⌗
+  </a>
+
+</div>
+
+<!-- CHAT BUBBLE -->
+<a href="#contact" class="chat-bubble">
+  💬
+</a>
+  <!-- HERO SECTION -->
+  <section class="section hero" id="home">
+
+  <div class="hero-layout">
+
+    <!-- LEFT TEXT -->
+    <div class="hero-left">
+
+      <h1>STUDY IN THE UK</h1>
+
+      <p>
+        We guide students from the Maghreb into top UK universities with full support:
+        admissions, visas, accommodation and career pathways.
+      </p>
+
+      <div class="hero-cta">
+        <a href="#contact" class="cta">Apply Now</a>
+        <a href="#why" class="cta-secondary">Explore more</a>
+      </div>
+
+      <div class="hero-stats">
+        <div><strong>+500</strong><span>Students placed</span></div>
+        <div><strong>95%</strong><span>Visa success</span></div>
+        <div><strong>20+</strong><span>UK universities</span></div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT VIDEO CAROUSEL -->
+    <div class="hero-right">
+
+      <div class="video-stack">
+
+        <div class="video-card large">
+          <video autoplay muted loop playsinline>
+            <source src="video.MOV" type="video/mp4">
+          </video>
+        </div>
+
+        <div class="video-row">
+
+          <div class="video-card small">
+            <video autoplay muted loop playsinline>
+              <source src="video.MOV" type="video/mp4">
+            </video>
+          </div>
+
+          <div class="video-card small">
+            <video autoplay muted loop playsinline>
+              <source src="video.MOV" type="video/mp4">
+            </video>
+          </div>
+
+          <div class="video-card small">
+            <video autoplay muted loop playsinline>
+              <source src="video.MOV" type="video/mp4">
+            </video>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+  <!-- WHY SECTION -->
+  <section class="section why">
+
+    <div class="content">
+
+      <h2>Why choose us</h2>
+
+      <p>
+        ✔ Personalized guidance<br>
+        ✔ University applications<br>
+        ✔ Visa support<br>
+        ✔ Accommodation help<br>
+        ✔ Maghreb student focus
+      </p>
+
+      <p>
+        We make studying in the UK simple and accessible.
+      </p>
+
+    </div>
+
+  </section>
+
+  <!-- CONTACT SECTION -->
+  <section class="section contact" id="contact">
+
+    <div class="content">
+
+      <h2>Start your application</h2>
+
+      <form class="contact-form">
+        <input type="text" placeholder="Full name" required />
+        <input type="email" placeholder="Email address" required />
+        <input type="text" placeholder="Country" />
+        <textarea rows="5" placeholder="Tell us about your plans..." required></textarea>
+        <button type="submit">Send</button>
+      </form>
+
+    </div>
+
+  </section>
+
+</main>
+<footer class="footer">
+  © 2026 Maghreb UK Talent Ltd. All rights reserved.
+</footer>
+
+  <!-- Enlace al JS que conecta con el backend -->
+  <script src="script.js"></script>
+
+
+
+
+</body>
+</html>
