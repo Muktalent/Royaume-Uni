@@ -1,0 +1,34 @@
+[
+  {
+    "title": "Network Vulnerability Lab",
+    "image": "nmap_lab.jpg",
+    "description": "",
+    "tools": ["Nmap", "Metasploit", "Kali Linux"],
+    "category": "Network Security",
+    "link": "#"
+  },
+  {
+    "title": "Password Strength Analyzer",
+    "image": "password_tool.jpg",
+    "description": "",
+    "tools": ["Python", "Regex"],
+    "category": "Security Automation",
+    "link": "#"
+  },
+  {
+    "title": "Phishing Detection Report",
+    "image": "phishing_report.jpg",
+    "description": "",
+    "tools": ["Linux", "Email Header Analysis"],
+    "category": "Threat Analysis",
+    "link": "#"
+  },
+   {
+    "title": "Password Strength Analyzer",
+    "image": "password_tool.jpg",
+    "description": "",
+    "tools": ["Python", "Regex"],
+    "category": "Security Automation",
+    "link": "#"
+  }
+]
