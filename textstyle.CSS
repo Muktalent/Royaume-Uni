@@ -601,14 +601,15 @@ footer {
   letter-spacing: 0.3px;
 }
 /* ==========================
-   RESPONSIVE FIX
+   RESPONSIVE FIX (CORREGIDO)
 ========================== */
 
+/* TABLET / LAPTOP PEQUEÑA */
 @media (max-width: 1024px) {
 
   .hero-layout {
     grid-template-columns: 1fr;
-    gap: 40px;
+    gap: 30px;
   }
 
   .hero-left h1 {
@@ -616,10 +617,16 @@ footer {
   }
 
   .video-card.large {
-    height: 280px;
+    height: 260px;
+  }
+
+  /* 🔥 IMPORTANTE: ya controlamos mini videos aquí también */
+  .video-row {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
+/* MOBILE */
 @media (max-width: 768px) {
 
   .hero-left h1 {
@@ -635,26 +642,31 @@ footer {
     flex-wrap: wrap;
   }
 
-  .video-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .hero-stats {
     flex-direction: column;
-  }
-}
-
-@media (max-width: 480px) {
-
-  .hero-left h1 {
-    font-size: 26px;
   }
 
   .video-row {
     grid-template-columns: 1fr;
   }
 
+  .video-card.large {
+    height: 220px;
+  }
+}
+
+/* MOBILE PEQUEÑO */
+@media (max-width: 480px) {
+
+  .hero-left h1 {
+    font-size: 26px;
+  }
+
   .header {
     padding: 12px 5%;
+  }
+
+  .video-card.large {
+    height: 200px;
   }
 }
