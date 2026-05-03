@@ -1,167 +1,156 @@
 // ==========================
-// 🌗 DARK MODE TOGGLE LOGIC
-// ==========================
-document.addEventListener("DOMContentLoaded", () => {
-  const toggle = document.getElementById("theme-toggle");
-
-  // Load saved theme
-  if (localStorage.getItem("theme") === "dark") {
-    document.body.classList.add("dark-mode");
-    toggle.textContent = "☀️";
-  }
-
-  toggle.addEventListener("click", () => {
-    document.body.classList.toggle("dark-mode");
-
-    const isDark = document.body.classList.contains("dark-mode");
-    toggle.textContent = isDark ? "☀️" : "🌙";
-
-    // Save user preference
-    localStorage.setItem("theme", isDark ? "dark" : "light");
-  });
-});
-
-
-// ==========================
-// 📩 CONTACT FORM HANDLER
-// ==========================
-document.addEventListener("DOMContentLoaded", () => {
-  const form = document.querySelector(".contact-form");
-  if (!form) return;
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    alert("✅ Tu mensaje ha sido enviado correctamente.");
-    form.reset();
-  });
-});
-
-// ==========================
-// 🌍 LANGUAGE DROPDOWN MENU
+// 🌍 LANGUAGE SYSTEM (FINAL CLEAN VERSION)
 // ==========================
 document.addEventListener("DOMContentLoaded", () => {
   const langBtn = document.getElementById("lang-btn");
   const langMenu = document.getElementById("lang-menu");
 
-  // Load saved language or default to English
-  let currentLang = localStorage.getItem("lang") || "en";
-  applyLanguage(currentLang);
-
-  // Toggle dropdown
-  langBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    langMenu.parentElement.classList.toggle("active");
-  });
-
-  // Change language
-  langMenu.querySelectorAll("li").forEach((item) => {
-    item.addEventListener("click", () => {
-      const selectedLang = item.getAttribute("data-lang");
-      applyLanguage(selectedLang);
-      localStorage.setItem("lang", selectedLang);
-      langMenu.parentElement.classList.remove("active");
-    });
-  });
-
-  // Close dropdown when clicking outside
-  document.addEventListener("click", () => {
-    langMenu.parentElement.classList.remove("active");
-  });
-});
-
-function applyLanguage(lang) {
-  document.documentElement.lang = lang;
-  document.body.dir = lang === "ar" ? "rtl" : "ltr";
-
-  const texts = {
+  const translations = {
     en: {
-      resume: "RESUME",
-      intro: "Hi, I’m Samuel — a full-stack engineer connecting design and development.",
-      download: "Download CV",
-      experience: "Experience",
-      portfolio: "PORTFOLIO",
+      home: "HOME",
+      why: "WHY UK",
+      uni: "UNIVERSITIES",
       contact: "CONTACT",
-      contactText: "Have a question or proposal? Write me:",
+      login: "Log in",
+      apply: "Apply Now",
+      explore: "Explore more",
+
+      title: "STUDY IN THE UK",
+      heroText:
+        "We guide students from the Maghreb into top UK universities with full support: admissions, visas, accommodation and career pathways.",
+
+      students: "Students placed",
+      visa: "Visa success",
+      unis: "UK universities",
+
+      whyTitle: "Why choose us",
+      whyPoints:
+        "✔ Personalized guidance<br>✔ University applications<br>✔ Visa support<br>✔ Accommodation help<br>✔ Maghreb student focus",
+      whyText: "We make studying in the UK simple and accessible.",
+
+      contactTitle: "Start your application",
       send: "Send",
-      footer: "© 2025 — Mr Samir Senhaji",
+
+      // placeholders
+      name: "Full name",
+      email: "Email address",
+      country: "Country",
+      message: "Tell us about your plans..."
     },
+
     es: {
-      resume: "RÉSUMÉ",
-      intro: "Hola, soy Samuel, un ingeniero full-stack que conecta diseño y desarrollo.",
-      download: "Descargar CV",
-      experience: "Experiencia",
-      portfolio: "PORTFOLIO",
+      home: "INICIO",
+      why: "POR QUÉ UK",
+      uni: "UNIVERSIDADES",
       contact: "CONTACTO",
-      contactText: "¿Tienes una pregunta o propuesta? Escríbeme:",
+      login: "Iniciar sesión",
+      apply: "Aplicar ahora",
+      explore: "Explorar más",
+
+      title: "ESTUDIA EN EL REINO UNIDO",
+      heroText:
+        "Guiamos a estudiantes del Magreb hacia las mejores universidades del Reino Unido con apoyo completo.",
+
+      students: "Estudiantes",
+      visa: "Éxito en visas",
+      unis: "Universidades UK",
+
+      whyTitle: "Por qué elegirnos",
+      whyPoints:
+        "✔ Asesoría personalizada<br>✔ Aplicaciones universitarias<br>✔ Apoyo en visas<br>✔ Ayuda con alojamiento<br>✔ Enfoque Magreb",
+      whyText: "Hacemos estudiar en UK simple y accesible.",
+
+      contactTitle: "Inicia tu aplicación",
       send: "Enviar",
-      footer: "© 2025 — Mr Samir Senhaji",
+
+      name: "Nombre completo",
+      email: "Correo electrónico",
+      country: "País",
+      message: "Cuéntanos tus planes..."
     },
+
     ar: {
-      resume: "السيرة الذاتية",
-      intro: "مرحباً، أنا صامويل، مهندس برمجيات شامل يدمج بين التصميم والتطوير.",
-      download: "تحميل السيرة الذاتية",
-      experience: "الخبرة",
-      portfolio: "الأعمال",
+      home: "الرئيسية",
+      why: "لماذا بريطانيا",
+      uni: "الجامعات",
       contact: "اتصل",
-      contactText: "هل لديك سؤال أو اقتراح؟ راسلني:",
+      login: "تسجيل الدخول",
+      apply: "قدّم الآن",
+      explore: "اكتشف المزيد",
+
+      title: "ادرس في المملكة المتحدة",
+      heroText:
+        "نوجه الطلاب من المغرب العربي إلى أفضل الجامعات البريطانية مع دعم كامل.",
+
+      students: "طالب تم قبوله",
+      visa: "نجاح التأشيرات",
+      unis: "جامعات بريطانية",
+
+      whyTitle: "لماذا نحن",
+      whyPoints:
+        "✔ إرشاد شخصي<br>✔ تقديم للجامعات<br>✔ دعم التأشيرات<br>✔ مساعدة السكن<br>✔ تركيز على طلاب المغرب العربي",
+      whyText: "نجعل الدراسة في بريطانيا سهلة وميسرة.",
+
+      contactTitle: "ابدأ طلبك",
       send: "إرسال",
-      footer: "© 2025 — السيد سمير السنهـاجي",
-    },
+
+      name: "الاسم الكامل",
+      email: "البريد الإلكتروني",
+      country: "الدولة",
+      message: "أخبرنا عن خططك..."
+    }
   };
 
-  const t = texts[lang];
-  document.querySelector(".panel:nth-child(1) h2").textContent = t.resume;
-  document.querySelector(".panel:nth-child(1) p").textContent = t.intro;
-  document.querySelector(".download-btn").textContent = t.download;
-  document.querySelector(".panel:nth-child(1) h3").textContent = t.experience;
-  document.querySelector(".panel:nth-child(2) h2").textContent = t.portfolio;
-  document.querySelector(".panel:nth-child(3) h2").textContent = t.contact;
-  document.querySelector(".panel:nth-child(3) p").textContent = t.contactText;
-  document.querySelector(".contact-form button").textContent = t.send;
-  document.querySelector("footer").textContent = t.footer;
+  function applyLanguage(lang) {
+    const dict = translations[lang];
 
-  // Update visible label
-  const labels = { en: "EN ⌄", es: "ES ⌄", ar: "AR ⌄" };
-  document.getElementById("lang-btn").textContent = labels[lang];
-}
+    // TEXTS
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      const key = el.dataset.i18n;
+      if (dict[key]) {
+        el.innerHTML = dict[key]; // importante para <br>
+      }
+    });
 
-const mainVideo = document.getElementById("mainVideo");
-const thumbs = document.querySelectorAll(".thumb");
+    // PLACEHOLDERS
+    document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+      const key = el.dataset.i18nPlaceholder;
+      if (dict[key]) {
+        el.placeholder = dict[key];
+      }
+    });
 
-thumbs.forEach(thumb => {
-  thumb.addEventListener("click", () => {
-    mainVideo.src = thumb.src;
-    mainVideo.play();
+    // BUTTON LABEL
+    const labels = { en: "EN ⌄", es: "ES ⌄", ar: "AR ⌄" };
+    langBtn.textContent = labels[lang];
 
-    thumbs.forEach(t => t.classList.remove("active"));
-    thumb.classList.add("active");
+    // direction
+    document.documentElement.lang = lang;
+    document.body.dir = lang === "ar" ? "rtl" : "ltr";
+  }
+
+  // INIT
+  let savedLang = localStorage.getItem("lang") || "en";
+  applyLanguage(savedLang);
+
+  // OPEN MENU
+  langBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    langBtn.parentElement.classList.toggle("active");
+  });
+
+  // SELECT LANGUAGE
+  langMenu.querySelectorAll("li").forEach((item) => {
+    item.addEventListener("click", () => {
+      const lang = item.dataset.lang;
+      localStorage.setItem("lang", lang);
+      applyLanguage(lang);
+      langBtn.parentElement.classList.remove("active");
+    });
+  });
+
+  // CLOSE ON OUTSIDE CLICK
+  document.addEventListener("click", () => {
+    langBtn.parentElement.classList.remove("active");
   });
 });
-// ==========================
-// 🎨 LOAD PORTFOLIO PROJECTS DYNAMICALLY
-// ==========================
-document.addEventListener("DOMContentLoaded", () => {
-  const portfolioGrid = document.getElementById("portfolio-grid");
-
-  // Load data from projects.json
-  fetch("projects.json")
-    .then(response => {
-      if (!response.ok) throw new Error("Error loading projects.json");
-      return response.json();
-    })
-    .then(projects => {
-      portfolioGrid.innerHTML = projects.map(project => `
-        <div class="portfolio-item">
-          <img src="${project.image}" alt="${project.title}">
-          <h4>${project.title}</h4>
-          <p>${project.description}</p>
-          <a href="${project.link}" class="view-project">View Project</a>
-        </div>
-      `).join("");
-    })
-    .catch(err => {
-      console.error(err);
-      portfolioGrid.innerHTML = "<p>⚠️ Unable to load portfolio.</p>";
-    });
-});
-

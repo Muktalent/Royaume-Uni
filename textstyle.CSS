@@ -148,9 +148,9 @@ padding-top: clamp(80px, 10vh, 110px);
 .section {
   min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 80px clamp(20px, 5vw, 80px);
+  align-items: center;
+  padding: 80px 5vw;
 }
 .hero {
   background: rgba(255,255,255,0.55);
@@ -393,12 +393,17 @@ footer {
   position: absolute;
   top: 45px;
   right: 0;
-  background: rgba(255,255,255,0.95);
+  background: white;
   list-style: none;
-  border-radius: 8px;
   display: none;
-  min-width: 130px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  min-width: 140px;
+  z-index: 9999;
+}
+
+.lang-selector.active .lang-menu {
+  display: block;
 }
 
 .lang-menu li {
@@ -406,8 +411,8 @@ footer {
   cursor: pointer;
 }
 
-.lang-selector.active .lang-menu {
-  display: block;
+.lang-menu li:hover {
+  background: #eee;
 }
 
 /* ==========================

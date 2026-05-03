@@ -2,100 +2,92 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tres Paneles Horizontales con Scroll</title>
   <link rel="stylesheet" href="textstyle.css" />
-  
-  
 </head>
+
 <body>
+
 <header class="header">
+
   <div class="logo">
-  <img src="logo.png" alt="Maghreb UK Logo" />
-</div>
+    <img src="logo.png" alt="Maghreb UK Logo" />
+  </div>
 
   <nav class="nav">
-    <a href="#home">HOME</a>
-    <a href="#why">WHY UK</a>
-    <a href="#universities">UNIVERSITIES</a>
-    <a href="#contact">CONTACT</a>
+    <a href="#home" data-i18n="home">HOME</a>
+    <a href="#why" data-i18n="why">WHY UK</a>
+    <a href="#universities" data-i18n="uni">UNIVERSITIES</a>
+    <a href="#contact" data-i18n="contact">CONTACT</a>
   </nav>
 
   <div class="header-actions">
-    <button class="btn-secondary">Log in</button>
-    <a href="#contact" class="btn-primary">Apply Now</a>
+    <button class="btn-secondary" data-i18n="login">Log in</button>
+    <a href="#contact" class="btn-primary" data-i18n="apply">Apply Now</a>
   </div>
-</header>
-
-<!-- 🌗 Theme + 🌍 Language Controls -->
-<div class="controls">
-  <button id="theme-toggle" class="control-btn">🌙</button>
 
   <div class="lang-selector">
-    <button id="lang-btn" class="control-btn">EN ⌄</button>
+    <button id="lang-btn" class="btn-secondary">EN ⌄</button>
     <ul id="lang-menu" class="lang-menu">
       <li data-lang="en">English</li>
       <li data-lang="es">Español</li>
       <li data-lang="ar">العربية</li>
     </ul>
   </div>
-</div>
 
+</header>
 
-  <!-- Contenedor principal -->
-  <main>
-<!-- SOCIAL RIGHT BAR -->
+<main>
+
+<!-- SOCIAL -->
 <div class="social-bar">
-
-  <a href="#" class="social-icon" aria-label="Tripadvisor">
-    ⌘
-  </a>
-
-  <a href="#" class="social-icon" aria-label="Facebook">
-    f
-  </a>
-
-  <a href="#" class="social-icon" aria-label="Instagram">
-    ⌗
-  </a>
-
+  <a href="#" class="social-icon">⌘</a>
+  <a href="#" class="social-icon">f</a>
+  <a href="#" class="social-icon">⌗</a>
 </div>
 
-<!-- CHAT BUBBLE -->
-<a href="#contact" class="chat-bubble">
-  💬
-</a>
-  <!-- HERO SECTION -->
-  <section class="section hero" id="home">
+<a href="#contact" class="chat-bubble">💬</a>
+
+<!-- HERO -->
+<section class="section hero" id="home">
 
   <div class="hero-layout">
 
-    <!-- LEFT TEXT -->
     <div class="hero-left">
 
-      <h1>STUDY IN THE UK</h1>
+      <h1 data-i18n="title">STUDY IN THE UK</h1>
 
-      <p>
+      <p data-i18n="heroText">
         We guide students from the Maghreb into top UK universities with full support:
         admissions, visas, accommodation and career pathways.
       </p>
 
       <div class="hero-cta">
-        <a href="#contact" class="cta">Apply Now</a>
-        <a href="#why" class="cta-secondary">Explore more</a>
+        <a href="#contact" class="cta" data-i18n="apply">Apply Now</a>
+        <a href="#why" class="cta-secondary" data-i18n="explore">Explore more</a>
       </div>
 
       <div class="hero-stats">
-        <div><strong>+500</strong><span>Students placed</span></div>
-        <div><strong>95%</strong><span>Visa success</span></div>
-        <div><strong>20+</strong><span>UK universities</span></div>
+        <div>
+          <strong>+500</strong>
+          <span data-i18n="students">Students placed</span>
+        </div>
+
+        <div>
+          <strong>95%</strong>
+          <span data-i18n="visa">Visa success</span>
+        </div>
+
+        <div>
+          <strong>20+</strong>
+          <span data-i18n="unis">UK universities</span>
+        </div>
       </div>
 
     </div>
 
-    <!-- RIGHT VIDEO CAROUSEL -->
     <div class="hero-right">
-
       <div class="video-stack">
 
         <div class="video-card large">
@@ -105,87 +97,71 @@
         </div>
 
         <div class="video-row">
-
-          <div class="video-card small">
-            <video autoplay muted loop playsinline>
-              <source src="video.MOV" type="video/mp4">
-            </video>
-          </div>
-
-          <div class="video-card small">
-            <video autoplay muted loop playsinline>
-              <source src="video.MOV" type="video/mp4">
-            </video>
-          </div>
-
-          <div class="video-card small">
-            <video autoplay muted loop playsinline>
-              <source src="video.MOV" type="video/mp4">
-            </video>
-          </div>
-
+          <div class="video-card small"><video autoplay muted loop><source src="video.MOV"></video></div>
+          <div class="video-card small"><video autoplay muted loop><source src="video.MOV"></video></div>
+          <div class="video-card small"><video autoplay muted loop><source src="video.MOV"></video></div>
         </div>
 
       </div>
-
     </div>
 
   </div>
 
 </section>
 
-  <!-- WHY SECTION -->
-  <section class="section why">
+<!-- WHY -->
+<section class="section why" id="why">
 
-    <div class="content">
+  <div class="content">
 
-      <h2>Why choose us</h2>
+    <h2 data-i18n="whyTitle">Why choose us</h2>
 
-      <p>
-        ✔ Personalized guidance<br>
-        ✔ University applications<br>
-        ✔ Visa support<br>
-        ✔ Accommodation help<br>
-        ✔ Maghreb student focus
-      </p>
+    <p data-i18n="whyPoints">
+      ✔ Personalized guidance<br>
+      ✔ University applications<br>
+      ✔ Visa support<br>
+      ✔ Accommodation help<br>
+      ✔ Maghreb student focus
+    </p>
 
-      <p>
-        We make studying in the UK simple and accessible.
-      </p>
+    <p data-i18n="whyText">
+      We make studying in the UK simple and accessible.
+    </p>
 
-    </div>
+  </div>
 
-  </section>
+</section>
 
-  <!-- CONTACT SECTION -->
-  <section class="section contact" id="contact">
+<!-- CONTACT -->
+<section class="section contact" id="contact">
 
-    <div class="content">
+  <div class="content">
 
-      <h2>Start your application</h2>
+    <h2 data-i18n="contactTitle">Start your application</h2>
 
-      <form class="contact-form">
-        <input type="text" placeholder="Full name" required />
-        <input type="email" placeholder="Email address" required />
-        <input type="text" placeholder="Country" />
-        <textarea rows="5" placeholder="Tell us about your plans..." required></textarea>
-        <button type="submit">Send</button>
-      </form>
+    <form class="contact-form">
 
-    </div>
+      <input type="text" placeholder="Full name" required data-i18n-placeholder="name" />
+      <input type="email" placeholder="Email address" required data-i18n-placeholder="email" />
+      <input type="text" placeholder="Country" data-i18n-placeholder="country" />
+      <textarea rows="5" placeholder="Tell us about your plans..." data-i18n-placeholder="message"></textarea>
 
-  </section>
+      <button type="submit" data-i18n="send">Send</button>
+
+    </form>
+
+  </div>
+
+</section>
 
 </main>
+
+<!-- FOOTER SIN CAMBIOS -->
 <footer class="footer">
   © 2026 Maghreb UK Talent Ltd. All rights reserved.
 </footer>
 
-  <!-- Enlace al JS que conecta con el backend -->
-  <script src="script.js"></script>
-
-
-
+<script src="script.js"></script>
 
 </body>
 </html>
