@@ -1,5 +1,5 @@
 // ==========================
-// 🌍 LANGUAGE SYSTEM (FINAL CLEAN VERSION)
+// 🌍 LANGUAGE SYSTEM
 // ==========================
 document.addEventListener("DOMContentLoaded", () => {
   const langBtn = document.getElementById("lang-btn");
@@ -31,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
       contactTitle: "Start your application",
       send: "Send",
 
-      // placeholders
       name: "Full name",
       email: "Email address",
       country: "Country",
@@ -104,42 +103,32 @@ document.addEventListener("DOMContentLoaded", () => {
   function applyLanguage(lang) {
     const dict = translations[lang];
 
-    // TEXTS
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const key = el.dataset.i18n;
-      if (dict[key]) {
-        el.innerHTML = dict[key]; // importante para <br>
-      }
+      if (dict[key]) el.innerHTML = dict[key];
     });
 
-    // PLACEHOLDERS
     document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
       const key = el.dataset.i18nPlaceholder;
-      if (dict[key]) {
-        el.placeholder = dict[key];
-      }
+      if (dict[key]) el.placeholder = dict[key];
     });
 
-    // BUTTON LABEL
     const labels = { en: "EN ⌄", es: "ES ⌄", ar: "AR ⌄" };
     langBtn.textContent = labels[lang];
 
-    // direction
     document.documentElement.lang = lang;
     document.body.dir = lang === "ar" ? "rtl" : "ltr";
   }
 
-  // INIT
+  // INIT LANGUAGE
   let savedLang = localStorage.getItem("lang") || "en";
   applyLanguage(savedLang);
 
-  // OPEN MENU
   langBtn.addEventListener("click", (e) => {
     e.stopPropagation();
     langBtn.parentElement.classList.toggle("active");
   });
 
-  // SELECT LANGUAGE
   langMenu.querySelectorAll("li").forEach((item) => {
     item.addEventListener("click", () => {
       const lang = item.dataset.lang;
@@ -149,8 +138,54 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // CLOSE ON OUTSIDE CLICK
   document.addEventListener("click", () => {
     langBtn.parentElement.classList.remove("active");
   });
+
+  // ==========================
+  // 🎬 VIDEO CAROUSEL (CLEAN)
+  // ==========================
+
+  const videos = [
+    "video.mp4",
+    "video1.mp4",
+    "video2.mp4",
+    "video3.mp4"
+  ];
+
+  let currentIndex = 0;
+
+  const mainVideo = document.getElementById("mainVideo");
+  const prevBtn = document.getElementById("prevVideo");
+  const nextBtn = document.getElementById("nextVideo");
+
+  function loadVideo(index) {
+    mainVideo.pause();
+    mainVideo.src = videos[index];
+    mainVideo.load();
+    mainVideo.play();
+  }
+
+  function nextVideo() {
+    currentIndex = (currentIndex + 1) % videos.length;
+    loadVideo(currentIndex);
+  }
+
+  function prevVideo() {
+    currentIndex = (currentIndex - 1 + videos.length) % videos.length;
+    loadVideo(currentIndex);
+  }
+
+  nextBtn.addEventListener("click", nextVideo);
+  prevBtn.addEventListener("click", prevVideo);
+
+  // INIT FIRST VIDEO
+  loadVideo(currentIndex);
+
+  const soundBtn = document.getElementById("soundToggle");
+
+soundBtn.addEventListener("click", () => {
+  mainVideo.muted = !mainVideo.muted;
+  soundBtn.textContent = mainVideo.muted ? "🔇" : "🔊";
+});
 });

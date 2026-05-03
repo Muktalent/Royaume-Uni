@@ -91,39 +91,20 @@
     </div>
 
     <div class="hero-right">
-  <div class="video-stack">
 
-    <!-- VIDEO GRANDE -->
-    <div class="video-card large">
-      <video autoplay muted loop playsinline>
-        <source src="video.mp4" type="video/mp4">
-      </video>
-    </div>
+  <div class="video-carousel">
 
-    <!-- VIDEOS PEQUEÑOS -->
-    <div class="video-row">
+    <button class="video-arrow left" id="prevVideo">‹</button>
 
-      <div class="video-card small">
-        <video autoplay muted loop playsinline>
-          <source src="video.mp4" type="video/mp4">
-        </video>
-      </div>
+   <div class="video-frame">
+  <video id="mainVideo" autoplay muted loop playsinline></video>
+</div>
 
-      <div class="video-card small">
-        <video autoplay muted loop playsinline>
-          <source src="video.mp4" type="video/mp4">
-        </video>
-      </div>
-
-      <div class="video-card small">
-        <video autoplay muted loop playsinline>
-          <source src="video.mp4" type="video/mp4">
-        </video>
-      </div>
-
-    </div>
-
+    <button class="video-arrow right" id="nextVideo">›</button>
+<button id="soundToggle">🔇</button>
   </div>
+
+</div>
 </div>
 
 </section>
@@ -177,7 +158,72 @@
 
 <!-- FOOTER SIN CAMBIOS -->
 <footer class="footer">
-  © 2026 Maghreb UK Talent Ltd. All rights reserved.
+
+  <div class="footer-container">
+
+    <!-- SOCIAL -->
+    <div class="footer-col">
+      <h3>FOLLOW US</h3>
+
+      <div class="social-icons">
+        <a href="#">Facebook</a>
+        <a href="#">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">YouTube</a>
+      </div>
+
+      <p class="muted">More Social Media Accounts</p>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="footer-col">
+      <h3>FIND US</h3>
+
+      <ul>
+        <li>Contact us</li>
+        <li>Getting here</li>
+      </ul>
+
+      <div class="address">
+        
+        London / Marrakech<br>
+        agents@muktalent.com<br>
+        +44 07311874281<br>
+        +212 069615910
+      </div>
+    </div>
+
+    <!-- PARTNERS -->
+    <div class="footer-col">
+      <h3>PARTNERS</h3>
+
+      <ul>
+        <li>University partnerships</li>
+        <li>Corporate partners</li>
+        <li>Knowledge transfer</li>
+        <li>Alumni network</li>
+      </ul>
+    </div>
+
+    <!-- INFO -->
+    <div class="footer-col">
+      <h3>GENERAL INFORMATION</h3>
+
+      <ul>
+        <li>Careers</li>
+        <li>Work with us</li>
+        <li>Privacy policy</li>
+        <li>Cookie policy</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <div class="footer-bottom">
+    Copyright © 2026 MAGHREB UK TALENT LTD
+  </div>
+
 </footer>
 
 <script src="script.js"></script>

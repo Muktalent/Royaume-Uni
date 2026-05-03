@@ -127,29 +127,14 @@ body {
   font-family: 'Inter', sans-serif;
   min-height: 100vh;
 
-  background:
-    linear-gradient(180deg, rgba(246,241,231,0.92), rgba(232,220,200,0.88)),
-    url("Capture.PNG");
+  background: #fafafa; /* marfil limpio */
 
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-padding-top: clamp(80px, 10vh, 110px);
+  padding-top: clamp(80px, 10vh, 110px);
   color: #2b2118;
 }
 
-/* ==========================
-   SECTIONS (IMPORTANTE: DIFERENCIA VISUAL)
-========================== */
-/*.section {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 80px 10%;
-}
 
-/* HERO (más claro) */
+/* estructura (NO TOCAR) */
 .section {
   min-height: 100vh;
   display: flex;
@@ -157,21 +142,12 @@ padding-top: clamp(80px, 10vh, 110px);
   align-items: center;
   padding: 80px 5vw;
 }
-.hero {
-  background: rgba(255,255,255,0.55);
-  backdrop-filter: blur(10px);
-}
 
-/* WHY (más arena/marrón) */
-.why {
-  background: rgba(232, 220, 200, 0.65);
-  backdrop-filter: blur(10px);
-}
-
-/* CONTACT (claro limpio) */
+/* fondo uniforme */
+.hero,
+.why,
 .contact {
-  background: rgba(255,255,255,0.6);
-  backdrop-filter: blur(10px);
+  background: #fafafa;
 }
 
 /* ==========================
@@ -243,68 +219,96 @@ padding-top: clamp(80px, 10vh, 110px);
   opacity: 1;
 }
 
+
 /* ==========================
-   VIDEO STACK (KEY PART)
+   VIDEO CAROUSEL SIMPLE PRO
 ========================== */
-video {
+
+.video-carousel {
+  position: relative;
   width: 100%;
-  height: auto;
-  display: block;
-  border-radius: 20px;
-  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
-}
-.hero-right {
+  max-width: 650px;
+  margin: auto;
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 
-.video-stack {
+/* VIDEO FRAME */
+.video-frame {
   width: 100%;
-  max-width: 650px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-/* LARGE VIDEO */
-.video-card.large {
-  border-radius: 20px;
-  overflow: hidden;
   aspect-ratio: 16 / 9;
-  width: 100%;
+  overflow: hidden;
+  border-radius: 18px;
   box-shadow: 0 25px 60px rgba(0,0,0,0.25);
 }
 
-.video-card.large video {
+.video-frame video {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-/* ROW SMALL VIDEOS */
-.video-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-
-.video-card.small {
-  height: 110px;
-  border-radius: 14px;
-  overflow: hidden;
-  opacity: 0.85;
-  transition: 0.3s;
-}
-
-.video-card.small video {
+/* FLECHAS */
+.video-carousel {
+  position: relative;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 650px;
+  margin: auto;
 }
 
-.video-card.small:hover {
-  transform: scale(1.05);
+/* ocultas por defecto */
+.video-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%) scale(0.9);
+
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+
+  background: rgba(255,255,255,0.4);
+  backdrop-filter: blur(8px);
+
+  border: none;
+  cursor: pointer;
+
+  font-size: 20px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+/* aparecen SOLO al hover */
+.video-carousel:hover .video-arrow {
   opacity: 1;
+  transform: translateY(-50%) scale(1);
+}
+
+/* posiciones */
+.video-arrow.left {
+  left: 10px;
+}
+
+.video-arrow.right {
+  right: 10px;
+}
+
+/* hover elegante */
+.video-arrow:hover {
+  background: #2b2118;
+  color: white;
+}
+.video-arrow {
+  opacity: 0.3;
+}
+
+.video-carousel:hover .video-arrow {
+  opacity: 0.9;
 }
 
 /* ==========================
@@ -359,12 +363,112 @@ video {
 /* ==========================
    FOOTER (FIXED)
 ========================== */
-footer {
-  background: #1c1612;
-  color: white;
-  text-align: center;
-  padding: 18px;
+/* ==========================
+   FOOTER PRO (CERN STYLE)
+========================== */
+
+.footer {
+  background: #151515;
+  color: #fff;
+  padding: 60px 6%;
+  margin-top: 80px;
+}
+
+.footer-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 40px;
+}
+
+/* TITULOS */
+.footer h3 {
   font-size: 14px;
+  letter-spacing: 1px;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.footer h3::after {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 2px;
+  background: #ffffff55;
+  margin-top: 8px;
+}
+
+/* LINKS */
+.footer ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer ul li {
+  margin: 8px 0;
+  font-size: 14px;
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.footer ul li:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* SOCIAL */
+.social-icons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.social-icons a {
+  color: #fff;
+  opacity: 0.8;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.social-icons a:hover {
+  opacity: 1;
+}
+
+/* ADDRESS */
+.address {
+  margin-top: 15px;
+  font-size: 13px;
+  opacity: 0.7;
+  line-height: 1.6;
+}
+
+/* MUTED TEXT */
+.muted {
+  margin-top: 20px;
+  font-size: 12px;
+  opacity: 0.5;
+}
+
+/* BOTTOM BAR */
+.footer-bottom {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #ffffff22;
+  text-align: center;
+  font-size: 12px;
+  opacity: 0.6;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .footer-container {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ==========================
@@ -649,6 +753,12 @@ footer {
 /* ==========================
    MOBILE
 ========================== */
+
+@media (max-width: 768px) {
+  .video-arrow {
+    opacity: 0.8;
+  }
+}
 @media (max-width: 768px) {
 
   /* HEADER */
