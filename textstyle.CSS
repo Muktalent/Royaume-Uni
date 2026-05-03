@@ -146,9 +146,11 @@ padding-top: clamp(80px, 10vh, 110px);
 
 /* HERO (más claro) */
 .section {
-  min-height: auto;
-  padding: 100px 5vw;
-  display: block;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 5vw;
 }
 .hero {
   background: rgba(255,255,255,0.55);
