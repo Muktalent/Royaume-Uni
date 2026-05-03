@@ -148,8 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
 const videos = [
   
   "https://res.cloudinary.com/dapuyi9pm/video/upload/v1777823109/VOZM5262_bx2cdr.mp4",
-  "https://res.cloudinary.com/dapuyi9pm/video/upload/v1777822862/SHLF7434_n3ohg3.mp4",
-  "https://res.cloudinary.com/dapuyi9pm/video/upload/v1777822862/SHLF7434_n3ohg3.mp4"
+  "https://res.cloudinary.com/dapuyi9pm/video/upload/v1777824266/31de7446-6600-4488-8974-0ff3b7fbd73c_nhonml.mp4"
 ];
 
 let currentIndex = 0;
