@@ -110,9 +110,7 @@
 }
 
 /* evitar que el contenido quede debajo del header */
-body {
-  padding-top: 80px;
-}
+
 /* ==========================
    BODY (FONDO PREMIUM)
 ========================== */
@@ -187,17 +185,13 @@ padding-top: clamp(80px, 10vh, 110px);
    HERO PRO LAYOUT
 ========================== */
 .hero-layout {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 40px;
+
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.hero-left,
-.hero-right {
-  width: 100%;
 }
 
 /* LEFT SIDE */
@@ -247,6 +241,13 @@ padding-top: clamp(80px, 10vh, 110px);
 /* ==========================
    VIDEO STACK (KEY PART)
 ========================== */
+video {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 20px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+}
 .hero-right {
   display: flex;
   justify-content: center;
