@@ -145,39 +145,39 @@ document.addEventListener("DOMContentLoaded", () => {
   // ==========================
   // 🎬 VIDEO CAROUSEL (CLEAN)
   // ==========================
+const videos = [
+  
+  "https://res.cloudinary.com/dapuyi9pm/video/upload/v1777823109/VOZM5262_bx2cdr.mp4",
+  "https://res.cloudinary.com/dapuyi9pm/video/upload/v1777822862/SHLF7434_n3ohg3.mp4",
+  "https://res.cloudinary.com/dapuyi9pm/video/upload/v1777822862/SHLF7434_n3ohg3.mp4"
+];
 
-  const videos = [
-    "video.mp4",
-    "video1.mp4",
-    "video2.mp4",
-    "video3.mp4"
-  ];
+let currentIndex = 0;
 
-  let currentIndex = 0;
+const mainVideo = document.getElementById("mainVideo");
+const prevBtn = document.getElementById("prevVideo");
+const nextBtn = document.getElementById("nextVideo");
 
-  const mainVideo = document.getElementById("mainVideo");
-  const prevBtn = document.getElementById("prevVideo");
-  const nextBtn = document.getElementById("nextVideo");
+function loadVideo(index) {
+  mainVideo.pause();
+  mainVideo.src = videos[index];
+  mainVideo.load();
+  mainVideo.play();
+}
 
-  function loadVideo(index) {
-    mainVideo.pause();
-    mainVideo.src = videos[index];
-    mainVideo.load();
-    mainVideo.play();
-  }
+nextBtn.addEventListener("click", () => {
+  currentIndex = (currentIndex + 1) % videos.length;
+  loadVideo(currentIndex);
+});
 
-  function nextVideo() {
-    currentIndex = (currentIndex + 1) % videos.length;
-    loadVideo(currentIndex);
-  }
+prevBtn.addEventListener("click", () => {
+  currentIndex = (currentIndex - 1 + videos.length) % videos.length;
+  loadVideo(currentIndex);
+});
 
-  function prevVideo() {
-    currentIndex = (currentIndex - 1 + videos.length) % videos.length;
-    loadVideo(currentIndex);
-  }
-
-  nextBtn.addEventListener("click", nextVideo);
-  prevBtn.addEventListener("click", prevVideo);
+// init
+loadVideo(currentIndex);
+ 
 
   // INIT FIRST VIDEO
   loadVideo(currentIndex);
