@@ -18,3 +18,8 @@
   </url>
 
 </urlset>
+
+<url>
+  <loc>https://muktalent.com</loc>
+  <priority>1.0</priority>
+</url>
