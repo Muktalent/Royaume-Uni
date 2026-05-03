@@ -187,4 +187,25 @@ soundBtn.addEventListener("click", () => {
   mainVideo.muted = !mainVideo.muted;
   soundBtn.textContent = mainVideo.muted ? "🔇" : "🔊";
 });
+
+const menuToggle = document.getElementById("menuToggle");
+const mobileMenu = document.getElementById("mobileMenu");
+
+menuToggle.addEventListener("click", () => {
+  mobileMenu.classList.add("active");
+});
+
+// cerrar al hacer click en cualquier link
+document.querySelectorAll(".mobile-menu a").forEach(link => {
+  link.addEventListener("click", () => {
+    mobileMenu.classList.remove("active");
+  });
+});
+
+// cerrar al tocar fondo
+mobileMenu.addEventListener("click", (e) => {
+  if (e.target === mobileMenu) {
+    mobileMenu.classList.remove("active");
+  }
+});
 });
