@@ -17,9 +17,10 @@
     <loc>https://muktalent.com/#contact</loc>
   </url>
 
-</urlset>
-
-<url>
+  <url>
   <loc>https://muktalent.com</loc>
   <priority>1.0</priority>
 </url>
+
+</urlset>
+
