@@ -2,10 +2,7 @@
    RESET
 ========================== */
 
-html, body {
-  width: 100%;
-  overflow-x: hidden;
-}
+
 * {
   margin: 0;
   padding: 0;
@@ -152,19 +149,14 @@ padding-top: clamp(80px, 10vh, 110px);
 /* HERO (más claro) */
 .section {
   min-height: 100vh;
-  width: 100%;
-
-  display: block;   /* 👈 IMPORTANTE (quita el flex problema) */
-
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 80px clamp(20px, 5vw, 80px);
 }
 .hero {
   background: rgba(255,255,255,0.55);
   backdrop-filter: blur(10px);
-}
-.hero-layout {
-  max-width: 1200px;
-  margin: 0 auto;
 }
 
 /* WHY (más arena/marrón) */
@@ -195,9 +187,17 @@ padding-top: clamp(80px, 10vh, 110px);
    HERO PRO LAYOUT
 ========================== */
 .hero-layout {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 40px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero-left,
+.hero-right {
+  width: 100%;
 }
 
 /* LEFT SIDE */
