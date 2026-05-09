@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Study in the UK | Maghreb UK Talent</title>
   <meta name="description" content="We help students from Morocco, Algeria and Tunisia study in the UK with university applications, visa support and guidance.">
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 
 <body>
@@ -13,7 +13,7 @@
 <header class="header">
 
   <div class="logo">
-    <img src="assets/logo.png" alt="Maghreb UK Logo" />
+    <img src="/assets/logo.png" alt="Maghreb UK Logo" />
   </div>
 
 <nav class="nav">
@@ -68,10 +68,9 @@
     <div class="lang-selector">
       <button id="lang-btn" class="btn-secondary">EN ⌄</button>
       <ul id="lang-menu" class="lang-menu">
-        <li data-lang="en">English</li>
+         <li data-lang="en">English</li>
            <li data-lang="fr">Français</li>
         <li data-lang="ar">العربية</li>
-     
       </ul>
     </div>
 
@@ -130,41 +129,24 @@
 
     </div>
 
-<div class="hero-right">
+    <div class="hero-right">
 
-  <div class="media-wall">
+  <div class="video-carousel">
 
-    <!-- FEATURED VIDEO -->
-    <div class="media-featured">
-      <video id="mainVideo" autoplay muted playsinline></video>
+    <button class="video-arrow left" id="prevVideo">‹</button>
 
-      <button id="soundToggle" class="sound-btn">🔇</button>
-    </div>
+   <div class="video-frame">
+<video id="mainVideo" autoplay muted playsinline></video>
+</div>
 
-    <!-- THUMBNAIL GRID -->
-    <div class="media-grid">
-
-      <div class="media-item active" data-video="0">
-        <video muted playsinline></video>
-      </div>
-
-      <div class="media-item" data-video="1">
-        <video muted playsinline></video>
-      </div>
-
-      <div class="media-item" data-video="2">
-        <video muted playsinline></video>
-      </div>
-
-    </div>
-
+    <button class="video-arrow right" id="nextVideo">›</button>
+<button id="soundToggle">🔇</button>
   </div>
 
 </div>
 </div>
 
 </section>
-
 
 <!-- WHY -->
 <section class="section why" id="why">
