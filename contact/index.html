@@ -101,12 +101,13 @@
 
 <!-- SOCIAL -->
 <div class="social-bar">
-  <a href="#" class="social-icon">⌘</a>
-  <a href="#" class="social-icon">f</a>
-  <a href="#" class="social-icon">⌗</a>
+  <a href="https://www.linkedin.com/company/maghreb-uk-talent/" class="social-icon" target="_blank" rel="noopener noreferrer">⌘</a>
+  <a href="https://www.instagram.com/maghrebuktalent/" class="social-icon" target="_blank" rel="noopener noreferrer">IG</a>  <a href="#" class="social-icon">⌗</a>
 </div>
 
-<a href="#contact" class="chat-bubble">💬</a>
+<a href="https://wa.me/2120696115910" class="chat-bubble" target="_blank" rel="noopener noreferrer"> 
+  <img src="/assets/image.png" alt="WhatsApp">
+</a>
 
 <!-- HERO -->
 <section class="section hero" id="home">
@@ -194,16 +195,18 @@
 
     <h2 data-i18n="contactTitle">Start your application</h2>
 
-    <form class="contact-form">
+    <form class="contact-form" action="https://formsubmit.co/agents@muktalent.com" method="POST">
+  
+  <input type="hidden" name="_captcha" value="false">
+  <!-- página después de enviar -->
+  <input type="hidden" name="_next" value="https://muktalent.com/thank-you.html">
+  <input type="text" name="name" placeholder="Full name" required data-i18n-placeholder="name" />
+  <input type="email" name="email" placeholder="Email address" required data-i18n-placeholder="email" />
+  <input type="text" name="country" placeholder="Country" data-i18n-placeholder="country" />
+  <textarea rows="5" name="message" placeholder="Tell us about your plans..." data-i18n-placeholder="message"></textarea>
+  <button type="submit" data-i18n="send">Send</button>
 
-      <input type="text" placeholder="Full name" required data-i18n-placeholder="name" />
-      <input type="email" placeholder="Email address" required data-i18n-placeholder="email" />
-      <input type="text" placeholder="Country" data-i18n-placeholder="country" />
-      <textarea rows="5" placeholder="Tell us about your plans..." data-i18n-placeholder="message"></textarea>
-
-      <button type="submit" data-i18n="send">Send</button>
-
-    </form>
+</form>
 
   </div>
 

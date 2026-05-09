@@ -722,7 +722,6 @@ body {
 
 .chat-bubble {
   position: fixed;
-
   left: 24px;
   bottom: 24px;
 
@@ -735,21 +734,23 @@ body {
 
   border-radius: 50%;
 
-  background: #111;
-  color: white;
+  background: #1d1e1d;
 
-  text-decoration: none;
-
-  box-shadow:
-    0 10px 25px rgba(0,0,0,0.18);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 
   z-index: 9999;
 
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease;
+}
+
+.chat-bubble img {
+  width: 26px;
+  height: 26px;
+  display: block;
 }
 
 .chat-bubble:hover {
-  transform: scale(1.08);
+  transform: scale(1.06);
 }
 
 /* ==========================
