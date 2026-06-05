@@ -29,88 +29,94 @@
 <header class="header">
 
   <div class="logo">
-    <img src="/assets/logo.png" alt="Maghreb UK Logo" />
+    <a href="/" aria-label="Maghreb UK Talent home">
+      <img src="/assets/logo.png" alt="Maghreb UK Logo" />
+    </a>
   </div>
 
-<nav class="nav">
+  <nav class="nav" aria-label="Primary navigation">
+    <a href="/" data-i18n="home">ACCUEIL</a>
+    <a href="/about-us/" data-i18n="about">À PROPOS</a>
 
-  <a href="/" data-i18n="home">ACCUEIL</a>
-
-  <a href="/about-us/" data-i18n="about">À PROPOS</a>
-
-  <!-- SERVICES -->
-  <div class="dropdown">
-
-    <a href="/services/" data-i18n="services">
-      SERVICES ▼
-    </a>
-
-    <div class="dropdown-menu">
-
-      <a href="/services/university-applications/" data-i18n="uniApps">
-        Candidatures universitaires UK
+    <div class="dropdown">
+      <a href="/services/" data-i18n="services">
+        SERVICES ▼
       </a>
 
-      <a href="/services/student-visa-support/" data-i18n="visaSupport">
-        Visa étudiant UK
-      </a>
+      <div class="dropdown-menu">
+        <a href="/services/university-applications/" data-i18n="uniApps">
+          Candidatures universitaires UK
+        </a>
 
-      <a href="/services/accommodation-support/" data-i18n="accommodation">
-        Hébergement étudiant
-      </a>
+        <a href="/services/student-visa-support/" data-i18n="visaSupport">
+          Visa étudiant UK
+        </a>
 
-      <a href="/services/ielts-guidance/" data-i18n="ielts">
-        Préparation IELTS
-      </a>
+        <a href="/services/accommodation-support/" data-i18n="accommodation">
+          Hébergement étudiant
+        </a>
 
-      <a href="/services/scholarships/" data-i18n="scholarships">
-        Bourses d’études
-      </a>
+        <a href="/services/ielts-guidance/" data-i18n="ielts">
+          Préparation IELTS
+        </a>
 
+        <a href="/services/scholarships/" data-i18n="scholarships">
+          Bourses d’études
+        </a>
+      </div>
     </div>
 
-  </div>
-
-  <a href="/contact/" data-i18n="contact">CONTACT</a>
-
-</nav>
+    <a href="/contact/" data-i18n="contact">CONTACT</a>
+  </nav>
 
   <div class="header-right">
-
-   <div class="header-actions">
-<button class="btn-secondary" data-i18n="assessment">Free Assessment</button>
+    <div class="header-actions">
+      <button class="btn-secondary" data-i18n="assessment">Free Assessment</button>
     </div>
 
     <div class="lang-selector">
       <button id="lang-btn" class="btn-secondary">EN ⌄</button>
       <ul id="lang-menu" class="lang-menu">
-          <li data-lang="en">English</li>
-           <li data-lang="fr">Français</li>
+        <li data-lang="en">English</li>
+        <li data-lang="fr">Français</li>
         <li data-lang="ar">العربية</li>
       </ul>
     </div>
 
-
+    <button
+      class="mobile-menu-toggle"
+      id="mobileMenuToggle"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="mobileMenu"
+      type="button"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
-<div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
-<nav class="mobile-menu" id="mobileMenu" aria-hidden="true">
-  <div class="mobile-menu-inner">
-    <a href="/" class="mobile-menu-link">Accueil</a>
-    <a href="/about-us/" class="mobile-menu-link">À propos</a>
-    <a href="/services/" class="mobile-menu-link">Services</a>
-    <a href="/services/university-applications/" class="mobile-menu-sublink">Candidatures universitaires UK</a>
-    <a href="/services/student-visa-support/" class="mobile-menu-sublink">Visa étudiant UK</a>
-    <a href="/services/accommodation-support/" class="mobile-menu-sublink">Hébergement étudiant</a>
-    <a href="/services/ielts-guidance/" class="mobile-menu-sublink">Préparation IELTS</a>
-    <a href="/services/scholarships/" class="mobile-menu-sublink">Bourses d’études</a>
-    <a href="/contact/" class="mobile-menu-link">Contact</a>
+  <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
-    <div class="mobile-menu-actions">
-      <a href="#contact" class="mobile-book-btn">Évaluation gratuite</a>
+  <nav class="mobile-menu" id="mobileMenu" aria-hidden="true" aria-label="Mobile navigation">
+    <div class="mobile-menu-inner">
+      <a href="/" class="mobile-menu-link">Accueil</a>
+      <a href="/about-us/" class="mobile-menu-link">À propos</a>
+      <a href="/services/" class="mobile-menu-link">Services</a>
+      <a href="/services/university-applications/" class="mobile-menu-sublink">Candidatures universitaires UK</a>
+      <a href="/services/student-visa-support/" class="mobile-menu-sublink">Visa étudiant UK</a>
+      <a href="/services/accommodation-support/" class="mobile-menu-sublink">Hébergement étudiant</a>
+      <a href="/services/ielts-guidance/" class="mobile-menu-sublink">Préparation IELTS</a>
+      <a href="/services/scholarships/" class="mobile-menu-sublink">Bourses d’études</a>
+      <a href="/contact/" class="mobile-menu-link">Contact</a>
+
+      <div class="mobile-menu-actions">
+        <a href="/contact/" class="mobile-book-btn">Évaluation gratuite</a>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
+
 </header>
 
 
