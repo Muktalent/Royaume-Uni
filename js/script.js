@@ -153,74 +153,78 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==========================
-  // 📱 MOBILE MENU
-  // ==========================
-  const mobileMenuToggle = document.getElementById("mobileMenuToggle");
-  const mobileMenu = document.getElementById("mobileMenu");
-  const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+// 📱 MOBILE MENU
+// ==========================
+const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+const mobileMenu = document.getElementById("mobileMenu");
+const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
 
-  function syncMenuState(isOpen) {
-    document.body.classList.toggle("menu-open", isOpen);
+function setMenuState(isOpen) {
+  document.body.classList.toggle("menu-open", isOpen);
 
-    if (mobileMenuToggle) {
-      mobileMenuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    }
-
-    if (mobileMenu) {
-      mobileMenu.setAttribute("aria-hidden", isOpen ? "false" : "true");
-    }
+  if (mobileMenuToggle) {
+    mobileMenuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    mobileMenuToggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
   }
 
-  function openMobileMenu() {
-    syncMenuState(true);
+  if (mobileMenu) {
+    mobileMenu.setAttribute("aria-hidden", isOpen ? "false" : "true");
   }
 
-  function closeMobileMenu() {
-    syncMenuState(false);
+  if (mobileMenuOverlay) {
+    mobileMenuOverlay.style.opacity = isOpen ? "1" : "0";
+    mobileMenuOverlay.style.visibility = isOpen ? "visible" : "hidden";
+    mobileMenuOverlay.style.pointerEvents = isOpen ? "auto" : "none";
   }
 
-  // reset SIEMPRE al cargar nueva página
-  closeMobileMenu();
+  if (mobileMenu) {
+    mobileMenu.style.opacity = isOpen ? "1" : "0";
+    mobileMenu.style.visibility = isOpen ? "visible" : "hidden";
+    mobileMenu.style.pointerEvents = isOpen ? "auto" : "none";
+  }
+}
 
-  if (mobileMenuToggle && mobileMenu && mobileMenuOverlay) {
-    mobileMenuToggle.style.display = "";
-    mobileMenuToggle.style.visibility = "";
-    mobileMenuToggle.style.opacity = "";
+function openMobileMenu() {
+  setMenuState(true);
+}
 
-    mobileMenuToggle.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+function closeMobileMenu() {
+  setMenuState(false);
+}
 
-      const isOpen = document.body.classList.contains("menu-open");
-      if (isOpen) {
-        closeMobileMenu();
-      } else {
-        openMobileMenu();
-      }
-    });
+if (mobileMenuToggle && mobileMenu && mobileMenuOverlay) {
+  setMenuState(false);
 
-    mobileMenuOverlay.addEventListener("click", closeMobileMenu);
+  mobileMenuToggle.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-    mobileMenu.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", () => {
-        closeMobileMenu();
-      });
-    });
+    const isOpen = document.body.classList.contains("menu-open");
+    setMenuState(!isOpen);
+  });
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeMobileMenu();
-    });
+  mobileMenuOverlay.addEventListener("click", closeMobileMenu);
 
-    window.addEventListener("pageshow", () => {
+  mobileMenu.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", closeMobileMenu);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
       closeMobileMenu();
-    });
+    }
+  });
 
-    window.addEventListener("resize", () => {
-      if (window.innerWidth > 768) {
-        closeMobileMenu();
-      }
-    });
-  }
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 768) {
+      closeMobileMenu();
+    }
+  });
+
+  window.addEventListener("pageshow", () => {
+    closeMobileMenu();
+  });
+}
 
   // ==========================
   // 🎬 MEDIA WALL SYSTEM
