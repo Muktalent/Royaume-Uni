@@ -97,111 +97,193 @@
 
 
 
-<main>
+<main class="contact-page contact-page-premium">
 
-<!-- SOCIAL -->
-<div class="social-bar">
-  <a href="https://www.linkedin.com/company/maghreb-uk-talent/" class="social-icon" target="_blank" rel="noopener noreferrer">⌘</a>
-  <a href="https://www.instagram.com/maghrebuktalent/" class="social-icon" target="_blank" rel="noopener noreferrer">IG</a>  <a href="#" class="social-icon">⌗</a>
-</div>
-
-<a href="https://wa.me/2120696115910" class="chat-bubble" target="_blank" rel="noopener noreferrer"> 
-  <img src="/assets/image.png" alt="WhatsApp">
-</a>
-
-
-
-<!-- HEADER SECTION -->
-<section class="section contact-hero">
-
-  <div class="content">
-
-    <h1>Contact us</h1>
-
-    <p>
-      General enquiries for Maghreb UK Talent.  
-      We support students applying to study in the United Kingdom.
-    </p>
-
+  <!-- SOCIAL -->
+  <div class="social-bar">
+    <a href="https://www.linkedin.com/company/maghreb-uk-talent/" class="social-icon" target="_blank" rel="noopener noreferrer">⌘</a>
+    <a href="https://www.instagram.com/maghrebuktalent/" class="social-icon" target="_blank" rel="noopener noreferrer">IG</a>
+    <a href="#" class="social-icon">⌗</a>
   </div>
 
-</section>
+  <a href="https://wa.me/21269615910?text=Bonjour%20Maghreb%20UK%20Talent%2C%20je%20souhaite%20obtenir%20des%20informations%20sur%20mon%20projet%20d%E2%80%99%C3%A9tudes%20au%20Royaume-Uni." class="chat-bubble" target="_blank" rel="noopener noreferrer">
+    <img src="/assets/image.png" alt="WhatsApp">
+  </a>
 
-<!-- MAIN INFO BLOCK -->
-<section class="section contact-info-section">
+  <!-- HERO / INTRO -->
+  <section class="section contact-intro-hero">
+    <div class="content contact-hero-grid">
+      <div class="contact-hero-copy">
+        <span class="eyebrow">Contact</span>
+        <h1>Parlez à une équipe qui peut réellement faire avancer votre projet UK</h1>
+        <p>
+          Que vous soyez au début de votre réflexion ou déjà prêt à déposer une
+          candidature, nous pouvons vous orienter rapidement sur l’admission,
+          l’IELTS, le visa étudiant, les documents et le logement.
+        </p>
 
-  <div class="content">
+        <div class="hero-cta">
+          <a href="#contact-form" class="cta">Envoyer une demande</a>
+          <a href="https://wa.me/21269615910?text=Bonjour%20Maghreb%20UK%20Talent%2C%20je%20souhaite%20obtenir%20des%20informations%20sur%20mon%20projet%20d%E2%80%99%C3%A9tudes%20au%20Royaume-Uni." class="btn-secondary" target="_blank" rel="noopener noreferrer">WhatsApp direct</a>
+        </div>
+      </div>
 
-    <h2>General questions or feedback</h2>
+      <div class="contact-quick-card">
+        <p class="card-label">Coordonnées</p>
 
-    <p>
-      Chat with our team online, by phone or email during working hours.
-      Monday – Friday, 09:00 – 18:00.
-    </p>
+        <div class="quick-contact-list">
+          <div class="quick-contact-item">
+            <span class="quick-label">Email</span>
+            <a href="mailto:agents@muktalent.com?subject=Demande%20d%27information%20-%20Maghreb%20UK%20Talent">agents@muktalent.com</a>
+          </div>
 
-    <div class="contact-details">
+          <div class="quick-contact-item">
+            <span class="quick-label">Téléphone UK</span>
+            <a href="tel:+447311874281">+44 07311874281</a>
+          </div>
 
-      <p><strong>Phone:</strong> +44 07311874281</p>
-      <p><strong>Phone:</strong> +212 069615910</p>
-      <p><strong>Email:</strong> agent@muktalent.com</p>
-      <p><strong>Location:</strong> London / Marrakech</p>
+          <div class="quick-contact-item">
+            <span class="quick-label">Téléphone Maroc</span>
+            <a href="tel:+21269615910">+212 069615910</a>
+          </div>
+
+          <div class="quick-contact-item">
+            <span class="quick-label">Présence</span>
+            <span>London / Marrakech</span>
+          </div>
+
+          <div class="quick-contact-item">
+            <span class="quick-label">Horaires</span>
+            <span>Lundi – Vendredi, 09:00 – 18:00</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FORM + SUPPORT -->
+  <section class="section contact-main-block" id="contact-form">
+    <div class="content contact-main-grid">
+
+      <div class="contact-form-wrap">
+        <span class="eyebrow">Formulaire principal</span>
+        <h2>Dites-nous où vous en êtes</h2>
+        <p class="form-intro">
+          Plus votre message est précis, plus notre réponse sera utile et rapide.
+        </p>
+
+        <form class="contact-form contact-form-pro" action="https://formsubmit.co/agents@muktalent.com" method="POST">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_next" value="https://muktalent.com/thank-you.html">
+          <input type="hidden" name="_subject" value="Nouvelle demande depuis la page Contact">
+
+          <div class="form-row-two">
+            <input type="text" name="name" placeholder="Nom complet" required />
+            <input type="email" name="email" placeholder="Adresse e-mail" required />
+          </div>
+
+          <div class="form-row-two">
+            <input type="text" name="country" placeholder="Pays" />
+            <input type="text" name="phone" placeholder="Téléphone / WhatsApp" />
+          </div>
+
+          <div class="form-row-two">
+            <select name="service">
+              <option value="">Service concerné</option>
+              <option value="university-applications">Candidatures universitaires UK</option>
+              <option value="ielts-guidance">Préparation IELTS</option>
+              <option value="student-visa-support">Visa étudiant UK</option>
+              <option value="accommodation-support">Hébergement étudiant</option>
+              <option value="scholarships">Bourses d’études</option>
+              <option value="general">Demande générale</option>
+            </select>
+
+            <select name="study-level">
+              <option value="">Niveau d’études visé</option>
+              <option value="foundation">Foundation</option>
+              <option value="undergraduate">Undergraduate</option>
+              <option value="postgraduate">Postgraduate</option>
+              <option value="phd">PhD</option>
+              <option value="other">Autre</option>
+            </select>
+          </div>
+
+          <textarea rows="7" name="message" placeholder="Décrivez votre situation actuelle, votre niveau d’anglais, votre objectif d’études et l’aide dont vous avez besoin..."></textarea>
+
+          <button type="submit">Envoyer ma demande</button>
+        </form>
+      </div>
+
+      <div class="contact-side-stack">
+        <div class="contact-side-card">
+          <span class="eyebrow">Réponse rapide</span>
+          <h3>Vous préférez WhatsApp ?</h3>
+          <p>
+            Utilisez notre lien direct avec message prérempli pour nous envoyer
+            votre demande immédiatement.
+          </p>
+          <a href="https://wa.me/21269615910?text=Bonjour%20Maghreb%20UK%20Talent%2C%20je%20souhaite%20obtenir%20des%20informations%20sur%20mon%20projet%20d%E2%80%99%C3%A9tudes%20au%20Royaume-Uni." class="cta contact-side-cta" target="_blank" rel="noopener noreferrer">Ouvrir WhatsApp</a>
+        </div>
+
+        <div class="contact-side-card muted-card">
+          <span class="eyebrow">Email direct</span>
+          <h3>Vous avez déjà un dossier ?</h3>
+          <p>
+            Envoyez vos questions ou documents directement par e-mail pour un
+            premier échange plus détaillé.
+          </p>
+          <a href="mailto:agents@muktalent.com?subject=Demande%20de%20suivi%20dossier%20-%20Maghreb%20UK%20Talent" class="text-link">Écrire par email</a>
+        </div>
+      </div>
 
     </div>
+  </section>
 
-    <div class="contact-buttons">
+  <!-- TOPICS -->
+  <section class="section contact-topics">
+    <div class="content">
+      <span class="eyebrow">Demandes fréquentes</span>
+      <h2>Choisissez l’objet de votre demande</h2>
 
-      <a href="mailto:agent@muktalent.com" class="btn-contact">
-        Email us
-      </a>
+      <div class="topics-grid">
+        <a href="/services/university-applications/" class="topic-card">
+          <h3>Candidatures universitaires</h3>
+          <p>Choix des universités, stratégie, dossier académique et suivi des offres.</p>
+          <span>Voir le service</span>
+        </a>
 
-      <a href="https://wa.me/2120696115910" class="btn-contact" target="_blank">
-        WhatsApp
-      </a>
+        <a href="/services/ielts-guidance/" class="topic-card">
+          <h3>Préparation IELTS</h3>
+          <p>Objectif de score, niveau actuel, préparation et accompagnement ciblé.</p>
+          <span>Voir le service</span>
+        </a>
 
+        <a href="/services/student-visa-support/" class="topic-card">
+          <h3>Visa étudiant UK</h3>
+          <p>CAS, finances, dossier visa, rendez-vous biométriques et dépôt.</p>
+          <span>Voir le service</span>
+        </a>
+
+        <a href="/services/accommodation-support/" class="topic-card">
+          <h3>Hébergement étudiant</h3>
+          <p>Logement avant arrivée selon ville, budget et type de résidence.</p>
+          <span>Voir le service</span>
+        </a>
+      </div>
     </div>
+  </section>
 
-  </div>
-
-</section>
-
-<!-- SECOND SECTION (LIKE IMAGE DROPDOWN STYLE) -->
-<section class="section contact-options">
-
-  <div class="content">
-
-    <h2>What is your question about?</h2>
-
-    <p>
-      Choose the relevant area so we can direct your enquiry correctly.
-    </p>
-
-    <div class="dropdown-box">
-
-      <div class="dropdown-item">
-        <span>University applications</span>
-        <span>›</span>
-      </div>
-
-      <div class="dropdown-item">
-        <span>Student visa support</span>
-        <span>›</span>
-      </div>
-
-      <div class="dropdown-item">
-        <span>Accommodation</span>
-        <span>›</span>
-      </div>
-
-      <div class="dropdown-item">
-        <span>General enquiries</span>
-        <span>›</span>
-      </div>
-
+  <!-- FINAL BAR -->
+  <section class="section contact-final-band">
+    <div class="content contact-final-box">
+      <span class="eyebrow light">Maghreb UK Talent LTD</span>
+      <h2>Une structure UK-based pour les étudiants du Maghreb</h2>
+      <p>
+        Admissions, IELTS, visa, documents et logement: un seul point de contact
+        pour faire avancer votre projet d’études au Royaume-Uni.
+      </p>
     </div>
-
-  </div>
-
-</section>
+  </section>
 
 </main>
 
