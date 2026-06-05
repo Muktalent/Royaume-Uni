@@ -1,7 +1,27 @@
-// ==========================
-// 🌍 LANGUAGE SYSTEM
-// ==========================
 document.addEventListener("DOMContentLoaded", () => {
+  // ==========================
+  // HELPERS
+  // ==========================
+  const safeStorage = {
+    get(key) {
+      try {
+        return window.localStorage.getItem(key);
+      } catch (error) {
+        return null;
+      }
+    },
+    set(key, value) {
+      try {
+        window.localStorage.setItem(key, value);
+      } catch (error) {
+        return;
+      }
+    }
+  };
+
+  // ==========================
+  // 🌍 LANGUAGE SYSTEM
+  // ==========================
   const langBtn = document.getElementById("lang-btn");
   const langMenu = document.getElementById("lang-menu");
 
@@ -14,23 +34,19 @@ document.addEventListener("DOMContentLoaded", () => {
       login: "Log in",
       apply: "Apply Now",
       explore: "Explore more",
-
+      assessment: "Free Assessment",
       title: "STUDY IN THE UK",
       heroText:
         "We guide students from the Maghreb into top UK universities with full support: admissions, visas, accommodation and career pathways.",
-
       students: "Students placed",
       visa: "Visa success",
       unis: "UK universities",
-
       whyTitle: "Why choose us",
       whyPoints:
         "✔ Personalized guidance<br>✔ University applications<br>✔ Visa support<br>✔ Accommodation help<br>✔ Maghreb student focus",
       whyText: "We make studying in the UK simple and accessible.",
-
       contactTitle: "Start your application",
       send: "Send",
-
       name: "Full name",
       email: "Email address",
       country: "Country",
@@ -45,23 +61,19 @@ document.addEventListener("DOMContentLoaded", () => {
       login: "تسجيل الدخول",
       apply: "قدّم الآن",
       explore: "اكتشف المزيد",
-
+      assessment: "تقييم مجاني",
       title: "ادرس في المملكة المتحدة",
       heroText:
         "نوجه الطلاب من المغرب العربي إلى أفضل الجامعات البريطانية مع دعم كامل.",
-
       students: "طالب تم قبوله",
       visa: "نجاح التأشيرات",
       unis: "جامعات بريطانية",
-
       whyTitle: "لماذا نحن",
       whyPoints:
         "✔ إرشاد شخصي<br>✔ تقديم للجامعات<br>✔ دعم التأشيرات<br>✔ مساعدة السكن<br>✔ تركيز على طلاب المغرب العربي",
       whyText: "نجعل الدراسة في بريطانيا سهلة وميسرة.",
-
       contactTitle: "ابدأ طلبك",
       send: "إرسال",
-
       name: "الاسم الكامل",
       email: "البريد الإلكتروني",
       country: "الدولة",
@@ -73,7 +85,6 @@ document.addEventListener("DOMContentLoaded", () => {
       why: "POURQUOI LE ROYAUME-UNI",
       uni: "UNIVERSITÉS",
       contact: "CONTACT",
-
       login: "Connexion",
       apply: "Postuler maintenant",
       explore: "Explorer",
@@ -81,19 +92,15 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "ÉTUDIER AU ROYAUME-UNI",
       heroText:
         "Nous accompagnons les étudiants du Maghreb vers les meilleures universités britanniques avec un support complet.",
-
       students: "Étudiants placés",
       visa: "Taux de visa réussi",
       unis: "Universités UK",
-
       whyTitle: "Pourquoi nous choisir",
       whyPoints:
         "✔ Accompagnement personnalisé<br>✔ Candidatures universitaires<br>✔ Support visa<br>✔ Aide logement<br>✔ Focus Maghreb",
       whyText: "Nous rendons les études au Royaume-Uni simples et accessibles.",
-
       contactTitle: "Commencez votre candidature",
       send: "Envoyer",
-
       name: "Nom complet",
       email: "Email",
       country: "Pays",
@@ -122,10 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.dir = lang === "ar" ? "rtl" : "ltr";
   }
 
-  // ==========================
-  // INIT LANGUAGE (FR DEFAULT)
-  // ==========================
-  let savedLang = localStorage.getItem("lang") || "fr";
+  const savedLang = safeStorage.get("lang") || "fr";
   applyLanguage(savedLang);
 
   if (langBtn && langMenu) {
@@ -137,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
     langMenu.querySelectorAll("li").forEach((item) => {
       item.addEventListener("click", () => {
         const lang = item.dataset.lang;
-        localStorage.setItem("lang", lang);
+        safeStorage.set("lang", lang);
         applyLanguage(lang);
         langBtn.parentElement.classList.remove("active");
       });
@@ -149,9 +153,55 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // ==========================
+  // 📱 MOBILE MENU
+  // ==========================
+  const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+
+  function openMobileMenu() {
+    document.body.classList.add("menu-open");
+    if (mobileMenuToggle) mobileMenuToggle.setAttribute("aria-expanded", "true");
+    if (mobileMenu) mobileMenu.setAttribute("aria-hidden", "false");
+  }
+
+  function closeMobileMenu() {
+    document.body.classList.remove("menu-open");
+    if (mobileMenuToggle) mobileMenuToggle.setAttribute("aria-expanded", "false");
+    if (mobileMenu) mobileMenu.setAttribute("aria-hidden", "true");
+  }
+
+  if (mobileMenuToggle && mobileMenu && mobileMenuOverlay) {
+    mobileMenuToggle.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const isOpen = document.body.classList.contains("menu-open");
+      if (isOpen) {
+        closeMobileMenu();
+      } else {
+        openMobileMenu();
+      }
+    });
+
+    mobileMenuOverlay.addEventListener("click", closeMobileMenu);
+
+    mobileMenu.querySelectorAll("a").forEach((link) => {
+      link.addEventListener("click", closeMobileMenu);
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeMobileMenu();
+    });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 768) closeMobileMenu();
+    });
+  }
+
+  // ==========================
   // 🎬 MEDIA WALL SYSTEM
   // ==========================
-
   const videos = [
     "https://res.cloudinary.com/dapuyi9pm/video/upload/v1777823109/VOZM5262_bx2cdr.mp4",
     "https://res.cloudinary.com/dapuyi9pm/video/upload/v1777824266/31de7446-6600-4488-8974-0ff3b7fbd73c_nhonml.mp4",
@@ -164,46 +214,67 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let currentIndex = 0;
 
+  function safePlay(videoEl) {
+    if (!videoEl) return;
+    const playPromise = videoEl.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {});
+    }
+  }
+
   function loadVideo(index) {
     currentIndex = index;
 
-    if (!mainVideo) return;
+    if (!mainVideo || !items.length) return;
 
     mainVideo.src = videos[index];
     mainVideo.muted = true;
-    mainVideo.play().catch(() => {});
+    mainVideo.loop = true;
+    mainVideo.playsInline = true;
+    safePlay(mainVideo);
 
     items.forEach((item, i) => {
       item.classList.toggle("active", i === index);
 
-      const v = item.querySelector("video");
-      if (v) {
-        v.src = videos[i];
-        v.muted = true;
-        v.loop = true;
-        v.play().catch(() => {});
+      const thumbVideo = item.querySelector("video");
+      if (thumbVideo) {
+        thumbVideo.src = videos[i];
+        thumbVideo.muted = true;
+        thumbVideo.loop = true;
+        thumbVideo.playsInline = true;
+        safePlay(thumbVideo);
       }
     });
+
+    if (soundBtn) {
+      soundBtn.textContent = "🔇";
+    }
   }
 
-  items.forEach((item) => {
-    item.addEventListener("click", () => {
-      const index = parseInt(item.dataset.video);
-      loadVideo(index);
+  if (items.length && mainVideo) {
+    items.forEach((item) => {
+      item.addEventListener("click", () => {
+        const index = parseInt(item.dataset.video, 10);
+        if (Number.isNaN(index)) return;
 
-      if (mainVideo && soundBtn) {
-        mainVideo.muted = false;
-        soundBtn.textContent = "🔊";
-      }
+        loadVideo(index);
+
+        if (mainVideo && soundBtn) {
+          mainVideo.muted = false;
+          soundBtn.textContent = "🔊";
+          safePlay(mainVideo);
+        }
+      });
     });
-  });
+
+    loadVideo(0);
+  }
 
   if (soundBtn && mainVideo) {
     soundBtn.addEventListener("click", () => {
       mainVideo.muted = !mainVideo.muted;
       soundBtn.textContent = mainVideo.muted ? "🔇" : "🔊";
+      safePlay(mainVideo);
     });
   }
-
-  loadVideo(0);
 });
