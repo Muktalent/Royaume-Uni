@@ -1,7 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // ==========================
-  // HELPERS
-  // ==========================
   const safeStorage = {
     get(key) {
       try {
@@ -20,10 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // ==========================
-  // 🌍 LANGUAGE SYSTEM
+  // LANGUAGE SYSTEM
   // ==========================
   const langBtn = document.getElementById("lang-btn");
   const langMenu = document.getElementById("lang-menu");
+  const langSelector = document.querySelector(".lang-selector");
 
   const translations = {
     en: {
@@ -52,7 +50,6 @@ document.addEventListener("DOMContentLoaded", () => {
       country: "Country",
       message: "Tell us about your plans..."
     },
-
     ar: {
       home: "الرئيسية",
       why: "لماذا بريطانيا",
@@ -79,7 +76,6 @@ document.addEventListener("DOMContentLoaded", () => {
       country: "الدولة",
       message: "أخبرنا عن خططك..."
     },
-
     fr: {
       home: "ACCUEIL",
       why: "POURQUOI LE ROYAUME-UNI",
@@ -132,10 +128,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const savedLang = safeStorage.get("lang") || "fr";
   applyLanguage(savedLang);
 
-  if (langBtn && langMenu) {
+  if (langBtn && langMenu && langSelector) {
     langBtn.addEventListener("click", (e) => {
       e.stopPropagation();
-      langBtn.parentElement.classList.toggle("active");
+      langSelector.classList.toggle("active");
+      langBtn.setAttribute(
+        "aria-expanded",
+        langSelector.classList.contains("active") ? "true" : "false"
+      );
     });
 
     langMenu.querySelectorAll("li").forEach((item) => {
@@ -143,91 +143,80 @@ document.addEventListener("DOMContentLoaded", () => {
         const lang = item.dataset.lang;
         safeStorage.set("lang", lang);
         applyLanguage(lang);
-        langBtn.parentElement.classList.remove("active");
+        langSelector.classList.remove("active");
+        langBtn.setAttribute("aria-expanded", "false");
       });
     });
 
     document.addEventListener("click", () => {
-      langBtn.parentElement.classList.remove("active");
+      langSelector.classList.remove("active");
+      langBtn.setAttribute("aria-expanded", "false");
     });
   }
 
   // ==========================
-// 📱 MOBILE MENU
-// ==========================
-const mobileMenuToggle = document.getElementById("mobileMenuToggle");
-const mobileMenu = document.getElementById("mobileMenu");
-const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+  // MOBILE MENU
+  // ==========================
+  const mobileMenuToggle = document.getElementById("mobileMenuToggle");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
+  const mobileMenuLinks = document.querySelectorAll("#mobileMenu a");
 
-function setMenuState(isOpen) {
-  document.body.classList.toggle("menu-open", isOpen);
+  function setMenuState(isOpen) {
+    document.body.classList.toggle("menu-open", isOpen);
 
-  if (mobileMenuToggle) {
-    mobileMenuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    mobileMenuToggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
-  }
-
-  if (mobileMenu) {
-    mobileMenu.setAttribute("aria-hidden", isOpen ? "false" : "true");
-  }
-
-  if (mobileMenuOverlay) {
-    mobileMenuOverlay.style.opacity = isOpen ? "1" : "0";
-    mobileMenuOverlay.style.visibility = isOpen ? "visible" : "hidden";
-    mobileMenuOverlay.style.pointerEvents = isOpen ? "auto" : "none";
-  }
-
-  if (mobileMenu) {
-    mobileMenu.style.opacity = isOpen ? "1" : "0";
-    mobileMenu.style.visibility = isOpen ? "visible" : "hidden";
-    mobileMenu.style.pointerEvents = isOpen ? "auto" : "none";
-  }
-}
-
-function openMobileMenu() {
-  setMenuState(true);
-}
-
-function closeMobileMenu() {
-  setMenuState(false);
-}
-
-if (mobileMenuToggle && mobileMenu && mobileMenuOverlay) {
-  setMenuState(false);
-
-  mobileMenuToggle.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    const isOpen = document.body.classList.contains("menu-open");
-    setMenuState(!isOpen);
-  });
-
-  mobileMenuOverlay.addEventListener("click", closeMobileMenu);
-
-  mobileMenu.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", closeMobileMenu);
-  });
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      closeMobileMenu();
+    if (mobileMenuToggle) {
+      mobileMenuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      mobileMenuToggle.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
     }
-  });
 
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 768) {
-      closeMobileMenu();
+    if (mobileMenu) {
+      mobileMenu.setAttribute("aria-hidden", isOpen ? "false" : "true");
     }
-  });
 
-  window.addEventListener("pageshow", () => {
-    closeMobileMenu();
-  });
-}
+    if (mobileMenuOverlay) {
+      mobileMenuOverlay.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    }
+  }
+
+  if (mobileMenuToggle && mobileMenu && mobileMenuOverlay) {
+    setMenuState(false);
+
+    mobileMenuToggle.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setMenuState(!document.body.classList.contains("menu-open"));
+    });
+
+    mobileMenuOverlay.addEventListener("click", () => {
+      setMenuState(false);
+    });
+
+    mobileMenuLinks.forEach((link) => {
+      link.addEventListener("click", () => {
+        setMenuState(false);
+      });
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        setMenuState(false);
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 768) {
+        setMenuState(false);
+      }
+    });
+
+    window.addEventListener("pageshow", () => {
+      setMenuState(false);
+    });
+  }
 
   // ==========================
-  // 🎬 MEDIA WALL SYSTEM
+  // MEDIA WALL SYSTEM
   // ==========================
   const videos = [
     "https://res.cloudinary.com/dapuyi9pm/video/upload/v1777823109/VOZM5262_bx2cdr.mp4",
@@ -301,43 +290,3 @@ if (mobileMenuToggle && mobileMenu && mobileMenuOverlay) {
     });
   }
 });
-
-const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-const mobileMenu = document.getElementById('mobileMenu');
-const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-const mobileMenuLinks = document.querySelectorAll('.mobile-menu a');
-
-if (mobileMenuToggle && mobileMenu && mobileMenuOverlay) {
-  const closeMobileMenu = () => {
-    document.body.classList.remove('menu-open');
-    mobileMenuToggle.setAttribute('aria-expanded', 'false');
-    mobileMenu.setAttribute('aria-hidden', 'true');
-  };
-
-  const openMobileMenu = () => {
-    document.body.classList.add('menu-open');
-    mobileMenuToggle.setAttribute('aria-expanded', 'true');
-    mobileMenu.setAttribute('aria-hidden', 'false');
-  };
-
-  mobileMenuToggle.addEventListener('click', () => {
-    const isOpen = document.body.classList.contains('menu-open');
-    if (isOpen) {
-      closeMobileMenu();
-    } else {
-      openMobileMenu();
-    }
-  });
-
-  mobileMenuOverlay.addEventListener('click', closeMobileMenu);
-
-  mobileMenuLinks.forEach(link => {
-    link.addEventListener('click', closeMobileMenu);
-  });
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      closeMobileMenu();
-    }
-  });
-}
