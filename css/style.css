@@ -2662,30 +2662,13 @@ iframe {
 }
 
 /* ==========================================
-   FINAL HEADER + FULLSCREEN MOBILE MENU
+   MOBILE HAMBURGER ONLY
+   Añadir al FINAL del CSS
 ========================================== */
 
 body.menu-open {
   overflow: hidden;
 }
-
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 10050;
-}
-
-.logo,
-.header-right {
-  position: relative;
-  z-index: 10060;
-}
-
-/* ==========================
-   MOBILE MENU BASE
-========================== */
 
 .mobile-menu-toggle,
 .mobile-menu,
@@ -2693,45 +2676,27 @@ body.menu-open {
   display: none;
 }
 
-/* ==========================
-   DESKTOP SAFETY
-========================== */
-
 @media (min-width: 769px) {
+  .mobile-menu-toggle,
   .mobile-menu,
-  .mobile-menu-overlay,
-  .mobile-menu-toggle {
+  .mobile-menu-overlay {
     display: none !important;
   }
 }
 
-/* ==========================
-   MOBILE HEADER
-========================== */
-
 @media (max-width: 768px) {
   .header {
-    padding: 14px 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: rgba(255,255,255,0.94);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    z-index: 10050;
   }
 
-  .logo img {
-    height: 34px;
+  .logo,
+  .header-right {
+    position: relative;
+    z-index: 10060;
   }
 
   .nav {
     display: none !important;
-  }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
   }
 
   .header-actions,
@@ -2739,35 +2704,52 @@ body.menu-open {
     display: none !important;
   }
 
+  .header-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0;
+  }
+
   .mobile-menu-toggle {
     display: inline-flex !important;
-    width: 52px;
-    height: 52px;
+    width: 48px;
+    height: 48px;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     gap: 6px;
-    background: transparent;
     border: 1px solid rgba(0,0,0,0.14);
-    border-radius: 0;
+    background: transparent;
     color: #111;
     cursor: pointer;
-    transition: all 0.28s ease;
+    border-radius: 0;
     -webkit-tap-highlight-color: transparent;
-    z-index: 10060;
+    transition: all 0.25s ease;
   }
 
   .mobile-menu-toggle span {
-    width: 22px;
+    width: 20px;
     height: 2px;
     background: currentColor;
     border-radius: 999px;
-    transition: transform 0.28s ease, opacity 0.22s ease;
+    transition: transform 0.28s ease, opacity 0.2s ease;
+  }
+
+  body.menu-open .header {
+    background: transparent !important;
+    border-bottom-color: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  body.menu-open .logo img {
+    filter: brightness(0) invert(1);
   }
 
   body.menu-open .mobile-menu-toggle {
     color: #fff;
-    border-color: rgba(255,255,255,0.34);
+    border-color: rgba(255,255,255,0.28);
   }
 
   body.menu-open .mobile-menu-toggle span:nth-child(1) {
@@ -2783,16 +2765,14 @@ body.menu-open {
   }
 
   .mobile-menu-overlay {
-    display: block;
+    display: block !important;
     position: fixed;
     inset: 0;
-    background: rgba(7, 8, 10, 0.86);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(0,0,0,0.94);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.32s ease, visibility 0.32s ease;
+    transition: opacity 0.28s ease, visibility 0.28s ease;
     z-index: 10020;
   }
 
@@ -2806,12 +2786,14 @@ body.menu-open {
     display: flex !important;
     position: fixed;
     inset: 0;
-    padding: 110px 24px 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 96px 24px 32px;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
     z-index: 10030;
-    transition: opacity 0.32s ease, visibility 0.32s ease;
+    transition: opacity 0.28s ease, visibility 0.28s ease;
   }
 
   body.menu-open .mobile-menu {
@@ -2822,11 +2804,10 @@ body.menu-open {
 
   .mobile-menu-inner {
     width: 100%;
-    min-height: calc(100vh - 150px);
+    max-width: 420px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
     text-align: center;
     gap: 10px;
   }
@@ -2834,10 +2815,10 @@ body.menu-open {
   .mobile-menu-label {
     margin-bottom: 8px;
     font-size: 11px;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.45);
+    color: rgba(255,255,255,0.42);
   }
 
   .mobile-menu-link,
@@ -2848,80 +2829,49 @@ body.menu-open {
 
   .mobile-menu-link {
     color: #fff;
-    font-size: clamp(28px, 6vw, 40px);
+    font-size: clamp(28px, 7vw, 40px);
     font-weight: 400;
     line-height: 1.08;
-    padding: 4px 0;
-    letter-spacing: 0.5px;
+    padding: 3px 0;
   }
 
   .mobile-menu-sublink {
-    color: rgba(255,255,255,0.70);
+    color: rgba(255,255,255,0.72);
     font-size: 14px;
-    line-height: 1.5;
-    padding: 2px 0;
+    line-height: 1.45;
+    padding: 1px 0;
   }
 
   .mobile-menu-link:hover,
-  .mobile-menu-sublink:hover,
-  .mobile-menu-link:focus-visible,
-  .mobile-menu-sublink:focus-visible {
-    opacity: 0.72;
-    transform: translateY(-1px);
+  .mobile-menu-sublink:hover {
+    opacity: 0.75;
   }
 
   .mobile-menu-actions {
-    margin-top: 22px;
+    margin-top: 18px;
   }
 
   .mobile-book-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 48px;
+    min-height: 46px;
     padding: 0 22px;
     text-decoration: none;
-    border: 1px solid rgba(255,255,255,0.26);
-    color: #fff;
-    background: rgba(255,255,255,0.06);
     border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.26);
+    background: rgba(255,255,255,0.08);
+    color: #fff;
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
-    transition: all 0.24s ease;
-  }
-
-  .mobile-book-btn:hover,
-  .mobile-book-btn:focus-visible {
-    background: rgba(255,255,255,0.12);
-    border-color: rgba(255,255,255,0.4);
-  }
-
-  .social-bar {
-    display: none;
   }
 }
 
-/* ==========================
-   SMALL MOBILE
-========================== */
-
 @media (max-width: 480px) {
-  .header {
-    padding: 12px 14px;
-  }
-
-  .logo img {
-    height: 30px;
-  }
-
   .mobile-menu {
-    padding: 96px 20px 28px;
-  }
-
-  .mobile-menu-inner {
-    gap: 8px;
+    padding: 88px 20px 28px;
   }
 
   .mobile-menu-link {
@@ -2930,14 +2880,5 @@ body.menu-open {
 
   .mobile-menu-sublink {
     font-size: 13px;
-  }
-
-  .mobile-menu-toggle {
-    width: 48px;
-    height: 48px;
-  }
-
-  .mobile-menu-toggle span {
-    width: 20px;
   }
 }

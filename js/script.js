@@ -301,3 +301,43 @@ if (mobileMenuToggle && mobileMenu && mobileMenuOverlay) {
     });
   }
 });
+
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const mobileMenu = document.getElementById('mobileMenu');
+const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+const mobileMenuLinks = document.querySelectorAll('.mobile-menu a');
+
+if (mobileMenuToggle && mobileMenu && mobileMenuOverlay) {
+  const closeMobileMenu = () => {
+    document.body.classList.remove('menu-open');
+    mobileMenuToggle.setAttribute('aria-expanded', 'false');
+    mobileMenu.setAttribute('aria-hidden', 'true');
+  };
+
+  const openMobileMenu = () => {
+    document.body.classList.add('menu-open');
+    mobileMenuToggle.setAttribute('aria-expanded', 'true');
+    mobileMenu.setAttribute('aria-hidden', 'false');
+  };
+
+  mobileMenuToggle.addEventListener('click', () => {
+    const isOpen = document.body.classList.contains('menu-open');
+    if (isOpen) {
+      closeMobileMenu();
+    } else {
+      openMobileMenu();
+    }
+  });
+
+  mobileMenuOverlay.addEventListener('click', closeMobileMenu);
+
+  mobileMenuLinks.forEach(link => {
+    link.addEventListener('click', closeMobileMenu);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      closeMobileMenu();
+    }
+  });
+}
