@@ -2133,3 +2133,530 @@ body {
   opacity: 1;
 }
 
+
+/* ==========================================
+   RESPONSIVE FIXES — HOME SIGNATURE
+   Añadir al FINAL del CSS
+========================================== */
+
+/* Prevención global de overflow */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+  height: auto;
+}
+
+/* El video debe ocupar espacio real */
+#mainVideo,
+.media-item video,
+.media-featured video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Evita que grids internos rompan el ancho */
+.signature-hero-grid,
+.intro-strip-grid,
+.difference-grid,
+.signature-contact-grid,
+.signature-services-grid,
+.vision-grid,
+.hero-layout,
+.service-hero-grid,
+.two-col,
+.contact-wrap,
+.about-split-grid,
+.about-identity-grid,
+.editorial-grid,
+.values-layout,
+.contact-hero-grid,
+.contact-main-grid {
+  min-width: 0;
+}
+
+.signature-copy,
+.signature-media-wrap,
+.signature-contact-copy,
+.intro-statement,
+.intro-text,
+.difference-left,
+.difference-right {
+  min-width: 0;
+}
+
+/* Mejor escalado general */
+.section {
+  padding: clamp(72px, 8vw, 120px) 6%;
+}
+
+.signature-hero {
+  min-height: auto;
+  padding-top: clamp(120px, 14vw, 150px);
+  padding-bottom: clamp(60px, 9vw, 90px);
+}
+
+.signature-copy h1 {
+  font-size: clamp(40px, 8vw, 112px);
+  line-height: 0.92;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+.signature-lead {
+  font-size: clamp(15px, 2.4vw, 18px);
+  line-height: 1.75;
+}
+
+/* Botones más adaptables */
+.signature-actions,
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.signature-actions .cta,
+.signature-actions .ghost-btn,
+.hero-cta .cta,
+.hero-cta .btn-secondary {
+  min-height: 48px;
+}
+
+/* Vídeo principal más visible */
+.signature-media-shell {
+  width: 100%;
+}
+
+.signature-featured-video,
+.media-featured {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  min-height: 220px;
+}
+
+.signature-media-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.signature-media-grid .media-item,
+.media-grid .media-item {
+  aspect-ratio: 16 / 9;
+  min-height: 82px;
+}
+
+/* Desktop medio */
+@media (max-width: 1200px) {
+  .signature-hero-grid {
+    grid-template-columns: 1fr 0.9fr;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .signature-copy h1 {
+    font-size: clamp(48px, 6vw, 76px);
+  }
+
+  .vision-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .vision-card.large {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .header {
+    padding: 14px 20px;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .header-right {
+    gap: 8px;
+  }
+
+  .header-actions .btn-secondary {
+    padding: 10px 12px;
+    font-size: 11px;
+  }
+
+  .signature-hero-grid,
+  .intro-strip-grid,
+  .difference-grid,
+  .signature-contact-grid,
+  .about-split-grid,
+  .about-identity-grid,
+  .editorial-grid,
+  .values-layout,
+  .contact-hero-grid,
+  .contact-main-grid,
+  .service-hero-grid,
+  .two-col,
+  .contact-wrap {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .signature-copy {
+    max-width: 100%;
+  }
+
+  .signature-copy h1 {
+    max-width: 12ch;
+    font-size: clamp(42px, 7vw, 68px);
+  }
+
+  .signature-media-wrap {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .signature-hero-overlay {
+    width: 100%;
+    height: 44%;
+    left: 0;
+    bottom: 0;
+    border-top-left-radius: 18% 16%;
+    border-top-right-radius: 32% 24%;
+    border-bottom-right-radius: 0;
+  }
+
+  .signature-services-grid,
+  .feature-grid,
+  .benefit-strip,
+  .topics-grid,
+  .pillars-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .skills-list {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .vision-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vision-card.large {
+    grid-column: auto;
+  }
+}
+
+/* Mobile grande */
+@media (max-width: 768px) {
+  body {
+    padding-top: 82px;
+  }
+
+  .header {
+    padding: 12px 16px;
+  }
+
+  .logo img {
+    height: 36px;
+  }
+
+  .header-actions {
+    display: none;
+  }
+
+  .lang-selector .btn-secondary {
+    padding: 9px 12px;
+    font-size: 11px;
+  }
+
+  .section {
+    padding: 72px 20px;
+  }
+
+  .signature-hero {
+    padding-top: 126px;
+    padding-bottom: 56px;
+    min-height: auto;
+  }
+
+  .signature-hero-grid {
+    gap: 24px;
+    align-items: start;
+  }
+
+  .signature-copy {
+    text-align: left;
+  }
+
+  .signature-copy h1 {
+    font-size: clamp(34px, 10vw, 48px);
+    line-height: 0.96;
+    letter-spacing: -1px;
+    margin-bottom: 18px;
+    max-width: 10ch;
+  }
+
+  .signature-lead {
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 100%;
+  }
+
+  .signature-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .signature-actions .cta,
+  .signature-actions .ghost-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .signature-tags {
+    gap: 8px;
+  }
+
+  .signature-tags span {
+    font-size: 11px;
+    padding: 9px 12px;
+  }
+
+  .signature-media-shell {
+    padding: 12px;
+    border-radius: 22px;
+  }
+
+  .signature-featured-video,
+  .media-featured {
+    border-radius: 18px;
+    aspect-ratio: 16 / 9;
+    min-height: 200px;
+  }
+
+  .signature-media-grid,
+  .media-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .signature-media-grid .media-item,
+  .media-grid .media-item {
+    border-radius: 12px;
+    min-height: 64px;
+  }
+
+  .sound-btn {
+    right: 10px;
+    bottom: 10px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .social-bar {
+    display: none;
+  }
+
+  .chat-bubble {
+    left: 16px;
+    bottom: 16px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .chat-bubble img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .intro-strip-grid,
+  .difference-grid,
+  .signature-contact-grid,
+  .split-head {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .signature-services-grid,
+  .feature-grid,
+  .benefit-strip,
+  .topics-grid,
+  .skills-list {
+    grid-template-columns: 1fr;
+  }
+
+  .signature-head,
+  .timeline-heading,
+  .section-head-center {
+    margin-bottom: 24px;
+  }
+
+  .content h2,
+  .signature-head h2,
+  .difference-left h2,
+  .intro-statement h2,
+  .signature-contact-copy h2,
+  .contact-hero-copy h1,
+  .service-hero-copy h1,
+  .about-intro h1 {
+    font-size: clamp(30px, 7vw, 42px);
+    line-height: 1.02;
+    margin-bottom: 18px;
+  }
+
+  .signature-service-card,
+  .difference-item,
+  .vision-card,
+  .signature-form,
+  .info-card,
+  .feature-card,
+  .skill-item,
+  .benefit-box,
+  .topic-card,
+  .contact-form-wrap,
+  .contact-side-card,
+  .pillar-card,
+  .timeline-content,
+  .value-box {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .signature-service-card h3,
+  .difference-item strong,
+  .vision-card h3,
+  .feature-card h3,
+  .skill-item h3,
+  .benefit-box h3,
+  .pillar-card h3,
+  .topic-card h3,
+  .contact-side-card h3 {
+    font-size: 22px;
+    line-height: 1.12;
+  }
+
+  .contact-form input,
+  .contact-form textarea,
+  .contact-form select,
+  .contact-form-pro input,
+  .contact-form-pro textarea,
+  .contact-form-pro select,
+  .signature-form input,
+  .signature-form textarea,
+  .signature-form select {
+    font-size: 16px;
+  }
+
+  .footer {
+    padding: 48px 20px;
+    margin-top: 56px;
+  }
+
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+
+/* Mobile pequeño */
+@media (max-width: 480px) {
+  body {
+    padding-top: 78px;
+  }
+
+  .section {
+    padding: 64px 16px;
+  }
+
+  .signature-hero {
+    padding-top: 118px;
+    padding-bottom: 48px;
+  }
+
+  .signature-copy h1 {
+    font-size: 34px;
+    max-width: 9ch;
+  }
+
+  .signature-lead,
+  .content p,
+  .intro-text p,
+  .signature-service-card p,
+  .difference-item p,
+  .vision-card p,
+  .signature-contact-copy p,
+  .service-hero-copy p,
+  .contact-hero-copy p {
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .signature-featured-video,
+  .media-featured {
+    min-height: 190px;
+  }
+
+  .signature-media-grid,
+  .media-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .signature-media-grid .media-item:nth-child(3),
+  .media-grid .media-item:nth-child(3) {
+    display: none;
+  }
+
+  .signature-tags span,
+  .hero-mini-points span {
+    font-size: 10px;
+    padding: 8px 10px;
+  }
+
+  .cta,
+  .btn-secondary,
+  .ghost-btn {
+    padding: 14px 18px;
+    font-size: 11px;
+    letter-spacing: 0.8px;
+  }
+
+  .content h2,
+  .signature-head h2,
+  .difference-left h2,
+  .intro-statement h2,
+  .signature-contact-copy h2,
+  .contact-hero-copy h1,
+  .service-hero-copy h1,
+  .about-intro h1 {
+    font-size: 30px;
+  }
+}
+
+/* Alturas muy bajas */
+@media (max-height: 740px) and (max-width: 900px) {
+  .signature-hero {
+    min-height: auto;
+  }
+
+  .signature-hero-grid {
+    align-items: start;
+  }
+
+  .signature-featured-video,
+  .media-featured {
+    min-height: 180px;
+  }
+}
