@@ -159,19 +159,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const mobileMenu = document.getElementById("mobileMenu");
   const mobileMenuOverlay = document.getElementById("mobileMenuOverlay");
 
+  function syncMenuState(isOpen) {
+    document.body.classList.toggle("menu-open", isOpen);
+
+    if (mobileMenuToggle) {
+      mobileMenuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    }
+
+    if (mobileMenu) {
+      mobileMenu.setAttribute("aria-hidden", isOpen ? "false" : "true");
+    }
+  }
+
   function openMobileMenu() {
-    document.body.classList.add("menu-open");
-    if (mobileMenuToggle) mobileMenuToggle.setAttribute("aria-expanded", "true");
-    if (mobileMenu) mobileMenu.setAttribute("aria-hidden", "false");
+    syncMenuState(true);
   }
 
   function closeMobileMenu() {
-    document.body.classList.remove("menu-open");
-    if (mobileMenuToggle) mobileMenuToggle.setAttribute("aria-expanded", "false");
-    if (mobileMenu) mobileMenu.setAttribute("aria-hidden", "true");
+    syncMenuState(false);
   }
 
+  // reset SIEMPRE al cargar nueva página
+  closeMobileMenu();
+
   if (mobileMenuToggle && mobileMenu && mobileMenuOverlay) {
+    mobileMenuToggle.style.display = "";
+    mobileMenuToggle.style.visibility = "";
+    mobileMenuToggle.style.opacity = "";
+
     mobileMenuToggle.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -187,15 +202,23 @@ document.addEventListener("DOMContentLoaded", () => {
     mobileMenuOverlay.addEventListener("click", closeMobileMenu);
 
     mobileMenu.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", closeMobileMenu);
+      link.addEventListener("click", () => {
+        closeMobileMenu();
+      });
     });
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") closeMobileMenu();
     });
 
+    window.addEventListener("pageshow", () => {
+      closeMobileMenu();
+    });
+
     window.addEventListener("resize", () => {
-      if (window.innerWidth > 768) closeMobileMenu();
+      if (window.innerWidth > 768) {
+        closeMobileMenu();
+      }
     });
   }
 
@@ -212,8 +235,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const soundBtn = document.getElementById("soundToggle");
   const items = document.querySelectorAll(".media-item");
 
-  let currentIndex = 0;
-
   function safePlay(videoEl) {
     if (!videoEl) return;
     const playPromise = videoEl.play();
@@ -223,8 +244,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function loadVideo(index) {
-    currentIndex = index;
-
     if (!mainVideo || !items.length) return;
 
     mainVideo.src = videos[index];
@@ -259,7 +278,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         loadVideo(index);
 
-        if (mainVideo && soundBtn) {
+        if (soundBtn) {
           mainVideo.muted = false;
           soundBtn.textContent = "🔊";
           safePlay(mainVideo);
