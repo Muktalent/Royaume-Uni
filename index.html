@@ -41,9 +41,7 @@
     <a href="/about-us/" data-i18n="about">À PROPOS</a>
 
     <div class="dropdown">
-      <a href="/services/" data-i18n="services">
-        SERVICES ▼
-      </a>
+      <a href="/services/" data-i18n="services">SERVICES ▼</a>
 
       <div class="dropdown-menu">
         <a href="/services/university-applications/" data-i18n="uniApps">
@@ -73,11 +71,13 @@
 
   <div class="header-right">
     <div class="header-actions">
-      <button class="btn-secondary" data-i18n="assessment">Free Assessment</button>
+      <a href="/contact/" class="btn-secondary" data-i18n="assessment">Évaluation gratuite</a>
     </div>
 
     <div class="lang-selector">
-      <button id="lang-btn" class="btn-secondary">EN ⌄</button>
+      <button id="lang-btn" class="btn-secondary" type="button" aria-label="Change language">
+        FR ⌄
+      </button>
       <ul id="lang-menu" class="lang-menu">
         <li data-lang="en">English</li>
         <li data-lang="fr">Français</li>
@@ -101,20 +101,65 @@
 
   <div class="mobile-menu-overlay" id="mobileMenuOverlay"></div>
 
-  <nav class="mobile-menu" id="mobileMenu" aria-hidden="true" aria-label="Mobile navigation">
+  <nav
+    class="mobile-menu"
+    id="mobileMenu"
+    aria-hidden="true"
+    aria-label="Mobile navigation"
+  >
     <div class="mobile-menu-inner">
-      <a href="/" class="mobile-menu-link">Accueil</a>
-      <a href="/about-us/" class="mobile-menu-link">À propos</a>
-      <a href="/services/" class="mobile-menu-link">Services</a>
-      <a href="/services/university-applications/" class="mobile-menu-sublink">Candidatures universitaires UK</a>
-      <a href="/services/student-visa-support/" class="mobile-menu-sublink">Visa étudiant UK</a>
-      <a href="/services/accommodation-support/" class="mobile-menu-sublink">Hébergement étudiant</a>
-      <a href="/services/ielts-guidance/" class="mobile-menu-sublink">Préparation IELTS</a>
-      <a href="/services/scholarships/" class="mobile-menu-sublink">Bourses d’études</a>
-      <a href="/contact/" class="mobile-menu-link">Contact</a>
+      <p class="mobile-menu-label">Navigation</p>
+
+      <a href="/" class="mobile-menu-link" data-i18n="home">ACCUEIL</a>
+      <a href="/about-us/" class="mobile-menu-link" data-i18n="about">À PROPOS</a>
+      <a href="/services/" class="mobile-menu-link" data-i18n="services">SERVICES</a>
+
+      <a
+        href="/services/university-applications/"
+        class="mobile-menu-sublink"
+        data-i18n="uniApps"
+      >
+        Candidatures universitaires UK
+      </a>
+
+      <a
+        href="/services/student-visa-support/"
+        class="mobile-menu-sublink"
+        data-i18n="visaSupport"
+      >
+        Visa étudiant UK
+      </a>
+
+      <a
+        href="/services/accommodation-support/"
+        class="mobile-menu-sublink"
+        data-i18n="accommodation"
+      >
+        Hébergement étudiant
+      </a>
+
+      <a
+        href="/services/ielts-guidance/"
+        class="mobile-menu-sublink"
+        data-i18n="ielts"
+      >
+        Préparation IELTS
+      </a>
+
+      <a
+        href="/services/scholarships/"
+        class="mobile-menu-sublink"
+        data-i18n="scholarships"
+      >
+        Bourses d’études
+      </a>
+
+      <a href="/contact/" class="mobile-menu-link" data-i18n="contact">CONTACT</a>
 
       <div class="mobile-menu-actions">
-        <a href="/contact/" class="mobile-book-btn">Évaluation gratuite</a>
+        <a href="/contact/" class="mobile-book-btn" data-i18n="assessment">
+          Évaluation gratuite
+        </a>
       </div>
     </div>
   </nav>
