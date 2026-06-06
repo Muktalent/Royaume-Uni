@@ -28,72 +28,104 @@
 <body>
 
 <header class="header">
-
   <div class="logo">
-    <img src="/assets/logo.png" alt="Maghreb UK Logo" />
+    <a href="/" aria-label="Maghreb UK Talent home">
+      <img src="/assets/logo.png" alt="Maghreb UK Talent" />
+    </a>
   </div>
 
-<nav class="nav">
+  <nav class="nav" aria-label="Primary navigation">
+    <a href="/" data-i18n="home">ACCUEIL</a>
+    <a href="/about-us/" data-i18n="about">À PROPOS</a>
 
-  <a href="/" data-i18n="home">ACCUEIL</a>
-
-  <a href="/about-us/" data-i18n="about">À PROPOS</a>
-
-  <!-- SERVICES -->
-  <div class="dropdown">
-
-    <a href="/services/" data-i18n="services">
-      SERVICES ▼
-    </a>
-
-    <div class="dropdown-menu">
-
-      <a href="/services/university-applications/" data-i18n="uniApps">
-        Candidatures universitaires UK
+    <div class="dropdown">
+      <a
+        href="/services/"
+        data-i18n="services"
+        aria-haspopup="true"
+      >
+        SERVICES ▼
       </a>
 
-      <a href="/services/student-visa-support/" data-i18n="visaSupport">
-        Visa étudiant UK
-      </a>
-
-      <a href="/services/accommodation-support/" data-i18n="accommodation">
-        Hébergement étudiant
-      </a>
-
-      <a href="/services/ielts-guidance/" data-i18n="ielts">
-        Préparation IELTS
-      </a>
-
-      <a href="/services/scholarships/" data-i18n="scholarships">
-        Bourses d’études
-      </a>
-
+      <div class="dropdown-menu">
+        <a href="/services/university-applications/" data-i18n="uniApps">
+          Candidatures universitaires UK
+        </a>
+        <a href="/services/student-visa-support/" data-i18n="visaSupport">
+          Visa étudiant UK
+        </a>
+        <a href="/services/accommodation-support/" data-i18n="accommodation">
+          Hébergement étudiant
+        </a>
+        <a href="/services/ielts-guidance/" data-i18n="ielts">
+          Préparation IELTS
+        </a>
+        <a href="/services/scholarships/" data-i18n="scholarships">
+          Bourses d’études
+        </a>
+      </div>
     </div>
 
-  </div>
-
-  <a href="/contact/" data-i18n="contact">CONTACT</a>
-
-</nav>
+    <a href="/contact/" data-i18n="contact">CONTACT</a>
+  </nav>
 
   <div class="header-right">
-
-    <div class="header-actions">
-      <button class="btn-secondary">Free Assessment</button>
-    </div>
+    <a href="/contact/" class="btn-secondary header-cta" data-i18n="assessment">
+      Évaluation gratuite
+    </a>
 
     <div class="lang-selector">
-      <button id="lang-btn" class="btn-secondary">EN ⌄</button>
-      <ul id="lang-menu" class="lang-menu">
-        <li data-lang="en">English</li>
-        <li data-lang="es">Español</li>
-        <li data-lang="ar">العربية</li>
+      <button
+        id="lang-btn"
+        class="btn-secondary"
+        type="button"
+        aria-label="Change language"
+        aria-expanded="false"
+        aria-controls="lang-menu"
+      >
+        FR ⌄
+      </button>
+
+      <ul id="lang-menu" class="lang-menu" role="menu">
+        <li data-lang="en" role="menuitem">English</li>
+        <li data-lang="fr" role="menuitem">Français</li>
+        <li data-lang="ar" role="menuitem">العربية</li>
       </ul>
     </div>
 
-
+    <button
+      class="mobile-menu-toggle"
+      id="mobileMenuToggle"
+      type="button"
+      aria-label="Open menu"
+      aria-expanded="false"
+      aria-controls="mobileMenu"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
   </div>
 
+  <div
+    class="mobile-menu-overlay"
+    id="mobileMenuOverlay"
+    aria-hidden="true"
+  ></div>
+
+  <nav
+    class="mobile-menu"
+    id="mobileMenu"
+    aria-label="Mobile navigation"
+    aria-hidden="true"
+  >
+    <div class="mobile-menu-inner">
+      <a href="/" class="mobile-menu-link" data-i18n="home">ACCUEIL</a>
+      <a href="/about-us/" class="mobile-menu-link" data-i18n="about">À PROPOS</a>
+      <a href="/services/" class="mobile-menu-link" data-i18n="services">SERVICES</a>
+      <a href="/contact/" class="mobile-menu-link" data-i18n="contact">CONTACT</a>
+    </div>
+  </nav>
 </header>
 
 
