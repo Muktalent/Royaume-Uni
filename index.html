@@ -197,7 +197,7 @@
             text-shadow: 0 3px 18px rgba(0,0,0,0.26);
           "
         >
-        Nous accompagnons les étudiants du Maroc, de l’Algérie et de la Tunisie
+          Nous accompagnons les étudiants du Maroc, de l’Algérie et de la Tunisie
           vers les universités britanniques avec une approche plus claire,
           plus structurée et plus sérieuse.
         </p>
@@ -401,12 +401,16 @@
 
       <script>
         document.addEventListener('DOMContentLoaded', () => {
+          const viewport = document.getElementById('reelsViewport');
           const track = document.getElementById('reelsTrack');
           const prevBtn = document.getElementById('reelsPrev');
           const nextBtn = document.getElementById('reelsNext');
           const items = Array.from(document.querySelectorAll('.reel-item'));
+          const videos = Array.from(document.querySelectorAll('.reel-video'));
 
           let currentIndex = 0;
+          let mobileScrollTimer = null;
+          let autoPlayingByScroll = false;
 
           function visibleCount() {
             if (window.innerWidth <= 768) return 1;
@@ -416,6 +420,38 @@
 
           function maxIndex() {
             return Math.max(0, items.length - visibleCount());
+          }
+
+          function resetVideo(video) {
+            video.pause();
+            video.currentTime = 0;
+            video.muted = false;
+          }
+
+          function stopAllExcept(activeVideo = null) {
+            videos.forEach((video) => {
+              if (video !== activeVideo) {
+                resetVideo(video);
+              }
+            });
+          }
+
+          async function playSingle(video, fromMobileScroll = false) {
+            stopAllExcept(video);
+
+            try {
+              if (fromMobileScroll) {
+                video.muted = true;
+                autoPlayingByScroll = true;
+              } else {
+                video.muted = false;
+                autoPlayingByScroll = false;
+              }
+
+              await video.play();
+            } catch (e) {
+              // no-op
+            }
           }
 
           function updateSlider() {
@@ -430,22 +466,90 @@
             track.style.transform = `translateX(-${offset}px)`;
           }
 
+          function getMostVisibleMobileVideo() {
+            const viewportRect = viewport.getBoundingClientRect();
+            let bestVideo = null;
+            let bestVisibleWidth = 0;
+
+            items.forEach((item) => {
+              const rect = item.getBoundingClientRect();
+              const visibleWidth = Math.max(
+                0,
+                Math.min(rect.right, viewportRect.right) - Math.max(rect.left, viewportRect.left)
+              );
+
+              if (visibleWidth > bestVisibleWidth) {
+                bestVisibleWidth = visibleWidth;
+                bestVideo = item.querySelector('.reel-video');
+              }
+            });
+
+            return bestVideo;
+          }
+
+          function handleMobileActiveVideo() {
+            if (window.innerWidth > 768) return;
+
+            const activeVideo = getMostVisibleMobileVideo();
+            if (!activeVideo) return;
+
+            playSingle(activeVideo, true);
+          }
+
           prevBtn?.addEventListener('click', () => {
             currentIndex = Math.max(0, currentIndex - 1);
+            stopAllExcept(null);
             updateSlider();
           });
 
           nextBtn?.addEventListener('click', () => {
             currentIndex = Math.min(maxIndex(), currentIndex + 1);
+            stopAllExcept(null);
             updateSlider();
           });
+
+          videos.forEach((video) => {
+            video.addEventListener('play', () => {
+              if (!autoPlayingByScroll) {
+                playSingle(video, false);
+              }
+            });
+
+            video.addEventListener('ended', () => {
+              resetVideo(video);
+            });
+
+            video.addEventListener('pause', () => {
+              if (video.currentTime > 0 && video.currentTime < video.duration && !video.seeking) {
+                autoPlayingByScroll = false;
+              }
+            });
+          });
+
+          viewport.addEventListener('scroll', () => {
+            if (window.innerWidth > 768) return;
+
+            clearTimeout(mobileScrollTimer);
+            mobileScrollTimer = setTimeout(() => {
+              handleMobileActiveVideo();
+            }, 120);
+          }, { passive: true });
 
           window.addEventListener('resize', () => {
             currentIndex = Math.min(currentIndex, maxIndex());
+            stopAllExcept(null);
             updateSlider();
+
+            if (window.innerWidth <= 768) {
+              setTimeout(handleMobileActiveVideo, 120);
+            }
           });
 
           updateSlider();
+
+          if (window.innerWidth <= 768) {
+            setTimeout(handleMobileActiveVideo, 250);
+          }
         });
       </script>
     </div>
