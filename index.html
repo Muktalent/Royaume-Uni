@@ -148,69 +148,442 @@
     <img src="/assets/image.png" alt="WhatsApp" />
   </a>
 
-  <!-- HERO -->
+  <!-- HERO / INTRO STYLISE -->
   <section class="section signature-hero" id="home">
     <div class="signature-hero-bg"></div>
-    <div class="signature-hero-overlay"></div>
+    <div
+      class="signature-hero-overlay"
+      style="background: linear-gradient(180deg, rgba(6,19,28,0.30) 0%, rgba(6,19,28,0.52) 100%);"
+    ></div>
 
-    <div class="content signature-hero-grid">
-      <div class="signature-copy">
-        <span class="eyebrow light">Maghreb UK Talent LTD</span>
+    <div class="content">
+      <div style="max-width: 1240px; margin: 0 auto 38px; text-align: center;">
+        <span
+          class="eyebrow light"
+          style="
+            display:inline-block;
+            margin-bottom:16px;
+            letter-spacing:2px;
+            color: rgba(255,255,255,0.82);
+            text-shadow: 0 2px 12px rgba(0,0,0,0.30);
+          "
+        >
+          Maghreb UK Talent LTD
+        </span>
 
-        <h1>
-          UK education.<br>
-          Maghreb ambition.<br>
-          Real pathways.
+        <h1
+          style="
+            font-size: clamp(50px, 6vw, 92px);
+            line-height: 0.96;
+            margin-bottom: 18px;
+            letter-spacing: -2.2px;
+            max-width: 15ch;
+            margin-left: auto;
+            margin-right: auto;
+            color: #ffffff;
+            text-shadow: 0 6px 24px rgba(0,0,0,0.34);
+          "
+        >
+          UK education for Maghreb students with real pathways
         </h1>
 
-        <p class="signature-lead">
+        <p
+          class="signature-lead"
+          style="
+            max-width: 760px;
+            margin: 0 auto;
+            font-size: clamp(16px, 1.9vw, 19px);
+            line-height: 1.8;
+            color: rgba(255,255,255,0.94);
+            opacity: 1;
+            text-shadow: 0 3px 18px rgba(0,0,0,0.26);
+          "
+        >
           Nous accompagnons les étudiants du Maroc, de l’Algérie et de la Tunisie
-          vers les universités britanniques avec une approche plus élégante, plus
-          structurée et plus complète: admissions, IELTS, documents, visa et logement.
+          vers les universités britanniques avec une approche plus claire,
+          plus structurée et plus sérieuse.
         </p>
-
-        <div class="signature-actions">
-          <a href="#contact" class="cta">Commencer maintenant</a>
-          <a href="/services/" class="ghost-btn">Voir nos services</a>
-        </div>
-
-        <div class="signature-tags">
-          <span>UK-based company</span>
-          <span>Admissions & Visa</span>
-          <span>Focus Maghreb</span>
-        </div>
       </div>
 
-      <div class="signature-media-wrap">
-        <div class="signature-media-shell">
-          <div class="media-wall">
+      <!-- MULTIMEDIA FIRST / 2 VIDEOS VISIBLE -->
+      <div
+        class="reels-slider"
+        style="
+          position: relative;
+          max-width: 1240px;
+          margin: 0 auto;
+          padding: 0 64px;
+        "
+      >
+        <button
+          type="button"
+          class="reels-nav prev"
+          onclick="moveReels(-1)"
+          aria-label="Voir les vidéos précédentes"
+          style="
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 46px;
+            height: 46px;
+            border: none;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.88);
+            color: #111;
+            font-size: 22px;
+            cursor: pointer;
+            z-index: 3;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.10);
+          "
+        >
+          ‹
+        </button>
 
-            <div class="media-featured signature-featured-video">
-              <video id="mainVideo" autoplay muted playsinline preload="metadata"></video>
-              <button
-                id="soundToggle"
-                class="sound-btn"
-                type="button"
-                aria-label="Activer ou couper le son"
+        <div style="overflow: hidden;">
+          <div
+            id="reelsTrack"
+            style="
+              display: flex;
+              gap: 22px;
+              transition: transform 0.45s ease;
+              will-change: transform;
+            "
+          >
+            <article
+              class="reel-card"
+              style="
+                position: relative;
+                min-width: calc(50% - 11px);
+                height: 440px;
+                border-radius: 32px;
+                overflow: hidden;
+                background: #111;
+                flex: 0 0 calc(50% - 11px);
+                box-shadow: 0 26px 60px rgba(0,0,0,0.16);
+              "
+            >
+              <video
+                class="reel-video"
+                playsinline
+                muted
+                loop
+                autoplay
+                preload="metadata"
+                poster="/assets/reel-1.jpg"
+                style="
+                  position:absolute;
+                  inset:0;
+                  width:100%;
+                  height:100%;
+                  object-fit:cover;
+                "
               >
-                🔇
-              </button>
-            </div>
+                <source src="https://res.cloudinary.com/dapuyi9pm/video/upload/v1777823109/VOZM5262_bx2cdr.mp4" type="video/mp4" />
+              </video>
 
-            <div class="media-grid signature-media-grid">
-              <div class="media-item active" data-video="0">
-                <video muted playsinline preload="metadata"></video>
-              </div>
-              <div class="media-item" data-video="1">
-                <video muted playsinline preload="metadata"></video>
-              </div>
-              <div class="media-item" data-video="2">
-                <video muted playsinline preload="metadata"></video>
-              </div>
-            </div>
+              <div
+                class="reel-overlay"
+                style="
+                  position:absolute;
+                  inset:0;
+                  background: linear-gradient(to top, rgba(0,0,0,0.62) 8%, rgba(0,0,0,0.08) 60%, rgba(0,0,0,0.02) 100%);
+                "
+              ></div>
 
+              <div
+                class="reel-content"
+                style="
+                  position:absolute;
+                  left:0;
+                  right:0;
+                  bottom:0;
+                  z-index:2;
+                  padding:24px;
+                  display:flex;
+                  justify-content:center;
+                "
+              >
+                <button
+                  class="reel-info-btn"
+                  type="button"
+                  aria-expanded="false"
+                  style="
+                    min-height: 44px;
+                    padding: 0 18px;
+                    border: 1px solid rgba(255,255,255,0.22);
+                    border-radius: 999px;
+                    background: rgba(255,255,255,0.10);
+                    color: #fff;
+                    backdrop-filter: blur(10px);
+                    -webkit-backdrop-filter: blur(10px);
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                  "
+                >
+                  En savoir plus
+                </button>
+              </div>
+            </article>
+
+            <article
+              class="reel-card"
+              style="
+                position: relative;
+                min-width: calc(50% - 11px);
+                height: 440px;
+                border-radius: 32px;
+                overflow: hidden;
+                background: #111;
+                flex: 0 0 calc(50% - 11px);
+                box-shadow: 0 26px 60px rgba(0,0,0,0.16);
+              "
+            >
+              <video
+                class="reel-video"
+                playsinline
+                muted
+                loop
+                autoplay
+                preload="metadata"
+                poster="/assets/reel-2.jpg"
+                style="
+                  position:absolute;
+                  inset:0;
+                  width:100%;
+                  height:100%;
+                  object-fit:cover;
+                "
+              >
+                <source src="https://res.cloudinary.com/dapuyi9pm/video/upload/v1777824266/31de7446-6600-4488-8974-0ff3b7fbd73c_nhonml.mp4" type="video/mp4" />
+              </video>
+
+              <div
+                class="reel-overlay"
+                style="
+                  position:absolute;
+                  inset:0;
+                  background: linear-gradient(to top, rgba(0,0,0,0.62) 8%, rgba(0,0,0,0.08) 60%, rgba(0,0,0,0.02) 100%);
+                "
+              ></div>
+
+              <div
+                class="reel-content"
+                style="
+                  position:absolute;
+                  left:0;
+                  right:0;
+                  bottom:0;
+                  z-index:2;
+                  padding:24px;
+                  display:flex;
+                  justify-content:center;
+                "
+              >
+                <button
+                  class="reel-info-btn"
+                  type="button"
+                  aria-expanded="false"
+                  style="
+                    min-height: 44px;
+                    padding: 0 18px;
+                    border: 1px solid rgba(255,255,255,0.22);
+                    border-radius: 999px;
+                    background: rgba(255,255,255,0.10);
+                    color: #fff;
+                    backdrop-filter: blur(10px);
+                    -webkit-backdrop-filter: blur(10px);
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                  "
+                >
+                  En savoir plus
+                </button>
+              </div>
+            </article>
+
+            <article
+              class="reel-card"
+              style="
+                position: relative;
+                min-width: calc(50% - 11px);
+                height: 440px;
+                border-radius: 32px;
+                overflow: hidden;
+                background: #111;
+                flex: 0 0 calc(50% - 11px);
+                box-shadow: 0 26px 60px rgba(0,0,0,0.16);
+              "
+            >
+              <video
+                class="reel-video"
+                playsinline
+                muted
+                loop
+                autoplay
+                preload="metadata"
+                poster="/assets/reel-3.jpg"
+                style="
+                  position:absolute;
+                  inset:0;
+                  width:100%;
+                  height:100%;
+                  object-fit:cover;
+                "
+              >
+                <source src="https://res.cloudinary.com/dapuyi9pm/video/upload/v1777823109/VOZM5262_bx2cdr.mp4" type="video/mp4" />
+              </video>
+
+              <div
+                class="reel-overlay"
+                style="
+                  position:absolute;
+                  inset:0;
+                  background: linear-gradient(to top, rgba(0,0,0,0.62) 8%, rgba(0,0,0,0.08) 60%, rgba(0,0,0,0.02) 100%);
+                "
+              ></div>
+
+              <div
+                class="reel-content"
+                style="
+                  position:absolute;
+                  left:0;
+                  right:0;
+                  bottom:0;
+                  z-index:2;
+                  padding:24px;
+                  display:flex;
+                  justify-content:center;
+                "
+              >
+                <button
+                  class="reel-info-btn"
+                  type="button"
+                  aria-expanded="false"
+                  style="
+                    min-height: 44px;
+                    padding: 0 18px;
+                    border: 1px solid rgba(255,255,255,0.22);
+                    border-radius: 999px;
+                    background: rgba(255,255,255,0.10);
+                    color: #fff;
+                    backdrop-filter: blur(10px);
+                    -webkit-backdrop-filter: blur(10px);
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                  "
+                >
+                  En savoir plus
+                </button>
+              </div>
+            </article>
+
+            <article
+              class="reel-card"
+              style="
+                position: relative;
+                min-width: calc(50% - 11px);
+                height: 440px;
+                border-radius: 32px;
+                overflow: hidden;
+                background: #111;
+                flex: 0 0 calc(50% - 11px);
+                box-shadow: 0 26px 60px rgba(0,0,0,0.16);
+              "
+            >
+              <video
+                class="reel-video"
+                playsinline
+                muted
+                loop
+                autoplay
+                preload="metadata"
+                poster="/assets/reel-4.jpg"
+                style="
+                  position:absolute;
+                  inset:0;
+                  width:100%;
+                  height:100%;
+                  object-fit:cover;
+                "
+              >
+                <source src="https://res.cloudinary.com/dapuyi9pm/video/upload/v1777824266/31de7446-6600-4488-8974-0ff3b7fbd73c_nhonml.mp4" type="video/mp4" />
+              </video>
+
+              <div
+                class="reel-overlay"
+                style="
+                  position:absolute;
+                  inset:0;
+                  background: linear-gradient(to top, rgba(0,0,0,0.62) 8%, rgba(0,0,0,0.08) 60%, rgba(0,0,0,0.02) 100%);
+                "
+              ></div>
+
+              <div
+                class="reel-content"
+                style="
+                  position:absolute;
+                  left:0;
+                  right:0;
+                  bottom:0;
+                  z-index:2;
+                  padding:24px;
+                  display:flex;
+                  justify-content:center;
+                "
+              >
+                <button
+                  class="reel-info-btn"
+                  type="button"
+                  aria-expanded="false"
+                  style="
+                    min-height: 44px;
+                    padding: 0 18px;
+                    border: 1px solid rgba(255,255,255,0.22);
+                    border-radius: 999px;
+                    background: rgba(255,255,255,0.10);
+                    color: #fff;
+                    backdrop-filter: blur(10px);
+                    -webkit-backdrop-filter: blur(10px);
+                    font-size: 12px;
+                    font-weight: 600;
+                    cursor: pointer;
+                  "
+                >
+                  En savoir plus
+                </button>
+              </div>
+            </article>
           </div>
         </div>
+
+        <button
+          type="button"
+          class="reels-nav next"
+          onclick="moveReels(1)"
+          aria-label="Voir les vidéos suivantes"
+          style="
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 46px;
+            height: 46px;
+            border: none;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.88);
+            color: #111;
+            font-size: 22px;
+            cursor: pointer;
+            z-index: 3;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.10);
+          "
+        >
+          ›
+        </button>
       </div>
     </div>
   </section>
@@ -377,6 +750,36 @@
       </form>
     </div>
   </section>
+
+  <script>
+    let currentReelIndex = 0;
+
+    function moveReels(direction) {
+      const track = document.getElementById('reelsTrack');
+      if (!track) return;
+
+      const cards = track.querySelectorAll('.reel-card');
+      const totalCards = cards.length;
+      const isMobile = window.innerWidth <= 768;
+      const visibleCards = isMobile ? 1 : 2;
+      const maxIndex = Math.max(0, totalCards - visibleCards);
+
+      currentReelIndex += direction;
+
+      if (currentReelIndex < 0) currentReelIndex = 0;
+      if (currentReelIndex > maxIndex) currentReelIndex = maxIndex;
+
+      const gap = 22;
+      const cardWidth = cards[0].offsetWidth + gap;
+      track.style.transform = `translateX(-${currentReelIndex * cardWidth}px)`;
+    }
+
+    window.addEventListener('resize', () => {
+      currentReelIndex = 0;
+      const track = document.getElementById('reelsTrack');
+      if (track) track.style.transform = 'translateX(0)';
+    });
+  </script>
 
 </main>
 
