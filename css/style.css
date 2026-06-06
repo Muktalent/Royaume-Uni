@@ -672,6 +672,14 @@ body {
   }
 }
 
+.footer {
+  background:
+    linear-gradient(rgba(21, 21, 21, 0.82), rgba(21, 21, 21, 0.82)),
+    url('/assets/footer.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 /* ==========================
    SOCIAL BAR
 ========================== */
