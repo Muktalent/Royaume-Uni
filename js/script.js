@@ -48,7 +48,9 @@ document.addEventListener("DOMContentLoaded", () => {
       name: "Full name",
       email: "Email address",
       country: "Country",
-      message: "Tell us about your plans..."
+      message: "Tell us about your plans...",
+      about: "ABOUT",
+      services: "SERVICES"
     },
     ar: {
       home: "الرئيسية",
@@ -74,7 +76,9 @@ document.addEventListener("DOMContentLoaded", () => {
       name: "الاسم الكامل",
       email: "البريد الإلكتروني",
       country: "الدولة",
-      message: "أخبرنا عن خططك..."
+      message: "أخبرنا عن خططك...",
+      about: "من نحن",
+      services: "الخدمات"
     },
     fr: {
       home: "ACCUEIL",
@@ -100,7 +104,9 @@ document.addEventListener("DOMContentLoaded", () => {
       name: "Nom complet",
       email: "Email",
       country: "Pays",
-      message: "Parlez-nous de votre projet..."
+      message: "Parlez-nous de votre projet...",
+      about: "À PROPOS",
+      services: "SERVICES"
     }
   };
 
@@ -110,16 +116,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const key = el.dataset.i18n;
-      if (dict[key]) el.innerHTML = dict[key];
+      if (dict[key]) {
+        el.innerHTML = dict[key];
+      }
     });
 
     document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
       const key = el.dataset.i18nPlaceholder;
-      if (dict[key]) el.placeholder = dict[key];
+      if (dict[key]) {
+        el.placeholder = dict[key];
+      }
     });
 
-    const labels = { en: "EN ⌄", fr: "FR ⌄", ar: "AR ⌄" };
-    if (langBtn) langBtn.textContent = labels[lang] || "FR ⌄";
+    const labels = {
+      en: "EN ⌄",
+      fr: "FR ⌄",
+      ar: "AR ⌄"
+    };
+
+    if (langBtn) {
+      langBtn.textContent = labels[lang] || "FR ⌄";
+    }
 
     document.documentElement.lang = lang;
     document.body.dir = lang === "ar" ? "rtl" : "ltr";
@@ -179,40 +196,43 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function closeMobileMenu() {
+    setMenuState(false);
+  }
+
+  function toggleMobileMenu() {
+    const isOpen = document.body.classList.contains("menu-open");
+    setMenuState(!isOpen);
+  }
+
   if (mobileMenuToggle && mobileMenu && mobileMenuOverlay) {
     setMenuState(false);
 
     mobileMenuToggle.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
-      setMenuState(!document.body.classList.contains("menu-open"));
+      toggleMobileMenu();
     });
 
-    mobileMenuOverlay.addEventListener("click", () => {
-      setMenuState(false);
-    });
+    mobileMenuOverlay.addEventListener("click", closeMobileMenu);
 
     mobileMenuLinks.forEach((link) => {
-      link.addEventListener("click", () => {
-        setMenuState(false);
-      });
+      link.addEventListener("click", closeMobileMenu);
     });
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
-        setMenuState(false);
+        closeMobileMenu();
       }
     });
 
     window.addEventListener("resize", () => {
       if (window.innerWidth > 768) {
-        setMenuState(false);
+        closeMobileMenu();
       }
     });
 
-    window.addEventListener("pageshow", () => {
-      setMenuState(false);
-    });
+    window.addEventListener("pageshow", closeMobileMenu);
   }
 
   // ==========================
@@ -230,6 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function safePlay(videoEl) {
     if (!videoEl) return;
+
     const playPromise = videoEl.play();
     if (playPromise !== undefined) {
       playPromise.catch(() => {});
@@ -237,7 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function loadVideo(index) {
-    if (!mainVideo || !items.length) return;
+    if (!mainVideo || !items.length || !videos[index]) return;
 
     mainVideo.src = videos[index];
     mainVideo.muted = true;
@@ -249,7 +270,7 @@ document.addEventListener("DOMContentLoaded", () => {
       item.classList.toggle("active", i === index);
 
       const thumbVideo = item.querySelector("video");
-      if (thumbVideo) {
+      if (thumbVideo && videos[i]) {
         thumbVideo.src = videos[i];
         thumbVideo.muted = true;
         thumbVideo.loop = true;
