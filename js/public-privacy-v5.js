@@ -1,14 +1,88 @@
-
-function initPrivacy(){
- const english=document.documentElement.lang==='en',key='muk-privacy-v1',version=1,ttl=180*86400000;
- let remembered=false;try{const v=JSON.parse(localStorage.getItem(key)||'null');remembered=!!(v&&v.version===version&&v.necessary===true&&Number.isFinite(v.updatedAt)&&Date.now()-v.updatedAt>=0&&Date.now()-v.updatedAt<ttl);}catch{}
- const banner=document.createElement('section');banner.className='muk-cookie-info';banner.setAttribute('aria-label',english?'Browser storage information':'Information sur le stockage');banner.hidden=remembered;
- const p=document.createElement('p');p.textContent=english?'This version uses necessary browser storage for your assessment and privacy preferences. No optional advertising or audience-measurement tool is intentionally enabled.':'Cette version utilise le stockage nécessaire au parcours d’évaluation et à vos préférences. Aucun outil optionnel de publicité ou de mesure d’audience n’est volontairement activé.';
- const actions=document.createElement('div');actions.className='muk-cookie-actions';const ok=document.createElement('button');ok.type='button';ok.textContent=english?'Understood, continue':'Compris et continuer';const settings=document.createElement('button');settings.type='button';settings.textContent=english?'Details & preferences':'Détails et préférences';banner.append(p,actions);actions.append(ok,settings);document.body.append(banner);
- const dialog=document.createElement('dialog');dialog.className='muk-privacy-panel';dialog.setAttribute('aria-labelledby','mukPrivacyTitle');
- const title=document.createElement('h2');title.id='mukPrivacyTitle';title.textContent=english?'Storage preferences':'Préférences de stockage';const info=document.createElement('p');info.textContent=english?'Necessary storage supports the service you request. No optional tracker is offered in this release. This is an information acknowledgement, not consent to advertising.':'Le stockage nécessaire permet le service demandé. Aucun traceur optionnel n’est proposé dans cette livraison. Il s’agit d’une prise de connaissance, pas d’un consentement publicitaire.';
- const detail=document.createElement('a');detail.href='/cookies/';detail.textContent=english?'Read the storage policy (French)':'Lire la politique de stockage';const controls=document.createElement('div');controls.className='muk-cookie-actions';const close=document.createElement('button');close.type='button';close.textContent=english?'Close':'Fermer';const reset=document.createElement('button');reset.type='button';reset.textContent=english?'Reset this acknowledgement':'Réinitialiser cette préférence';dialog.append(title,info,detail,controls);controls.append(close,reset);document.body.append(dialog);
- function open(){if(typeof dialog.showModal==='function'){if(!dialog.open)dialog.showModal();}else window.location.assign('/cookies/');}
- ok.addEventListener('click',()=>{try{localStorage.setItem(key,JSON.stringify({version,updatedAt:Date.now(),necessary:true,optional:false}));}catch{}banner.hidden=true;});settings.addEventListener('click',open);close.addEventListener('click',()=>dialog.close());reset.addEventListener('click',()=>{try{localStorage.removeItem(key);}catch{}banner.hidden=false;dialog.close();});for(const el of document.querySelectorAll('[data-privacy-settings]'))el.addEventListener('click',event=>{event.preventDefault();open();});
+(() => {
+'use strict';
+if (/^\/(admin|api)(\/|$)/.test(location.pathname)) return;
+const ID='1826090698815504', KEY='muk-marketing-v2', TTL=180*86400000;
+let initialized=false, pageSent=false;
+function choice(){
+ try {const v=JSON.parse(localStorage.getItem(KEY));const age=Date.now()-v.updatedAt;
+ return v.version===2 && typeof v.marketing==='boolean' && age>=0 && age<TTL ? v : null;}catch{return null;}
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initPrivacy);else initPrivacy();
+function allowed(){return choice()?.marketing===true;}
+function start(){
+ if(!allowed())return;
+ if(!initialized){
+  if(window.fbq){console.warn('Another Meta installation exists. Check for duplicates.');return;}
+  const q=window.fbq=function(){q.callMethod?q.callMethod.apply(q,arguments):q.queue.push(arguments);};
+  window._fbq=q;q.push=q;q.loaded=true;q.version='2.0';q.queue=[];
+  q('consent','grant');q('set','autoConfig',false,ID);q('init',ID);
+  const s=document.createElement('script');s.async=true;s.src='https://connect.facebook.net/en_US/fbevents.js';
+  document.head.append(s);initialized=true;
+ }else window.fbq('consent','grant');
+ if(!pageSent){window.fbq('trackSingle',ID,'PageView');pageSent=true;}
+}
+function stop(){
+ if(initialized)window.fbq('consent','revoke');
+ for(const name of ['_fbp','_fbc']){
+  const parts=location.hostname.split('.');
+  document.cookie=`${name}=; Max-Age=0; Path=/; SameSite=Lax`;
+  for(let i=0;i<parts.length-1;i++){
+   const d=parts.slice(i).join('.');
+   document.cookie=`${name}=; Max-Age=0; Path=/; Domain=${d}; SameSite=Lax`;
+   document.cookie=`${name}=; Max-Age=0; Path=/; Domain=.${d}; SameSite=Lax`;
+  }
+ }
+}
+const seen=new Set();
+window.MUKMarketing=Object.freeze({lead(id){
+ try{
+  if(!allowed()){stop();return;}
+  if(!initialized || typeof id!=='string')return;
+  const key='muk-meta-lead:'+id;
+  if(seen.has(id))return;
+  try{if(sessionStorage.getItem(key))return;}catch{}
+  window.fbq('trackSingle',ID,'Lead');seen.add(id);
+  try{sessionStorage.setItem(key,'1');}catch{}
+ }catch{}
+}});
+function init(){
+ const en=document.documentElement.lang==='en';
+ const tr=(fr,eng)=>en?eng:fr;
+ const style=document.createElement('style');
+ style.textContent='.muk-cookie-info[hidden]{display:none!important}.muk-cookie-actions{display:flex;flex-wrap:wrap;gap:10px}.muk-cookie-actions button{background:#17283b!important;color:#fff!important;border:1px solid #17283b!important;padding:12px 16px!important;border-radius:4px;cursor:pointer;font:inherit}.muk-privacy-panel{max-width:640px;width:calc(100% - 40px);padding:24px;border:1px solid #ccc}.muk-privacy-panel::backdrop{background:rgba(0,0,0,.45)}';
+ document.head.append(style);
+ function el(tag,text){const n=document.createElement(tag);if(text)n.textContent=text;return n;}
+ function link(url,text){const a=el('a',text);a.href=url;return a;}
+ const text=tr('Avec votre accord, Muktalent utilise le pixel Meta pour mesurer les visites et les demandes issues de ses publicités. Des informations de navigation et des identifiants peuvent être transmis à Meta pour la mesure publicitaire. Refuser ne bloque ni le formulaire ni la réservation.','With your consent, Muktalent uses the Meta pixel to measure visits and enquiries from advertising. Browsing information and identifiers may be shared with Meta for advertising measurement. Rejecting does not block forms or bookings.');
+ const banner=el('section');banner.className='muk-cookie-info';banner.setAttribute('aria-label',tr('Choix des cookies','Cookie choices'));
+ banner.append(el('p',text));
+ const links=el('p');links.append(link('/cookies/',tr('Cookies et durées','Cookies and retention')),document.createTextNode(' · '),link('/privacy/',tr('Confidentialité','Privacy')));banner.append(links);
+ const dialog=el('dialog');dialog.className='muk-privacy-panel';dialog.setAttribute('aria-labelledby','mukPrivacyTitle');
+ const h=el('h2',tr('Préférences de confidentialité','Privacy preferences'));h.id='mukPrivacyTitle';
+ const status=el('p');dialog.append(h,el('p',text),status,link('/cookies/',tr('Consulter les détails','Read the details')));
+ function statusText(){status.textContent=allowed()?tr('Publicité : autorisée. Vous pouvez retirer votre accord.','Advertising: allowed. You can withdraw consent.'):tr('Publicité : désactivée. Le stockage nécessaire reste actif.','Advertising: disabled. Necessary storage remains active.');}
+ function save(marketing){
+  try{localStorage.setItem(KEY,JSON.stringify({version:2,updatedAt:Date.now(),marketing}));}
+  catch{stop();window.alert(tr('Votre choix ne peut pas être enregistré. Le pixel reste désactivé.','Your choice cannot be saved. The pixel remains disabled.'));return;}
+  marketing?start():stop();banner.hidden=true;statusText();if(dialog.open)dialog.close();
+ }
+ function buttons(parent){
+  const actions=el('div');actions.className='muk-cookie-actions';
+  const accept=el('button',tr('Accepter la publicité','Accept advertising'));
+  const reject=el('button',tr('Refuser la publicité','Reject advertising'));
+  accept.type=reject.type='button';accept.onclick=()=>save(true);reject.onclick=()=>save(false);
+  actions.append(accept,reject);parent.append(actions);return actions;
+ }
+ const actions=buttons(banner);const details=el('button',tr('Préférences','Preferences'));details.type='button';actions.append(details);
+ const controls=buttons(dialog);const close=el('button',tr('Fermer sans modifier','Close without changes'));close.type='button';close.onclick=()=>dialog.close();controls.append(close);
+ document.body.append(banner,dialog);
+ function open(){statusText();if(typeof dialog.showModal==='function'){if(!dialog.open)dialog.showModal();}else{banner.hidden=false;banner.scrollIntoView();}}
+ details.onclick=open;
+ document.querySelectorAll('[data-privacy-settings]').forEach(n=>n.addEventListener('click',e=>{e.preventDefault();open();}));
+ function sync(){const v=choice();banner.hidden=!!v;allowed()?start():stop();statusText();}
+ window.addEventListener('storage',e=>{if(e.key===KEY||e.key===null)sync();});
+ window.addEventListener('pageshow',sync);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync();});
+ sync();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();

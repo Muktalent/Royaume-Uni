@@ -53,6 +53,7 @@ form.addEventListener('submit',async event=>{
  busy=true;$('submit').disabled=true;$('previous').disabled=true;notice('form-message','Enregistrement en cours…');
  try{const data=await api('/api/evaluation',payload());token=data.token;reference=data.reference;
  try{sessionStorage.setItem('muk-eval-receipt',JSON.stringify({token,reference}));}catch{}
+ try{window.MUKMarketing?.lead(submissionId);}catch{}
  form.reset();success();
  }catch(e){notice('form-message',e.name==='TimeoutError'?'La réponse a pris trop de temps. Réessayez sans fermer cet onglet : le même envoi ne créera pas de doublon.':e.message,true);}
  finally{busy=false;$('submit').disabled=false;$('previous').disabled=false;}
