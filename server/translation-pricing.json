@@ -1,0 +1,11 @@
+{
+  "currencySupplier": "GBP",
+  "supplierPricePerPage": 27.9,
+  "maximumWordsPerSupplierPage": 250,
+  "managementMarkupPercent": 25,
+  "displayCurrency": "MAD",
+  "exchangeRate": null,
+  "taxStatus": "UNCONFIRMED",
+  "publicMode": "quote_only",
+  "wordCountRule": "Supplier must confirm billable pages; do not infer from word count alone."
+}

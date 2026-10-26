@@ -1,0 +1,4 @@
+/* Focused adjustments; no new layout or language variants. */
+header .brand img{display:block;width:190px;max-width:100%;height:auto;max-height:76px;object-fit:contain}
+@media(max-width:768px){.mt-home .mt-hero h1{font-size:clamp(38px,8.5vw,58px)}.mt-home .mt-hero h1>span{font-size:.76em;line-height:1.23;letter-spacing:-1px}.mt-home .mt-hero .mt-micro{font-size:11px;line-height:1.6}}
+@media(max-width:480px){header .brand img{width:158px;max-height:58px}}
