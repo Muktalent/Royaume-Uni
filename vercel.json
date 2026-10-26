@@ -1,0 +1,66 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run build:admin && node tools/build-site.mjs",
+  "outputDirectory": "web-dist",
+  "functions": {
+    "api/index.mjs": {
+      "includeFiles": [
+        "server/app.mjs",
+        "server/crm-config.json",
+        "server/validation.mjs",
+        "server/vercel-route.mjs",
+        "server/evaluation-public.mjs",
+        "server/evaluation-validation.mjs",
+        "server/exports.mjs",
+        "server/export-data.mjs"
+      ],
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/api/index?__crm_route=:path*"
+    },
+    {
+      "source": "/admin",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/admin/",
+      "destination": "/admin/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/admin/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/services/ielts-guidance/:path*",
+      "destination": "/services/#anglais",
+      "permanent": true
+    },
+    {
+      "source": "/services/scholarships/:path*",
+      "destination": "/services/university-applications/#financement",
+      "permanent": true
+    }
+  ]
+}

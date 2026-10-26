@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>MUKTALENT · Administration</title>
+<link rel="stylesheet" href="/admin/style.css"><script type="module" src="/admin/app.js"></script>
+</head>
+<body>
+<section id="loginView" class="login-screen" lang="fr">
+  <div class="login-card">
+    <a class="wordmark" href="/admin/">MUK<span>TALENT</span></a>
+
+    <p class="eyebrow">ESPACE D&rsquo;ADMINISTRATION</p>
+
+    <h1>Tout votre travail,<br>au m&ecirc;me endroit.</h1>
+
+    <p class="muted">
+      Acc&egrave;s priv&eacute; r&eacute;serv&eacute; aux administrateurs.
+    </p>
+
+    <form id="loginForm">
+      <label for="email">Adresse e-mail</label>
+      <input
+        id="email"
+        type="email"
+        autocomplete="username"
+        maxlength="320"
+        required
+      >
+
+      <label for="password">Mot de passe</label>
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        required
+      >
+
+      <button id="loginSubmit" class="primary" type="submit" disabled>
+        Acc&eacute;der au tableau de bord
+      </button>
+    </form>
+
+    <p
+      id="loginMessage"
+      class="message"
+      role="status"
+      aria-live="polite"
+    >Connexion en cours&hellip;</p>
+  </div>
+</section>
+<div id="appShell" class="app-shell" hidden>
+ <aside class="sidebar"><a class="wordmark" href="/admin/">MUK<span>TALENT</span></a><p class="nav-caption">OPERACIONES</p><nav id="navigation" aria-label="Secciones del panel"></nav><div class="sidebar-footer"><p id="staffName"></p><small>Administración</small><button id="logout" class="ghost">Cerrar sesión</button></div></aside>
+ <main class="main"><header class="page-header"><div><p class="eyebrow">MUKTALENT / ADMINISTRACIÓN</p><h1 id="pageTitle">Resumen</h1><p id="pageDescription" class="muted"></p></div><button id="createRecord" class="primary" hidden>Nuevo registro</button></header>
+ <div id="globalMessage" class="message" role="status" aria-live="polite"></div>
+ <section id="overview" hidden><div id="metrics" class="metrics"></div><div class="dashboard-grid"><section class="card"><h2>Distribución de candidatos</h2><p class="muted">Registros no archivados. Recuento de toda la base visible para esta cuenta.</p><div id="pipeline"></div></section><section class="card"><h2>Prioridades</h2><p>Consulta los seguimientos vencidos y las solicitudes pendientes antes de continuar con las nuevas altas.</p><button id="openOverdue" class="secondary">Ver seguimientos vencidos</button><p id="asOf" class="muted"></p></section></div></section>
+ <section id="listView" class="card records" hidden><form id="filters" class="toolbar"><div class="search-field"><label for="search">Buscar</label><input id="search" type="search" maxlength="100" placeholder="Nombre, referencia o correo"></div><div id="statusField"><label for="statusFilter">Estado</label><select id="statusFilter"></select></div><div id="archiveField"><label for="archiveFilter">Archivo</label><select id="archiveFilter"><option value="false">Activos</option><option value="true">Archivados</option></select></div><label id="overdueField" class="checkbox"><input id="overdueFilter" type="checkbox"> Solo seguimientos vencidos</label><button class="secondary" type="submit">Aplicar</button><button id="refresh" class="ghost" type="button">Actualizar</button></form><p id="listMessage" class="muted" role="status"></p><div class="table-wrap"><table><caption id="tableCaption" class="sr-only">Registros</caption><thead id="tableHead"></thead><tbody id="tableBody"></tbody></table></div><footer class="pagination"><span id="pageInfo"></span><div><button id="previous" class="secondary">Anterior</button><button id="next" class="secondary">Siguiente</button></div></footer></section>
+ </main>
+</div>
+<dialog id="recordDialog" class="record-dialog"><header class="dialog-header"><div><p id="detailEyebrow" class="eyebrow"></p><h2 id="detailTitle">Registro</h2></div><button id="closeDialog" class="icon-button" aria-label="Cerrar ficha">×</button></header><div class="dialog-body"><button id="backCandidate" class="ghost" type="button" hidden>← Volver al candidato</button><p id="detailNotice" class="notice"></p><div id="detailMetadata" class="metadata"></div><form id="recordForm"><div id="formFields" class="form-grid"></div><div class="form-actions"><button id="saveRecord" class="primary" type="submit">Guardar cambios</button><button id="archiveRecord" class="danger" type="button" hidden>Archivar</button></div></form><p id="detailMessage" class="message" role="status" aria-live="polite"></p><section id="candidateRelated" hidden><h3>Expediente del candidato</h3><nav id="relatedTabs" class="tabs" aria-label="Apartados del expediente"></nav><div class="related-heading"><p id="relatedDescription" class="muted"></p><button id="addRelated" class="secondary" hidden>Añadir registro</button></div><div id="relatedMessage" class="message" role="status"></div><div id="relatedRows"></div><div class="pagination"><button id="relatedPrevious" class="ghost">Anterior</button><span id="relatedPage"></span><button id="relatedNext" class="ghost">Siguiente</button></div></section></div></dialog>
+</body></html>

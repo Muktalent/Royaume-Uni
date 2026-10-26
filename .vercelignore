@@ -1,0 +1,8 @@
+
+site-backup-*/
+admin-backup-*/
+web-backup-*/
+web-dist/
+.env
+.env.*
+*.backup-*

@@ -1,0 +1,30 @@
+
+# Local configuration and private files
+.env
+.env.*
+!.env.example
+node_modules/
+private-uploads/
+*.log
+
+site-backup-*/
+admin-backup-*/
+web-backup-*/
+web-dist/
+*.backup-*
+
+# Dependencias y archivos locales
+node_modules/
+.vercel/
+web-dist/
+coverage/
+.env
+.env.*
+!.env.example
+
+# Respaldos e instaladores locales
+site-backup-*/
+admin-backup-*/
+*.backup-*
+muktalent-*.zip
+muktalent-revision-web.txt

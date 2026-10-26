@@ -1,0 +1,800 @@
+{
+  "resources": {
+    "candidates": {
+      "table": "crm_candidates",
+      "title": "Candidatos",
+      "key": "id",
+      "summary": [
+        "reference",
+        "first_name",
+        "last_name",
+        "email",
+        "status",
+        "next_action_at"
+      ],
+      "search": [
+        "reference",
+        "first_name",
+        "last_name",
+        "email"
+      ],
+      "fields": [
+        "first_name",
+        "last_name",
+        "email",
+        "phone_e164",
+        "whatsapp_phone_e164",
+        "preferred_language",
+        "residence_country_code",
+        "residence_city",
+        "status",
+        "source",
+        "assigned_to",
+        "target_study_level",
+        "subject_interest",
+        "intended_intake",
+        "budget_amount",
+        "budget_currency",
+        "funding_plan",
+        "next_action",
+        "next_action_at"
+      ],
+      "create": true,
+      "archive": true,
+      "select": "id,reference,first_name,last_name,email,status,next_action_at,phone_e164,whatsapp_phone_e164,preferred_language,residence_country_code,residence_city,source,assigned_to,target_study_level,subject_interest,intended_intake,budget_amount,budget_currency,funding_plan,next_action,created_at,updated_at,archived_at,evaluation_payload",
+      "columns": {
+        "first_name": {
+          "label": "Nombre",
+          "type": "text",
+          "nullable": false,
+          "required": true,
+          "maxLength": 150,
+          "nonempty": true
+        },
+        "last_name": {
+          "label": "Apellidos",
+          "type": "text",
+          "nullable": false,
+          "required": true,
+          "maxLength": 150,
+          "nonempty": true
+        },
+        "email": {
+          "label": "Correo electrónico",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "format": "email",
+          "maxLength": 320
+        },
+        "phone_e164": {
+          "label": "Teléfono internacional",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "pattern": "^\\+[1-9][0-9]{6,14}$",
+          "maxLength": 2000
+        },
+        "whatsapp_phone_e164": {
+          "label": "WhatsApp internacional",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "pattern": "^\\+[1-9][0-9]{6,14}$",
+          "maxLength": 2000
+        },
+        "preferred_language": {
+          "label": "Idioma",
+          "type": "text",
+          "nullable": false,
+          "required": false,
+          "options": [
+            "fr",
+            "en"
+          ],
+          "maxLength": 2000
+        },
+        "residence_country_code": {
+          "label": "País de residencia (2 letras)",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "pattern": "^[A-Z]{2}$",
+          "maxLength": 2000
+        },
+        "residence_city": {
+          "label": "Ciudad",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        },
+        "status": {
+          "label": "Estado",
+          "type": "text",
+          "nullable": false,
+          "required": false,
+          "options": [
+            "new",
+            "contacted",
+            "assessment_in_progress",
+            "documents_pending",
+            "ready_for_review",
+            "on_hold",
+            "closed"
+          ],
+          "maxLength": 2000
+        },
+        "source": {
+          "label": "Origen",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        },
+        "assigned_to": {
+          "label": "Responsable",
+          "type": "uuid",
+          "nullable": true,
+          "required": false,
+          "format": "uuid",
+          "maxLength": 2000
+        },
+        "target_study_level": {
+          "label": "Nivel de estudios previsto",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "options": [
+            "foundation",
+            "undergraduate",
+            "postgraduate",
+            "phd",
+            "english_course",
+            "other"
+          ],
+          "maxLength": 2000
+        },
+        "subject_interest": {
+          "label": "Área de interés",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "maxLength": 500
+        },
+        "intended_intake": {
+          "label": "Convocatoria prevista",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "maxLength": 100
+        },
+        "budget_amount": {
+          "label": "Presupuesto",
+          "type": "numeric",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        },
+        "budget_currency": {
+          "label": "Moneda (3 letras)",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "pattern": "^[A-Z]{3}$",
+          "maxLength": 2000
+        },
+        "funding_plan": {
+          "label": "Plan de financiación",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        },
+        "next_action": {
+          "label": "Próxima acción",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        },
+        "next_action_at": {
+          "label": "Fecha de seguimiento",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        }
+      }
+    },
+    "enquiries": {
+      "table": "crm_enquiries",
+      "title": "Consultas",
+      "key": "id",
+      "summary": [
+        "full_name",
+        "email",
+        "enquiry_type",
+        "status",
+        "next_action_at"
+      ],
+      "search": [
+        "full_name",
+        "email",
+        "subject"
+      ],
+      "fields": [
+        "full_name",
+        "email",
+        "whatsapp_phone_e164",
+        "preferred_language",
+        "enquiry_type",
+        "subject",
+        "message",
+        "status",
+        "assigned_to",
+        "candidate_id",
+        "next_action",
+        "next_action_at"
+      ],
+      "create": false,
+      "select": "id,full_name,email,enquiry_type,status,next_action_at,whatsapp_phone_e164,preferred_language,subject,message,assigned_to,candidate_id,next_action,created_at,updated_at,read_at,read_by,source_page,privacy_notice_version,privacy_notice_acknowledged_at",
+      "columns": {
+        "full_name": {
+          "label": "Nombre completo",
+          "type": "text",
+          "nullable": false,
+          "required": true,
+          "maxLength": 300,
+          "nonempty": true
+        },
+        "email": {
+          "label": "Correo electrónico",
+          "type": "text",
+          "nullable": false,
+          "required": true,
+          "format": "email",
+          "maxLength": 320
+        },
+        "whatsapp_phone_e164": {
+          "label": "WhatsApp internacional",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "pattern": "^\\+[1-9][0-9]{6,14}$",
+          "maxLength": 2000
+        },
+        "preferred_language": {
+          "label": "Idioma",
+          "type": "text",
+          "nullable": false,
+          "required": false,
+          "options": [
+            "fr",
+            "en"
+          ],
+          "maxLength": 2000
+        },
+        "enquiry_type": {
+          "label": "Tipo de consulta",
+          "type": "text",
+          "nullable": false,
+          "required": false,
+          "options": [
+            "profile_assessment",
+            "general",
+            "existing_candidate",
+            "installation_pack"
+          ],
+          "maxLength": 2000
+        },
+        "subject": {
+          "label": "Asunto",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        },
+        "message": {
+          "label": "Mensaje",
+          "type": "text",
+          "nullable": false,
+          "required": true,
+          "maxLength": 20000,
+          "nonempty": true
+        },
+        "status": {
+          "label": "Estado",
+          "type": "text",
+          "nullable": false,
+          "required": false,
+          "options": [
+            "new",
+            "in_progress",
+            "awaiting_reply",
+            "resolved",
+            "archived"
+          ],
+          "maxLength": 2000
+        },
+        "assigned_to": {
+          "label": "Responsable",
+          "type": "uuid",
+          "nullable": true,
+          "required": false,
+          "format": "uuid",
+          "maxLength": 2000
+        },
+        "candidate_id": {
+          "label": "ID del candidato",
+          "type": "uuid",
+          "nullable": true,
+          "required": false,
+          "format": "uuid",
+          "maxLength": 2000
+        },
+        "next_action": {
+          "label": "Próxima acción",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        },
+        "next_action_at": {
+          "label": "Fecha de seguimiento",
+          "type": "timestamp with time zone",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        }
+      }
+    },
+    "appointments": {
+      "table": "crm_appointments",
+      "title": "Citas",
+      "key": "id",
+      "summary": [
+        "full_name",
+        "email",
+        "starts_at",
+        "advisor_id",
+        "status"
+      ],
+      "search": [
+        "full_name",
+        "email",
+        "subject"
+      ],
+      "fields": [
+        "status",
+        "cancellation_reason"
+      ],
+      "create": false,
+      "select": "id,full_name,email,starts_at,advisor_id,status,cancellation_reason,created_at,updated_at,candidate_id,subject,preferred_language,whatsapp_phone_e164,reviewed_at,cancelled_at,ends_at,blocked_until,reviewed_by,privacy_notice_version,privacy_notice_acknowledged_at",
+      "columns": {
+        "status": {
+          "label": "Estado",
+          "type": "text",
+          "nullable": false,
+          "required": false,
+          "options": [
+            "confirmed",
+            "completed",
+            "cancelled",
+            "no_show"
+          ],
+          "maxLength": 2000
+        },
+        "cancellation_reason": {
+          "label": "Motivo de cancelación",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        }
+      }
+    },
+    "blocks": {
+      "table": "crm_calendar_blocks",
+      "title": "Bloqueos de agenda",
+      "key": "id",
+      "summary": [
+        "advisor_id",
+        "starts_at",
+        "ends_at",
+        "reason"
+      ],
+      "search": [
+        "reason"
+      ],
+      "fields": [
+        "advisor_id",
+        "starts_at",
+        "ends_at",
+        "reason"
+      ],
+      "create": true,
+      "select": "id,advisor_id,starts_at,ends_at,reason,created_at",
+      "columns": {
+        "advisor_id": {
+          "label": "Asesor",
+          "type": "uuid",
+          "nullable": false,
+          "required": true,
+          "format": "uuid",
+          "maxLength": 2000
+        },
+        "starts_at": {
+          "label": "Inicio",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "required": true,
+          "maxLength": 2000
+        },
+        "ends_at": {
+          "label": "Fin",
+          "type": "timestamp with time zone",
+          "nullable": false,
+          "required": true,
+          "maxLength": 2000
+        },
+        "reason": {
+          "label": "Motivo",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        }
+      }
+    },
+    "staff": {
+      "table": "crm_staff",
+      "title": "Equipo",
+      "key": "user_id",
+      "summary": [
+        "full_name",
+        "role",
+        "active",
+        "user_id"
+      ],
+      "search": [
+        "full_name"
+      ],
+      "fields": [
+        "full_name",
+        "active"
+      ],
+      "create": true,
+      "select": "user_id,full_name,role,active,created_at,updated_at",
+      "columns": {
+        "full_name": {
+          "label": "Nombre completo",
+          "type": "text",
+          "nullable": false,
+          "required": true,
+          "maxLength": 200,
+          "nonempty": true
+        },
+        "active": {
+          "label": "Activo",
+          "type": "boolean",
+          "nullable": false,
+          "required": false,
+          "maxLength": 2000
+        },
+        "user_id": {
+          "label": "ID del usuario de Authentication",
+          "type": "uuid",
+          "nullable": false,
+          "required": true,
+          "format": "uuid",
+          "maxLength": 2000
+        }
+      }
+    },
+    "settings": {
+      "table": "crm_booking_settings",
+      "title": "Horario de reservas",
+      "key": "id",
+      "summary": [
+        "timezone",
+        "opening_time",
+        "closing_time",
+        "slot_minutes",
+        "buffer_minutes"
+      ],
+      "search": [],
+      "fields": [
+        "opening_time",
+        "closing_time"
+      ],
+      "create": false,
+      "select": "id,timezone,opening_time,closing_time,slot_minutes,buffer_minutes,updated_at",
+      "columns": {
+        "opening_time": {
+          "label": "Hora de apertura",
+          "type": "time without time zone",
+          "nullable": false,
+          "required": false,
+          "maxLength": 2000
+        },
+        "closing_time": {
+          "label": "Hora de cierre",
+          "type": "time without time zone",
+          "nullable": false,
+          "required": false,
+          "maxLength": 2000
+        }
+      }
+    },
+    "notes": {
+      "table": "crm_candidate_notes",
+      "title": "Notas compartidas",
+      "key": "id",
+      "summary": [
+        "body",
+        "created_at",
+        "created_by"
+      ],
+      "search": [],
+      "fields": [
+        "body"
+      ],
+      "create": true,
+      "nested": true,
+      "immutable": true,
+      "select": "id,body,created_at,created_by,updated_at",
+      "columns": {
+        "body": {
+          "label": "Nota",
+          "type": "text",
+          "nullable": false,
+          "required": true,
+          "maxLength": 20000,
+          "nonempty": true
+        }
+      }
+    },
+    "admin-notes": {
+      "table": "crm_admin_notes",
+      "title": "Notas privadas de administración",
+      "key": "id",
+      "summary": [
+        "body",
+        "created_at",
+        "created_by"
+      ],
+      "search": [],
+      "fields": [
+        "body"
+      ],
+      "create": true,
+      "nested": true,
+      "select": "id,body,created_at,created_by,updated_at",
+      "columns": {
+        "body": {
+          "label": "Nota",
+          "type": "text",
+          "nullable": false,
+          "required": true,
+          "maxLength": 20000,
+          "nonempty": true
+        }
+      }
+    },
+    "education": {
+      "table": "crm_education",
+      "title": "Estudios",
+      "key": "id",
+      "summary": [
+        "institution_name",
+        "qualification",
+        "field_of_study",
+        "is_current"
+      ],
+      "search": [],
+      "fields": [
+        "institution_name",
+        "qualification",
+        "field_of_study",
+        "country_code",
+        "start_date",
+        "end_date",
+        "is_current",
+        "result_text",
+        "grading_scale"
+      ],
+      "create": true,
+      "nested": true,
+      "select": "id,institution_name,qualification,field_of_study,is_current,country_code,start_date,end_date,result_text,grading_scale,created_at,updated_at",
+      "columns": {
+        "institution_name": {
+          "label": "Institución",
+          "type": "text",
+          "nullable": false,
+          "required": true,
+          "maxLength": 300,
+          "nonempty": true
+        },
+        "qualification": {
+          "label": "Titulación",
+          "type": "text",
+          "nullable": false,
+          "required": true,
+          "maxLength": 300,
+          "nonempty": true
+        },
+        "field_of_study": {
+          "label": "Área de estudios",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        },
+        "country_code": {
+          "label": "País (2 letras)",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "pattern": "^[A-Z]{2}$",
+          "maxLength": 2000
+        },
+        "start_date": {
+          "label": "Fecha de inicio",
+          "type": "date",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        },
+        "end_date": {
+          "label": "Fecha de fin",
+          "type": "date",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        },
+        "is_current": {
+          "label": "En curso",
+          "type": "boolean",
+          "nullable": false,
+          "required": false,
+          "maxLength": 2000
+        },
+        "result_text": {
+          "label": "Resultado",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        },
+        "grading_scale": {
+          "label": "Escala de notas",
+          "type": "text",
+          "nullable": true,
+          "required": false,
+          "maxLength": 2000
+        }
+      }
+    },
+    "documents": {
+      "table": "crm_documents",
+      "title": "Documentos · inventario",
+      "key": "id",
+      "summary": [
+        "original_filename",
+        "document_type",
+        "size_bytes",
+        "scan_status",
+        "review_status"
+      ],
+      "search": [
+        "original_filename"
+      ],
+      "fields": [],
+      "create": false,
+      "readonly": true,
+      "nested": true,
+      "select": "id,original_filename,document_type,size_bytes,scan_status,review_status,created_at,updated_at,request_id,mime_type,uploaded_via,uploaded_by,reviewed_at,reviewed_by,rejection_reason,sha256",
+      "columns": {}
+    },
+    "document-requests": {
+      "table": "crm_document_requests",
+      "title": "Solicitudes documentales · consulta",
+      "key": "id",
+      "summary": [
+        "title",
+        "status",
+        "expires_at",
+        "max_files"
+      ],
+      "search": [
+        "title"
+      ],
+      "fields": [],
+      "create": false,
+      "readonly": true,
+      "nested": true,
+      "select": "id,title,status,expires_at,max_files,created_at,updated_at,instructions,requested_documents,preferred_language,created_by",
+      "columns": {}
+    }
+  },
+  "labels": {
+    "first_name": "Nombre",
+    "last_name": "Apellidos",
+    "full_name": "Nombre completo",
+    "reference": "Referencia",
+    "email": "Correo electrónico",
+    "phone_e164": "Teléfono internacional",
+    "whatsapp_phone_e164": "WhatsApp internacional",
+    "preferred_language": "Idioma",
+    "residence_country_code": "País de residencia (2 letras)",
+    "residence_city": "Ciudad",
+    "status": "Estado",
+    "source": "Origen",
+    "assigned_to": "Responsable",
+    "target_study_level": "Nivel de estudios previsto",
+    "subject_interest": "Área de interés",
+    "intended_intake": "Convocatoria prevista",
+    "budget_amount": "Presupuesto",
+    "budget_currency": "Moneda (3 letras)",
+    "funding_plan": "Plan de financiación",
+    "next_action": "Próxima acción",
+    "next_action_at": "Fecha de seguimiento",
+    "created_at": "Creado",
+    "updated_at": "Actualizado",
+    "created_by": "Autor",
+    "archived_at": "Archivado",
+    "user_id": "ID del usuario de Authentication",
+    "role": "Rol",
+    "active": "Activo",
+    "advisor_id": "Asesor",
+    "starts_at": "Inicio",
+    "ends_at": "Fin",
+    "reason": "Motivo",
+    "subject": "Asunto",
+    "message": "Mensaje",
+    "enquiry_type": "Tipo de consulta",
+    "candidate_id": "ID del candidato",
+    "cancellation_reason": "Motivo de cancelación",
+    "timezone": "Zona horaria",
+    "opening_time": "Hora de apertura",
+    "closing_time": "Hora de cierre",
+    "slot_minutes": "Duración de cita (min)",
+    "buffer_minutes": "Margen (min)",
+    "body": "Nota",
+    "institution_name": "Institución",
+    "qualification": "Titulación",
+    "field_of_study": "Área de estudios",
+    "country_code": "País (2 letras)",
+    "start_date": "Fecha de inicio",
+    "end_date": "Fecha de fin",
+    "is_current": "En curso",
+    "result_text": "Resultado",
+    "grading_scale": "Escala de notas",
+    "original_filename": "Archivo",
+    "document_type": "Tipo documental",
+    "size_bytes": "Tamaño (bytes)",
+    "scan_status": "Análisis de seguridad",
+    "review_status": "Revisión",
+    "title": "Título",
+    "expires_at": "Caducidad",
+    "max_files": "Máximo de archivos",
+    "read_at": "Marcada como leída",
+    "read_by": "Leída por",
+    "reviewed_at": "Revisada",
+    "reviewed_by": "Revisada por",
+    "cancelled_at": "Cancelada",
+    "blocked_until": "Bloqueado hasta",
+    "privacy_notice_version": "Versión del aviso de privacidad",
+    "privacy_notice_acknowledged_at": "Aviso de privacidad reconocido",
+    "source_page": "Página de origen",
+    "instructions": "Instrucciones",
+    "requested_documents": "Documentos solicitados",
+    "uploaded_via": "Canal de subida",
+    "uploaded_by": "Subido por",
+    "sha256": "Huella SHA-256",
+    "rejection_reason": "Motivo de rechazo",
+    "request_id": "ID de solicitud",
+    "evaluation_payload": "Évaluation reçue · formulaire complet"
+  }
+}
