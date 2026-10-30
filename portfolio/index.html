@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" class="theme-dawn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive,noimageindex">
+<meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:">
+<title>Portfolio</title>
+<link rel="icon" href="/assets/book/img/icon.svg" type="image/svg+xml">
+<link rel="preload" href="/assets/book/fonts/arvo-normal-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/book/fonts/lato-normal-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/book/fonts.css">
+<link rel="stylesheet" href="/assets/book/book.css">
+<script type="module" src="/assets/book/portfolio.js"></script>
+</head>
+<body class="is-book">
+<a class="skip" href="#work">Skip to projects</a>
+<div class="scene" aria-hidden="true"></div>
+
+<button type="button" class="corner corner-left" id="langBtn"><span class="lang-code">ES</span></button>
+<button type="button" class="corner corner-right" id="themeBtn"></button>
+
+<nav class="booknav" id="booknav" aria-label="Book sections">
+  <a href="#cover" data-go="cover"></a>
+  <a href="#cv" data-go="cv"></a>
+  <a href="#work" data-go="work"></a>
+  <a href="#contact" data-go="contact"></a>
+  <a href="/certificates/" data-go="certs"></a>
+</nav>
+
+<main class="book" id="book" data-state="closed" data-page="cv">
+  <div class="leaf leaf-cover" id="leafCover">
+    <section class="face front cover" id="cover" aria-labelledby="coverName">
+      <div class="cover-art" id="coverArt"></div>
+      <div class="cover-shade"></div>
+      <header class="cover-head">
+        <p class="cover-edition" id="coverEdition"></p>
+        <h1 class="cover-name" id="coverName"></h1>
+        <p class="cover-sub" id="coverSub"></p>
+      </header>
+      <div class="cover-stories" id="coverStories"></div>
+      <button type="button" class="ribbon" id="openBook"><span class="stitch"></span><strong id="openLabel">OPEN</strong><span class="stitch"></span></button>
+      <div class="cover-latest" id="coverLatest" hidden>
+        <p class="latest-label"><span id="latestLabel"></span> · <a href="#work" id="latestAll"></a></p>
+        <button type="button" class="latest-bar" id="latestBar"></button>
+      </div>
+      <p class="cover-barcode" aria-hidden="true"><span></span><em id="coverIssue"></em></p>
+    </section>
+    <section class="face back page" id="cv" aria-labelledby="cvTitle" tabindex="-1">
+      <div class="page-scroll"><div class="page-in" id="cvBody"></div></div>
+      <span class="folio">i</span>
+    </section>
+  </div>
+
+  <section class="page page-mid" id="work" aria-labelledby="workTitle" tabindex="-1">
+    <div class="page-scroll"><div class="page-in" id="workBody"></div></div>
+    <span class="folio">ii</span>
+  </section>
+
+  <div class="leaf leaf-right" id="leafRight">
+    <section class="face front page" id="contact" aria-labelledby="contactTitle" tabindex="-1">
+      <button type="button" class="bookmark" id="closeBook"><span class="sr" id="closeLabel">Close book</span></button>
+      <div class="page-scroll"><div class="page-in" id="contactBody"></div></div>
+      <span class="folio">iii</span>
+    </section>
+    <div class="face back blank"></div>
+  </div>
+</main>
+
+<p class="status-live sr" id="live" role="status" aria-live="polite"></p>
+<noscript><p class="noscript">This portfolio needs JavaScript enabled.</p></noscript>
+</body>
+</html>

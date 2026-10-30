@@ -349,12 +349,12 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
     };
   }
   async function acceptExisting() {
-    const modal = dialog("Incorporar un lead real"), form = E("form"), q = field(form, "search", "Buscar en leads"), find = button("Buscar", async () => {
+    const modal = dialog("Incorporar un lead real"), form = E("form"), q2 = field(form, "search", "Buscar en leads"), find = button("Buscar", async () => {
       find.disabled = true;
       choice.disabled = true;
       try {
         const p = new URLSearchParams({ page: "1", page_size: "100" });
-        if (q.value.trim()) p.set("q", q.value.trim());
+        if (q2.value.trim()) p.set("q", q2.value.trim());
         const r = await api2("/api/candidates?" + p);
         choice.replaceChildren();
         const rows = r.data.filter((c) => !c.case_accepted_at);
@@ -21068,122 +21068,339 @@ function shouldShowDeprecationWarning() {
 }
 if (shouldShowDeprecationWarning()) console.warn("\u26A0\uFE0F  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217");
 
+// book/card-icons.js
+var BRAND_PATHS = {
+  "linkedin": "M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z",
+  "instagram": "M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077",
+  "tiktok": "M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z",
+  "facebook": "M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z",
+  "youtube": "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z",
+  "x": "M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z",
+  "whatsapp": "M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"
+};
+var UI_PATHS = {
+  menu: ["M4 7h16", "M4 12h16", "M4 17h16"],
+  close: ["M6 6l12 12", "M18 6L6 18"],
+  share: ["M12 3v12", "M7.5 7.5L12 3l4.5 4.5", "M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"],
+  link: ["M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1", "M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"],
+  qr: ["M4 4h6v6H4z", "M14 4h6v6h-6z", "M4 14h6v6H4z", "M14 14h2v2h-2z", "M18 14h2", "M14 18h2", "M18 18h2v2", "M20 16v.01"],
+  contact: ["M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20", "M10 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7", "M19 8v6", "M16 11h6"],
+  wallet: ["M3 7.5A2.5 2.5 0 0 1 5.5 5H18a2 2 0 0 1 2 2v1", "M3 7.5v10A2.5 2.5 0 0 0 5.5 20H19a2 2 0 0 0 2-2v-3", "M21 10h-4a2 2 0 0 0 0 4h4z"],
+  open: ["M14 4h6v6", "M20 4l-9 9", "M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"],
+  edit: ["M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z", "M13.5 6.5l4 4"],
+  users: ["M17 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1", "M10 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8", "M21 20v-1a4 4 0 0 0-3-3.9", "M16 3.1a4 4 0 0 1 0 7.8"],
+  download: ["M12 4v11", "M7.5 10.5L12 15l4.5-4.5", "M5 20h14"],
+  phone: ["M5 4h3l1.5 4.5-2 1.3a11 11 0 0 0 6.7 6.7l1.3-2L20 16v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"],
+  mail: ["M4 6h16v12H4z", "M4 7l8 6 8-6"],
+  calendar: ["M5 5h14v15H5z", "M5 10h14", "M9 3v4", "M15 3v4"],
+  check: ["M5 12.5l4.5 4.5L19 7.5"]
+};
+Object.assign(UI_PATHS, {
+  home: ["M4 11l8-7 8 7", "M6 9.5V20h12V9.5", "M10 20v-5h4v5"],
+  pipeline: ["M4 5h16l-6 7.5V19l-4 1.5v-8z"],
+  planner: ["M5 5h14v15H5z", "M5 10h14", "M9 3v4", "M15 3v4", "M8.5 14h2", "M13.5 14h2", "M8.5 17h2"],
+  studio: ["M4 7h16v12H4z", "M4 7l3-3h10l3 3", "M10 10.5v5l4.5-2.5z"],
+  card: ["M7 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2", "M9 3v18", "M12.5 9.5a1.75 1.75 0 1 0 3.5 0 1.75 1.75 0 0 0-3.5 0", "M12 15h4.5", "M12 17.5h3"],
+  refresh: ["M20 11a8 8 0 0 0-14.5-4.5L4 8", "M4 4v4h4", "M4 13a8 8 0 0 0 14.5 4.5L20 16", "M20 20v-4h-4"],
+  plus: ["M12 5v14", "M5 12h14"],
+  lock: ["M6 11h12v9H6z", "M8.5 11V8a3.5 3.5 0 0 1 7 0v3"],
+  logout: ["M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3", "M10 16l-4-4 4-4", "M6 12h10"]
+});
+
 // book/business-card.js
+var SVG = "http://www.w3.org/2000/svg";
 var E2 = (t, v, c) => {
   const n = document.createElement(t);
-  if (v !== void 0) n.textContent = String(v);
+  if (v !== void 0 && v !== null) n.textContent = String(v);
   if (c) n.className = c;
   return n;
 };
-function createBusinessCard({ data, photoUrl, qrImage }) {
-  const scene = E2("div", void 0, "biz-scene mk-scene"), card = E2("article", void 0, "mk-card");
-  card.setAttribute("aria-label", "MUK Talent digital business card");
-  const header = E2("header", void 0, "mk-brand");
-  header.append(E2("span", "MUK TALENT", "mk-wordmark"), E2("span", "STUDENT COUNSELLING", "mk-brand-caption"));
-  const portrait = E2("div", void 0, "mk-portrait"), circle = E2("div", void 0, "mk-avatar"), name = data.display_name || data.full_name || "MUK Talent";
-  circle.append(E2("span", name.split(/\s+/).slice(0, 2).map((v) => v[0]).join(""), "mk-initials"));
+function icon(name, cls = "mk-icon") {
+  const s = document.createElementNS(SVG, "svg");
+  s.setAttribute("viewBox", "0 0 24 24");
+  s.setAttribute("aria-hidden", "true");
+  s.setAttribute("focusable", "false");
+  s.setAttribute("class", cls);
+  s.setAttribute("fill", "none");
+  s.setAttribute("stroke", "currentColor");
+  s.setAttribute("stroke-width", "1.7");
+  s.setAttribute("stroke-linecap", "round");
+  s.setAttribute("stroke-linejoin", "round");
+  for (const d of UI_PATHS[name] || []) {
+    const p = document.createElementNS(SVG, "path");
+    p.setAttribute("d", d);
+    s.append(p);
+  }
+  return s;
+}
+function brandIcon(platform, cls = "mk-brand-icon") {
+  const s = document.createElementNS(SVG, "svg");
+  s.setAttribute("viewBox", "0 0 24 24");
+  s.setAttribute("aria-hidden", "true");
+  s.setAttribute("focusable", "false");
+  s.setAttribute("class", cls);
+  s.setAttribute("fill", "currentColor");
+  const p = document.createElementNS(SVG, "path");
+  p.setAttribute("d", BRAND_PATHS[platform] || "");
+  s.append(p);
+  return s;
+}
+var initials = (name) => String(name || "MT").trim().split(/\s+/).slice(0, 2).map((v) => v[0] || "").join("").toUpperCase();
+var reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+var sameOrigin = (value) => {
+  try {
+    const u = new URL(value, location.origin);
+    return u.protocol === "https:" || u.origin === location.origin ? u.href : null;
+  } catch {
+    return null;
+  }
+};
+function createBusinessCard({ data = {}, photoUrl, link } = {}) {
+  const name = data.display_name || data.full_name || "MUK Talent", title = (data.job_title || "Team member").toUpperCase();
+  const scene = E2("div", void 0, "biz-scene mk-scene"), badge = E2("article", void 0, "mk-badge");
+  badge.setAttribute("aria-label", name + ", " + (data.job_title || "MUK Talent") + " \xB7 MUK Talent business card");
+  const band = E2("div", void 0, "mk-band"), bandText = E2("span", title, "mk-band-title");
+  bandText.setAttribute("aria-hidden", "true");
+  band.append(bandText);
+  badge.style.setProperty("--title-len", String(Math.max(8, title.length)));
+  badge.style.setProperty("--name-len", String(Math.max(10, name.length)));
+  const panel = E2("div", void 0, "mk-panel"), logo = E2("img", void 0, "mk-logo");
+  logo.src = "/book/muk-badge-logo.png";
+  logo.alt = "MUK Talent";
+  logo.width = 500;
+  logo.height = 291;
+  logo.decoding = "async";
+  const photo = E2("div", void 0, "mk-photo");
+  photo.append(E2("span", initials(name), "mk-initials"));
   if (photoUrl) {
-    const image = E2("img");
-    image.src = photoUrl;
-    image.alt = name;
-    image.width = image.height = 132;
-    image.decoding = "async";
-    image.onerror = () => image.remove();
-    circle.append(image);
+    const img = E2("img");
+    img.alt = "Photo of " + name;
+    img.decoding = "async";
+    img.referrerPolicy = "no-referrer";
+    img.onload = () => photo.classList.add("mk-has-photo");
+    img.onerror = () => img.remove();
+    img.src = photoUrl;
+    photo.append(img);
   }
-  portrait.append(circle);
-  const identity = E2("section", void 0, "mk-identity");
-  identity.append(E2("h2", name), E2("p", data.job_title || "Team member", "mk-position"));
-  if (name.length > 28) identity.classList.add("mk-long-name");
-  if (data.assigned_city) identity.append(E2("p", data.assigned_city, "mk-location"));
-  const contacts = E2("dl", void 0, "mk-contacts");
-  for (const [label2, value] of [["Work phone", data.contact_phone], ["Work email", data.contact_email]]) if (value) {
-    const row = E2("div");
-    row.append(E2("dt", label2), E2("dd", value));
-    contacts.append(row);
+  const id = E2("div", void 0, "mk-id"), heading = E2("h2", name, "mk-name");
+  if (name.length > 24) heading.classList.add("mk-name-long");
+  id.append(heading);
+  const lines = E2("ul", void 0, "mk-lines");
+  lines.append(E2("li", data.employee_code ? "ID " + data.employee_code : "MUK Talent team"));
+  if (data.assigned_city) lines.append(E2("li", data.assigned_city));
+  const shown = link?.display || data.short_display;
+  if (shown) lines.append(E2("li", shown, "mk-link-line"));
+  else lines.append(E2("li", "muktalent.com"));
+  id.append(lines);
+  const sheen = E2("span", void 0, "mk-sheen");
+  sheen.setAttribute("aria-hidden", "true");
+  panel.append(logo, photo, id);
+  badge.append(band, panel, sheen);
+  scene.append(badge);
+  if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    let frame = 0;
+    scene.addEventListener("pointermove", (e) => {
+      if (reduced()) return;
+      const r = badge.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        badge.style.setProperty("--ry", (x * 9).toFixed(2) + "deg");
+        badge.style.setProperty("--rx", (-y * 7).toFixed(2) + "deg");
+        badge.style.setProperty("--gx", ((x + 0.5) * 100).toFixed(1) + "%");
+        badge.classList.add("mk-tilting");
+      });
+    });
+    scene.addEventListener("pointerleave", () => {
+      cancelAnimationFrame(frame);
+      badge.style.setProperty("--rx", "0deg");
+      badge.style.setProperty("--ry", "0deg");
+      badge.classList.remove("mk-tilting");
+    });
   }
-  const connection = E2("section", void 0, "mk-connect");
-  connection.setAttribute("aria-label", "Scan this card");
-  if (qrImage) {
-    const qr = E2("img");
-    qr.src = qrImage;
-    qr.alt = "Scan to open this business card, book an appointment and save it to Wallet";
-    qr.width = qr.height = 160;
-    connection.append(qr, E2("p", "SCAN TO CONNECT", "mk-scan-label"));
-  } else connection.append(E2("p", "Your QR is available once the public card is enabled.", "mk-qr-pending"));
-  const footer = E2("footer", "muktalent.com", "mk-footer");
-  card.append(header, portrait, identity);
-  if (contacts.children.length) card.append(contacts);
-  card.append(connection, footer);
-  scene.append(card);
   return scene;
 }
-function createShareTools({ url, qrImage, name, data }) {
-  const box = E2("div", void 0, "biz-share-tools"), message2 = E2("p", "", "biz-share-message");
+function createSocialLinks(socials = [], name = "") {
+  const list = E2("ul", void 0, "mk-socials");
+  list.setAttribute("aria-label", "Social profiles");
+  for (const s of socials) {
+    if (!BRAND_PATHS[s.platform]) continue;
+    let url;
+    try {
+      url = new URL(s.url);
+    } catch {
+      continue;
+    }
+    if (url.protocol !== "https:") continue;
+    const li = E2("li"), a = E2("a", void 0, "mk-social mk-social-" + s.platform);
+    a.href = url.href;
+    a.target = "_blank";
+    a.rel = "me noopener noreferrer";
+    a.setAttribute("aria-label", (name ? name + " on " : "") + s.label);
+    a.title = s.label;
+    a.append(brandIcon(s.platform));
+    li.append(a);
+    list.append(li);
+  }
+  return list;
+}
+function vcard({ name, data, url, socials }) {
+  const safe = (v) => String(v || "").replace(/\\/g, "\\\\").replace(/[\r\n]+/g, "\\n").replace(/;/g, "\\;").replace(/,/g, "\\,");
+  const parts = String(name || "").trim().split(/\s+/), last = parts.length > 1 ? parts.pop() : "", first = parts.join(" ");
+  const lines = ["BEGIN:VCARD", "VERSION:3.0", "N:" + safe(last) + ";" + safe(first) + ";;;", "FN:" + safe(name), "ORG:MUK Talent", "TITLE:" + safe(data.job_title), "URL;TYPE=WORK:" + url];
+  if (data.contact_phone) lines.push("TEL;TYPE=WORK,VOICE:" + safe(data.contact_phone));
+  if (data.contact_email) lines.push("EMAIL;TYPE=WORK:" + safe(data.contact_email));
+  if (data.assigned_city) lines.push("ADR;TYPE=WORK:;;;" + safe(data.assigned_city) + ";;;");
+  for (const s of socials || []) lines.push("X-SOCIALPROFILE;TYPE=" + safe(s.platform) + ":" + s.url, "URL;TYPE=" + safe(s.label) + ":" + s.url);
+  lines.push("END:VCARD");
+  return lines.join("\r\n");
+}
+function download(href, filename) {
+  const a = E2("a");
+  a.href = href;
+  a.download = filename;
+  a.rel = "noopener";
+  document.body.append(a);
+  a.click();
+  a.remove();
+}
+var fileName = (name) => ("muktalent-" + String(name || "card").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")).slice(0, 60);
+function qrDialog({ qrImage, display: display2, name }) {
+  const dialog2 = E2("dialog", void 0, "mk-dialog");
+  dialog2.setAttribute("aria-label", "QR code for " + name);
+  const box = E2("div", void 0, "mk-dialog-body"), close = E2("button", void 0, "mk-dialog-close");
+  close.type = "button";
+  close.setAttribute("aria-label", "Close");
+  close.append(icon("close"));
+  const frame = E2("div", void 0, "mk-qr-frame"), img = E2("img");
+  img.src = qrImage;
+  img.alt = "QR code that opens " + display2;
+  img.width = img.height = 600;
+  frame.append(img);
+  const save = E2("button", void 0, "mk-button mk-button-gold");
+  save.type = "button";
+  save.append(icon("download"), E2("span", "Download QR"));
+  save.onclick = () => download(qrImage, fileName(name) + "-qr.png");
+  box.append(close, E2("p", "SCAN TO CONNECT", "mk-dialog-kicker"), frame, E2("p", display2, "mk-dialog-link"), E2("p", "Print it, add it to slides or show it from your phone.", "mk-dialog-note"), save);
+  dialog2.append(box);
+  close.onclick = () => dialog2.close();
+  dialog2.addEventListener("click", (e) => {
+    if (e.target === dialog2) dialog2.close();
+  });
+  dialog2.addEventListener("close", () => dialog2.remove());
+  document.body.append(dialog2);
+  dialog2.showModal();
+  close.focus();
+}
+function createCardMenu({ url, display: display2, qrImage, name, data = {}, slug, socials = [], showOpen = false, extras = [] }) {
+  const safeUrl = sameOrigin(url) || location.href, shown = display2 || safeUrl.replace(/^https?:\/\//, "");
+  const box = E2("div", void 0, "mk-actions"), bar = E2("div", void 0, "mk-bar"), message2 = E2("p", "", "mk-status");
   message2.setAttribute("role", "status");
   message2.setAttribute("aria-live", "polite");
-  const share = E2("button", "Share card", "biz-action"), copy = E2("button", "Copy link", "biz-action");
-  share.type = copy.type = "button";
-  share.onclick = async () => {
-    try {
-      if (navigator.share) await navigator.share({ title: name + " \xB7 MUK Talent", url });
-      else {
-        await navigator.clipboard.writeText(url);
-        message2.textContent = "Link copied.";
-      }
-    } catch (error) {
-      if (error.name !== "AbortError") message2.textContent = url;
-    }
+  let clear = 0;
+  const say = (t) => {
+    message2.textContent = t;
+    clearTimeout(clear);
+    clear = setTimeout(() => {
+      message2.textContent = "";
+    }, 4e3);
   };
-  copy.onclick = async () => {
+  const copyNow = async () => {
     try {
-      await navigator.clipboard.writeText(url);
-      message2.textContent = "Link copied.";
+      await navigator.clipboard.writeText(safeUrl);
+      say("Link copied \xB7 " + shown);
+      return true;
     } catch {
-      message2.textContent = url;
+      say(shown);
+      return false;
     }
   };
-  box.append(share, copy);
-  if (qrImage) {
-    const download = E2("a", "Download QR", "biz-action");
-    download.href = qrImage;
-    download.download = "muktalent-business-card-qr.png";
-    box.append(download);
-  }
-  if (data) {
-    const save = E2("button", "Save contact", "biz-action");
-    save.type = "button";
-    save.onclick = () => {
-      const safe = (v) => String(v || "").replace(/\\/g, "\\\\").replace(/[\r\n]+/g, "\\n").replace(/;/g, "\\;").replace(/,/g, "\\,");
-      const lines = ["BEGIN:VCARD", "VERSION:3.0", "FN:" + safe(name), "ORG:MUK Talent", "TITLE:" + safe(data.job_title), "URL:" + url];
-      if (data.contact_phone) lines.push("TEL;TYPE=WORK:" + safe(data.contact_phone));
-      if (data.contact_email) lines.push("EMAIL;TYPE=WORK:" + safe(data.contact_email));
-      lines.push("END:VCARD");
-      const blob = new Blob([lines.join("\r\n")], { type: "text/vcard;charset=utf-8" }), a = E2("a"), link = URL.createObjectURL(blob);
-      a.href = link;
-      a.download = "muktalent-contact.vcf";
-      document.body.append(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(link), 1e3);
+  const linkButton = E2("button", void 0, "mk-linkpill");
+  linkButton.type = "button";
+  linkButton.setAttribute("aria-label", "Copy card link " + shown);
+  linkButton.append(icon("link"), E2("span", shown, "mk-linkpill-text"), E2("span", "Copy", "mk-linkpill-cta"));
+  linkButton.onclick = copyNow;
+  const toggle = E2("button", void 0, "mk-burger");
+  toggle.type = "button";
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.setAttribute("aria-label", "Card actions");
+  toggle.title = "Card actions";
+  const lines = E2("span", void 0, "mk-burger-lines");
+  lines.setAttribute("aria-hidden", "true");
+  lines.append(E2("i"), E2("i"), E2("i"));
+  toggle.append(lines);
+  const menuId = "mk-menu-" + Math.random().toString(36).slice(2, 9);
+  const menu = E2("div", void 0, "mk-menu");
+  menu.id = menuId;
+  menu.hidden = true;
+  toggle.setAttribute("aria-controls", menuId);
+  bar.append(linkButton, toggle);
+  box.append(bar, menu, message2);
+  const item = (ic, label2, hint, onSelect, cls = "") => {
+    const b = E2("button", void 0, "mk-item " + cls);
+    b.type = "button";
+    const t = E2("span", void 0, "mk-item-text");
+    t.append(E2("strong", label2));
+    if (hint) t.append(E2("small", hint));
+    const i = E2("span", void 0, "mk-item-icon");
+    i.append(typeof ic === "string" ? icon(ic) : ic);
+    b.append(i, t);
+    b.onclick = async () => {
+      await onSelect(b);
     };
-    box.append(save);
-  }
-  const wallet = E2("button", "Add to Wallet", "biz-action biz-wallet biz-wallet-main");
-  wallet.type = "button";
-  wallet.setAttribute("aria-expanded", "false");
-  const choices = E2("section", void 0, "biz-wallet-options");
-  choices.setAttribute("aria-label", "Wallet options");
-  choices.hidden = true;
-  let busy = false;
-  box.append(wallet, choices, message2);
+    menu.append(b);
+    return b;
+  };
+  const group = (label2) => menu.append(E2("p", label2, "mk-menu-label"));
+  group("Share");
+  item("share", "Share card", "Send by WhatsApp, email or any app", async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: name + " \xB7 MUK Talent", text: name + " \xB7 " + (data.job_title || "MUK Talent"), url: safeUrl });
+        close();
+      } else {
+        await copyNow();
+        close();
+      }
+    } catch (e) {
+      if (e.name !== "AbortError") say(shown);
+    }
+  });
+  item("link", "Copy short link", shown, async () => {
+    await copyNow();
+    close();
+  });
+  if (qrImage) item("qr", "QR code", "Show full screen or download", () => {
+    close();
+    qrDialog({ qrImage, display: shown, name });
+  });
+  group("Save");
+  item("contact", "Save contact", "Adds this card to the phone contacts", () => {
+    const blob = new Blob([vcard({ name, data, url: safeUrl, socials })], { type: "text/vcard;charset=utf-8" }), href = URL.createObjectURL(blob);
+    download(href, fileName(name) + ".vcf");
+    setTimeout(() => URL.revokeObjectURL(href), 1500);
+    close();
+  });
+  const walletBox = E2("div", void 0, "mk-wallet-options");
+  walletBox.hidden = true;
+  const wallet = item("wallet", "Add to Wallet", "Apple Wallet or Google Wallet", () => walletFlow());
+  menu.append(walletBox);
+  if (showOpen || extras.length) group("Manage");
+  if (showOpen) item("open", "Open public card", "See it as your clients do", () => {
+    window.open(safeUrl, "_blank", "noopener,noreferrer");
+    close();
+  });
+  for (const x of extras) item(x.icon || "edit", x.label, x.hint, async () => {
+    close();
+    await x.onSelect();
+  });
+  let walletBusy = false;
   async function readResponse(response) {
     const text = await response.text();
     let value;
     try {
       value = JSON.parse(text);
     } catch {
-      value = { error: response.status === 429 ? "Too many Wallet requests. Please wait before trying again." : "This server did not return the Wallet response expected. Check the public deployment." };
+      value = { error: response.status === 429 ? "Too many Wallet requests. Please wait before trying again." : "Wallet is temporarily unavailable." };
     }
     if (!response.ok) {
       const e = new Error(value.error || "Wallet is unavailable.");
@@ -21192,67 +21409,106 @@ function createShareTools({ url, qrImage, name, data }) {
     }
     return value;
   }
-  wallet.onclick = async () => {
-    if (busy) return;
-    if (!choices.hidden) {
-      choices.hidden = true;
-      wallet.setAttribute("aria-expanded", "false");
+  async function walletFlow() {
+    if (walletBusy) return;
+    if (!walletBox.hidden) {
+      walletBox.hidden = true;
       return;
     }
-    busy = true;
+    walletBusy = true;
     wallet.disabled = true;
-    wallet.textContent = "Checking Wallet\u2026";
-    message2.textContent = "";
-    choices.replaceChildren();
-    choices.hidden = false;
-    wallet.setAttribute("aria-expanded", "true");
+    wallet.querySelector("strong").textContent = "Checking Wallet\u2026";
+    walletBox.replaceChildren();
     try {
-      const slug = new URL(url, location.origin).searchParams.get("c");
-      if (!slug) throw Error("This card link has no card identifier. Reopen the public business card.");
-      const info = await readResponse(await fetch("/api/business-card/" + encodeURIComponent(slug) + "/wallet", { cache: "no-store" }));
-      if (info.version !== 2) throw Error("This server is running an older Wallet integration. Publish the latest version.");
+      const id = slug || new URL(safeUrl, location.origin).searchParams.get("c");
+      if (!id) throw Error("Publish your card to enable Wallet.");
+      const info = await readResponse(await fetch("/api/business-card/" + encodeURIComponent(id) + "/wallet", { cache: "no-store" }));
+      if (info.version !== 2) throw Error("Wallet needs the latest server version.");
+      const ua = navigator.userAgent || "", ios = /iPhone|iPad|iPod/.test(ua) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1, android = /Android/i.test(ua);
+      if (ios && info.apple) info.google = false;
+      else if (android && info.google) info.apple = false;
       if (info.apple) {
-        const apple = E2("a", "Add to Apple Wallet", "biz-action biz-wallet");
         const target = new URL(info.appleUrl, location.origin);
         if (target.origin !== location.origin) throw Error("Unexpected Apple Wallet endpoint.");
-        apple.href = target.href;
-        choices.append(apple);
+        const a = E2("a", void 0, "mk-wallet-btn mk-wallet-apple");
+        a.href = target.href;
+        a.append(E2("span", "Add to Apple Wallet"));
+        walletBox.append(a);
       }
       if (info.google) {
-        const google = E2("button", "Add to Google Wallet", "biz-action biz-wallet");
-        google.type = "button";
-        choices.append(google);
-        google.onclick = async () => {
-          if (busy) return;
-          busy = true;
-          google.disabled = wallet.disabled = true;
-          google.textContent = "Preparing your card\u2026";
-          message2.textContent = "";
+        const g = E2("button", void 0, "mk-wallet-btn mk-wallet-google");
+        g.type = "button";
+        g.append(E2("span", "Add to Google Wallet"));
+        walletBox.append(g);
+        g.onclick = async () => {
+          if (walletBusy) return;
+          walletBusy = true;
+          g.disabled = true;
+          g.firstChild.textContent = "Preparing\u2026";
           try {
             const endpoint = new URL(info.googleEndpoint, location.origin);
             if (endpoint.origin !== location.origin) throw Error("Unexpected Google Wallet endpoint.");
             const result = await readResponse(await fetch(endpoint.href, { method: "POST", cache: "no-store", headers: { "Content-Type": "application/json" }, body: "{}" }));
-            if (!result.url) throw Error("The server did not return a Wallet save link.");
-            const target = new URL(result.url);
+            const target = new URL(result.url || "about:blank");
             if (target.origin !== "https://pay.google.com") throw Error("Unexpected Wallet save destination.");
             window.location.assign(target.href);
-          } catch (error) {
-            message2.textContent = error.message;
+          } catch (e) {
+            say(e.message);
           } finally {
-            busy = false;
-            google.disabled = wallet.disabled = false;
-            google.textContent = "Add to Google Wallet";
+            walletBusy = false;
+            g.disabled = false;
+            g.firstChild.textContent = "Add to Google Wallet";
           }
         };
       }
-      if (!info.apple && !info.google) message2.textContent = "Wallet is not enabled on the server serving this page. Check its issuer credentials and public HTTPS site URL. Local configuration does not configure the public deployment.";
-    } catch (error) {
-      message2.textContent = error.message;
+      if (!info.apple && !info.google) say("Wallet is not enabled yet on this server.");
+      else walletBox.hidden = false;
+    } catch (e) {
+      say(e.message);
     } finally {
-      busy = false;
+      walletBusy = false;
       wallet.disabled = false;
-      wallet.textContent = "Add to Wallet";
+      wallet.querySelector("strong").textContent = "Add to Wallet";
     }
+  }
+  function onDoc(e) {
+    if (!box.contains(e.target)) close();
+  }
+  function onKey(e) {
+    if (e.key === "Escape") {
+      close();
+      toggle.focus();
+    }
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      const items = [...menu.querySelectorAll("button:not([disabled]),a")];
+      const i = items.indexOf(document.activeElement);
+      if (i < 0) return;
+      e.preventDefault();
+      items[(i + (e.key === "ArrowDown" ? 1 : items.length - 1)) % items.length].focus();
+    }
+  }
+  function open() {
+    menu.hidden = false;
+    toggle.setAttribute("aria-expanded", "true");
+    box.classList.add("mk-open");
+    document.addEventListener("pointerdown", onDoc);
+    document.addEventListener("keydown", onKey);
+    menu.querySelector("button")?.focus({ preventScroll: true });
+  }
+  function close() {
+    if (menu.hidden) return;
+    menu.hidden = true;
+    walletBox.hidden = true;
+    toggle.setAttribute("aria-expanded", "false");
+    box.classList.remove("mk-open");
+    document.removeEventListener("pointerdown", onDoc);
+    document.removeEventListener("keydown", onKey);
+  }
+  toggle.onclick = () => menu.hidden ? open() : close();
+  box.openWallet = async () => {
+    if (menu.hidden) open();
+    if (walletBox.hidden) await walletFlow();
+    wallet.scrollIntoView({ block: "nearest", behavior: "smooth" });
   };
   return box;
 }
@@ -21409,26 +21665,6 @@ async function renderMyProfile({ host, root, api: api2, owner, readOnly, staff }
     }
   } catch (error) {
     pending.textContent = error.message;
-  }
-}
-async function renderManagedCard({ host, api: api2, owner, staff }) {
-  styles();
-  const section = E3("section", void 0, "ws-managed-card"), message2 = E3("p", "Preparing your business card\u2026", "ws-muted");
-  section.append(message2);
-  host.append(section);
-  try {
-    const d = await fetchDirectory(api2, owner);
-    if (!section.isConnected) return;
-    section.replaceChildren();
-    let qr = null;
-    if (d.card?.published) qr = await api2("/api/workspace/card/qr" + (owner ? "?owner=" + encodeURIComponent(owner) : ""));
-    const data = { display_name: d.full_name, job_title: d.job_title, assigned_city: d.assigned_city, contact_phone: d.publish_contact ? d.contact_phone : "", contact_email: d.publish_contact ? d.contact_email : "" };
-    section.append(createBusinessCard({ data, photoUrl: d.avatar_url, qrImage: qr?.image }));
-    if (qr) section.append(createShareTools({ url: qr.url, qrImage: qr.image, name: d.full_name, data }));
-    else section.append(E3("p", "Your administrator will enable your public card once your professional details are ready.", "ws-card-notice"));
-    section.append(E3("p", "Your name, position and territory are managed by MUK Talent. Update your photo and work contact details in My profile.", "ws-card-notice"));
-  } catch (error) {
-    message2.textContent = error.message;
   }
 }
 function mountProfessionalAdmin({ api: api2, getStaff }) {
@@ -21904,8 +22140,262 @@ function manageAppointment({ a, api: api2, root, onSaved }) {
   };
 }
 
-// admin-src/employee.js
+// admin-src/card-studio.js
 var E5 = (t, v, c) => {
+  const n = document.createElement(t);
+  if (v !== void 0 && v !== null) n.textContent = String(v);
+  if (c) n.className = c;
+  return n;
+};
+var editable = (v) => !v ? "" : /^[@+]/.test(v.value || "") ? v.value : v.url || v.value || "";
+var q = (owner) => owner ? "?owner=" + encodeURIComponent(owner) : "";
+function btn(text, fn, cls = "lx-button") {
+  const b = E5("button", text, cls);
+  b.type = "button";
+  b.onclick = fn;
+  return b;
+}
+function cardData(d) {
+  return { display_name: d.full_name, job_title: d.job_title, assigned_city: d.assigned_city, employee_code: d.employee_code, contact_phone: d.publish_contact ? d.contact_phone : "", contact_email: d.publish_contact ? d.contact_email : "", short_display: d.card?.handle ? d.card.display : null };
+}
+function miniBadge(d, photoUrl) {
+  const wrap = E5("div", void 0, "cs-mini");
+  wrap.append(createBusinessCard({ data: cardData(d), photoUrl: photoUrl ?? d.avatar_url, link: { display: d.card?.handle ? d.card.display : null } }));
+  return wrap;
+}
+async function renderCardStudio({ host, api: api2, owner, readOnly, directory, openTab, onChanged }) {
+  const d = directory, layout = E5("div", void 0, "cs-layout"), stage = E5("section", void 0, "cs-stage"), side = E5("div", void 0, "cs-side");
+  layout.append(stage, side);
+  host.append(layout);
+  let qr = null;
+  if (d.card?.published) {
+    try {
+      qr = await api2("/api/workspace/card/qr" + q(owner));
+    } catch {
+      qr = null;
+    }
+  }
+  if (!host.isConnected) return;
+  const data = cardData(d);
+  if (qr?.handle) data.short_display = qr.display;
+  stage.append(createBusinessCard({ data, photoUrl: d.avatar_url, link: { display: data.short_display } }));
+  const socials = Array.isArray(d.socials) ? d.socials : [];
+  if (socials.length) stage.append(createSocialLinks(socials, d.full_name));
+  let editor;
+  if (qr) {
+    const extras = readOnly ? [] : [{ icon: "edit", label: "Edit short link", hint: "Choose muktalent.com/your-name", onSelect: () => {
+      editor?.focus();
+      editor?.scrollIntoView({ block: "center", behavior: "smooth" });
+    } }, { icon: "users", label: "Edit social links", hint: "LinkedIn, Instagram, TikTok\u2026", onSelect: () => openTab("social") }];
+    stage.append(createCardMenu({ url: qr.url, display: qr.display, qrImage: qr.image, name: d.full_name, data, slug: qr.slug, socials, showOpen: true, extras }));
+  } else stage.append(E5("p", "Preview only. Your administrator will publish your card once your professional details are ready. You can already reserve your short link.", "cs-note"));
+  stage.append(E5("p", "Name, position, territory and ID are managed by MUK Talent. Your photo and work contact are in Profile.", "cs-note"));
+  editor = await shortLinkPanel({ host: side, api: api2, owner, readOnly, onChanged });
+  side.append(socialSummary({ socials, readOnly, openTab }));
+}
+async function shortLinkPanel({ host, api: api2, owner, readOnly, onChanged }) {
+  const panel = E5("section", void 0, "lx-panel cs-panel");
+  panel.append(E5("p", "YOUR SHORT LINK", "lx-overline"), E5("h2", "Easy to say, easy to remember"));
+  host.append(panel);
+  let info;
+  try {
+    info = (await api2("/api/workspace/card-link" + q(owner))).data;
+  } catch (error) {
+    panel.append(E5("p", error.message.includes("Database") || error.message.includes("unavailable") ? "Short links are not active yet. Ask your administrator to run the latest database update." : error.message, "lx-muted"));
+    return null;
+  }
+  const current = E5("div", void 0, "cs-current");
+  const shown = E5("strong", info.handle ? info.host + "/" + info.handle : "Not set yet");
+  current.append(icon("link"), shown);
+  panel.append(current);
+  if (readOnly) {
+    panel.append(E5("p", info.previous.length ? "Previous links still redirect: " + info.previous.map((h) => info.host + "/" + h).join(", ") : "Read-only preview.", "lx-muted"));
+    return null;
+  }
+  const form = E5("form", void 0, "cs-handle-form"), label2 = E5("label", "Choose your link", "cs-label"), row = E5("div", void 0, "cs-handle-row"), prefix = E5("span", info.host + "/", "cs-prefix"), input = E5("input");
+  input.id = "cs-handle";
+  label2.htmlFor = input.id;
+  input.autocomplete = "off";
+  input.spellcheck = false;
+  input.autocapitalize = "none";
+  input.maxLength = 30;
+  input.placeholder = "laura";
+  input.value = info.handle || "";
+  input.setAttribute("aria-describedby", "cs-handle-hint");
+  const save = E5("button", "Save link", "lx-button lx-primary");
+  save.type = "submit";
+  row.append(prefix, input);
+  const hint = E5("p", "3\u201330 characters: letters, numbers and single hyphens.", "cs-hint");
+  hint.id = "cs-handle-hint";
+  hint.setAttribute("aria-live", "polite");
+  form.append(label2, row, hint);
+  if (info.suggestions?.length) {
+    const chips = E5("div", void 0, "cs-suggestions");
+    chips.append(E5("span", "Suggestions", "cs-suggest-label"));
+    for (const s of info.suggestions) {
+      const c = btn(s, () => {
+        input.value = s;
+        check();
+      }, "cs-suggestion");
+      chips.append(c);
+    }
+    form.append(chips);
+  }
+  form.append(save);
+  panel.append(form);
+  panel.append(E5("p", (info.previous.length ? "Previous links keep working and stay reserved for you: " + info.previous.map((h) => "/" + h).join(", ") + ". " : "Old QR codes and links keep working after a change. ") + info.remaining + " changes left.", "cs-note"));
+  let timer = 0, seq = 0, ok = false;
+  const state2 = (text, kind) => {
+    hint.textContent = text;
+    hint.dataset.state = kind || "";
+  };
+  async function check() {
+    clearTimeout(timer);
+    const value = input.value.trim().toLowerCase();
+    input.value = value.replace(/[^a-z0-9-]/g, "");
+    ok = false;
+    save.disabled = true;
+    if (!input.value) {
+      state2("3\u201330 characters: letters, numbers and single hyphens.");
+      return;
+    }
+    if (input.value === info.handle) {
+      state2("This is your current link.", "ok");
+      return;
+    }
+    if (input.value.length < 3) {
+      state2("At least 3 characters.", "bad");
+      return;
+    }
+    state2("Checking\u2026");
+    const mine = ++seq;
+    timer = setTimeout(async () => {
+      try {
+        const r = (await api2("/api/workspace/card-link/check?handle=" + encodeURIComponent(input.value))).data;
+        if (mine !== seq) return;
+        ok = r.available;
+        save.disabled = !ok;
+        state2(r.available ? r.mine ? "Already yours. Save to make it your main link." : info.host + "/" + r.handle + " is available." : r.reason || "Not available.", r.available ? "ok" : "bad");
+      } catch (e) {
+        if (mine === seq) state2(e.message, "bad");
+      }
+    }, 420);
+  }
+  input.addEventListener("input", check);
+  save.disabled = true;
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    if (!ok) return;
+    save.disabled = true;
+    state2("Saving\u2026");
+    try {
+      const r = (await api2("/api/workspace/card-link" + q(owner), { method: "PUT", body: JSON.stringify({ handle: input.value }) })).data;
+      info.handle = r.handle;
+      shown.textContent = r.display;
+      state2("Saved. Your card now uses " + r.display + ".", "ok");
+      onChanged?.("Short link saved \xB7 " + r.display + ". Old links keep working.");
+    } catch (err2) {
+      state2(err2.message, "bad");
+      save.disabled = false;
+    }
+  };
+  return input;
+}
+function socialSummary({ socials, readOnly, openTab }) {
+  const panel = E5("section", void 0, "lx-panel cs-panel");
+  panel.append(E5("p", "SOCIAL PROFILES", "lx-overline"), E5("h2", socials.length ? socials.length + " connected to your card" : "Connect your social profiles"));
+  if (socials.length) {
+    const list = E5("div", void 0, "cs-social-mini");
+    for (const s of socials) {
+      const chip = E5("span", void 0, "cs-social-chip");
+      chip.append(brandIcon(s.platform), E5("span", s.value || s.label));
+      list.append(chip);
+    }
+    panel.append(list);
+  } else panel.append(E5("p", "Clients can follow you in one tap from your public card. Add LinkedIn, Instagram, TikTok and more.", "lx-muted"));
+  if (!readOnly) panel.append(btn(socials.length ? "Manage social links" : "Add social links", () => openTab("social"), "lx-button lx-primary"));
+  return panel;
+}
+async function renderSocialEditor({ host, api: api2, owner, readOnly, onSaved }) {
+  const panel = E5("section", void 0, "lx-panel cs-panel cs-social-editor");
+  panel.append(E5("p", "SOCIAL PROFILES", "lx-overline"), E5("h2", "Your social links"), E5("p", "Paste your profile link or @username. Only official profile addresses are accepted, so your card always opens the right account.", "lx-muted"));
+  host.append(panel);
+  let info;
+  try {
+    info = (await api2("/api/workspace/socials" + q(owner))).data;
+  } catch (error) {
+    panel.append(E5("p", /unavailable|Database/.test(error.message) ? "Social links are not active yet. Ask your administrator to run the latest database update." : error.message, "lx-muted"));
+    return;
+  }
+  const form = E5("form", void 0, "cs-social-form"), inputs = {}, preview = E5("div", void 0, "cs-social-preview");
+  for (const p of info.platforms) {
+    const row = E5("div", void 0, "cs-social-row"), ic = E5("span", void 0, "cs-social-icon cs-" + p.id), label2 = E5("label", p.label, "cs-label"), input = E5("input");
+    ic.append(brandIcon(p.id));
+    input.id = "cs-social-" + p.id;
+    label2.htmlFor = input.id;
+    input.placeholder = p.placeholder;
+    input.maxLength = 200;
+    input.autocomplete = "off";
+    input.spellcheck = false;
+    input.autocapitalize = "none";
+    input.value = editable(info.links?.[p.id]);
+    input.readOnly = readOnly;
+    input.type = p.id === "whatsapp" ? "tel" : "text";
+    const field2 = E5("div", void 0, "cs-social-field");
+    field2.append(label2, input);
+    row.append(ic, field2);
+    form.append(row);
+    inputs[p.id] = input;
+  }
+  const toggleRow = E5("label", void 0, "cs-toggle"), toggle = E5("input");
+  toggle.type = "checkbox";
+  toggle.checked = info.show_on_card !== false;
+  toggle.disabled = readOnly;
+  toggleRow.append(toggle, E5("span", "Show these icons on my public business card"));
+  form.append(toggleRow);
+  const message2 = E5("p", "", "lx-status");
+  message2.setAttribute("role", "status");
+  message2.setAttribute("aria-live", "polite");
+  if (!readOnly) {
+    const save = E5("button", "Save social links", "lx-button lx-primary");
+    save.type = "submit";
+    form.append(save, message2);
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      save.disabled = true;
+      message2.textContent = "Saving\u2026";
+      for (const i of Object.values(inputs)) i.removeAttribute("aria-invalid");
+      try {
+        const links = Object.fromEntries(Object.entries(inputs).map(([k, i]) => [k, i.value.trim()]));
+        const r = (await api2("/api/workspace/socials", { method: "PUT", body: JSON.stringify({ links, show_on_card: toggle.checked }) })).data;
+        for (const [k, i] of Object.entries(inputs)) i.value = editable(r.links[k]);
+        paint(r.links);
+        message2.textContent = "Saved. Your public card is updated.";
+        onSaved?.();
+      } catch (err2) {
+        message2.textContent = err2.message;
+        const bad = err2.platform && inputs[err2.platform];
+        if (bad) {
+          bad.setAttribute("aria-invalid", "true");
+          bad.focus();
+        }
+      } finally {
+        save.disabled = false;
+      }
+    };
+  } else form.append(E5("p", "Read-only preview.", "lx-muted"));
+  function paint(links) {
+    preview.replaceChildren(E5("p", "PREVIEW", "lx-overline"), createSocialLinks(Object.entries(links || {}).map(([platform, v]) => ({ platform, label: platform, value: v.value, url: v.url }))));
+  }
+  paint(info.links);
+  panel.append(form, preview);
+  const note = E5("details", void 0, "cs-details");
+  note.append(E5("summary", "Why links and not a login with each network?"), E5("p", "Signing in with Instagram, TikTok or LinkedIn would give MUK Talent access to your private account data and requires approval from each platform. Linking your public profile gives clients the same one-tap access without sharing your passwords or permissions.", "lx-muted"));
+  panel.append(note);
+}
+
+// admin-src/employee.js
+var E6 = (t, v, c) => {
   const n = document.createElement(t);
   if (v !== void 0) n.textContent = String(v);
   if (c) n.className = c;
@@ -21932,7 +22422,7 @@ function money2(v, c) {
 }
 function linkStyles() {
   for (const [id, href] of [["professionalStyles", "/admin/professional.css"], ["businessCardStyles", "/book/business-card.css"], ["luxuryWorkspaceStyles", "/admin/luxury-workspace.css"]]) if (!document.getElementById(id)) {
-    const l = E5("link");
+    const l = E6("link");
     l.id = id;
     l.rel = "stylesheet";
     l.href = href;
@@ -21942,17 +22432,17 @@ function linkStyles() {
 async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack = null }) {
   document.getElementById("employeeWorkspace")?.remove();
   linkStyles();
-  const readOnly = Boolean(owner), root = E5("div", void 0, "lux");
+  const readOnly = Boolean(owner), root = E6("div", void 0, "lux");
   root.id = "employeeWorkspace";
   root.lang = "en";
-  const sidebar = E5("aside", void 0, "lx-sidebar"), brand = E5("a", "MUK TALENT", "lx-brand");
+  const sidebar = E6("aside", void 0, "lx-sidebar"), brand = E6("a", "MUK TALENT", "lx-brand");
   brand.href = "/";
-  sidebar.append(brand, E5("p", "PRIVATE TEAM WORKSPACE", "lx-overline"));
-  const nav2 = E5("nav");
+  sidebar.append(brand, E6("p", "PRIVATE TEAM WORKSPACE", "lx-overline"));
+  const nav2 = E6("nav");
   nav2.setAttribute("aria-label", "Workspace");
   sidebar.append(nav2);
-  const footer = E5("div", void 0, "lx-sidebar-footer");
-  footer.append(E5("strong", staff.full_name), E5("small", readOnly ? "Administrator preview" : "MUK Talent team"));
+  const footer = E6("div", void 0, "lx-sidebar-footer");
+  footer.append(E6("strong", staff.full_name), E6("small", readOnly ? "Administrator preview" : "MUK Talent team"));
   const exit = button2(readOnly ? "Back to administration" : "Sign out", async () => {
     exit.disabled = true;
     try {
@@ -21971,68 +22461,53 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     if (changed) notice("Password changed.");
   }));
   sidebar.append(footer);
-  const main = E5("main", void 0, "lx-main"), header = E5("header", void 0, "lx-header"), intro = E5("div"), title = E5("h1"), subtitle = E5("p", void 0, "lx-muted");
-  intro.append(E5("p", "MUK TALENT / TEAM OPERATIONS", "lx-overline"), title, subtitle);
-  const actions = E5("div", void 0, "lx-actions"), refresh = button2("Refresh", () => load()), add = button2("Add record", () => {
+  const main = E6("main", void 0, "lx-main"), header = E6("header", void 0, "lx-header"), intro = E6("div"), title = E6("h1"), subtitle = E6("p", void 0, "lx-muted");
+  intro.append(E6("p", "MUK TALENT / TEAM OPERATIONS", "lx-overline"), title, subtitle);
+  const actions = E6("div", void 0, "lx-actions"), refresh = button2("", () => load()), add = button2("Add record", () => {
   });
   add.classList.add("lx-primary");
+  refresh.append(icon("refresh", "lx-btn-icon"), E6("span", "Refresh", "lx-btn-label"));
+  refresh.setAttribute("aria-label", "Refresh");
   actions.append(refresh, add);
   header.append(intro, actions);
-  const status = E5("p", "", "lx-status");
+  const status = E6("p", "", "lx-status");
   status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
-  const body = E5("div", void 0, "lx-body");
+  const body = E6("div", void 0, "lx-body");
   main.append(header, status, body);
   root.append(sidebar, main);
   document.body.append(root);
   let data = { records: [], leads: [], appointments: [], activity: [] }, directory = null, assets = [], section = "overview", busy = false, dialogBusy = false, loadVersion = 0;
   let selectedDay = dateKey(), month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1), studioTab = "productions";
-  const pages = [["overview", "Overview", "\u25C8"], ["leads", "My leads", "\u25CE"], ["partner", "Partners", "\u25C7"], ["content", "Content studio", "\u25A7"], ["calendar", "Calendar", "\u25A6"], ["task", "Tasks", "\u2713"], ["profile", "My profile", "\u25CB"], ["card", "My business card", "\u25B1"]];
-  const navButtons = {};
-  for (const [id, label2, symbol] of pages) {
-    const b = E5("button", void 0, "lx-nav");
+  const groups = [["home", "Home", "home", [["overview", "Home"]]], ["pipeline", "Pipeline", "pipeline", [["leads", "Leads"], ["partner", "Partners"]]], ["planner", "Planner", "planner", [["calendar", "Calendar & reports"], ["task", "Tasks"]]], ["studio", "Studio", "studio", [["content", "Productions"], ["library", "Media library"]]], ["me", "My card", "card", [["card", "Card"], ["social", "Socials"], ["profile", "Profile"], ["account", "Account"]]]];
+  const pages = groups.flatMap((g) => g[3].map(([id, label2]) => [id, label2, g[0]]));
+  const tabs = Object.fromEntries(groups.map((g) => [g[0], g[3][0][0]]));
+  let group = "home";
+  const navButtons = {}, dockButtons = {};
+  for (const [id, label2, symbol] of groups) {
+    const b = E6("button", void 0, "lx-nav");
     b.type = "button";
-    b.append(E5("span", symbol), E5("span", label2));
-    b.onclick = () => navigate2(id);
+    b.append(icon(symbol, "lx-nav-icon"), E6("span", label2));
+    b.onclick = () => navigate2(tabs[id]);
     navButtons[id] = b;
     nav2.append(b);
   }
-  const dock = E5("nav", void 0, "lx-dock");
-  dock.setAttribute("aria-label", "Mobile workspace");
-  for (const [id, label2, symbol] of [["overview", "Home", "\u25C8"], ["content", "Studio", "\u25A7"], ["calendar", "Calendar", "\u25A6"], ["more", "More", "\u2630"]]) {
-    const b = E5("button");
+  const dock = E6("nav", void 0, "lx-dock");
+  dock.setAttribute("aria-label", "Workspace sections");
+  for (const [id, label2, symbol] of groups) {
+    const b = E6("button");
     b.type = "button";
-    b.append(E5("span", symbol), E5("small", label2));
-    b.onclick = () => {
-      if (id !== "more") {
-        navigate2(id);
-        return;
-      }
-      const sheet = E5("dialog", void 0, "lx-menu");
-      sheet.lang = "en";
-      sheet.append(E5("h2", "Your workspace"));
-      for (const [page, text] of pages) sheet.append(button2(text, () => {
-        sheet.remove();
-        navigate2(page);
-      }));
-      if (!readOnly) sheet.append(button2("Change password", () => {
-        sheet.remove();
-        requirePasswordChange({ api: api2, mandatory: false }).catch(() => {
-        });
-      }));
-      sheet.append(button2(readOnly ? "Back to administration" : "Sign out", () => {
-        sheet.remove();
-        exit.click();
-      }), button2("Close", () => sheet.remove()));
-      root.append(sheet);
-      sheet.onclose = () => sheet.remove();
-      sheet.showModal();
-    };
+    b.append(icon(symbol, "lx-dock-icon"), E6("small", label2));
+    b.onclick = () => navigate2(tabs[id]);
+    dockButtons[id] = b;
     dock.append(b);
   }
   root.append(dock);
+  const tabBar = E6("div", void 0, "lx-tabs");
+  tabBar.setAttribute("role", "tablist");
+  main.insertBefore(tabBar, status);
   function button2(text, fn) {
-    const b = E5("button", text, "lx-button");
+    const b = E6("button", text, "lx-button");
     b.type = "button";
     b.onclick = fn;
     return b;
@@ -22043,21 +22518,32 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     status.className = error ? "lx-status lx-error" : "lx-status";
   }
   function panel(text) {
-    const p = E5("section", void 0, "lx-panel");
-    if (text) p.append(E5("h2", text));
+    const p = E6("section", void 0, "lx-panel");
+    if (text) p.append(E6("h2", text));
     return p;
   }
   function empty(target, text) {
-    target.append(E5("p", text, "lx-empty"));
+    target.append(E6("p", text, "lx-empty"));
   }
   function records(kind) {
     return data.records.filter((r) => r.kind === kind);
   }
   function navigate2(id) {
     if (dialogBusy) return;
+    if (id === "home") id = "overview";
+    const page = pages.find((p) => p[0] === id);
+    if (!page) return;
     section = id;
+    group = page[2];
+    tabs[group] = id;
     render();
     window.scrollTo({ top: 0, behavior: "auto" });
+  }
+  async function refreshDirectory() {
+    try {
+      directory = (await api2("/api/team-directory" + (owner ? "?owner=" + encodeURIComponent(owner) : ""))).data;
+    } catch {
+    }
   }
   async function load() {
     if (busy) return;
@@ -22079,61 +22565,128 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       refresh.disabled = false;
     }
   }
+  const groupText = { home: "Your people, your priorities, your impact.", pipeline: "Leads and partners with clear next steps.", planner: "Appointments, daily reports and tasks in one place.", studio: "Ideas, production and your media library.", me: "Your digital introduction, ready to share." };
   function render() {
     if (!root.isConnected) return;
     root.dataset.section = section;
+    root.dataset.group = group;
     root.querySelectorAll(".ws-member-banner").forEach((n) => n.remove());
     body.replaceChildren();
-    title.textContent = section === "overview" ? "Hello, " + (directory?.full_name || staff.full_name).split(" ")[0] : pages.find((p) => p[0] === section)?.[1];
-    subtitle.textContent = readOnly ? "Read-only employee workspace." : { overview: "Your people, your priorities, your impact.", leads: "Build a pipeline with clear next steps.", partner: "Relationships that create opportunities.", content: "A studio for ideas, production and published work.", calendar: "Your appointments, daily report and work history in one place.", task: "Turn priorities into progress.", profile: "Your professional identity within MUK Talent.", card: "Your digital introduction. Ready to share." }[section];
-    for (const [id, b] of Object.entries(navButtons)) {
-      b.classList.toggle("active", id === section);
-      if (id === section) b.setAttribute("aria-current", "page");
+    const g = groups.find((x) => x[0] === group);
+    title.textContent = group === "home" ? "Hello, " + (directory?.full_name || staff.full_name).split(" ")[0] : g[1];
+    subtitle.textContent = readOnly ? "Read-only employee workspace." : groupText[group];
+    for (const [id, b] of [...Object.entries(navButtons), ...Object.entries(dockButtons)]) {
+      b.classList.toggle("active", id === group);
+      if (id === group) b.setAttribute("aria-current", "page");
       else b.removeAttribute("aria-current");
     }
-    add.hidden = readOnly || !["leads", "partner", "task", "content"].includes(section);
-    add.textContent = section === "content" ? "New production" : section === "leads" ? "Add lead" : "Add " + section;
-    add.onclick = () => edit(section === "leads" ? "lead" : section);
+    tabBar.replaceChildren();
+    tabBar.hidden = g[3].length < 2;
+    for (const [id, label2] of g[3]) {
+      if (readOnly && id === "account") continue;
+      const t = E6("button", label2, "lx-tab");
+      t.type = "button";
+      t.setAttribute("role", "tab");
+      t.setAttribute("aria-selected", String(id === section));
+      t.tabIndex = id === section ? 0 : -1;
+      t.onclick = () => navigate2(id);
+      t.onkeydown = (e) => {
+        if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+        const list = [...tabBar.children], i = list.indexOf(t), next = list[(i + (e.key === "ArrowRight" ? 1 : list.length - 1)) % list.length];
+        next.click();
+        tabBar.querySelector("[aria-selected=true]")?.focus();
+      };
+      tabBar.append(t);
+    }
+    const actionsFor = { leads: ["Add lead", () => edit("lead")], partner: ["Add partner", () => edit("partner")], task: ["Add task", () => edit("task")], content: ["New production", () => edit("content")], library: ["Upload media", () => uploadDialog()], calendar: ["Today\u2019s report", () => edit("report", records("report").find((r) => r.record_date === dateKey()), dateKey())] };
+    const act = actionsFor[section];
+    add.hidden = readOnly || !act;
+    if (act) {
+      add.textContent = act[0];
+      add.onclick = act[1];
+    }
+    const ctx = { host: body, api: api2, owner, readOnly, staff };
     if (section === "overview") overview();
     else if (section === "leads") leads();
     else if (section === "partner" || section === "task") listRecords(section);
     else if (section === "calendar") calendarPage();
-    else if (section === "content") studio();
-    else if (section === "profile") renderMyProfile({ host: body, root, api: api2, owner, readOnly, staff });
-    else if (section === "card") renderManagedCard({ host: body, api: api2, owner, staff });
+    else if (section === "content" || section === "library") studio();
+    else if (section === "profile") renderMyProfile({ ...ctx, root });
+    else if (section === "card") {
+      if (directory) renderCardStudio({ ...ctx, directory, openTab: (id) => navigate2(id), onChanged: async (text) => {
+        await refreshDirectory();
+        render();
+        notice(text);
+      } });
+      else body.append(E6("p", "Loading your card\u2026", "lx-empty"));
+    } else if (section === "social") renderSocialEditor({ ...ctx, onSaved: () => refreshDirectory() });
+    else if (section === "account") account();
+  }
+  function account() {
+    const wrap = E6("div", void 0, "lx-account"), sec = panel("Security");
+    sec.append(E6("p", "Protect access to your leads, appointments and documents.", "lx-muted"));
+    const rows = [["lock", "Password", "Change it any time. Use at least 12 characters you do not use elsewhere.", button2("Change password", async () => {
+      const changed = await requirePasswordChange({ api: api2, mandatory: false });
+      if (changed) notice("Password changed.");
+    })], ["refresh", "Automatic sign-out", "For your security you are signed out after 30 minutes without activity, with a warning first.", null], ["logout", "Sign out", "Ends your session on this device.", button2("Sign out", () => exit.click())]];
+    for (const [ic, h, t, b] of rows) {
+      const row = E6("div", void 0, "lx-account-row"), i = E6("span", void 0, "lx-account-icon"), txt = E6("div");
+      i.append(icon(ic));
+      txt.append(E6("h3", h), E6("p", t, "lx-muted"));
+      row.append(i, txt);
+      if (b) row.append(b);
+      sec.append(row);
+    }
+    wrap.append(sec);
+    const tips = panel("Good habits");
+    for (const t of ["Never share your password or sign-in links, even with colleagues.", "Sign out on shared or public computers.", "MUK Talent will never ask for your password by email or WhatsApp.", "Report anything unusual to your administrator straight away."]) tips.append(E6("p", t, "lx-tip"));
+    wrap.append(tips);
+    body.append(wrap);
   }
   function metric(label2, value, detail) {
     const c = panel();
     c.classList.add("lx-metric");
-    c.append(E5("p", label2, "lx-muted"), E5("strong", value), E5("small", detail));
+    c.append(E6("p", label2, "lx-muted"), E6("strong", value), E6("small", detail));
     return c;
   }
   function overview() {
-    const metrics = E5("div", void 0, "lx-metrics");
+    const metrics = E6("div", void 0, "lx-metrics");
     metrics.append(metric("Assigned leads", data.leads.length, "Loaded non-archived records"), metric("Ready for review", directory?.ready_count || 0, "Attributed leads \xB7 exact count"), metric("Open tasks", records("task").filter((t) => t.status !== "Done").length, "In your workspace"), metric("Content in production", records("content").filter((c) => c.status !== "Published").length, "Ideas and work in progress"));
     body.append(metrics);
-    const board = E5("div", void 0, "lx-board"), left = E5("div", void 0, "lx-board-left"), centre = E5("div", void 0, "lx-board-centre"), right = E5("div", void 0, "lx-board-right");
-    const portrait = E5("section", void 0, "lx-portrait-card");
-    if (directory?.avatar_url) {
-      const img = E5("img");
-      img.src = directory.avatar_url;
-      img.alt = directory.full_name;
-      portrait.append(img);
-    } else portrait.append(E5("div", (directory?.full_name || staff.full_name).split(" ").slice(0, 2).map((s) => s[0]).join(""), "lx-photo-placeholder"));
-    const caption = E5("div", void 0, "lx-portrait-caption");
-    caption.append(E5("span", "MUK TALENT \xB7 OUR PEOPLE", "lx-overline"), E5("h2", directory?.full_name || staff.full_name), E5("p", directory?.job_title || "Team member"), E5("span", directory?.assigned_city || "Territory pending assignment", "lx-role-pill"), E5("small", directory?.employee_code || ""));
-    portrait.append(caption);
-    left.append(portrait);
+    const board = E6("div", void 0, "lx-board"), left = E6("div", void 0, "lx-board-left"), centre = E6("div", void 0, "lx-board-centre"), right = E6("div", void 0, "lx-board-right");
+    if (directory) {
+      const mine = panel();
+      mine.classList.add("lx-card-widget");
+      mine.append(miniBadge(directory));
+      const row = E6("div", void 0, "lx-actions");
+      const url = directory.card?.published ? directory.card.url : null;
+      if (url && !readOnly) row.append(button2("Share my card", async () => {
+        try {
+          if (navigator.share) await navigator.share({ title: directory.full_name + " \xB7 MUK Talent", url });
+          else {
+            await navigator.clipboard.writeText(url);
+            notice("Card link copied \xB7 " + directory.card.display);
+          }
+        } catch (e) {
+          if (e.name !== "AbortError") notice(directory.card.display);
+        }
+      }));
+      const openCard = button2("Open my card", () => navigate2("card"));
+      if (!url || readOnly) openCard.classList.add("lx-primary");
+      row.append(openCard);
+      mine.append(row);
+      left.append(mine);
+    }
     const impact = panel("Your pipeline potential");
     impact.classList.add("lx-impact");
-    impact.append(E5("strong", directory?.ready_count || 0, "lx-impact-number"), E5("p", "Attributed leads ready for review", "lx-muted"));
-    if (directory?.potential_commission != null) impact.append(E5("b", money2(directory.potential_commission, directory.commission_currency) + " potential"));
-    impact.append(E5("small", directory?.potential_commission != null ? "Estimate only. Subject to approval and commission terms." : "Your administrator has not configured a commission rate."));
+    impact.append(E6("strong", directory?.ready_count || 0, "lx-impact-number"), E6("p", "Attributed leads ready for review", "lx-muted"));
+    if (directory?.potential_commission != null) impact.append(E6("b", money2(directory.potential_commission, directory.commission_currency) + " potential"));
+    impact.append(E6("small", directory?.potential_commission != null ? "Estimate only. Subject to approval and commission terms." : "Your administrator has not configured a commission rate."));
     left.append(impact);
     const tasks = panel("Your priorities"), open = records("task").filter((t) => t.status !== "Done").sort((a, b) => (a.record_date || "9999").localeCompare(b.record_date || "9999")).slice(0, 4);
     for (const t of open) {
-      const row = E5("div", void 0, "lx-row");
-      row.append(E5("span", t.payload.priority || "Medium", "lx-tag"), E5("h3", t.title), E5("p", t.record_date || "No due date", "lx-muted"));
+      const row = E6("div", void 0, "lx-row");
+      row.append(E6("span", t.payload.priority || "Medium", "lx-tag"), E6("h3", t.title), E6("p", t.record_date || "No due date", "lx-muted"));
       if (!readOnly) row.append(button2("Open task", () => edit("task", t)));
       tasks.append(row);
     }
@@ -22141,8 +22694,8 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     centre.append(tasks);
     const follow = panel("Follow-ups that need attention"), overdue = data.leads.filter((l) => l.status !== "closed" && l.next_action_at && new Date(l.next_action_at) < /* @__PURE__ */ new Date()).slice(0, 3);
     for (const lead of overdue) {
-      const row = E5("div", void 0, "lx-row");
-      row.append(E5("h3", lead.first_name + " " + lead.last_name), E5("p", lead.next_action || "Follow-up required", "lx-muted"));
+      const row = E6("div", void 0, "lx-row");
+      row.append(E6("h3", lead.first_name + " " + lead.last_name), E6("p", lead.next_action || "Follow-up required", "lx-muted"));
       if (!readOnly) row.append(button2("Open lead", () => edit("lead", lead)));
       follow.append(row);
     }
@@ -22152,26 +22705,100 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     miniCalendar(day, true);
     right.append(day);
     const todayReport = records("report").find((r) => r.record_date === dateKey()), checkin = panel("Daily check-in");
-    checkin.append(E5("p", todayReport ? "Today\u2019s report \xB7 " + todayReport.status : "Capture the progress behind the numbers.", "lx-muted"), button2("Open today", () => {
+    checkin.append(E6("p", todayReport ? "Today\u2019s report \xB7 " + todayReport.status : "Capture the progress behind the numbers.", "lx-muted"), button2("Open today", () => {
       selectedDay = dateKey();
       month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
       navigate2("calendar");
     }));
     right.append(checkin);
+    right.prepend(strength());
+    right.append(streak());
     board.append(left, centre, right);
-    body.append(board, E5("p", "Operational view: up to 100 leads, 500 workspace records, 200 appointments and 100 recent activity events. Ready-lead potential uses a separate exact count.", "lx-footnote"));
+    body.append(board, E6("p", "Operational view: up to 100 leads, 500 workspace records, 200 appointments and 100 recent activity events. Ready-lead potential uses a separate exact count.", "lx-footnote"));
+  }
+  function strength() {
+    const d = directory || {}, items = [["Profile photo", Boolean(d.avatar_url), "profile"], ["Work contact details", Boolean(d.contact_phone || d.contact_email), "profile"], ["Short link", Boolean(d.card?.handle), "card"], ["Social links", Boolean(d.socials?.length), "social"], ["Card published", Boolean(d.card?.published), "card"]], done = items.filter((i) => i[1]).length, pct = Math.round(done / items.length * 100);
+    const p = panel();
+    p.classList.add("lx-strength");
+    const top = E6("div", void 0, "lx-strength-top"), svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 44 44");
+    svg.setAttribute("class", "lx-ring");
+    svg.setAttribute("aria-hidden", "true");
+    for (const [cls, dash] of [["lx-ring-bg", "100 100"], ["lx-ring-fg", pct + " 100"]]) {
+      const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      c.setAttribute("cx", "22");
+      c.setAttribute("cy", "22");
+      c.setAttribute("r", "18");
+      c.setAttribute("pathLength", "100");
+      c.setAttribute("stroke-dasharray", dash);
+      c.setAttribute("class", cls);
+      svg.append(c);
+    }
+    const ring = E6("div", void 0, "lx-ring-wrap");
+    ring.append(svg, E6("strong", pct + "%"));
+    const txt = E6("div");
+    txt.append(E6("h2", "Card strength"), E6("p", done === items.length ? "Complete. Your card is ready to impress." : items.length - done + " quick wins left.", "lx-muted"));
+    top.append(ring, txt);
+    p.append(top);
+    const list = E6("ul", void 0, "lx-checklist");
+    for (const [label2, ok, target] of items) {
+      const li = E6("li", void 0, ok ? "done" : "");
+      const mark = E6("span", void 0, "lx-check");
+      if (ok) mark.append(icon("check"));
+      li.append(mark);
+      if (!ok && !readOnly && !(label2 === "Card published")) {
+        const b = E6("button", label2, "lx-check-link");
+        b.type = "button";
+        b.onclick = () => navigate2(target);
+        li.append(b);
+      } else li.append(E6("span", label2 + (label2 === "Card published" && !ok ? " \xB7 by your administrator" : "")));
+      list.append(li);
+    }
+    p.append(list);
+    return p;
+  }
+  function streak() {
+    const reports = new Set(records("report").map((r) => r.record_date)), p = panel("Reporting streak");
+    p.classList.add("lx-streak");
+    let count = 0;
+    const day = /* @__PURE__ */ new Date(dateKey() + "T12:00:00Z");
+    if (!reports.has(dateKey())) day.setUTCDate(day.getUTCDate() - 1);
+    for (let i = 0; i < 120; i++) {
+      const w = day.getUTCDay();
+      if (w !== 0 && w !== 6) {
+        if (reports.has(day.toISOString().slice(0, 10))) count++;
+        else break;
+      }
+      day.setUTCDate(day.getUTCDate() - 1);
+    }
+    const head2 = E6("div", void 0, "lx-streak-head");
+    head2.append(E6("strong", count, "lx-streak-number"), E6("span", count === 1 ? "working day in a row" : "working days in a row", "lx-muted"));
+    p.append(head2);
+    const week = E6("div", void 0, "lx-week"), today = /* @__PURE__ */ new Date(dateKey() + "T12:00:00Z"), monday = new Date(today);
+    monday.setUTCDate(today.getUTCDate() - (today.getUTCDay() + 6) % 7);
+    for (let i = 0; i < 5; i++) {
+      const d = new Date(monday);
+      d.setUTCDate(monday.getUTCDate() + i);
+      const key = d.toISOString().slice(0, 10), cell = E6("span", ["M", "T", "W", "T", "F"][i], "lx-week-day");
+      if (reports.has(key)) cell.classList.add("done");
+      if (key === dateKey()) cell.classList.add("today");
+      cell.setAttribute("aria-label", key + (reports.has(key) ? " \xB7 report sent" : " \xB7 no report"));
+      week.append(cell);
+    }
+    p.append(week, E6("small", count ? "Keep it going with today\u2019s report." : "Send today\u2019s report to start your streak.", "lx-footnote"));
+    return p;
   }
   function searchList(host, rows, draw) {
-    const input = E5("input");
+    const input = E6("input");
     input.type = "search";
     input.className = "lx-search";
     input.placeholder = "Search loaded records";
     input.setAttribute("aria-label", "Search loaded records");
-    const results = E5("div");
+    const results = E6("div");
     host.append(input, results);
     const paint = () => {
       results.replaceChildren();
-      const q = input.value.toLowerCase(), filtered = rows.filter((v) => JSON.stringify(v).toLowerCase().includes(q));
+      const q2 = input.value.toLowerCase(), filtered = rows.filter((v) => JSON.stringify(v).toLowerCase().includes(q2));
       for (const v of filtered) draw(results, v);
       if (!filtered.length) empty(results, "No matching records.");
     };
@@ -22181,10 +22808,10 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   function leads() {
     const host = panel();
     searchList(host, data.leads, (target, l) => {
-      const row = E5("article", void 0, "lx-row"), top = E5("div", void 0, "lx-row-top");
-      top.append(E5("h3", l.first_name + " " + l.last_name), E5("span", leadStates[l.status] || l.status, "lx-tag"));
-      row.append(top, E5("p", l.reference + " \xB7 " + (l.subject_interest || "Study interest not set"), "lx-muted"), E5("p", l.next_action || "No next action recorded."), E5("small", "Follow-up: " + time(l.next_action_at)));
-      const controls = E5("div", void 0, "lx-actions");
+      const row = E6("article", void 0, "lx-row"), top = E6("div", void 0, "lx-row-top");
+      top.append(E6("h3", l.first_name + " " + l.last_name), E6("span", leadStates[l.status] || l.status, "lx-tag"));
+      row.append(top, E6("p", l.reference + " \xB7 " + (l.subject_interest || "Study interest not set"), "lx-muted"), E6("p", l.next_action || "No next action recorded."), E6("small", "Follow-up: " + time(l.next_action_at)));
+      const controls = E6("div", void 0, "lx-actions");
       if (!readOnly) controls.append(button2("Open lead", () => edit("lead", l)));
       controls.append(button2("Qualification", () => editQualification({ lead: l, api: api2, readOnly, root })));
       row.append(controls);
@@ -22195,34 +22822,34 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   function listRecords(kind) {
     const host = panel();
     searchList(host, records(kind), (target, r) => {
-      const row = E5("article", void 0, "lx-row");
-      row.append(E5("div", r.status, "lx-tag"), E5("h3", r.title), E5("p", kind === "partner" ? [r.payload.type, r.payload.contact, r.payload.city].filter(Boolean).join(" \xB7 ") : [r.payload.priority, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E5("p", r.payload.next_action || r.payload.notes || ""));
+      const row = E6("article", void 0, "lx-row");
+      row.append(E6("div", r.status, "lx-tag"), E6("h3", r.title), E6("p", kind === "partner" ? [r.payload.type, r.payload.contact, r.payload.city].filter(Boolean).join(" \xB7 ") : [r.payload.priority, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E6("p", r.payload.next_action || r.payload.notes || ""));
       if (!readOnly) row.append(button2("Open / edit", () => edit(kind, r)));
       target.append(row);
     });
     body.append(host);
   }
   function appointment(host, a) {
-    const row = E5("article", void 0, "lx-appointment");
-    row.append(E5("span", new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Casablanca", hour: "2-digit", minute: "2-digit" }).format(new Date(a.starts_at)), "lx-appointment-time"), E5("h3", a.full_name), E5("p", a.subject || "Student consultation"), E5("p", (a.institution || "") + (a.institution ? " \xB7 " : "") + (a.meeting_mode === "in_person" ? "In person \xB7 confirm location" : "Phone consultation"), "lx-muted"), E5("p", (a.whatsapp_phone_e164 || "No phone") + " \xB7 " + (a.email || "No email"), "lx-muted"), E5("small", "UK: " + time(a.starts_at, "Europe/London")), E5("span", a.status, "lx-tag"));
+    const row = E6("article", void 0, "lx-appointment");
+    row.append(E6("span", new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Casablanca", hour: "2-digit", minute: "2-digit" }).format(new Date(a.starts_at)), "lx-appointment-time"), E6("h3", a.full_name), E6("p", a.subject || "Student consultation"), E6("p", (a.institution || "") + (a.institution ? " \xB7 " : "") + (a.meeting_mode === "in_person" ? "In person \xB7 confirm location" : "Phone consultation"), "lx-muted"), E6("p", (a.whatsapp_phone_e164 || "No phone") + " \xB7 " + (a.email || "No email"), "lx-muted"), E6("small", "UK: " + time(a.starts_at, "Europe/London")), E6("span", a.status, "lx-tag"));
     if (!readOnly && a.status !== "cancelled") row.append(button2("Manage appointment", () => manageAppointment({ a, api: api2, root, onSaved: load })));
     host.append(row);
   }
   function miniCalendar(host, compact = false) {
-    const tools = E5("div", void 0, "lx-calendar-tools");
+    const tools = E6("div", void 0, "lx-calendar-tools");
     tools.append(button2("\u2039", () => {
       month = new Date(month.getFullYear(), month.getMonth() - 1, 1);
       render();
-    }), E5("strong", new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month)), button2("\u203A", () => {
+    }), E6("strong", new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month)), button2("\u203A", () => {
       month = new Date(month.getFullYear(), month.getMonth() + 1, 1);
       render();
     }));
     host.append(tools);
-    const grid = E5("div", void 0, "lx-calendar");
-    for (const day of ["M", "T", "W", "T", "F", "S", "S"]) grid.append(E5("span", day, "lx-weekday"));
-    for (let i = 0; i < (month.getDay() + 6) % 7; i++) grid.append(E5("span"));
+    const grid = E6("div", void 0, "lx-calendar");
+    for (const day of ["M", "T", "W", "T", "F", "S", "S"]) grid.append(E6("span", day, "lx-weekday"));
+    for (let i = 0; i < (month.getDay() + 6) % 7; i++) grid.append(E6("span"));
     for (let d = 1; d <= new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate(); d++) {
-      const key = month.getFullYear() + "-" + String(month.getMonth() + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"), cell = E5("button", d, "lx-date");
+      const key = month.getFullYear() + "-" + String(month.getMonth() + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"), cell = E6("button", d, "lx-date");
       cell.type = "button";
       cell.classList.toggle("today", key === dateKey());
       cell.classList.toggle("selected", key === selectedDay);
@@ -22237,18 +22864,18 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       };
       grid.append(cell);
     }
-    host.append(grid, E5("p", "Gold ring: today \xB7 dot: appointments or daily report", "lx-footnote"));
+    host.append(grid, E6("p", "Gold ring: today \xB7 dot: appointments or daily report", "lx-footnote"));
     if (compact) {
       const upcoming = data.appointments.filter((a) => a.status === "confirmed" && new Date(a.starts_at) > /* @__PURE__ */ new Date()).sort((a, b) => a.starts_at.localeCompare(b.starts_at)).slice(0, 2);
       for (const a of upcoming) {
-        const row = E5("div", void 0, "lx-row");
-        row.append(E5("strong", a.full_name), E5("p", time(a.starts_at), "lx-muted"));
+        const row = E6("div", void 0, "lx-row");
+        row.append(E6("strong", a.full_name), E6("p", time(a.starts_at), "lx-muted"));
         host.append(row);
       }
     }
   }
   function calendarPage() {
-    const grid = E5("div", void 0, "lx-day-layout"), calendar = panel("Plan your day");
+    const grid = E6("div", void 0, "lx-day-layout"), calendar = panel("Plan your day");
     calendar.append(button2("Today", () => {
       selectedDay = dateKey();
       month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
@@ -22256,31 +22883,31 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     }));
     miniCalendar(calendar);
     const day = panel(new Intl.DateTimeFormat("en-GB", { dateStyle: "full", timeZone: "UTC" }).format(/* @__PURE__ */ new Date(selectedDay + "T12:00:00Z"))), report = records("report").find((r) => r.record_date === selectedDay);
-    day.append(E5("span", selectedDay === dateKey() ? "TODAY" : "SELECTED DAY", "lx-overline"));
-    const checkin = E5("section", void 0, "lx-day-report");
-    checkin.append(E5("h3", "Daily report"), E5("p", report ? "Status: " + report.status : "No daily report recorded.", "lx-muted"));
+    day.append(E6("span", selectedDay === dateKey() ? "TODAY" : "SELECTED DAY", "lx-overline"));
+    const checkin = E6("section", void 0, "lx-day-report");
+    checkin.append(E6("h3", "Daily report"), E6("p", report ? "Status: " + report.status : "No daily report recorded.", "lx-muted"));
     if (report) {
-      for (const [key, label2] of fields.report) if (report.payload[key]) checkin.append(E5("strong", label2), E5("p", report.payload[key]));
+      for (const [key, label2] of fields.report) if (report.payload[key]) checkin.append(E6("strong", label2), E6("p", report.payload[key]));
     }
     if (!readOnly) checkin.append(button2(report ? "Edit daily report" : "Write daily report", () => edit("report", report, selectedDay)));
-    day.append(checkin, E5("h3", "Appointments"));
+    day.append(checkin, E6("h3", "Appointments"));
     const appointments = data.appointments.filter((a) => dateKey(a.starts_at) === selectedDay).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
     for (const a of appointments) appointment(day, a);
     if (!appointments.length) empty(day, "No appointments on this day among loaded records.");
-    day.append(E5("h3", "Tasks for this day"));
+    day.append(E6("h3", "Tasks for this day"));
     const tasks = records("task").filter((t) => t.record_date === selectedDay);
     for (const t of tasks) {
-      const row = E5("div", void 0, "lx-row");
-      row.append(E5("strong", t.title), E5("span", t.status, "lx-tag"));
+      const row = E6("div", void 0, "lx-row");
+      row.append(E6("strong", t.title), E6("span", t.status, "lx-tag"));
       if (!readOnly) row.append(button2("Open task", () => edit("task", t)));
       day.append(row);
     }
     if (!tasks.length) empty(day, "No dated tasks.");
-    day.append(E5("h3", "Recorded workspace activity"));
+    day.append(E6("h3", "Recorded workspace activity"));
     const history = data.activity.filter((a) => dateKey(a.created_at) === selectedDay);
     for (const a of history) {
-      const row = E5("div", void 0, "lx-history-line");
-      row.append(E5("strong", a.title), E5("small", a.kind + " \xB7 " + a.action + " \xB7 " + time(a.created_at)));
+      const row = E6("div", void 0, "lx-history-line");
+      row.append(E6("strong", a.title), E6("small", a.kind + " \xB7 " + a.action + " \xB7 " + time(a.created_at)));
       day.append(row);
     }
     if (!history.length) empty(day, "No recorded workspace changes for this day among loaded activity.");
@@ -22288,28 +22915,15 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     body.append(grid);
   }
   function studio() {
-    const toolbar = E5("div", void 0, "lx-studio-tools");
-    for (const [id, label2] of [["productions", "Productions"], ["library", "Media library"]]) {
-      const b = button2(label2, () => {
-        studioTab = id;
-        render();
-      });
-      b.classList.toggle("lx-primary", studioTab === id);
-      toolbar.append(b);
-    }
-    const upload2 = button2("Upload media", () => uploadDialog());
-    upload2.hidden = readOnly;
-    toolbar.append(upload2);
-    body.append(toolbar);
-    const gallery = E5("div", void 0, "lx-gallery");
+    const gallery = E6("div", void 0, "lx-gallery");
     body.append(gallery);
-    if (studioTab === "library") {
+    if (section === "library") {
       const media = assets.filter((a) => a.category === "content");
       for (const a of media) {
-        const c = E5("article", void 0, "lx-media-card"), cover = mediaCover(a);
-        c.append(cover, E5("h3", a.original_name), E5("p", a.mime === "application/pdf" ? "PDF asset" : "Image asset", "lx-muted"));
+        const c = E6("article", void 0, "lx-media-card"), cover = mediaCover(a);
+        c.append(cover, E6("h3", a.original_name), E6("p", a.mime === "application/pdf" ? "PDF asset" : "Image asset", "lx-muted"));
         if (a.url) {
-          const link = E5("a", "Download", "lx-link");
+          const link = E6("a", "Download", "lx-link");
           link.href = a.url;
           link.target = "_blank";
           link.rel = "noopener noreferrer";
@@ -22331,45 +22945,45 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     }
     const items = records("content");
     for (const r of items) {
-      const c = E5("article", void 0, "lx-media-card"), asset = assets.find((a) => a.id === r.payload.asset_id && a.category === "content");
-      c.append(mediaCover(asset, r.payload.format), E5("span", r.status, "lx-tag"), E5("h3", r.title), E5("p", [r.payload.platform, r.payload.format, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E5("p", (r.payload.caption || r.payload.notes || "").slice(0, 180), "lx-media-caption"));
+      const c = E6("article", void 0, "lx-media-card"), asset = assets.find((a) => a.id === r.payload.asset_id && a.category === "content");
+      c.append(mediaCover(asset, r.payload.format), E6("span", r.status, "lx-tag"), E6("h3", r.title), E6("p", [r.payload.platform, r.payload.format, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E6("p", (r.payload.caption || r.payload.notes || "").slice(0, 180), "lx-media-caption"));
       for (const [key, label2] of [["asset_url", "Open asset"], ["publication_url", "View publication"]]) if (/^https:\/\//i.test(r.payload[key] || "")) {
-        const a = E5("a", label2, "lx-link");
+        const a = E6("a", label2, "lx-link");
         a.href = r.payload[key];
         a.target = "_blank";
         a.rel = "noopener noreferrer";
         c.append(a);
       }
       if (!readOnly) c.append(button2("Open production", () => edit("content", r)));
-      else c.append(E5("p", r.payload.caption || "", "lx-muted"));
+      else c.append(E6("p", r.payload.caption || "", "lx-muted"));
       gallery.append(c);
     }
     if (!items.length) empty(gallery, "Create your first production. Attach a library image or use an external video link.");
   }
   function mediaCover(asset, format = "Creative") {
-    const cover = E5("div", void 0, "lx-media-cover");
+    const cover = E6("div", void 0, "lx-media-cover");
     if (asset?.url && asset.mime.startsWith("image/")) {
-      const img = E5("img");
+      const img = E6("img");
       img.src = asset.url;
       img.alt = asset.original_name;
       img.loading = "lazy";
       cover.append(img);
-    } else cover.append(E5("span", asset?.mime === "application/pdf" ? "PDF" : format));
+    } else cover.append(E6("span", asset?.mime === "application/pdf" ? "PDF" : format));
     return cover;
   }
   function uploadDialog() {
-    const d = E5("dialog", void 0, "lx-dialog");
+    const d = E6("dialog", void 0, "lx-dialog");
     d.lang = "en";
-    const f = E5("form"), file = E5("input");
+    const f = E6("form"), file = E6("input");
     file.type = "file";
     file.accept = "image/jpeg,image/png,application/pdf";
     file.setAttribute("aria-label", "Select media file");
-    const msg = E5("p", "Images and PDFs up to 10 MB. Large videos use an HTTPS link.", "lx-muted"), send = E5("button", "Upload to library", "lx-button lx-primary");
+    const msg = E6("p", "Images and PDFs up to 10 MB. Large videos use an HTTPS link.", "lx-muted"), send = E6("button", "Upload to library", "lx-button lx-primary");
     send.type = "submit";
     const close = button2("Close", () => {
       if (!dialogBusy) d.remove();
     });
-    f.append(E5("h2", "Upload media"), msg, file, send, close);
+    f.append(E6("h2", "Upload media"), msg, file, send, close);
     d.append(f);
     root.append(d);
     d.showModal();
@@ -22393,7 +23007,8 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         if (uploaded.error) throw Error("Upload interrupted.");
         await api2("/api/workspace/assets/finish", { method: "POST", body: JSON.stringify({ id: started.id }) });
         d.remove();
-        studioTab = "library";
+        section = "library";
+        tabs.studio = "library";
         await load();
       } catch (error) {
         msg.textContent = error.message;
@@ -22405,27 +23020,27 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   }
   function edit(kind, record = null, day = null) {
     if (readOnly || dialogBusy) return;
-    const d = E5("dialog", void 0, "lx-dialog");
+    const d = E6("dialog", void 0, "lx-dialog");
     d.lang = "en";
-    const form = E5("form"), top = E5("div", void 0, "lx-row-top");
-    top.append(E5("h2", (record ? "Edit " : "New ") + (kind === "content" ? "production" : kind)));
+    const form = E6("form"), top = E6("div", void 0, "lx-row-top");
+    top.append(E6("h2", (record ? "Edit " : "New ") + (kind === "content" ? "production" : kind)));
     const close = button2("Close", () => dismiss());
     top.append(close);
     form.append(top);
-    const grid = E5("div", void 0, "lx-form-grid"), inputs = {};
+    const grid = E6("div", void 0, "lx-form-grid"), inputs = {};
     let definitions = kind === "lead" ? fields.lead : [["title", "Title"], ["status", "Status", states[kind]], ["record_date", kind === "report" ? "Report date" : "Date / next action", "date"], ...fields[kind]];
     if (kind === "content") definitions = [...definitions, ["asset_id", "Media library asset", "asset-select"]];
     for (const [key, label2, type] of definitions) {
-      const wrap = E5("div", void 0, type === "textarea" ? "lx-field lx-wide" : "lx-field"), caption = E5("label", label2);
+      const wrap = E6("div", void 0, type === "textarea" ? "lx-field lx-wide" : "lx-field"), caption = E6("label", label2);
       let input;
       if (Array.isArray(type) || type === "asset-select") {
-        input = E5("select");
+        input = E6("select");
         if (type === "asset-select") {
           input.append(new Option("No library asset", ""));
           for (const a of assets.filter((a2) => a2.category === "content")) input.append(new Option(a.original_name, a.id));
         } else for (const v of type) input.append(new Option(kind === "lead" && key === "status" ? leadStates[v] : v || "Not specified", v));
       } else {
-        input = E5(type === "textarea" ? "textarea" : "input");
+        input = E6(type === "textarea" ? "textarea" : "input");
         if (input.tagName === "INPUT") input.type = type || "text";
       }
       input.id = "lx-edit-" + key;
@@ -22450,9 +23065,9 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       inputs[key] = input;
     }
     form.append(grid);
-    const message2 = E5("p", "", "lx-status");
+    const message2 = E6("p", "", "lx-status");
     message2.setAttribute("role", "status");
-    const controls = E5("div", void 0, "lx-actions"), save = E5("button", "Save changes", "lx-button lx-primary");
+    const controls = E6("div", void 0, "lx-actions"), save = E6("button", "Save changes", "lx-button lx-primary");
     save.type = "submit";
     controls.append(save);
     let dirty = false;
@@ -22515,6 +23130,46 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       }
     };
   }
+  if (!readOnly) {
+    let tick = function() {
+      if (!root.isConnected) {
+        stop();
+        return;
+      }
+      const idle = Date.now() - last;
+      if (idle >= IDLE) {
+        stop();
+        onLogout?.().catch(() => {
+        });
+        return;
+      }
+      if (idle >= IDLE - WARN && !warning) {
+        warning = E6("div", void 0, "lx-idle");
+        warning.setAttribute("role", "alertdialog");
+        warning.setAttribute("aria-label", "Session timeout");
+        warning.append(E6("strong", "Still there?"), E6("p", "For your security you will be signed out in 2 minutes."), button2("Stay signed in", bump));
+        root.append(warning);
+        warning.querySelector("button").focus();
+      }
+    };
+    const IDLE = 30 * 60 * 1e3, WARN = 2 * 60 * 1e3, events = ["pointerdown", "keydown", "wheel", "touchstart"];
+    let last = Date.now(), warning = null;
+    const bump = () => {
+      last = Date.now();
+      if (warning) {
+        warning.remove();
+        warning = null;
+      }
+    };
+    for (const ev of events) window.addEventListener(ev, bump, { passive: true });
+    const stop = () => {
+      clearInterval(watch);
+      for (const ev of events) window.removeEventListener(ev, bump);
+      document.removeEventListener("visibilitychange", tick);
+    };
+    const watch = setInterval(tick, 15e3);
+    document.addEventListener("visibilitychange", tick);
+  }
   render();
   await load();
 }
@@ -22522,7 +23177,7 @@ function mountWorkspaceAdmin({ api: api2, getStaff }) {
   if (document.getElementById("workspaceAdminButton")) return;
   const host = document.querySelector("#appShell .page-header");
   if (!host) return;
-  const box = E5("div", void 0, "form-actions"), open = E5("button", "Employee workspaces", "secondary");
+  const box = E6("div", void 0, "form-actions"), open = E6("button", "Employee workspaces", "secondary");
   open.type = "button";
   open.id = "workspaceAdminButton";
   box.append(open);
@@ -22530,13 +23185,13 @@ function mountWorkspaceAdmin({ api: api2, getStaff }) {
   open.onclick = async () => {
     if (getStaff()?.role !== "admin") return;
     open.disabled = true;
-    const d = E5("dialog", void 0, "record-dialog"), body = E5("div", void 0, "dialog-body"), select = E5("select"), message2 = E5("p", "Loading team\u2026");
+    const d = E6("dialog", void 0, "record-dialog"), body = E6("div", void 0, "dialog-body"), select = E6("select"), message2 = E6("p", "Loading team\u2026");
     d.lang = "en";
     select.setAttribute("aria-label", "Team member");
-    const close = E5("button", "Close", "secondary");
+    const close = E6("button", "Close", "secondary");
     close.type = "button";
     close.onclick = () => d.remove();
-    const view = E5("button", "Open read-only workspace", "primary");
+    const view = E6("button", "Open read-only workspace", "primary");
     view.type = "button";
     view.disabled = true;
     let people = [];
@@ -22549,7 +23204,7 @@ function mountWorkspaceAdmin({ api: api2, getStaff }) {
         document.getElementById("appShell").hidden = false;
       } });
     };
-    body.append(E5("h2", "Employee workspaces"), select, message2, view, close);
+    body.append(E6("h2", "Employee workspaces"), select, message2, view, close);
     d.append(body);
     document.body.append(d);
     d.onclose = () => d.remove();
@@ -22696,7 +23351,7 @@ async function api(url, options = {}) {
     resetLogin("La sesi\xF3n ha caducado. Vuelve a entrar.");
     throw new Error("Sesi\xF3n caducada.");
   }
-  if (!response.ok) throw new Error(`${result.error || "No se pudo completar la operaci\xF3n."}${result.requestId ? ` \xB7 ID: ${result.requestId}` : ""}`);
+  if (!response.ok) throw Object.assign(new Error(`${result.error || "No se pudo completar la operaci\xF3n."}${result.requestId && response.status >= 500 ? ` \xB7 ID: ${result.requestId}` : ""}`), { status: response.status, platform: result.platform, fields: result.fields });
   return result;
 }
 function resource() {
@@ -22952,9 +23607,9 @@ async function openRecord(name, id = null, candidateId = null) {
         $("detailMetadata").append(item);
       }
     }
-    const editable = !r.readonly && !(id !== null && r.immutable);
-    $("recordForm").hidden = !editable;
-    if (editable) {
+    const editable2 = !r.readonly && !(id !== null && r.immutable);
+    $("recordForm").hidden = !editable2;
+    if (editable2) {
       const fields2 = [...r.fields];
       if (name === "staff" && id === null) fields2.unshift("user_id");
       for (const key of fields2) $("formFields").append(inputFor(name, key, r.columns[key], record, id === null));

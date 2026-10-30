@@ -1,5 +1,9 @@
-import {createBusinessCard,createShareTools} from './business-card.js';
-const $=id=>document.getElementById(id),slug=new URLSearchParams(location.search).get('c');
+import {createBusinessCard,createCardMenu,createSocialLinks,createContactChips,E} from './business-card.js';
+const $=id=>document.getElementById(id);
+// Card identifier: short link (/laura) or legacy long link (/book/?c=<id>).
+function cardIdentifier(){const c=new URLSearchParams(location.search).get('c');if(c)return /^[0-9a-f-]{36}$/i.test(c)?c.toLowerCase():null;const m=/^\/([a-zA-Z0-9][a-zA-Z0-9-]{1,28}[a-zA-Z0-9])\/?$/.exec(location.pathname);return m&&m[1].toLowerCase()!=='book'?m[1].toLowerCase():null;}
+let slug=cardIdentifier();
+const wantBooking=new URLSearchParams(location.search).get('book')==='1'||location.hash==='#book';
 const countries=[['MA','Morocco','212'],['GB','United Kingdom','44'],['FR','France','33'],['ES','Spain','34'],['DZ','Algeria','213'],['TN','Tunisia','216'],['BE','Belgium','32'],['DE','Germany','49'],['NL','Netherlands','31'],['IT','Italy','39'],['US','United States','1'],['CA','Canada','1'],['AE','United Arab Emirates','971'],['SA','Saudi Arabia','966'],['QA','Qatar','974'],['PT','Portugal','351'],['CH','Switzerland','41'],['EG','Egypt','20'],['TR','Turkey','90'],['SN','Senegal','221'],['CI','Cote d’Ivoire','225']];
 let busy=false,booked=false,blockedUntil=0,timer=null;const requestId=crypto.randomUUID();
 const form=$('bookingForm'),phone=form.elements.namedItem('phone');
@@ -17,9 +21,18 @@ phone.type='tel';phone.inputMode='tel';phone.autocomplete='tel-national';phone.r
 const hint=document.createElement('small');hint.className='booking-phone-hint';hint.textContent='Country code is selected separately. You can enter your local number, including its initial 0.';phoneRow.after(hint);
 phone.addEventListener('input',()=>{phone.setCustomValidity('');});code.addEventListener('change',()=>{phone.setCustomValidity('');phone.placeholder=code.value==='MA'?'06 12 34 56 78':'Your local phone number';});
 phone.addEventListener('paste',event=>{const text=event.clipboardData?.getData('text')?.trim()||'';if(!/^(\+|00)/.test(text))return;const digits=text.replace(/^00/,'').replace(/\D/g,'');const match=[...countries].sort((a,b)=>b[2].length-a[2].length).find(c=>digits.startsWith(c[2]));if(match){event.preventDefault();code.value=match[0];phone.value=digits.slice(match[2].length);phone.setCustomValidity('');}});
-async function initialise(){if(!slug){$('publicIdentity').replaceChildren();message('This business card link is incomplete.');return;}try{const result=await request('/api/business-card/'+encodeURIComponent(slug));const data=result.data;let qr=null;try{qr=await request('/api/business-card/'+encodeURIComponent(slug)+'/qr');}catch(error){/* Keep the business card visible even if its QR is temporarily rate-limited. */}
- $('publicIdentity').replaceChildren(createBusinessCard({data,photoUrl:'/api/counsellor/'+encodeURIComponent(slug)+'/photo',qrImage:qr?.image}));$('cardTools').replaceChildren(createShareTools({url:qr?.url||location.href,qrImage:qr?.image,name:data.display_name,data}));$('scrollQr')?.replaceChildren();$('openBooking').hidden=false;const today=new Date();$('day').min=dayKey(today);today.setDate(today.getDate()+60);$('day').max=dayKey(today);
- }catch(error){$('publicIdentity').replaceChildren();showError(error);}}
+async function initialise(){if(!slug){$('publicIdentity').replaceChildren();message('This business card link is incomplete.');return;}try{const result=await request('/api/business-card/'+encodeURIComponent(slug));const data=result.data;if(data.slug)slug=data.slug;let qr=null;try{qr=await request('/api/business-card/'+encodeURIComponent(slug)+'/qr');}catch(error){/* Keep the business card visible even if its QR is temporarily rate-limited. */}
+ const name=data.display_name||'MUK Talent',socials=Array.isArray(data.socials)?data.socials:[],shareUrl=data.short_url||qr?.url||location.href;document.title=name+' · MUK Talent';
+ $('publicIdentity').replaceChildren(createBusinessCard({data,photoUrl:'/api/counsellor/'+encodeURIComponent(slug)+'/photo',link:{display:data.short_display}}));
+ const social=E('div',undefined,'public-social');social.append(createSocialLinks(socials.filter(s=>s.platform!=='whatsapp'),name),createContactChips(data,socials));$('cardSocial').replaceChildren(social);
+ const menu=createCardMenu({url:shareUrl,display:data.short_display,qrImage:qr?.image,name,data,slug,socials});$('cardTools').replaceChildren(menu);
+ $('ctaBook').onclick=()=>$('openBooking').click();$('ctaWallet').onclick=()=>menu.openWallet?.();$('cardActions').hidden=false;
+ if(data.bio||data.languages){const about=$('cardAbout');about.replaceChildren(E('h2','About '+name.split(/\s+/)[0],'public-about-title'));if(data.bio)about.append(E('p',data.bio,'public-about-bio'));if(data.languages)about.append(E('p','Languages · '+data.languages,'public-about-meta'));about.hidden=false;}
+ try{const short=data.short_url&&new URL(data.short_url);if(short&&short.origin===location.origin&&location.pathname.startsWith('/book'))history.replaceState(null,'',short.pathname);}catch{}
+ $('scrollQr')?.replaceChildren();$('openBooking').hidden=false;const today=new Date();$('day').min=dayKey(today);today.setDate(today.getDate()+60);$('day').max=dayKey(today);
+ // Wallet passes link to ?book=1 so partners land straight on the booking form.
+ if(wantBooking)$('openBooking').click();
+ }catch(error){$('publicIdentity').replaceChildren();if(error.status===404){message('This business card is not available. Check the link or visit muktalent.com.');return;}showError(error);}}
 $('openBooking').onclick=()=>{if(booked)return;$('bookingPanel').hidden=false;$('bookingPanel').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});};
 $('closeBooking').onclick=()=>{if(busy)return;$('bookingPanel').hidden=true;$('publicIdentity').scrollIntoView({behavior:'auto'});};
 $('day').onchange=()=>{$('slot').replaceChildren(new Option('Find available times for this date',''));$('ukTime').textContent='';};
@@ -28,7 +41,9 @@ $('slot').onchange=()=>{$('ukTime').textContent=$('slot').value?'UK time: '+form
 form.onsubmit=async event=>{event.preventDefault();if(busy||booked||Date.now()<blockedUntil)return;phone.setCustomValidity('');if(!form.reportValidity())return;const chosen=new Date($('slot').value);if(Number.isNaN(chosen.getTime())){message('Choose an available appointment time.');return;}
  const values=new FormData(form);const payload={first_name:String(values.get('first_name')||'').trim(),last_name:String(values.get('last_name')||'').trim(),email:String(values.get('email')||'').trim(),phone:phone.value.trim(),phone_country:code.value,institution:String(values.get('institution')||'').trim(),subject:String(values.get('subject')||'').trim(),mode:String(values.get('mode')||'phone'),consent:form.elements.namedItem('consent').checked,website:String(values.get('website')||''),starts_at:chosen.toISOString(),request_id:requestId};
  busy=true;syncButtons();message('Confirming your appointment…');try{const result=await api('/book',{method:'POST',body:JSON.stringify(payload)});if(!result.data?.id||!result.data?.starts_at)throw Error('The server did not confirm this appointment. Please do not submit another booking until you have checked with MUK Talent.');
- booked=true;clearInterval(timer);timer=null;$('bookingPanel').hidden=true;$('openBooking').hidden=true;form.reset();$('slot').replaceChildren(new Option('Appointment booked',''));$('ukTime').textContent='';$('publicIdentity').scrollIntoView({behavior:'auto'});
+ booked=true;clearInterval(timer);timer=null;$('bookingPanel').hidden=true;$('openBooking').hidden=true;$('ctaBook').hidden=true;form.reset();$('slot').replaceChildren(new Option('Appointment booked',''));$('ukTime').textContent='';$('publicIdentity').scrollIntoView({behavior:'auto'});
  const confirmation='Appointment confirmed · '+format(result.data.starts_at,'Africa/Casablanca')+' (Morocco). '+(result.email_confirmation==='sent'?'Confirmation email sent.':'Please save these details. Email confirmation was not sent.');$('status').textContent=confirmation;$('status').classList.add('booking-confirmed-toast');setTimeout(()=>{if(booked){$('status').textContent='';$('status').classList.remove('booking-confirmed-toast');}},15000);
  }catch(error){if(error.status===409){$('slot').replaceChildren(new Option('Refresh available times',''));$('ukTime').textContent='';}showError(error);}finally{busy=false;syncButtons();}};
 initialise();
+
+

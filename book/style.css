@@ -5,13 +5,27 @@
 #bookingForm .booking-phone-row{display:grid;grid-template-columns:minmax(140px,.85fr) minmax(0,1.4fr);gap:9px;align-items:start}#bookingForm .booking-phone-row select{appearance:auto;padding-right:24px;cursor:pointer;font-size:13px;min-width:0}#bookingForm .booking-phone-row input{min-width:0}#bookingForm .booking-phone-hint{font-size:10px;line-height:1.6;color:#929e90;font-weight:400}#status.booking-confirmed-toast{position:fixed;z-index:100;left:50%;top:calc(20px + env(safe-area-inset-top));transform:translateX(-50%);width:min(580px,calc(100% - 30px));background:#1b2720f5;color:#e1dac0;border:1px solid #a38e5666;border-radius:14px;padding:18px 22px;box-shadow:0 15px 50px #0007;font-size:12px;line-height:1.8;text-align:left;backdrop-filter:blur(14px)}@media(max-width:540px){#bookingForm .booking-phone-row{grid-template-columns:minmax(120px,.85fr) minmax(0,1.2fr);gap:8px}#bookingForm .booking-phone-row select{font-size:12px;padding-left:9px}#status.booking-confirmed-toast{font-size:11px;padding:16px 18px}}
 
 
-/* corporate-card-stage-v4 */
-main{max-width:900px;padding-top:58px}.public-top{max-width:760px;margin-bottom:38px}.public-brand{font-size:9px;letter-spacing:2.3px}.book-call{border-color:#a48c4d60;background:#15202170;color:#e5cf9e}body{background:radial-gradient(ellipse at 50% 45%,#b09c6c12,transparent 65%),#080d10}body::before{background-size:65px 65px;opacity:.65}body::after{top:64vh;background:#d4ba7c12;width:70vw;left:15vw;height:11vh;filter:blur(55px)}@media(max-width:540px){main{padding-top:28px;padding-inline:15px}.public-top{margin-bottom:28px}.public-brand{font-size:8px}.book-call{font-size:9px;padding:11px 12px}}
-
-
-/* single-face-wallet-stage-v5 */
-main{max-width:570px;padding:35px 30px 65px}.public-top{max-width:470px;margin:0 auto 24px}.public-brand{font-size:8px;letter-spacing:1.8px}.book-call{font-size:9px;padding:11px 14px;min-height:41px}#bookingPanel{max-width:470px}body{background:radial-gradient(ellipse at 50% 25%,#3d44351a,transparent 70%),#090f12}body::before{opacity:.4;background-size:65px 65px}body::after{background:#c5a96a0b;top:65vh}#scrollQr,.biz-scroll-qr{display:none!important}@media(max-width:540px){main{padding:25px 16px calc(40px + env(safe-area-inset-bottom))}.public-top{margin-bottom:23px}.book-call{font-size:9px}}
-
-
-/* signature-card-stage-v6 */
-main{max-width:490px;padding:30px 27px 60px}.public-top{max-width:390px;margin:0 auto 23px}.public-brand{font-size:7px;letter-spacing:1.8px;color:#929d8e}.book-call{font-size:9px;padding:10px 13px;min-height:40px;color:#d9c18d;border-color:#84714866;background:#151e20}body{background:radial-gradient(ellipse at 50% 23%,#34413718,transparent 70%),#0a1013}body::before{opacity:.1}body::after{display:none}#bookingPanel{max-width:390px}#scrollQr,.biz-scroll-qr{display:none!important}@media(max-width:540px){main{padding:25px 16px calc(40px + env(safe-area-inset-bottom))}.public-top{margin-bottom:22px}.book-call{font-size:9px}}
+/* badge-stage-v7 · public card page */
+body{background:radial-gradient(ellipse 80% 50% at 50% 18%,#c9b48a12,transparent 70%),#0b0d0e;font-family:system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif}body::before{opacity:.18}body::after{display:none}
+main{max-width:460px;padding:26px 20px 70px}
+.public-top{max-width:380px;margin:0 auto 22px}
+.public-brand{font:500 12px 'MK Oswald','Arial Narrow',sans-serif;letter-spacing:.32em;color:#c9b48a}
+.book-call{font-size:13px;font-weight:600;letter-spacing:.01em;padding:0 18px;min-height:44px;border-radius:999px;border:0;color:#151515;background:linear-gradient(180deg,#e3d0a6,#c8ac77);box-shadow:0 8px 24px -10px #c8ac77aa}
+.book-call:hover{filter:brightness(1.06)}
+.public-about{max-width:380px;margin:26px auto 0;padding:20px 22px;border-radius:18px;border:1px solid #c9b48a26;background:#131617}
+.public-about-title{margin:0 0 8px;font:500 18px 'MK Oswald','Arial Narrow',sans-serif;letter-spacing:.04em;color:#d9c49a}
+.public-about-bio{margin:0;font-size:14px;line-height:1.7;color:#cfcabb;white-space:pre-line;overflow-wrap:anywhere}
+.public-about-meta{margin:12px 0 0;font-size:12.5px;color:#9a9789}
+#bookingPanel{max-width:380px}
+#scrollQr,.biz-scroll-qr{display:none!important}
+@media(max-width:420px){.public-about,#bookingPanel,.public-top{max-width:340px}}
+@media(max-width:540px){main{padding:18px 14px calc(50px + env(safe-area-inset-bottom))}.public-top{margin-bottom:18px}.public-brand{font-size:11px}.book-call{font-size:12.5px;padding:0 15px}}
+/* public-actions-v7: primary actions right under the card */
+.public-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(100%,380px);margin:16px auto 0}
+.public-cta{font:inherit;font-size:13px;white-space:nowrap;font-weight:600;min-height:50px;padding:0 16px;border-radius:14px;border:1px solid #c9b48a55;background:#161616;color:#e8dcc0;cursor:pointer;letter-spacing:.01em}
+.public-cta:hover{border-color:#c9b48a}
+.public-cta-gold{border:0;color:#151515;background:linear-gradient(180deg,#e3d0a6,#c8ac77);box-shadow:0 10px 26px -12px #c8ac77}
+.public-cta-gold:hover{filter:brightness(1.06)}
+@media(max-width:420px){.public-actions{width:min(100%,340px)}}
+@media(max-width:330px){.public-actions{grid-template-columns:1fr}}
+body:has(#cardActions:not([hidden])) #openBooking{display:none!important}

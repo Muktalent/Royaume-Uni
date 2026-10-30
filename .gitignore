@@ -31,3 +31,12 @@ muktalent-revision-web.txt
 
 .wallet-private/
 .wallet-cache/
+# Instaladores y revisiones locales
+install-*.cjs
+installer-*.cjs
+diagnostico-*
+*-installer/
+mt-personal-package/
+*.zip
+muktalent-*.txt
+portfolio-project-review.txt

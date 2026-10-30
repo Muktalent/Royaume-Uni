@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet,noimageindex">
+<meta name="googlebot" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#5b3a55">
+<link rel="icon" href="/assets/book/img/icon.svg" type="image/svg+xml">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; form-action 'self'">
+<link rel="stylesheet" href="/assets/book/fonts.css">
+<link rel="stylesheet" href="/assets/book/admin.css">
+<title>Admin personal</title>
+<script type="module" src="/personal-admin/app.js"></script>
+</head>
+<body class="admin">
+<header class="bar"><div class="wrap">
+ <a class="brand" href="/portfolio/"><span class="mark" aria-hidden="true"></span><span class="brand-name">Admin personal</span></a>
+ <nav class="nav" aria-label="Páginas públicas"><a href="/portfolio/" target="_blank" rel="noopener">Portfolio ↗</a><a href="/certificates/" target="_blank" rel="noopener">Certificates ↗</a></nav>
+</div></header>
+<main class="wrap admin-main" id="main">
+ <p id="status" class="a-status" role="status" aria-live="polite"></p>
+
+ <form id="login" class="a-card a-login" autocomplete="on">
+  <span class="mono">Acceso propietario</span>
+  <h1>Iniciar sesión</h1>
+  <p class="a-muted">Solo la cuenta asignada como propietaria en Supabase puede editar el portfolio y los certificados.</p>
+  <label>Email<input name="email" type="email" autocomplete="username" required></label>
+  <label>Contraseña<input name="password" type="password" autocomplete="current-password" required></label>
+  <button class="btn btn-solid" type="submit">Entrar</button>
+ </form>
+
+ <section id="panel" hidden>
+  <div class="a-head">
+   <div><span class="mono">Contenido</span><h1>Tu libro: portfolio y certificados</h1><p class="a-muted">Los borradores son privados. Marca “Publicado” para mostrar una entrada en las páginas públicas.</p></div>
+   <div class="a-actions"><button id="newItem" class="btn btn-solid" type="button">Nueva entrada</button><button id="logout" class="btn" type="button">Cerrar sesión</button></div>
+  </div>
+  <div class="a-guide">
+   <div><b>profile · Perfil y portada</b><p>Una sola entrada. Título = nombre (portada) · Resumen = titular · Categoría = “ahora mismo” (p. ej. Open to remote pentesting roles) · Emisor = ciudad · Descripción = bio · Competencias = skills · Web = LinkedIn · Repositorio = GitHub · Verificación = enlace para reservar llamada · Portada = tu foto · Documento = CV en PDF.</p></div>
+   <div><b>experience · Dónde he trabajado</b><p>Una entrada por puesto. Título = puesto · Emisor = empresa · Inicio y fin (fin vacío = “since 2024”) · Categoría = ciudad o modalidad · Descripción = logros · Competencias = herramientas. Orden 0 = arriba.</p></div>
+   <div><b>education · Dónde he estudiado</b><p>Título = titulación (p. ej. BSc Cybersecurity &amp; Networks) · Emisor = universidad · Inicio y fin · Descripción = módulos o proyecto final.</p></div>
+   <div><b>project · Portafolio</b><p>Título · Resumen · Categoría (crea las pestañas) · Descripción (línea en blanco entre párrafos; “# Título” crea subtítulo) · Competencias = tecnologías · Emisor = rol/cliente · Fecha · Web · Repositorio · Verificación = caso práctico · Portada + Galería · Documento = informe PDF. Identificador = enlace directo /portfolio/#identificador.</p></div>
+   <div><b>certificate · Certificados</b><p>Título · Emisor · Expedición y caducidad (opcional; avisa “Renew soon” 90 días antes) · Resumen = ID de credencial · Categoría (pestañas) · Verificación = URL oficial · Portada = imagen · Documento = PDF.</p></div>
+   <div><b>link · Redes y email</b><p>Una entrada por red: Título = nombre (GitHub, TryHackMe…) · Web = URL https (el icono se pone solo). Para el email: Título = Email · Resumen = tu dirección; activa la carta de contacto.</p></div>
+  </div>
+  <div id="records" class="a-records"></div>
+
+  <form id="editor" class="a-card a-editor" hidden>
+   <div class="a-head"><h2 id="editTitle">Entrada</h2></div>
+   <div id="fields" class="a-fields"></div>
+   <fieldset class="a-upload"><legend class="mono">Subir archivo (guarda primero)</legend>
+    <select id="uploadTarget" aria-label="Destino"><option value="cover_path">Portada / foto / imagen del certificado</option><option value="gallery_paths">Añadir a la galería</option><option value="document_path">Documento (PDF)</option></select>
+    <input id="uploadFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" aria-label="Archivo">
+    <button id="upload" class="btn" type="button">Subir</button>
+   </fieldset>
+   <div class="a-actions a-sticky"><button class="btn btn-solid" type="submit">Guardar</button><button id="cancel" class="btn" type="button">Cerrar</button><button id="delete" class="btn a-danger" type="button">Eliminar</button></div>
+  </form>
+ </section>
+</main>
+</body>
+</html>
