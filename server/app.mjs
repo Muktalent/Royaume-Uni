@@ -1,3 +1,11 @@
+import { mountAdminPipeline } from "./admin-pipeline.mjs";
+import { mountBusinessWallet } from "./business-wallet.mjs";
+import { mountProfessionalWorkspace } from "./professional-workspace.mjs";
+import { mountWorkspaceExtras } from "./workspace-extras.mjs";
+import { mountEmployeeSecurity } from "./employee-security.mjs";
+import { mountWorkspace } from "./workspace.mjs";
+import { mountStaffAccounts } from "./staff-accounts.mjs";
+import { mountPersonal } from "./personal-public.mjs";
 import { mountExports } from "./exports.mjs";
 import { mountEvaluation } from "./evaluation-public.mjs";
 import "dotenv/config";
@@ -27,7 +35,7 @@ if (!origin.startsWith("https://")) throw new Error("SUPABASE_URL debe usar HTTP
 const root = fileURLToPath(new URL("../", import.meta.url));
 const app = express();
 app.disable("x-powered-by");
-app.use(helmet({contentSecurityPolicy:{directives:{connectSrc:["'self'",origin]}}}));
+app.use(helmet({contentSecurityPolicy:{directives:{connectSrc:["'self'",origin],imgSrc:["'self'","data:",origin]}}}));
 app.use((req,res,next)=>{req.requestId=randomUUID();res.set("X-Request-Id",req.requestId);res.set("Cache-Control","no-store");next();});
 app.use("/api",rateLimit({keyGenerator:(req)=>ipKeyGenerator((process.env.VERCEL?String(req.headers["x-vercel-forwarded-for"]||req.headers["x-forwarded-for"]||"").split(",")[0].trim():req.ip)||"127.0.0.1"),validate:{xForwardedForHeader:false},windowMs:60000,limit:240,standardHeaders:"draft-7",legacyHeaders:false,message:{error:"Demasiadas peticiones. Espera un minuto."}}));
 app.use(express.json({limit:"64kb",strict:true}));
@@ -49,13 +57,62 @@ async function requireStaff(req,res,next){
   const staffResult=await db.from("crm_staff").select("user_id,full_name,role,active").eq("user_id",data.user.id).maybeSingle();
   if(staffResult.error) dbError(staffResult.error,req);
   if(!staffResult.data?.active) return fail(req,res,403,"El acceso del empleado no está activo.");
-  req.db=db;req.staff=staffResult.data;next();
+  const security=await db.from("mt_employee_security").select("must_change_password").eq("user_id",data.user.id).maybeSingle();
+  if(security.error) dbError(security.error,req);
+  if(!security.data)return fail(req,res,403,"Security configuration missing. Contact your administrator.");
+  const mustChange=security.data.must_change_password;
+  const route=req.originalUrl.split("?")[0];
+  if(mustChange && !["/api/me","/api/employee-security/password"].includes(route))
+    return fail(req,res,403,"Change your initial password before accessing your workspace. Sign out and sign in again.");
+  req.db=db;req.staff={...staffResult.data,must_change_password:mustChange};next();
 }
 function requireAdmin(req,res,next){if(req.staff.role!=="admin")return fail(req,res,403,"Este panel requiere una cuenta de administrador.");next();}
 app.get("/api/health",(req,res)=>res.json({status:"ok"}));
 app.get("/api/public-config",(req,res)=>res.json({supabaseUrl,supabasePublicKey:supabaseKey}));
 app.get("/api/me",requireStaff,(req,res)=>res.json({staff:req.staff}));
+mountProfessionalWorkspace(app, { requireStaff, requireAdmin });
+mountAdminPipeline(app, { requireStaff, requireAdmin });
 mountEvaluation(app);
+mountPersonal(app);
+app.get("/api/employee/overview", requireStaff, async (req, res) => {
+  const userId = req.staff.user_id;
+  const now = new Date().toISOString();
+  const results = await Promise.all([
+    req.db.from("crm_candidates").select("id", { count: "exact", head: true })
+      .eq("assigned_to", userId).is("archived_at", null),
+    req.db.from("crm_appointments").select("id", { count: "exact", head: true })
+      .eq("advisor_id", userId).eq("status", "confirmed").gte("starts_at", now),
+    req.db.from("crm_candidates").select("id", { count: "exact", head: true })
+      .eq("assigned_to", userId).is("archived_at", null)
+      .neq("status", "closed").lt("next_action_at", now),
+    req.db.from("crm_candidates")
+      .select("id,reference,first_name,last_name,status,next_action,next_action_at")
+      .eq("assigned_to", userId).is("archived_at", null)
+      .order("created_at", { ascending: false }).order("id", { ascending: false }).limit(25),
+    req.db.from("crm_appointments")
+      .select("id,full_name,starts_at,ends_at,status,subject,whatsapp_phone_e164")
+      .eq("advisor_id", userId).eq("status", "confirmed").gte("starts_at", now)
+      .order("starts_at", { ascending: true }).order("id", { ascending: true }).limit(25)
+  ]);
+  for (const result of results) {
+    if (result.error) dbError(result.error, req);
+  }
+  res.json({
+    metrics: {
+      candidates: results[0].count ?? 0,
+      appointments: results[1].count ?? 0,
+      overdue: results[2].count ?? 0
+    },
+    candidates: results[3].data ?? [],
+    appointments: results[4].data ?? []
+  });
+});
+
+mountStaffAccounts(app, { requireStaff, requireAdmin });
+mountWorkspace(app, { requireStaff });
+mountEmployeeSecurity(app, { requireStaff });
+mountWorkspaceExtras(app, { requireStaff });
+mountBusinessWallet(app);
 app.use("/api",requireStaff,requireAdmin);
 mountExports(app);
 app.get("/api/admin-config",(req,res)=>res.json(config));

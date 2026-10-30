@@ -41,7 +41,7 @@
       ],
       "create": true,
       "archive": true,
-      "select": "id,reference,first_name,last_name,email,status,next_action_at,phone_e164,whatsapp_phone_e164,preferred_language,residence_country_code,residence_city,source,assigned_to,target_study_level,subject_interest,intended_intake,budget_amount,budget_currency,funding_plan,next_action,created_at,updated_at,archived_at,evaluation_payload",
+      "select": "id,reference,first_name,last_name,email,status,next_action_at,phone_e164,whatsapp_phone_e164,preferred_language,residence_country_code,residence_city,source,assigned_to,target_study_level,subject_interest,intended_intake,budget_amount,budget_currency,funding_plan,next_action,created_at,updated_at,archived_at,evaluation_payload,case_accepted_at,case_accepted_by",
       "columns": {
         "first_name": {
           "label": "Nombre",
@@ -795,6 +795,8 @@
     "sha256": "Huella SHA-256",
     "rejection_reason": "Motivo de rechazo",
     "request_id": "ID de solicitud",
-    "evaluation_payload": "Évaluation reçue · formulaire complet"
+    "evaluation_payload": "Évaluation reçue · formulaire complet",
+    "case_accepted_at": "Caso aceptado",
+    "case_accepted_by": "Aceptado por (usuario)"
   }
 }

@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import path from 'node:path';
+// This script stores secrets locally and never prints their values.
+const args=process.argv.slice(2),opts={};for(let i=0;i<args.length;i+=2){if(!args[i]?.startsWith('--')||!args[i+1])throw Error('Use --option value pairs.');opts[args[i].slice(2)]=args[i+1];}
+const root=process.cwd();if(!fs.existsSync(path.join(root,'package.json')))throw Error('Run from the project root.');
+const ignored=fs.readFileSync(path.join(root,'.gitignore'),'utf8');if(!/^\.env\s*$/m.test(ignored))throw Error('Add .env to .gitignore before storing credentials.');
+const updates={};
+if(opts.google){const file=JSON.parse(fs.readFileSync(path.resolve(opts.google),'utf8'));if(!file.client_email||!file.private_key||file.type!=='service_account')throw Error('Use a real Google service-account JSON file.');if(!opts.issuer||!opts.class)throw Error('Google setup needs --issuer and --class.');if(!opts.class.startsWith(opts.issuer+'.'))throw Error('The class must belong to the issuer.');Object.assign(updates,{GOOGLE_WALLET_CLIENT_EMAIL:file.client_email,GOOGLE_WALLET_PRIVATE_KEY:file.private_key,GOOGLE_WALLET_ISSUER_ID:opts.issuer,GOOGLE_WALLET_CLASS_ID:opts.class});}
+if(opts['apple-cert']||opts['apple-key']||opts.wwdr){if(!opts['apple-cert']||!opts['apple-key']||!opts.wwdr||!opts['pass-type']||!opts.team)throw Error('Apple setup needs --apple-cert, --apple-key, --wwdr, --pass-type and --team.');for(const [option,variable]of [['apple-cert','APPLE_PASS_CERT_PEM_BASE64'],['apple-key','APPLE_PASS_KEY_PEM_BASE64'],['wwdr','APPLE_WWDR_CERT_PEM_BASE64']]){const data=fs.readFileSync(path.resolve(opts[option]));if(!data.toString('utf8').includes('-----BEGIN'))throw Error('Apple certificates and key must be in PEM format.');updates[variable]=data.toString('base64');}updates.APPLE_PASS_TYPE_ID=opts['pass-type'];updates.APPLE_TEAM_ID=opts.team;if(opts['passphrase-file'])updates.APPLE_PASS_KEY_PASSPHRASE=fs.readFileSync(path.resolve(opts['passphrase-file']),'utf8').trimEnd();}
+if(opts.site){const u=new URL(opts.site);if(u.protocol!=='https:')throw Error('Use a public HTTPS site.');updates.PUBLIC_SITE_URL=u.origin;}
+if(!Object.keys(updates).length)throw Error('No Wallet configuration supplied. Read Wallet-activation.txt.');
+const envPath=path.join(root,'.env');let content=fs.existsSync(envPath)?fs.readFileSync(envPath,'utf8'):'';
+for(const [key,value]of Object.entries(updates)){const line=key+'='+JSON.stringify(value),pattern=new RegExp('^\\s*(?:export\\s+)?'+key+'\\s*=.*$','gm');if(pattern.test(content))content=content.replace(pattern,()=>line);else content+='\n'+line;}
+fs.writeFileSync(envPath,content.trimEnd()+'\n',{mode:0o600});console.log('Wallet credentials saved to local .env. Secret values were not printed. Restart the server. Configure deployment secrets separately.');

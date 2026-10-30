@@ -1,10 +1,15 @@
+import { mountAdminExperience, renderAdminPipeline } from "./admin-experience.js";
+import { mountProfessionalAdmin } from "./professional-workspace.js";
+import { requirePasswordChange } from "./employee-security.js";
+import { mountStaffAccounts } from "./staff-accounts.js";
+import { mountEmployee, mountWorkspaceAdmin } from "./employee.js";
 import { mountExportButtons } from "./exports.js";
 import { createClient } from "@supabase/supabase-js";
 const $ = id => document.getElementById(id);
 const state = {client:null,session:null,staff:null,config:null,section:"overview",page:1,total:0,epoch:0,listRequest:0,detailRequest:0,relatedRequest:0,busy:false,loading:false,detail:null,dirty:false,related:"notes",relatedPage:1,staffOptions:[]};
-const titles={overview:"Resumen",candidates:"Candidatos",enquiries:"Consultas",appointments:"Citas",blocks:"Bloqueos de agenda",staff:"Equipo",settings:"Horario de reservas",documents:"Documentos", "document-requests":"Solicitudes documentales"};
+const titles={overview:"Resumen",candidates:"Leads y casos",enquiries:"Consultas",appointments:"Citas",staff:"Equipo",documents:"Documentos",intelligence:"Pipeline e informes"};
 const statusText={new:"Nuevo",contacted:"Contactado",assessment_in_progress:"Evaluación en curso",documents_pending:"Documentos pendientes",ready_for_review:"Listo para revisión",on_hold:"En espera",closed:"Cerrado",in_progress:"En curso",awaiting_reply:"Esperando respuesta",resolved:"Resuelto",archived:"Archivado",confirmed:"Confirmada",completed:"Completada",cancelled:"Cancelada",no_show:"No se presentó",pending:"Pendiente",accepted:"Aceptado",rejected:"Rechazado",clean:"Limpio",infected:"Infectado",failed:"Fallido",open:"Abierta",revoked:"Revocada",admin:"Administrador",collaborator:"Colaborador",fr:"Francés",en:"Inglés"};
-const descriptions={overview:"Una vista global de la actividad y los próximos pasos.",candidates:"Expedientes, responsables y seguimiento del proceso.",enquiries:"Revisa las consultas recibidas y organiza su seguimiento.",appointments:"Consulta las citas existentes y registra su resultado. Horas mostradas en Africa/Casablanca.",blocks:"Gestiona indisponibilidades de los asesores. No cancela citas existentes.",staff:"Personal vinculado a usuarios existentes de Supabase Authentication.",settings:"Horario de apertura. Duración fija: 30 minutos y margen de 10 minutos.",documents:"Inventario de documentos existentes. No incluye descarga, subida ni análisis antivirus.","document-requests":"Consulta de solicitudes existentes. No genera enlaces privados."};
+const descriptions={overview:"Una vista global de la actividad y los próximos pasos.",candidates:"Leads y expedientes. Acepta como caso los leads que MUK Talent vaya a gestionar.",enquiries:"Revisa las consultas recibidas y organiza su seguimiento.",appointments:"Consulta las citas existentes y registra su resultado. Horas mostradas en Africa/Casablanca.",blocks:"Gestiona indisponibilidades de los asesores. No cancela citas existentes.",staff:"Cuentas, identidad profesional, territorios y acceso de los miembros del equipo.",settings:"Horario de apertura. Duración fija: 30 minutos y margen de 10 minutos.",documents:"Inventario de documentos existentes. No incluye descarga, subida ni análisis antivirus.","document-requests":"Consulta de solicitudes existentes. No genera enlaces privados."};
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text);if(cls)n.className=cls;return n;}
 function message(id,text="",error=false){$(id).textContent=text;$(id).classList.toggle("error",error);}
 function label(key){return state.config?.labels[key]||key;}
@@ -19,6 +24,7 @@ function valueText(key,value){
  return statusText[value]||String(value).replaceAll("_"," ");
 }
 function resetLogin(text=""){
+ document.getElementById("employeeWorkspace")?.remove();
  state.epoch++;state.session=null;state.staff=null;state.config=null;state.staffOptions=[];state.detail=null;state.dirty=false;state.busy=false;state.loading=false;
  if($("recordDialog").open)$("recordDialog").close();
  $("tableBody").replaceChildren();$("metrics").replaceChildren();$("pipeline").replaceChildren();$("formFields").replaceChildren();$("relatedRows").replaceChildren();$("detailMetadata").replaceChildren();
@@ -46,6 +52,15 @@ function nav(){
 }
 async function navigate(name,overdue=false){
  if(!state.session||!state.config)return;
+ document.getElementById("adminPipelineView")?.remove();
+ if(name==="intelligence"){
+  state.section=name;state.page=1;state.listRequest++;state.loading=false;
+  $("overview").hidden=true;$("listView").hidden=true;$("createRecord").hidden=true;
+  $("pageTitle").textContent="Pipeline e informes";$("pageDescription").textContent="Casos aceptados, hoja interna e informes de pipeline para universidades y partners.";message("globalMessage");
+  for(const b of $("navigation").children){b.classList.toggle("active",b.dataset.section===name);if(b.dataset.section===name)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");}
+  const host=document.createElement("section");host.id="adminPipelineView";$("globalMessage").after(host);
+  return renderAdminPipeline({api,getState:()=>state,openRecord,host});
+ }
  state.section=name;state.page=1;state.listRequest++;state.loading=false;message("globalMessage");
  $("pageTitle").textContent=titles[name];$("pageDescription").textContent=descriptions[name]||"";
  for(const b of $("navigation").children){b.classList.toggle("active",b.dataset.section===name);if(b.dataset.section===name)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");}
@@ -155,7 +170,7 @@ async function openRecord(name,id=null,candidateId=null){
  }catch(e){if(request===state.detailRequest&&epoch===state.epoch){$("detailTitle").textContent="No se pudo abrir el registro";message("detailMessage",e.message,true);}}
 }
 function renderRelatedTabs(){
- $("relatedTabs").replaceChildren();for(const name of ["notes","admin-notes","education","documents","document-requests"]){const r=state.config.resources[name];const b=el("button",r.title,"tab");b.type="button";b.classList.toggle("active",state.related===name);b.addEventListener("click",()=>{state.related=name;state.relatedPage=1;renderRelatedTabs();loadRelated();});$("relatedTabs").append(b);}
+ $("relatedTabs").replaceChildren();for(const name of ["notes","admin-notes","education","documents"]){const r=state.config.resources[name];const b=el("button",r.title,"tab");b.type="button";b.classList.toggle("active",state.related===name);b.addEventListener("click",()=>{state.related=name;state.relatedPage=1;renderRelatedTabs();loadRelated();});$("relatedTabs").append(b);}
 }
 async function loadRelated(){
  const context=state.detail;if(context?.name!=="candidates")return;
@@ -202,14 +217,57 @@ $("archiveRecord").addEventListener("click",async()=>{
 async function loadStaffOptions(){
  const all=[];for(let page=1;page<=100;page++){const r=await api(`/api/staff?page=${page}&page_size=100`);all.push(...r.data);if(all.length>=r.total)break;}state.staffOptions=all;
 }
-$("loginForm").addEventListener("submit",async event=>{
- event.preventDefault();if(!state.client)return;$("loginSubmit").disabled=true;message("loginMessage","Entrando…");
- try{
-  const {data,error}=await state.client.auth.signInWithPassword({email:$("email").value.trim(),password:$("password").value});$("password").value="";if(error)throw new Error(error.message);if(!data.session)throw new Error("No se recibió una sesión.");
-  state.session=data.session;state.epoch++;state.staff=(await api("/api/me")).staff;if(state.staff.role!=="admin")throw new Error("Esta versión del panel es exclusiva para administradores.");
-  state.config=await api("/api/admin-config");await loadStaffOptions();nav();$("staffName").textContent=state.staff.full_name;$("loginView").hidden=true;$("appShell").hidden=false;await navigate("overview");
- }catch(e){resetLogin(e.message);await state.client.auth.signOut({scope:"local"}).catch(()=>{});}
- finally{$("loginSubmit").disabled=false;}
+$("loginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  if (!state.client || $("loginSubmit").disabled) return;
+  $("loginSubmit").disabled = true;
+  message("loginMessage", "Entrando…");
+  try {
+    const { data, error } = await state.client.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("password").value
+    });
+    $("password").value = "";
+    if (error) throw new Error("No se pudo iniciar sesión. Revisa tus credenciales.");
+    if (!data.session) throw new Error("No se recibió una sesión.");
+    state.session = data.session;
+    state.epoch++;
+    state.staff = (await api("/api/me")).staff;
+    if(state.staff.must_change_password){
+      await requirePasswordChange({api,mandatory:true});
+      state.staff = (await api("/api/me")).staff;
+    }
+    if (!["admin", "collaborator"].includes(state.staff.role)) {
+      throw new Error("Esta cuenta no tiene un rol de acceso válido.");
+    }
+    if (state.staff.role === "collaborator") {
+      $("loginView").hidden = true;
+      $("appShell").hidden = true;
+      await mountEmployee({
+        staff: state.staff,
+        api,
+        onLogout: async () => {
+          const { error } = await state.client.auth.signOut({ scope: "local" });
+          if (error) throw error;
+          resetLogin();
+          message("loginMessage", "Sesión cerrada.");
+        }
+      });
+      return;
+    }
+    state.config = await api("/api/admin-config");
+    await loadStaffOptions();
+    nav();
+    $("staffName").textContent = state.staff.full_name;
+    $("loginView").hidden = true;
+    $("appShell").hidden = false;
+    await navigate("overview");
+  } catch (error) {
+    resetLogin(error.message);
+    await state.client.auth.signOut({ scope: "local" }).catch(() => {});
+  } finally {
+    $("loginSubmit").disabled = false;
+  }
 });
 $("logout").addEventListener("click",async()=>{if(state.busy)return;if(state.dirty&&!window.confirm("¿Descartar los cambios y cerrar sesión?"))return;resetLogin();await state.client.auth.signOut({scope:"local"}).catch(()=>{});});
 $("filters").addEventListener("submit",event=>{event.preventDefault();state.page=1;loadList();});
@@ -220,7 +278,7 @@ $("createRecord").addEventListener("click",()=>openRecord(state.section));
 $("closeDialog").addEventListener("click",closeDialog);
 $("backCandidate").addEventListener("click",()=>{if(state.detail?.candidateId)openRecord("candidates",state.detail.candidateId);});
 $("recordDialog").addEventListener("cancel",event=>{event.preventDefault();closeDialog();});
-$("recordDialog").addEventListener("close",()=>{if(state.session){if(state.section==="overview")loadOverview();else loadList();}});
+$("recordDialog").addEventListener("close",()=>{if(state.session&&state.staff?.role==="admin"&&state.config){if(state.section==="overview")loadOverview();else loadList();}});
 $("addRelated").addEventListener("click",()=>{if(state.detail?.name==="candidates")openRecord(state.related,null,state.detail.id);});
 $("relatedPrevious").addEventListener("click",()=>{if(state.relatedPage>1){state.relatedPage--;loadRelated();}});
 $("relatedNext").addEventListener("click",()=>{state.relatedPage++;loadRelated();});
@@ -234,9 +292,21 @@ async function initialise(){
   message("loginMessage");$("loginSubmit").disabled=false;
  }catch(e){message("loginMessage",`No se pudo conectar con la administración. ${e.message}`,true);}
 }
+mountStaffAccounts({
+  api,
+  onCreated: async () => {
+    if (state.staff?.role !== "admin") return;
+    await loadStaffOptions();
+    if (state.section === "staff") await loadList();
+  }
+});
+mountWorkspaceAdmin({ api, getStaff: () => state.staff });
+mountProfessionalAdmin({ api, getStaff: () => state.staff });
 initialise();
 
 mountExportButtons(async()=>{
  if(!state.staff||state.staff.role!=="admin"||!state.client)return null;
  const {data,error}=await state.client.auth.getSession();if(error)return null;return data.session;
 });
+
+mountAdminExperience({api,getState:()=>state,openRecord});

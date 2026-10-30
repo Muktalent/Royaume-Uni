@@ -28,3 +28,6 @@ admin-backup-*/
 *.backup-*
 muktalent-*.zip
 muktalent-revision-web.txt
+
+.wallet-private/
+.wallet-cache/
