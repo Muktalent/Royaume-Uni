@@ -1,8 +1,16 @@
-export function apiUrl(raw,query={}){
- const u=new URL(raw,"https://local.invalid");
- const candidates=u.searchParams.getAll("__crm_route");
- let route=candidates.length?candidates.length===1?candidates[0]:null:query.__crm_route;
- if(typeof route!=="string"||!route||route.length>250||!/^[a-z0-9-]+(?:\/[a-z0-9-]+)*$/i.test(route))throw new Error("Invalid API route");
- u.searchParams.delete("__crm_route");
- const q=u.searchParams.toString();return "/api/"+route+(q?"?"+q:"");
+export function apiUrl(raw, query = {}) {
+  const url = new URL(raw, "https://internal.invalid");
+  const routes = url.searchParams.getAll("__crm_route");
+  const route = routes.length === 0
+    ? query?.__crm_route
+    : routes.length === 1 ? routes[0] : null;
+
+  const allowed = /^[a-z0-9_-]+(?:\/[a-z0-9_-]+)*(?:\.(?:png|pkpass))?$/i;
+  if (typeof route !== "string" || !route || route.length > 250 || !allowed.test(route)) {
+    throw new Error("Invalid API route");
+  }
+
+  url.searchParams.delete("__crm_route");
+  const search = url.searchParams.toString();
+  return `/api/${route}${search ? `?${search}` : ""}`;
 }
