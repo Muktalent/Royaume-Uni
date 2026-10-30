@@ -7,8 +7,8 @@
     "api/index.mjs": {
       "includeFiles": "server/**"
       "maxDuration": 30
-    }
-  },
+      }
+    },
   "rewrites": [
     {
       "source": "/api/:path*",
