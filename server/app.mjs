@@ -9,6 +9,7 @@ import { mountPersonal } from "./personal-public.mjs";
 import { mountExports } from "./exports.mjs";
 import { mountEvaluation } from "./evaluation-public.mjs";
 import { mountCardLinks } from "./card-links.mjs";
+import { mountPayroll } from "./payroll.mjs";
 import "dotenv/config";
 import express from "express";
 import helmet from "helmet";
@@ -74,6 +75,7 @@ app.get("/api/me",requireStaff,(req,res)=>res.json({staff:req.staff}));
 // Short card links must resolve before the public card routes are matched.
 mountCardLinks(app, { requireStaff });
 mountProfessionalWorkspace(app, { requireStaff, requireAdmin });
+mountPayroll(app, { requireStaff, requireAdmin });
 mountAdminPipeline(app, { requireStaff, requireAdmin });
 mountEvaluation(app);
 mountPersonal(app);

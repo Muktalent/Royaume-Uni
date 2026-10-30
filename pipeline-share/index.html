@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#efe8dc">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>MUK Talent · Pipeline briefing</title>
+<link rel="stylesheet" href="/pipeline-share/style.css">
+<script type="module" src="/pipeline-share/app.js"></script>
+</head>
+<body>
+<header class="ps-top">
+  <img src="/book/muk-badge-logo.png" alt="MUK Talent" width="120" height="70">
+  <div class="ps-top-actions">
+    <button id="csv" type="button" hidden>Download CSV</button>
+    <button id="print" type="button" hidden>Print / PDF</button>
+  </div>
+</header>
+<main class="ps-main">
+  <p class="ps-overline">MUK TALENT · PARTNER PIPELINE BRIEFING</p>
+  <h1 id="title">Loading report…</h1>
+  <p id="meta" class="ps-muted" role="status" aria-live="polite"></p>
+  <section id="board" class="ps-board" aria-label="Cases by stage"></section>
+  <div id="legend" class="ps-legend"></div>
+  <div class="ps-tools" id="tools" hidden>
+    <label for="filter">Status</label>
+    <select id="filter"><option value="">All statuses</option></select>
+    <input id="q" type="search" placeholder="Search reference, course, institution…" maxlength="80" aria-label="Search cases">
+  </div>
+  <div class="ps-sheet-wrap"><table id="sheet" class="ps-sheet"></table></div>
+  <p class="ps-foot">Pseudonymised snapshot: no names, phone numbers, emails or internal notes. Readiness fields are declared information and pipeline stages are not admissions guarantees. Do not forward this link.</p>
+</main>
+</body>
+</html>

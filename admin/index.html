@@ -5,9 +5,12 @@
 <meta name="robots" content="noindex,nofollow"><title>MUKTALENT · Administration</title>
 <link rel="stylesheet" href="/admin/style.css"><script type="module" src="/admin/app.js"></script>
 <link rel="manifest" href="/admin/team.webmanifest">
-<meta name="theme-color" content="#111518">
+<meta name="theme-color" content="#efe8dc">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="/assets/logo.png">
 <link rel="stylesheet" href="/admin/admin-premium.css">
+<link rel="stylesheet" href="/admin/muk-soft-admin.css">
 </head>
 <body>
 <section id="loginView" class="login-screen" lang="fr">
@@ -63,3 +66,4 @@
 </div>
 <dialog id="recordDialog" class="record-dialog"><header class="dialog-header"><div><p id="detailEyebrow" class="eyebrow"></p><h2 id="detailTitle">Registro</h2></div><button id="closeDialog" class="icon-button" aria-label="Cerrar ficha">×</button></header><div class="dialog-body"><button id="backCandidate" class="ghost" type="button" hidden>← Volver al candidato</button><p id="detailNotice" class="notice"></p><div id="detailMetadata" class="metadata"></div><form id="recordForm"><div id="formFields" class="form-grid"></div><div class="form-actions"><button id="saveRecord" class="primary" type="submit">Guardar cambios</button><button id="archiveRecord" class="danger" type="button" hidden>Archivar</button></div></form><p id="detailMessage" class="message" role="status" aria-live="polite"></p><section id="candidateRelated" hidden><h3>Expediente del candidato</h3><nav id="relatedTabs" class="tabs" aria-label="Apartados del expediente"></nav><div class="related-heading"><p id="relatedDescription" class="muted"></p><button id="addRelated" class="secondary" hidden>Añadir registro</button></div><div id="relatedMessage" class="message" role="status"></div><div id="relatedRows"></div><div class="pagination"><button id="relatedPrevious" class="ghost">Anterior</button><span id="relatedPage"></span><button id="relatedNext" class="ghost">Siguiente</button></div></section></div></dialog>
 </body></html>
+

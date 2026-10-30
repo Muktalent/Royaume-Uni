@@ -120,8 +120,58 @@ export function createCardMenu({url,display,qrImage,name,data={},slug,socials=[]
  function open(){menu.hidden=false;toggle.setAttribute('aria-expanded','true');box.classList.add('mk-open');document.addEventListener('pointerdown',onDoc);document.addEventListener('keydown',onKey);menu.querySelector('button')?.focus({preventScroll:true});}
  function close(){if(menu.hidden)return;menu.hidden=true;walletBox.hidden=true;toggle.setAttribute('aria-expanded','false');box.classList.remove('mk-open');document.removeEventListener('pointerdown',onDoc);document.removeEventListener('keydown',onKey);}
  toggle.onclick=()=>menu.hidden?open():close();
+ box.share=async()=>{try{if(navigator.share){await navigator.share({title:name+' · MUK Talent',text:name+' · '+(data.job_title||'MUK Talent'),url:safeUrl});}else await copyNow();}catch(e){if(e.name!=='AbortError')say(shown);}};
+ box.showQr=qrImage?()=>qrDialog({qrImage,display:shown,name}):null;
+ box.saveContact=()=>{const blob=new Blob([vcard({name,data,url:safeUrl,socials})],{type:'text/vcard;charset=utf-8'}),href=URL.createObjectURL(blob);download(href,fileName(name)+'.vcf');setTimeout(()=>URL.revokeObjectURL(href),1500);};
  box.openWallet=async()=>{if(menu.hidden)open();if(walletBox.hidden)await walletFlow();wallet.scrollIntoView({block:'nearest',behavior:'smooth'});};
  return box;
 }
 // Backwards compatible name used by older imports.
 export function createShareTools(options){return createCardMenu(options);}
+
+// ---- mk-profile-v1 · ClickCard-style face (logo, diagonal stripes, photo, angled name ribbon, contact rows) ----
+const okPhone=v=>{const p=String(v||'').replace(/[^\d+]/g,'');return /^\+?\d{6,16}$/.test(p)?p:null;};
+const okMail=v=>{const m=String(v||'').trim();return /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(m)?m:null;};
+export function createProfileCard({data={},photoUrl,link,socials=[],onSaveContact}={}){
+ const name=data.display_name||data.full_name||'MUK Talent',title=data.job_title||'Team member';
+ const card=E('article',undefined,'pc-card');card.setAttribute('aria-label',name+', '+title+' · MUK Talent digital business card');
+ const top=E('div',undefined,'pc-top'),logo=E('img',undefined,'pc-logo');logo.src='/book/muk-badge-logo.png';logo.alt='MUK Talent';logo.width=500;logo.height=291;logo.decoding='async';
+ const stripes=E('div',undefined,'pc-stripes');stripes.setAttribute('aria-hidden','true');for(let i=0;i<4;i++)stripes.append(E('i'));
+ top.append(logo,stripes);if(data.employee_code)top.append(E('span','ID '+data.employee_code,'pc-code'));
+ const photo=E('div',undefined,'pc-photo');photo.append(E('span',initials(name),'pc-initials'));
+ if(photoUrl){const img=E('img');img.alt='Photo of '+name;img.decoding='async';img.referrerPolicy='no-referrer';img.onload=()=>photo.classList.add('pc-has-photo');img.onerror=()=>img.remove();img.src=photoUrl;photo.append(img);}
+ const side=E('div',undefined,'pc-side-stripes');side.setAttribute('aria-hidden','true');side.append(E('i'),E('i'));photo.append(side);
+ if(onSaveContact){const add=E('button',undefined,'pc-add');add.type='button';add.setAttribute('aria-label','Save '+name+' to contacts');add.title='Save contact';add.append(icon('contact'));add.onclick=onSaveContact;photo.append(add);}
+ const ribbon=E('div',undefined,'pc-ribbon'),nameEl=E('h2',name.toUpperCase(),'pc-name');if(name.length>18)nameEl.classList.add('pc-name-long');ribbon.append(nameEl);
+ const band=E('div',undefined,'pc-band');band.append(E('span',title,'pc-title'));
+ const rows=E('dl',undefined,'pc-rows'),row=(label,value,href,external)=>{if(!value)return;const dt=E('dt',label),dd=E('dd');if(href){const a=E('a',value);a.href=href;if(external){a.target='_blank';a.rel='noopener noreferrer';}dd.append(a);}else dd.textContent=value;rows.append(dt,dd);};
+ const phone=okPhone(data.contact_phone),mail=okMail(data.contact_email),shown=link?.display||data.short_display;
+ row('Phone',phone?data.contact_phone:null,phone?'tel:'+phone:null);row('Email',mail,mail?'mailto:'+mail:null);row('Card',shown||'muktalent.com',link?.url||null,true);row('Based in',data.assigned_city||'United Kingdom');
+ const foot=E('div',undefined,'pc-foot');const list=createSocialLinks(socials,name);list.classList.add('pc-socials');if(list.children.length)foot.append(list);else foot.append(E('span','muktalent.com','pc-site'));
+ card.append(top,photo,ribbon,band,rows,foot);return card;
+}
+// Two faces of the same card: ClickCard-style profile (default) and the existing ID badge.
+export function createCardFaces({data={},photoUrl,link,socials=[],onSaveContact,initial='profile'}={}){
+ const wrap=E('div',undefined,'pc-faces'),sw=E('div',undefined,'pc-switch');sw.setAttribute('role','tablist');sw.setAttribute('aria-label','Card style');
+ const faces={profile:createProfileCard({data,photoUrl,link,socials,onSaveContact}),badge:createBusinessCard({data,photoUrl,link})};
+ const stage=E('div',undefined,'pc-face-stage');const buttons={};
+ const show=key=>{for(const [k,b]of Object.entries(buttons)){b.setAttribute('aria-selected',String(k===key));b.tabIndex=k===key?0:-1;}faces.profile.hidden=key!=='profile';faces.badge.hidden=key!=='badge';wrap.dataset.face=key;try{localStorage.setItem('mk-face',key);}catch{}};
+ for(const [k,label]of [['profile','Card'],['badge','ID badge']]){const b=E('button',label,'pc-switch-btn');b.type='button';b.setAttribute('role','tab');b.onclick=()=>show(k);buttons[k]=b;sw.append(b);}
+ stage.append(faces.profile,faces.badge);wrap.append(stage,sw);let start=initial;try{start=localStorage.getItem('mk-face')||initial;}catch{}show(start==='badge'?'badge':'profile');return wrap;
+}
+// Wallet / Share / QR tiles above the card (ClickCard top buttons).
+export function createActionTiles(menu,{onEdit}={}){
+ const row=E('div',undefined,'pc-tiles'),tile=(ic,label,fn)=>{const b=E('button',undefined,'pc-tile');b.type='button';b.append(icon(ic),E('span',label));b.onclick=fn;row.append(b);return b;};
+ tile('wallet','Wallet',()=>menu.openWallet?.());tile('share','Share',()=>menu.share?.());if(menu.showQr)tile('qr','QR code',()=>menu.showQr());else tile('contact','Save',()=>menu.saveContact?.());if(onEdit)tile('edit','Edit',onEdit);
+ return row;
+}
+// Preview of how the pass looks once saved to Google / Apple Wallet.
+export function createWalletPreview({data={},photoUrl,qrImage,display}={}){
+ const name=data.display_name||data.full_name||'MUK Talent',pass=E('figure',undefined,'pc-pass');pass.setAttribute('aria-label','Wallet pass preview');
+ const head=E('div',undefined,'pc-pass-head'),av=E('span',undefined,'pc-pass-avatar');if(photoUrl){const i=E('img');i.alt='';i.src=photoUrl;i.referrerPolicy='no-referrer';i.onerror=()=>i.remove();av.append(i);}else av.append(E('b',initials(name)));head.append(av,E('span',name.split(/\s+/)[0]+' · MUK Talent'));
+ const body=E('div',undefined,'pc-pass-body');body.append(E('small',(data.job_title||'MUK Talent')),E('strong',name));
+ const qr=E('div',undefined,'pc-pass-qr');if(qrImage){const q=E('img');q.src=qrImage;q.alt='QR code';q.width=q.height=150;qr.append(q);}else qr.append(E('span','QR','pc-pass-qr-empty'));
+ const row=E('div',undefined,'pc-pass-row');for(const [k,v]of [['Territory',data.assigned_city||'United Kingdom'],['Staff ID',data.employee_code||'—']]){const c=E('div');c.append(E('small',k),E('b',v));row.append(c);}
+ const foot=E('div',undefined,'pc-pass-foot'),logo=E('img');logo.src='/book/muk-badge-logo.png';logo.alt='MUK Talent';logo.width=120;logo.height=70;foot.append(logo,E('span','Your digital business card'));
+ pass.append(head,body,row,qr,E('p',display||'muktalent.com','pc-pass-link'),foot);return pass;
+}

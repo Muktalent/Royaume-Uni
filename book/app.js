@@ -1,4 +1,4 @@
-import {createBusinessCard,createCardMenu,createSocialLinks,createContactChips,E} from './business-card.js';
+import {createBusinessCard,createCardFaces,createCardMenu,createSocialLinks,createContactChips,E} from './business-card.js';
 const $=id=>document.getElementById(id);
 // Card identifier: short link (/laura) or legacy long link (/book/?c=<id>).
 function cardIdentifier(){const c=new URLSearchParams(location.search).get('c');if(c)return /^[0-9a-f-]{36}$/i.test(c)?c.toLowerCase():null;const m=/^\/([a-zA-Z0-9][a-zA-Z0-9-]{1,28}[a-zA-Z0-9])\/?$/.exec(location.pathname);return m&&m[1].toLowerCase()!=='book'?m[1].toLowerCase():null;}
@@ -23,9 +23,9 @@ phone.addEventListener('input',()=>{phone.setCustomValidity('');});code.addEvent
 phone.addEventListener('paste',event=>{const text=event.clipboardData?.getData('text')?.trim()||'';if(!/^(\+|00)/.test(text))return;const digits=text.replace(/^00/,'').replace(/\D/g,'');const match=[...countries].sort((a,b)=>b[2].length-a[2].length).find(c=>digits.startsWith(c[2]));if(match){event.preventDefault();code.value=match[0];phone.value=digits.slice(match[2].length);phone.setCustomValidity('');}});
 async function initialise(){if(!slug){$('publicIdentity').replaceChildren();message('This business card link is incomplete.');return;}try{const result=await request('/api/business-card/'+encodeURIComponent(slug));const data=result.data;if(data.slug)slug=data.slug;let qr=null;try{qr=await request('/api/business-card/'+encodeURIComponent(slug)+'/qr');}catch(error){/* Keep the business card visible even if its QR is temporarily rate-limited. */}
  const name=data.display_name||'MUK Talent',socials=Array.isArray(data.socials)?data.socials:[],shareUrl=data.short_url||qr?.url||location.href;document.title=name+' · MUK Talent';
- $('publicIdentity').replaceChildren(createBusinessCard({data,photoUrl:'/api/counsellor/'+encodeURIComponent(slug)+'/photo',link:{display:data.short_display}}));
  const social=E('div',undefined,'public-social');social.append(createSocialLinks(socials.filter(s=>s.platform!=='whatsapp'),name),createContactChips(data,socials));$('cardSocial').replaceChildren(social);
  const menu=createCardMenu({url:shareUrl,display:data.short_display,qrImage:qr?.image,name,data,slug,socials});$('cardTools').replaceChildren(menu);
+ $('publicIdentity').replaceChildren(createCardFaces({data,photoUrl:'/api/counsellor/'+encodeURIComponent(slug)+'/photo',link:{display:data.short_display,url:shareUrl},socials,onSaveContact:()=>menu.saveContact()}));
  $('ctaBook').onclick=()=>$('openBooking').click();$('ctaWallet').onclick=()=>menu.openWallet?.();$('cardActions').hidden=false;
  if(data.bio||data.languages){const about=$('cardAbout');about.replaceChildren(E('h2','About '+name.split(/\s+/)[0],'public-about-title'));if(data.bio)about.append(E('p',data.bio,'public-about-bio'));if(data.languages)about.append(E('p','Languages · '+data.languages,'public-about-meta'));about.hidden=false;}
  try{const short=data.short_url&&new URL(data.short_url);if(short&&short.origin===location.origin&&location.pathname.startsWith('/book'))history.replaceState(null,'',short.pathname);}catch{}

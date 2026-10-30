@@ -5,8 +5,8 @@
   "start_url": "/admin/",
   "scope": "/admin/",
   "display": "standalone",
-  "background_color": "#0d0f11",
-  "theme_color": "#111518",
+  "background_color": "#efe8dc",
+  "theme_color": "#efe8dc",
   "icons": [
     {
       "src": "/assets/logo.png",
@@ -14,3 +14,5 @@
     }
   ]
 }
+
+

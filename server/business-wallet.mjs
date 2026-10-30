@@ -82,16 +82,18 @@ async function googleSave(card){
  uris.push({id:'card',uri:d.url,description:'Open business card · Share · Add to Wallet'});
  for(const x of d.socials)if(x.platform!=='whatsapp'&&uris.length<9)uris.push({id:'social_'+x.platform,uri:x.url,description:x.label});
  uris.push({id:'site',uri:'https://muktalent.com',description:'muktalent.com'});
- const body={id,classId:config.classId,genericType:'GENERIC_OTHER',state:'ACTIVE',hexBackgroundColor:'#161616',
-  cardTitle:localized('MUK TALENT'),header:localized(card.display_name),subheader:localized((card.job_title||'MUK Talent').toUpperCase()),
-  logo:image(asset('logo.png?style=gold-v7'),'MUK Talent'),wideLogo:image(asset('wide-logo.png?style=gold-v7'),'MUK Talent · Maghreb UK Talent'),
+ // v8 · ClickCard layout: avatar + "Name · MUK Talent" header row, title label, big name, QR, black brand hero with gold stripe.
+ const first=String(card.display_name||'MUK Talent').trim().split(/\s+/)[0];
+ const body={id,classId:config.classId,genericType:'GENERIC_OTHER',state:'ACTIVE',hexBackgroundColor:'#111111',
+  cardTitle:localized(first+' · MUK Talent'),header:localized(card.display_name),subheader:localized(card.job_title||'MUK Talent'),
+  logo:image(d.photo?asset('avatar.png?v='+d.photo.id+'&style=soft-v8'):asset('logo.png?style=gold-v7'),card.display_name),
   barcode:{type:'QR_CODE',value:d.url,alternateText:d.display},
-  heroImage:image(asset('portrait.png?v='+(d.photo?.id||'none')+'&style=badge-v7'),card.display_name+' · MUK Talent'),
+  heroImage:image(asset('brand.png?style=soft-v8'),'MUK Talent · Your digital business card'),
   textModulesData:text,linksModuleData:{uris}};
  // An actual public deployment is required; do not replace images with expiring URLs or localhost.
- await walletPublicImage(body.logo.sourceUri.uri,'public_logo');
+ try{await walletPublicImage(body.logo.sourceUri.uri,d.photo?'public_photo':'public_logo');}catch(error){if(!d.photo)throw error;body.logo=image(asset('logo.png?style=gold-v7'),'MUK Talent');await walletPublicImage(body.logo.sourceUri.uri,'public_logo');}
  // Decorative images are optional: if Google could not fetch them, issue the pass without them instead of failing.
- for(const key of ['wideLogo','heroImage']){try{await walletPublicImage(body[key].sourceUri.uri,key==='heroImage'?'public_photo':'public_logo');}catch(error){delete body[key];console.warn(JSON.stringify({event:'wallet_optional_image_skipped',image:key,reason:walletSafeReason(error.message)}));}}
+ for(const key of ['heroImage']){try{await walletPublicImage(body[key].sourceUri.uri,key==='heroImage'?'public_photo':'public_logo');}catch(error){delete body[key];console.warn(JSON.stringify({event:'wallet_optional_image_skipped',image:key,reason:walletSafeReason(error.message)}));}}
  const token=await oauth(config),headers={Authorization:'Bearer '+token,'Content-Type':'application/json'},selector=id=>({firstValue:{fields:[{fieldPath:"object.textModulesData['"+id+"']"}]}});
  // Front of the card: Territory | Staff ID, then the short link. MULTIPLE_HOLDERS lets every partner save the same card.
  const template={multipleDevicesAndHoldersAllowedStatus:'MULTIPLE_HOLDERS',hexBackgroundColor:'#161616',classTemplateInfo:{cardTemplateOverride:{cardRowTemplateInfos:[{twoItems:{startItem:selector('territory'),endItem:selector(d.code?'staff_id':'link')}},...(card.contact_phone?[{twoItems:{startItem:selector('phone'),endItem:selector('link')}}]:d.code?[{oneItem:{item:selector('link')}}]:[])]}}};
@@ -158,6 +160,8 @@ res.status(error instanceof z.ZodError?400:503).json({error:imageError?'Wallet l
  const png=(res,bytes,age=86400)=>{res.set('Content-Type','image/png');res.set('X-Content-Type-Options','nosniff');res.set('Cache-Control','public, max-age='+age);res.send(bytes);};
  app.get('/api/business-card/:slug/wallet/wide-logo.png',imageLimit,handle(async(req,res)=>png(res,await walletImage('google-wide-logo.png',[1280,400]))));
  app.get('/api/business-card/:slug/wallet/logo.png',imageLimit,handle(async(req,res,card)=>{const bytes=await walletImage('google-logo.png',[660,660]);res.set('Content-Type','image/png');res.set('X-Content-Type-Options','nosniff');res.set('Cache-Control','public, max-age=300');res.send(bytes);}));
+ app.get('/api/business-card/:slug/wallet/brand.png',imageLimit,handle(async(req,res)=>png(res,await walletImage('hero-brand.png',[1032,336]))));
+ app.get('/api/business-card/:slug/wallet/avatar.png',imageLimit,handle(async(req,res,card)=>{const bytes=await avatarBytes(card);if(!bytes)return png(res,await walletImage('google-logo.png',[660,660]));const sharp=(await import('sharp')).default;png(res,await sharp(bytes,{limitInputPixels:16000000}).rotate().resize(660,660,{fit:'cover',position:'attention'}).flatten({background:'#111111'}).png().toBuffer());}));
  app.get('/api/business-card/:slug/wallet/portrait.png',imageLimit,handle(async(req,res,card)=>{const bytes=await googlePortraitImage(card);if(!bytes)return res.sendStatus(404);res.set('Content-Type','image/png');res.set('X-Content-Type-Options','nosniff');res.set('Cache-Control','public, max-age=300');res.send(bytes);}));
  app.get('/api/business-card/:slug/wallet',limit,handle(async(req,res,card)=>res.json({version:2,...capabilities(),appleUrl:'/api/business-card/'+card.slug+'/wallet/apple.pkpass',googleEndpoint:'/api/business-card/'+card.slug+'/wallet/google'})));
  app.post('/api/business-card/:slug/wallet/google',limit,handle(async(req,res,card)=>res.json({url:await googleSave(card)})));

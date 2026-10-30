@@ -29,3 +29,6 @@ main{max-width:460px;padding:26px 20px 70px}
 @media(max-width:420px){.public-actions{width:min(100%,340px)}}
 @media(max-width:330px){.public-actions{grid-template-columns:1fr}}
 body:has(#cardActions:not([hidden])) #openBooking{display:none!important}
+/* ClickCard face already shows the social icons */
+#publicIdentity:has(.pc-faces[data-face=profile])~#cardSocial .mk-socials{display:none}
+#publicIdentity .pc-switch{color:#efe6d2}

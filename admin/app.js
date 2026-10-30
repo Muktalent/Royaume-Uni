@@ -147,6 +147,14 @@ function mountAdminExperience({ api: api2, getState, openRecord: openRecord2 }) 
   }
   new MutationObserver(caseAction).observe(recordDialog, { childList: true, subtree: true });
 }
+function demoRows(stages) {
+  const unis = ["University of Leeds", "Coventry University", "University of Manchester", "Cardiff University", "University of Glasgow", "Northumbria University", "University of Kent", "Ulster University", "Queen Mary University of London", "University of Sussex", "University of Portsmouth", "University of Hertfordshire"], courses = ["MSc Data Science", "BSc Business Management", "LLM International Law", "MSc Cyber Security", "BEng Civil Engineering", "MBA", "BA Marketing", "MSc Finance", "International Foundation Year", "MA Education", "MSc Nursing", "BSc Computer Science"], levels = ["postgraduate", "undergraduate", "postgraduate", "postgraduate", "undergraduate", "postgraduate", "undergraduate", "postgraduate", "foundation", "postgraduate", "postgraduate", "undergraduate"], names = [["Amine", "B."], ["Salma", "E."], ["Youssef", "K."], ["Imane", "R."], ["Omar", "H."], ["Nadia", "T."], ["Karim", "M."], ["Lina", "A."], ["Hamza", "Z."], ["Sara", "O."], ["Mehdi", "L."], ["Rania", "F."]], steps = ["Profile assessment call", "Upload passport and transcripts", "Personal statement review", "Await university decision", "Offer accepted \xB7 CAS request", "Pay tuition deposit", "Enrolled \xB7 pre-arrival briefing", "Waiting for IELTS result", "Student chose another route"];
+  const now = Date.now();
+  return names.map(([f, l], i) => {
+    const st = stages[i % stages.length];
+    return { candidate_id: "demo-" + i, reference: "MT-DEMO-" + String(101 + i), first_name: f, last_name: l, email: "\u2014", whatsapp_phone_e164: "\u2014", owner_name: ["Laura M.", "Yassine B.", "Kenza A."][i % 3], residence_city: ["Casablanca", "Rabat", "Marrakech", "F\xE8s", "Tanger", "Agadir"][i % 6], next_action: steps[i % steps.length], next_action_at: new Date(now + (i + 1) * 864e5 * 2).toISOString(), budget_amount: [12e3, 15e3, 18e3, 22e3][i % 4], budget_currency: "GBP", stage: st, target_study_level: levels[i], subject_interest: courses[i].replace(/^(MSc|BSc|LLM|BEng|BA|MA|MBA) ?/, "") || "Business", intended_intake: ["September 2027", "January 2027", "September 2027"][i % 3], target_university: unis[i], target_course: courses[i], english_test: ["IELTS", "IELTS", "Duolingo", "PTE"][i % 4], english_score: ["6.5", "7.0", "6.0", "6.5"][i % 4], passport: i % 3 ? "Ready" : "In progress", school_status: i % 4 ? "Completed" : "Final year", funding: ["Family funded", "Scholarship applied", "Self funded", "Loan in progress"][i % 4], external_next_step: steps[i % steps.length], case_accepted_at: new Date(now - (i + 3) * 864e5 * 4).toISOString(), last_updated: new Date(now - i * 864e5).toISOString() };
+  });
+}
 async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord2, host }) {
   let page = 1, query = "", stage = "", mode = "internal", result = null, busy = false, selected = /* @__PURE__ */ new Set(), loadEpoch = 0;
   host.replaceChildren();
@@ -196,8 +204,11 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
   });
   tabs.append(internal, external);
   host.append(tabs);
+  const board = E("div", void 0, "admin-stage-board");
+  host.append(board);
   const summary = E("div", void 0, "admin-report-summary"), selection = E("p", "", "muted"), actions = E("div", void 0, "admin-report-actions");
   actions.append(button("Seleccionar esta p\xE1gina", () => {
+    if (demo) return;
     for (const r of result?.data || []) {
       if (selected.size >= 300) break;
       selected.add(r.candidate_id);
@@ -208,8 +219,16 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
     paint();
   }), button("Exportar selecci\xF3n (.xlsx)", () => exportRows()), button("Crear enlace para partner", () => share()), button("Enlaces compartidos", () => shares()));
   host.append(summary, selection, actions);
-  const warning = E("p", "", "admin-report-warning"), sheet = E("div", void 0, "admin-sheet-wrap"), pager = E("div", void 0, "pagination");
-  host.append(warning, sheet, pager);
+  const warning = E("p", "", "admin-report-warning"), sheet = E("div", void 0, "admin-sheet-wrap"), pager = E("div", void 0, "pagination"), legend = E("div", void 0, "admin-legend"), demoBanner = E("p", "EJEMPLO \xB7 datos ficticios para presentaciones. No se pueden exportar ni compartir.", "admin-demo-banner");
+  demoBanner.hidden = true;
+  let demo = false;
+  const demoBtn = button("Ver hoja de ejemplo", () => {
+    demo = !demo;
+    if (demo) selected.clear();
+    paint();
+  });
+  tabs.append(demoBtn);
+  host.append(warning, legend, demoBanner, sheet, pager);
   function message2(text, error = false) {
     if (!host.isConnected) return;
     notice.textContent = text;
@@ -251,24 +270,64 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
     selection.textContent = selected.size + " casos seleccionados; la selecci\xF3n puede abarcar varias p\xE1ginas. Al cambiar filtros se limpia.";
     warning.textContent = mode === "partners" ? "Vista externa: sin nombres, tel\xE9fonos, correos ni notas internas. Las referencias siguen siendo datos seudonimizados, no una garant\xEDa de anonimato. Revisa tambi\xE9n los textos de curso y pr\xF3ximo paso antes de compartir." : "Vista interna confidencial. La etapa acad\xE9mica de la pipeline es independiente del estado operativo del lead.";
     sheet.replaceChildren();
-    const table = E("table"), caption = E("caption", "MUK Talent \xB7 " + (mode === "partners" ? "Partner pipeline briefing" : "Internal case pipeline"));
+    sheet.dataset.mode = mode;
+    const meta = result.stage_meta || {}, tone = (st) => meta[st]?.tone || "grey", statusOf = (st) => meta[st]?.status || "\u2014";
+    board.replaceChildren();
+    for (const st of result.stages) {
+      const n = result.stage_counts?.[st];
+      const b = E("button", void 0, "admin-stage-card");
+      b.type = "button";
+      b.dataset.tone = tone(st);
+      if (stage === st) b.classList.add("active");
+      b.append(E("span", statusOf(st), "admin-stage-status"), E("strong", n == null ? "\u2014" : String(n)), E("small", st));
+      b.onclick = () => {
+        if (busy) return;
+        stage = stage === st ? "" : st;
+        status.value = stage;
+        page = 1;
+        selected.clear();
+        load();
+      };
+      board.append(b);
+    }
+    legend.replaceChildren();
+    for (const [label2, meaning] of result.status_legend || []) {
+      const st = Object.keys(meta).find((k) => meta[k].status === label2);
+      const item = E("span", void 0, "admin-legend-item");
+      item.title = meaning;
+      item.append(E("i", void 0, "admin-dot"), E("span", label2));
+      item.dataset.tone = tone(st);
+      legend.append(item);
+    }
+    const rows = demo ? demoRows(result.stages) : result.data;
+    demoBtn.textContent = demo ? "Salir del ejemplo" : "Ver hoja de ejemplo";
+    demoBanner.hidden = !demo;
+    const table = E("table", void 0, "admin-sheet"), caption = E("caption", "MUK Talent \xB7 " + (mode === "partners" ? "Partner pipeline briefing" : "Internal case pipeline"));
     caption.className = "sr-only";
     table.append(caption);
     const head2 = E("thead"), tr = E("tr");
-    tr.append(E("th", "Seleccionar"));
-    const columns = result.columns[mode];
-    for (const [, label2] of columns) {
+    const base = result.columns[mode], columns = [...base.filter((c) => c[0] === "reference"), ...base.filter((c) => c[0] === "stage"), ["__status", "Status"], ...base.filter((c) => c[0] !== "reference" && c[0] !== "stage")];
+    const sel = E("th", "");
+    sel.className = "admin-col-select";
+    sel.setAttribute("aria-label", "Seleccionar");
+    tr.append(E("th", "#", "admin-col-num"), sel);
+    for (const [key, label2] of columns) {
       const th = E("th", label2);
       th.scope = "col";
+      if (key === "reference") th.className = "admin-col-ref";
       tr.append(th);
     }
     tr.append(E("th", "Gesti\xF3n"));
     head2.append(tr);
     const body = E("tbody");
-    for (const row of result.data) {
-      const line = E("tr"), cell = E("td"), check = E("input");
+    rows.forEach((row, index) => {
+      const line = E("tr");
+      line.dataset.tone = tone(row.stage);
+      line.append(E("td", String((page - 1) * 50 + index + 1), "admin-col-num"));
+      const cell = E("td", void 0, "admin-col-select"), check = E("input");
       check.type = "checkbox";
-      check.checked = selected.has(row.candidate_id);
+      check.disabled = demo;
+      check.checked = !demo && selected.has(row.candidate_id);
       check.setAttribute("aria-label", "Seleccionar " + row.reference);
       check.onchange = () => {
         if (check.checked && selected.size >= 300) {
@@ -284,18 +343,40 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
       line.append(cell);
       for (const [key] of columns) {
         const td = E("td");
-        if (key === "stage") td.append(E("span", row.stage, "admin-stage-badge"));
-        else td.textContent = display(row[key], key);
+        if (key === "stage") {
+          const b = E("span", row.stage, "admin-stage-badge");
+          b.dataset.tone = tone(row.stage);
+          td.append(b);
+        } else if (key === "__status") {
+          const b = E("span", statusOf(row.stage), "admin-status-pill");
+          b.dataset.tone = tone(row.stage);
+          td.append(b);
+        } else {
+          td.textContent = display(row[key], key);
+          if (key === "reference") td.className = "admin-col-ref";
+        }
         line.append(td);
       }
       const control = E("td");
-      control.append(button("Gestionar", () => manage(row)), button("Expediente", () => openRecord2("candidates", row.candidate_id)));
+      if (demo) control.append(E("span", "Ejemplo", "admin-demo-tag"));
+      else control.append(button("Gestionar", () => manage(row)), button("Expediente", () => openRecord2("candidates", row.candidate_id)));
       line.append(control);
+      body.append(line);
+    });
+    if (!rows.length) for (let r = 0; r < 10; r++) {
+      const line = E("tr", void 0, "admin-sheet-ghost");
+      line.append(E("td", String(r + 1), "admin-col-num"), E("td", "", "admin-col-select"));
+      for (const [key] of columns) line.append(E("td", "", key === "reference" ? "admin-col-ref" : void 0));
+      line.append(E("td", ""));
       body.append(line);
     }
     table.append(head2, body);
     sheet.append(table);
-    if (!result.data.length) sheet.append(E("p", "Todav\xEDa no hay casos aceptados con estos filtros. Acepta un lead real o crea un caso manual desde administraci\xF3n.", "admin-report-empty"));
+    if (!rows.length) {
+      const empty = E("div", void 0, "admin-report-empty");
+      empty.append(E("strong", "Hoja lista \xB7 a\xFAn sin casos aceptados"), E("span", "Acepta un lead real, crea un caso manual o pulsa \xABVer hoja de ejemplo\xBB para ense\xF1ar la pipeline a una universidad."));
+      sheet.append(empty);
+    }
     pager.replaceChildren();
     const prev = button("Anterior", () => {
       if (busy) return;
@@ -311,6 +392,10 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
     pager.append(E("span", "P\xE1gina " + page + " de " + Math.max(1, Math.ceil(result.total / 50))), prev, next);
   }
   async function exportRows() {
+    if (demo) {
+      message2("La hoja de ejemplo no se exporta. Sal del ejemplo para exportar casos reales.", true);
+      return;
+    }
     if (!selected.size) {
       message2("Selecciona los casos que quieres exportar.", true);
       return;
@@ -432,6 +517,10 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
     };
   }
   function share() {
+    if (demo) {
+      message2("La hoja de ejemplo no se comparte.", true);
+      return;
+    }
     if (!selected.size) {
       message2("Selecciona los casos y revisa la vista externa antes de compartir.", true);
       return;
@@ -21505,12 +21594,199 @@ function createCardMenu({ url, display: display2, qrImage, name, data = {}, slug
     document.removeEventListener("keydown", onKey);
   }
   toggle.onclick = () => menu.hidden ? open() : close();
+  box.share = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: name + " \xB7 MUK Talent", text: name + " \xB7 " + (data.job_title || "MUK Talent"), url: safeUrl });
+      } else await copyNow();
+    } catch (e) {
+      if (e.name !== "AbortError") say(shown);
+    }
+  };
+  box.showQr = qrImage ? () => qrDialog({ qrImage, display: shown, name }) : null;
+  box.saveContact = () => {
+    const blob = new Blob([vcard({ name, data, url: safeUrl, socials })], { type: "text/vcard;charset=utf-8" }), href = URL.createObjectURL(blob);
+    download(href, fileName(name) + ".vcf");
+    setTimeout(() => URL.revokeObjectURL(href), 1500);
+  };
   box.openWallet = async () => {
     if (menu.hidden) open();
     if (walletBox.hidden) await walletFlow();
     wallet.scrollIntoView({ block: "nearest", behavior: "smooth" });
   };
   return box;
+}
+var okPhone = (v) => {
+  const p = String(v || "").replace(/[^\d+]/g, "");
+  return /^\+?\d{6,16}$/.test(p) ? p : null;
+};
+var okMail = (v) => {
+  const m = String(v || "").trim();
+  return /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(m) ? m : null;
+};
+function createProfileCard({ data = {}, photoUrl, link, socials = [], onSaveContact } = {}) {
+  const name = data.display_name || data.full_name || "MUK Talent", title = data.job_title || "Team member";
+  const card = E2("article", void 0, "pc-card");
+  card.setAttribute("aria-label", name + ", " + title + " \xB7 MUK Talent digital business card");
+  const top = E2("div", void 0, "pc-top"), logo = E2("img", void 0, "pc-logo");
+  logo.src = "/book/muk-badge-logo.png";
+  logo.alt = "MUK Talent";
+  logo.width = 500;
+  logo.height = 291;
+  logo.decoding = "async";
+  const stripes = E2("div", void 0, "pc-stripes");
+  stripes.setAttribute("aria-hidden", "true");
+  for (let i = 0; i < 4; i++) stripes.append(E2("i"));
+  top.append(logo, stripes);
+  if (data.employee_code) top.append(E2("span", "ID " + data.employee_code, "pc-code"));
+  const photo = E2("div", void 0, "pc-photo");
+  photo.append(E2("span", initials(name), "pc-initials"));
+  if (photoUrl) {
+    const img = E2("img");
+    img.alt = "Photo of " + name;
+    img.decoding = "async";
+    img.referrerPolicy = "no-referrer";
+    img.onload = () => photo.classList.add("pc-has-photo");
+    img.onerror = () => img.remove();
+    img.src = photoUrl;
+    photo.append(img);
+  }
+  const side = E2("div", void 0, "pc-side-stripes");
+  side.setAttribute("aria-hidden", "true");
+  side.append(E2("i"), E2("i"));
+  photo.append(side);
+  if (onSaveContact) {
+    const add = E2("button", void 0, "pc-add");
+    add.type = "button";
+    add.setAttribute("aria-label", "Save " + name + " to contacts");
+    add.title = "Save contact";
+    add.append(icon("contact"));
+    add.onclick = onSaveContact;
+    photo.append(add);
+  }
+  const ribbon = E2("div", void 0, "pc-ribbon"), nameEl = E2("h2", name.toUpperCase(), "pc-name");
+  if (name.length > 18) nameEl.classList.add("pc-name-long");
+  ribbon.append(nameEl);
+  const band = E2("div", void 0, "pc-band");
+  band.append(E2("span", title, "pc-title"));
+  const rows = E2("dl", void 0, "pc-rows"), row = (label2, value, href, external) => {
+    if (!value) return;
+    const dt = E2("dt", label2), dd = E2("dd");
+    if (href) {
+      const a = E2("a", value);
+      a.href = href;
+      if (external) {
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+      }
+      dd.append(a);
+    } else dd.textContent = value;
+    rows.append(dt, dd);
+  };
+  const phone = okPhone(data.contact_phone), mail = okMail(data.contact_email), shown = link?.display || data.short_display;
+  row("Phone", phone ? data.contact_phone : null, phone ? "tel:" + phone : null);
+  row("Email", mail, mail ? "mailto:" + mail : null);
+  row("Card", shown || "muktalent.com", link?.url || null, true);
+  row("Based in", data.assigned_city || "United Kingdom");
+  const foot = E2("div", void 0, "pc-foot");
+  const list = createSocialLinks(socials, name);
+  list.classList.add("pc-socials");
+  if (list.children.length) foot.append(list);
+  else foot.append(E2("span", "muktalent.com", "pc-site"));
+  card.append(top, photo, ribbon, band, rows, foot);
+  return card;
+}
+function createCardFaces({ data = {}, photoUrl, link, socials = [], onSaveContact, initial = "profile" } = {}) {
+  const wrap = E2("div", void 0, "pc-faces"), sw = E2("div", void 0, "pc-switch");
+  sw.setAttribute("role", "tablist");
+  sw.setAttribute("aria-label", "Card style");
+  const faces = { profile: createProfileCard({ data, photoUrl, link, socials, onSaveContact }), badge: createBusinessCard({ data, photoUrl, link }) };
+  const stage = E2("div", void 0, "pc-face-stage");
+  const buttons = {};
+  const show = (key) => {
+    for (const [k, b] of Object.entries(buttons)) {
+      b.setAttribute("aria-selected", String(k === key));
+      b.tabIndex = k === key ? 0 : -1;
+    }
+    faces.profile.hidden = key !== "profile";
+    faces.badge.hidden = key !== "badge";
+    wrap.dataset.face = key;
+    try {
+      localStorage.setItem("mk-face", key);
+    } catch {
+    }
+  };
+  for (const [k, label2] of [["profile", "Card"], ["badge", "ID badge"]]) {
+    const b = E2("button", label2, "pc-switch-btn");
+    b.type = "button";
+    b.setAttribute("role", "tab");
+    b.onclick = () => show(k);
+    buttons[k] = b;
+    sw.append(b);
+  }
+  stage.append(faces.profile, faces.badge);
+  wrap.append(stage, sw);
+  let start = initial;
+  try {
+    start = localStorage.getItem("mk-face") || initial;
+  } catch {
+  }
+  show(start === "badge" ? "badge" : "profile");
+  return wrap;
+}
+function createActionTiles(menu, { onEdit } = {}) {
+  const row = E2("div", void 0, "pc-tiles"), tile = (ic, label2, fn) => {
+    const b = E2("button", void 0, "pc-tile");
+    b.type = "button";
+    b.append(icon(ic), E2("span", label2));
+    b.onclick = fn;
+    row.append(b);
+    return b;
+  };
+  tile("wallet", "Wallet", () => menu.openWallet?.());
+  tile("share", "Share", () => menu.share?.());
+  if (menu.showQr) tile("qr", "QR code", () => menu.showQr());
+  else tile("contact", "Save", () => menu.saveContact?.());
+  if (onEdit) tile("edit", "Edit", onEdit);
+  return row;
+}
+function createWalletPreview({ data = {}, photoUrl, qrImage, display: display2 } = {}) {
+  const name = data.display_name || data.full_name || "MUK Talent", pass = E2("figure", void 0, "pc-pass");
+  pass.setAttribute("aria-label", "Wallet pass preview");
+  const head2 = E2("div", void 0, "pc-pass-head"), av = E2("span", void 0, "pc-pass-avatar");
+  if (photoUrl) {
+    const i = E2("img");
+    i.alt = "";
+    i.src = photoUrl;
+    i.referrerPolicy = "no-referrer";
+    i.onerror = () => i.remove();
+    av.append(i);
+  } else av.append(E2("b", initials(name)));
+  head2.append(av, E2("span", name.split(/\s+/)[0] + " \xB7 MUK Talent"));
+  const body = E2("div", void 0, "pc-pass-body");
+  body.append(E2("small", data.job_title || "MUK Talent"), E2("strong", name));
+  const qr = E2("div", void 0, "pc-pass-qr");
+  if (qrImage) {
+    const q2 = E2("img");
+    q2.src = qrImage;
+    q2.alt = "QR code";
+    q2.width = q2.height = 150;
+    qr.append(q2);
+  } else qr.append(E2("span", "QR", "pc-pass-qr-empty"));
+  const row = E2("div", void 0, "pc-pass-row");
+  for (const [k, v] of [["Territory", data.assigned_city || "United Kingdom"], ["Staff ID", data.employee_code || "\u2014"]]) {
+    const c = E2("div");
+    c.append(E2("small", k), E2("b", v));
+    row.append(c);
+  }
+  const foot = E2("div", void 0, "pc-pass-foot"), logo = E2("img");
+  logo.src = "/book/muk-badge-logo.png";
+  logo.alt = "MUK Talent";
+  logo.width = 120;
+  logo.height = 70;
+  foot.append(logo, E2("span", "Your digital business card"));
+  pass.append(head2, body, row, qr, E2("p", display2 || "muktalent.com", "pc-pass-link"), foot);
+  return pass;
 }
 
 // admin-src/professional-workspace.js
@@ -22178,17 +22454,32 @@ async function renderCardStudio({ host, api: api2, owner, readOnly, directory, o
   if (!host.isConnected) return;
   const data = cardData(d);
   if (qr?.handle) data.short_display = qr.display;
-  stage.append(createBusinessCard({ data, photoUrl: d.avatar_url, link: { display: data.short_display } }));
   const socials = Array.isArray(d.socials) ? d.socials : [];
-  if (socials.length) stage.append(createSocialLinks(socials, d.full_name));
-  let editor;
+  let editor, menu = null;
   if (qr) {
     const extras = readOnly ? [] : [{ icon: "edit", label: "Edit short link", hint: "Choose muktalent.com/your-name", onSelect: () => {
       editor?.focus();
       editor?.scrollIntoView({ block: "center", behavior: "smooth" });
     } }, { icon: "users", label: "Edit social links", hint: "LinkedIn, Instagram, TikTok\u2026", onSelect: () => openTab("social") }];
-    stage.append(createCardMenu({ url: qr.url, display: qr.display, qrImage: qr.image, name: d.full_name, data, slug: qr.slug, socials, showOpen: true, extras }));
-  } else stage.append(E5("p", "Preview only. Your administrator will publish your card once your professional details are ready. You can already reserve your short link.", "cs-note"));
+    menu = createCardMenu({ url: qr.url, display: qr.display, qrImage: qr.image, name: d.full_name, data, slug: qr.slug, socials, showOpen: true, extras });
+  }
+  if (menu) stage.append(createActionTiles(menu, { onEdit: readOnly ? null : () => openTab("profile") }));
+  stage.append(createCardFaces({ data, photoUrl: d.avatar_url, link: { display: data.short_display, url: qr?.url }, socials, onSaveContact: menu ? () => menu.saveContact() : null }));
+  if (socials.length) {
+    const list = createSocialLinks(socials, d.full_name);
+    list.classList.add("cs-badge-socials");
+    stage.append(list);
+  }
+  if (menu) stage.append(menu);
+  else stage.append(E5("p", "Preview only. Your administrator will publish your card once your professional details are ready. You can already reserve your short link.", "cs-note"));
+  const wallet = E5("section", void 0, "lx-panel cs-panel cs-wallet");
+  wallet.append(E5("p", "WALLET PASS", "lx-overline"), E5("h2", "How it looks in Wallet"), E5("p", "Clients save your card to Google Wallet or Apple Wallet. The pass keeps your photo, QR code, booking and contact links.", "lx-muted"), createWalletPreview({ data, photoUrl: d.avatar_url, qrImage: qr?.image, display: data.short_display }));
+  if (menu) {
+    const b = btn("Add to Wallet", () => menu.openWallet(), "lx-button lx-primary");
+    b.prepend(icon("wallet", "lx-btn-icon"));
+    wallet.append(b);
+  }
+  side.append(wallet);
   stage.append(E5("p", "Name, position, territory and ID are managed by MUK Talent. Your photo and work contact are in Profile.", "cs-note"));
   editor = await shortLinkPanel({ host: side, api: api2, owner, readOnly, onChanged });
   side.append(socialSummary({ socials, readOnly, openTab }));
@@ -22421,7 +22712,7 @@ function money2(v, c) {
   }
 }
 function linkStyles() {
-  for (const [id, href] of [["professionalStyles", "/admin/professional.css"], ["businessCardStyles", "/book/business-card.css"], ["luxuryWorkspaceStyles", "/admin/luxury-workspace.css"]]) if (!document.getElementById(id)) {
+  for (const [id, href] of [["professionalStyles", "/admin/professional.css"], ["businessCardStyles", "/book/business-card.css"], ["luxuryWorkspaceStyles", "/admin/luxury-workspace.css"], ["mukSoftStyles", "/admin/muk-soft.css"]]) if (!document.getElementById(id)) {
     const l = E6("link");
     l.id = id;
     l.rel = "stylesheet";
@@ -22432,9 +22723,10 @@ function linkStyles() {
 async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack = null }) {
   document.getElementById("employeeWorkspace")?.remove();
   linkStyles();
-  const readOnly = Boolean(owner), root = E6("div", void 0, "lux");
+  const readOnly = Boolean(owner), root = E6("div", void 0, "lux soft");
   root.id = "employeeWorkspace";
   root.lang = "en";
+  softChrome();
   const sidebar = E6("aside", void 0, "lx-sidebar"), brand = E6("a", "MUK TALENT", "lx-brand");
   brand.href = "/";
   sidebar.append(brand, E6("p", "PRIVATE TEAM WORKSPACE", "lx-overline"));
@@ -22478,6 +22770,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   root.append(sidebar, main);
   document.body.append(root);
   let data = { records: [], leads: [], appointments: [], activity: [] }, directory = null, assets = [], section = "overview", busy = false, dialogBusy = false, loadVersion = 0;
+  let payroll = {}, payrollBusy = {};
   let selectedDay = dateKey(), month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1), studioTab = "productions";
   const groups = [["home", "Home", "home", [["overview", "Home"]]], ["pipeline", "Pipeline", "pipeline", [["leads", "Leads"], ["partner", "Partners"]]], ["planner", "Planner", "planner", [["calendar", "Calendar & reports"], ["task", "Tasks"]]], ["studio", "Studio", "studio", [["content", "Productions"], ["library", "Media library"]]], ["me", "My card", "card", [["card", "Card"], ["social", "Socials"], ["profile", "Profile"], ["account", "Account"]]]];
   const pages = groups.flatMap((g) => g[3].map(([id, label2]) => [id, label2, g[0]]));
@@ -22650,6 +22943,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     return c;
   }
   function overview() {
+    body.append(homeHero());
     const metrics = E6("div", void 0, "lx-metrics");
     metrics.append(metric("Assigned leads", data.leads.length, "Loaded non-archived records"), metric("Ready for review", directory?.ready_count || 0, "Attributed leads \xB7 exact count"), metric("Open tasks", records("task").filter((t) => t.status !== "Done").length, "In your workspace"), metric("Content in production", records("content").filter((c) => c.status !== "Published").length, "Ideas and work in progress"));
     body.append(metrics);
@@ -22849,13 +23143,21 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     for (const day of ["M", "T", "W", "T", "F", "S", "S"]) grid.append(E6("span", day, "lx-weekday"));
     for (let i = 0; i < (month.getDay() + 6) % 7; i++) grid.append(E6("span"));
     for (let d = 1; d <= new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate(); d++) {
-      const key = month.getFullYear() + "-" + String(month.getMonth() + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"), cell = E6("button", d, "lx-date");
+      const key = month.getFullYear() + "-" + String(month.getMonth() + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"), cell = E6("button", void 0, "lx-date");
       cell.type = "button";
+      cell.append(E6("span", d, "lx-date-num"));
+      const wd = new Date(month.getFullYear(), month.getMonth(), d).getDay();
+      if (wd === 0 || wd === 6) cell.classList.add("lx-weekend");
+      const pay = payroll[monthKey()]?.days?.find((x) => x.date === key);
+      if (pay?.verified) {
+        cell.classList.add("lx-verified");
+        cell.append(E6("span", "+" + pay.verified * (payroll[monthKey()].per_verified_lead || 2e3) / 1e3 + "k", "lx-date-chip"));
+      }
       cell.classList.toggle("today", key === dateKey());
       cell.classList.toggle("selected", key === selectedDay);
       const appointments = data.appointments.filter((a) => dateKey(a.starts_at) === key), report = records("report").find((r) => r.record_date === key);
       if (appointments.length || report) cell.classList.add("has-events");
-      cell.setAttribute("aria-label", key + (key === dateKey() ? " Today" : "") + " \xB7 " + appointments.length + " appointments" + (report ? " \xB7 daily report " + report.status : ""));
+      cell.setAttribute("aria-label", key + (key === dateKey() ? " Today" : "") + " \xB7 " + appointments.length + " appointments" + (report ? " \xB7 daily report " + report.status : "") + (pay?.verified ? " \xB7 " + pay.verified + " verified lead" + (pay.verified > 1 ? "s" : "") : ""));
       if (key === dateKey()) cell.setAttribute("aria-current", "date");
       cell.onclick = () => {
         selectedDay = key;
@@ -22864,7 +23166,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       };
       grid.append(cell);
     }
-    host.append(grid, E6("p", "Gold ring: today \xB7 dot: appointments or daily report", "lx-footnote"));
+    host.append(grid, legend());
     if (compact) {
       const upcoming = data.appointments.filter((a) => a.status === "confirmed" && new Date(a.starts_at) > /* @__PURE__ */ new Date()).sort((a, b) => a.starts_at.localeCompare(b.starts_at)).slice(0, 2);
       for (const a of upcoming) {
@@ -22875,6 +23177,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     }
   }
   function calendarPage() {
+    body.append(payrollHeader());
     const grid = E6("div", void 0, "lx-day-layout"), calendar = panel("Plan your day");
     calendar.append(button2("Today", () => {
       selectedDay = dateKey();
@@ -22883,7 +23186,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     }));
     miniCalendar(calendar);
     const day = panel(new Intl.DateTimeFormat("en-GB", { dateStyle: "full", timeZone: "UTC" }).format(/* @__PURE__ */ new Date(selectedDay + "T12:00:00Z"))), report = records("report").find((r) => r.record_date === selectedDay);
-    day.append(E6("span", selectedDay === dateKey() ? "TODAY" : "SELECTED DAY", "lx-overline"));
+    day.append(E6("span", selectedDay === dateKey() ? "TODAY" : "SELECTED DAY", "lx-overline"), dayPay());
     const checkin = E6("section", void 0, "lx-day-report");
     checkin.append(E6("h3", "Daily report"), E6("p", report ? "Status: " + report.status : "No daily report recorded.", "lx-muted"));
     if (report) {
@@ -22913,6 +23216,177 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     if (!history.length) empty(day, "No recorded workspace changes for this day among loaded activity.");
     grid.append(calendar, day);
     body.append(grid);
+  }
+  function monthKey(d = month) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+  }
+  function mad2(v) {
+    return new Intl.NumberFormat("en-GB", { maximumFractionDigits: 0 }).format(Math.round(v || 0)) + " MAD";
+  }
+  function getPayroll(key = monthKey()) {
+    if (payroll[key] || payrollBusy[key]) return payroll[key] || null;
+    payrollBusy[key] = true;
+    api2("/api/workspace/payroll?month=" + key + (owner ? "&owner=" + encodeURIComponent(owner) : "")).then((r) => {
+      payroll[key] = r.data;
+      if (root.isConnected && !dialogBusy && (section === "overview" || section === "calendar")) render();
+    }).catch(() => {
+      payroll[key] = { error: true };
+    }).finally(() => {
+      payrollBusy[key] = false;
+    });
+    return null;
+  }
+  function legend() {
+    const l = E6("div", void 0, "lx-legend");
+    for (const [cls, text] of [["today", "Today"], ["events", "Report / appointment"], ["verified", "Verified lead \xB7 +commission"], ["weekend", "Weekend"]]) {
+      const i = E6("span", void 0, "lx-legend-item");
+      i.append(E6("i", void 0, "lx-legend-" + cls), E6("span", text));
+      l.append(i);
+    }
+    return l;
+  }
+  function pill(label2, value, tone) {
+    const p = E6("div", void 0, "lx-pill lx-pill-" + tone);
+    p.append(E6("span", label2), E6("strong", value));
+    return p;
+  }
+  function homeHero() {
+    const d = directory || {}, p = getPayroll(monthKey(/* @__PURE__ */ new Date())), name = d.full_name || staff.full_name, hero = E6("section", void 0, "lx-hero");
+    const photo = E6("figure", void 0, "lx-hero-photo");
+    if (d.avatar_url) {
+      const img = E6("img");
+      img.src = d.avatar_url;
+      img.alt = "Photo of " + name;
+      img.decoding = "async";
+      img.referrerPolicy = "no-referrer";
+      img.onerror = () => {
+        img.remove();
+        photo.classList.add("lx-no-photo");
+      };
+      photo.append(img);
+    } else photo.classList.add("lx-no-photo");
+    const initials2 = E6("span", name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase(), "lx-hero-initials");
+    initials2.setAttribute("aria-hidden", "true");
+    const cap = E6("figcaption");
+    cap.append(E6("h2", name), E6("p", d.job_title || "MUK Talent team"));
+    photo.append(initials2, cap);
+    const facts = E6("div", void 0, "lx-hero-facts");
+    const id = E6("article", void 0, "lx-fact lx-fact-gold");
+    id.append(E6("span", "Staff ID"), E6("strong", d.employee_code || "\u2014"), E6("small", d.assigned_city || "MUK Talent"));
+    const contact = E6("article", void 0, "lx-fact lx-fact-glass");
+    contact.append(E6("span", d.contact_phone ? "Phone number" : "Work email"), E6("strong", d.contact_phone || d.contact_email || "Add in Profile"));
+    if (!d.contact_phone && !d.contact_email && !readOnly) {
+      contact.classList.add("lx-clickable");
+      contact.tabIndex = 0;
+      contact.onclick = () => navigate2("profile");
+    }
+    facts.append(id, contact);
+    const chart = E6("article", void 0, "lx-chart");
+    const head2 = E6("div", void 0, "lx-chart-head");
+    head2.append(E6("span", "Verified leads"), E6("strong", p && !p.error ? String(p.verified_count) : "\u2014"));
+    chart.append(head2);
+    const bars = E6("div", void 0, "lx-bars");
+    const hist = p && !p.error ? p.history : Array.from({ length: 9 }, (_, i) => ({ month: monthKey(new Date((/* @__PURE__ */ new Date()).getFullYear(), (/* @__PURE__ */ new Date()).getMonth() - 8 + i, 1)), verified_count: 0, total: 0 }));
+    const max = Math.max(1, ...hist.map((h) => h.total || 0));
+    for (const h of hist) {
+      const b = E6("div", void 0, "lx-bar");
+      const fill = E6("i");
+      fill.style.setProperty("--h", Math.max(4, Math.round((h.total || 0) / max * 100)) + "%");
+      if (h.month === monthKey(/* @__PURE__ */ new Date())) b.classList.add("current");
+      b.title = h.month + " \xB7 " + mad2(h.total) + " \xB7 " + h.verified_count + " verified";
+      b.append(fill, E6("small", new Intl.DateTimeFormat("en-GB", { month: "short" }).format(/* @__PURE__ */ new Date(h.month + "-15T12:00:00Z")).slice(0, 3)));
+      bars.append(b);
+    }
+    chart.append(bars, E6("p", "Monthly earnings \xB7 last 9 months", "lx-chart-note"));
+    const links = E6("div", void 0, "lx-hero-links"), cardBtn = button2("", () => navigate2("card")), rep = button2("", () => {
+      selectedDay = dateKey();
+      month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
+      navigate2("calendar");
+    });
+    cardBtn.append(icon("card", "lx-btn-icon"), E6("span", "My card"));
+    rep.append(icon("planner", "lx-btn-icon"), E6("span", "Daily report"));
+    cardBtn.classList.add("lx-chip-btn");
+    rep.classList.add("lx-chip-btn");
+    links.append(cardBtn, rep);
+    const side = E6("div", void 0, "lx-hero-side");
+    side.append(facts, chart, links);
+    const pay = E6("article", void 0, "lx-hero-pay");
+    pay.append(E6("span", "This month \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long" }).format(/* @__PURE__ */ new Date()), "lx-overline"));
+    if (p && !p.error) {
+      pay.append(E6("strong", mad2(p.earned_to_date)), E6("p", "Earned to date \xB7 projected " + mad2(p.projected_total), "lx-muted"));
+      const pills = E6("div", void 0, "lx-pills");
+      pills.append(pill("Base", mad2(p.base_monthly), "gold"), pill("Leads", p.verified_count + " \xD7 " + mad2(p.per_verified_lead).replace(" MAD", ""), "dark"), pill("Days left", p.remaining_days, "grey"));
+      pay.append(pills);
+      const go = button2("Open salary calendar", () => navigate2("calendar"));
+      go.classList.add("lx-link-btn");
+      pay.append(go);
+    } else pay.append(E6("strong", p?.error ? "\u2014" : "\u2026"), E6("p", p?.error ? "Salary view unavailable. Refresh later." : "Loading your salary\u2026", "lx-muted"));
+    side.append(pay);
+    hero.append(photo, side);
+    return hero;
+  }
+  function payrollHeader() {
+    const key = monthKey(), p = getPayroll(key), wrap = E6("section", void 0, "lx-payroll");
+    const top = E6("div", void 0, "lx-payroll-top"), left = E6("div");
+    left.append(E6("span", "Salary \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month), "lx-overline"));
+    const big = E6("div", void 0, "lx-payroll-big");
+    if (p && !p.error) {
+      big.append(E6("strong", p.elapsed_days + "/" + p.working_days + " days"), E6("b", mad2(key < dateKey().slice(0, 7) ? p.projected_total : p.earned_to_date)));
+    } else big.append(E6("strong", p?.error ? "Salary unavailable" : "Loading\u2026"));
+    left.append(big);
+    const pick = E6("select", void 0, "lx-month-select");
+    pick.setAttribute("aria-label", "Month");
+    const now = /* @__PURE__ */ new Date();
+    for (let i = -11; i <= 1; i++) {
+      const m = new Date(now.getFullYear(), now.getMonth() + i, 1);
+      pick.append(new Option(new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(m), monthKey(m)));
+    }
+    if (![...pick.options].some((o) => o.value === key)) pick.append(new Option(key, key));
+    pick.value = key;
+    pick.onchange = () => {
+      const [y, m] = pick.value.split("-").map(Number);
+      month = new Date(y, m - 1, 1);
+      render();
+    };
+    top.append(left, pick);
+    wrap.append(top);
+    if (p && !p.error) {
+      const pills = E6("div", void 0, "lx-pills");
+      pills.append(pill("Work days \xB7 base", mad2(p.base_accrued) + " / " + mad2(p.base_monthly), "gold"), pill("Verified leads", p.verified_count + " \xB7 " + mad2(p.commission), "dark"), pill("Projected month", mad2(p.projected_total), "grey"));
+      wrap.append(pills, E6("p", "Base " + mad2(p.base_monthly) + " per month, Monday to Friday (" + mad2(p.daily_rate) + " per working day), plus " + mad2(p.per_verified_lead) + " for each lead attributed to you and verified by administration. " + p.notice, "lx-footnote"));
+    }
+    return wrap;
+  }
+  function dayPay() {
+    const p = payroll[monthKey(/* @__PURE__ */ new Date(selectedDay + "T12:00:00"))], info = p?.days?.find((x) => x.date === selectedDay), card = E6("article", void 0, "lx-day-pay");
+    if (!p || p.error || !info) return card;
+    const w = (/* @__PURE__ */ new Date(selectedDay + "T12:00:00Z")).getUTCDay(), weekend = w === 0 || w === 6;
+    const txt = E6("div");
+    txt.append(E6("span", weekend ? "Weekend" : "Working day", "lx-day-pay-label"), E6("strong", weekend ? "No base accrual" : "+" + mad2(p.daily_rate) + " base"), E6("small", info.verified ? info.verified + " verified lead" + (info.verified > 1 ? "s" : "") + " \xB7 +" + mad2(info.verified * p.per_verified_lead) : "No verified leads on this day"));
+    const leadsHere = (p.leads || []).filter((l) => l.verified_on === selectedDay);
+    if (leadsHere.length) txt.append(E6("small", leadsHere.map((l) => l.reference).join(" \xB7 ")));
+    const amount = E6("b", (info.verified ? "+" : "") + mad2((weekend ? 0 : p.daily_rate) + info.verified * p.per_verified_lead), "lx-day-pay-amount");
+    const doc = E6("span", void 0, "lx-day-pay-doc");
+    doc.append(icon(info.verified ? "check" : "calendar"));
+    card.append(doc, txt, amount);
+    return card;
+  }
+  function softChrome() {
+    let m = document.querySelector("meta[name=theme-color]");
+    if (!m) {
+      m = E6("meta");
+      m.name = "theme-color";
+      document.head.append(m);
+    }
+    m.dataset.previous = m.dataset.previous || m.content;
+    m.content = "#efe8dc";
+    for (const [n, c] of [["apple-mobile-web-app-capable", "yes"], ["mobile-web-app-capable", "yes"], ["apple-mobile-web-app-status-bar-style", "black-translucent"]]) if (!document.querySelector("meta[name=" + n + "]")) {
+      const x = E6("meta");
+      x.name = n;
+      x.content = c;
+      document.head.append(x);
+    }
+    document.documentElement.classList.add("mt-soft");
   }
   function studio() {
     const gallery = E6("div", void 0, "lx-gallery");
@@ -23274,6 +23748,107 @@ function mountExportButtons(getSession) {
     box.append(b);
   }
   host.after(box, msg);
+}
+
+// admin-src/admin-soft.js
+var E7 = (t, v, c) => {
+  const n = document.createElement(t);
+  if (v !== void 0 && v !== null) n.textContent = String(v);
+  if (c) n.className = c;
+  return n;
+};
+var mad = (v) => new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0, useGrouping: "always" }).format(Math.round(v || 0)) + " MAD";
+function chrome() {
+  document.documentElement.classList.add("mt-soft");
+  let m = document.querySelector("meta[name=theme-color]");
+  if (!m) {
+    m = E7("meta");
+    m.name = "theme-color";
+    document.head.append(m);
+  }
+  m.content = "#efe8dc";
+  for (const [n, c] of [["apple-mobile-web-app-capable", "yes"], ["mobile-web-app-capable", "yes"], ["apple-mobile-web-app-status-bar-style", "black-translucent"]]) if (!document.querySelector("meta[name=" + n + "]")) {
+    const x = E7("meta");
+    x.name = n;
+    x.content = c;
+    document.head.append(x);
+  }
+}
+function mountAdminSoft({ api: api2, getState, navigate: navigate2 }) {
+  chrome();
+  const shell = document.getElementById("appShell");
+  shell.classList.add("admin-soft");
+  const overview = document.getElementById("overview"), metrics = document.getElementById("metrics");
+  let busy = false, stamp = 0;
+  const monthKey = () => {
+    const p = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Casablanca", year: "numeric", month: "2-digit" }).formatToParts(/* @__PURE__ */ new Date());
+    return p.find((x) => x.type === "year").value + "-" + p.find((x) => x.type === "month").value;
+  };
+  function hero() {
+    let h = document.getElementById("adminSoftHero");
+    if (h) return h;
+    h = E7("section", void 0, "as-hero");
+    h.id = "adminSoftHero";
+    h.setAttribute("aria-label", "Resumen del d\xEDa");
+    overview.prepend(h);
+    return h;
+  }
+  async function paint() {
+    const s = getState();
+    if (!s.staff || s.staff.role !== "admin" || busy) return;
+    const id = ++stamp;
+    busy = true;
+    const h = hero();
+    const first = String(s.staff.full_name || "").split(/\s+/)[0] || "equipo";
+    const greet = E7("article", void 0, "as-greet");
+    greet.append(E7("p", "MUK TALENT \xB7 ADMINISTRACI\xD3N", "as-overline"), E7("h2", "Hola, " + first), E7("p", new Intl.DateTimeFormat("es-ES", { timeZone: "Africa/Casablanca", weekday: "long", day: "numeric", month: "long" }).format(/* @__PURE__ */ new Date()) + " \xB7 Africa/Casablanca", "as-muted"));
+    const quick = E7("div", void 0, "as-quick");
+    for (const [label2, section] of [["Leads y casos", "candidates"], ["Pipeline e informes", "intelligence"], ["Equipo", "staff"], ["Citas", "appointments"]]) {
+      const b = E7("button", label2, "as-quick-btn");
+      b.type = "button";
+      b.onclick = () => navigate2(section);
+      quick.append(b);
+    }
+    greet.append(quick);
+    const pay = E7("article", void 0, "as-pay");
+    pay.append(E7("p", "N\xD3MINA DEL EQUIPO \xB7 " + new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(/* @__PURE__ */ new Date()).toUpperCase(), "as-overline"));
+    h.replaceChildren(greet, pay);
+    try {
+      const r = await api2("/api/admin/payroll?month=" + monthKey());
+      if (id !== stamp) return;
+      const tot = E7("div", void 0, "as-pay-total");
+      tot.append(E7("strong", mad(r.totals.projected_total)), E7("span", "previsto este mes"));
+      pay.append(tot);
+      const pills = E7("div", void 0, "as-pills");
+      for (const [label2, value, tone] of [["Base", mad(r.base_monthly) + " / persona", "gold"], ["Leads verificados", String(r.totals.verified_count), "dark"], ["Comisiones", mad(r.totals.commission), "grey"]]) {
+        const p = E7("span", void 0, "as-pill as-pill-" + tone);
+        p.append(E7("span", label2), E7("b", value));
+        pills.append(p);
+      }
+      pay.append(pills);
+      const list = E7("div", void 0, "as-pay-list");
+      const max = Math.max(1, ...r.data.map((x) => x.projected_total));
+      for (const row of r.data.slice(0, 6)) {
+        const line = E7("div", void 0, "as-pay-row"), bar = E7("i");
+        bar.style.setProperty("--w", Math.round(row.projected_total / max * 100) + "%");
+        const name = E7("span", row.full_name, "as-pay-name");
+        line.append(name, E7("span", row.verified_count + " leads", "as-pay-leads"), E7("b", mad(row.projected_total)), bar);
+        list.append(line);
+      }
+      if (!r.data.length) list.append(E7("p", "A\xFAn no hay colaboradores activos.", "as-muted"));
+      pay.append(list, E7("p", "Base " + mad(r.base_monthly) + " (lunes a viernes) + " + mad(r.per_verified_lead) + " por lead verificado. Un lead cuenta cuando administraci\xF3n lo acepta como caso.", "as-foot"));
+    } catch (e) {
+      if (id === stamp) pay.append(E7("p", "N\xF3mina no disponible ahora mismo.", "as-muted"));
+    } finally {
+      busy = false;
+    }
+  }
+  new MutationObserver(() => {
+    if (!overview.hidden && metrics.children.length) paint();
+  }).observe(metrics, { childList: true });
+  new MutationObserver(() => {
+    document.querySelector("#navigation .nav-button.active")?.scrollIntoView({ inline: "center", block: "nearest" });
+  }).observe(document.getElementById("navigation"), { subtree: true, attributes: true, attributeFilter: ["class"] });
 }
 
 // admin-src/app.js
@@ -23906,3 +24481,4 @@ mountExportButtons(async () => {
   return data.session;
 });
 mountAdminExperience({ api, getState: () => state, openRecord });
+mountAdminSoft({ api, getState: () => state, navigate });

@@ -5,6 +5,7 @@ import { mountStaffAccounts } from "./staff-accounts.js";
 import { mountEmployee, mountWorkspaceAdmin } from "./employee.js";
 import { mountExportButtons } from "./exports.js";
 import { createClient } from "@supabase/supabase-js";
+import { mountAdminSoft } from "./admin-soft.js";
 const $ = id => document.getElementById(id);
 const state = {client:null,session:null,staff:null,config:null,section:"overview",page:1,total:0,epoch:0,listRequest:0,detailRequest:0,relatedRequest:0,busy:false,loading:false,detail:null,dirty:false,related:"notes",relatedPage:1,staffOptions:[]};
 const titles={overview:"Resumen",candidates:"Leads y casos",enquiries:"Consultas",appointments:"Citas",staff:"Equipo",documents:"Documentos",intelligence:"Pipeline e informes"};
@@ -310,5 +311,6 @@ mountExportButtons(async()=>{
 });
 
 mountAdminExperience({api,getState:()=>state,openRecord});
+mountAdminSoft({api,getState:()=>state,navigate});
 
 

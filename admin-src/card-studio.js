@@ -1,5 +1,5 @@
 // card-studio-v1 · Employee business card, short link (muktalent.com/name) and social profiles.
-import {createBusinessCard,createCardMenu,createSocialLinks,brandIcon,icon} from '../book/business-card.js';
+import {createBusinessCard,createCardMenu,createSocialLinks,createCardFaces,createActionTiles,createWalletPreview,brandIcon,icon} from '../book/business-card.js';
 const E=(t,v,c)=>{const n=document.createElement(t);if(v!==undefined&&v!==null)n.textContent=String(v);if(c)n.className=c;return n;};
 const editable=v=>!v?'':/^[@+]/.test(v.value||'')?v.value:v.url||v.value||'';
 const q=owner=>owner?'?owner='+encodeURIComponent(owner):'';
@@ -16,13 +16,19 @@ export async function renderCardStudio({host,api,owner,readOnly,directory,openTa
  if(d.card?.published){try{qr=await api('/api/workspace/card/qr'+q(owner));}catch{qr=null;}}
  if(!host.isConnected)return;
  const data=cardData(d);if(qr?.handle)data.short_display=qr.display;
- stage.append(createBusinessCard({data,photoUrl:d.avatar_url,link:{display:data.short_display}}));
  const socials=Array.isArray(d.socials)?d.socials:[];
- if(socials.length)stage.append(createSocialLinks(socials,d.full_name));
- let editor;
+ let editor,menu=null;
  if(qr){const extras=readOnly?[]:[{icon:'edit',label:'Edit short link',hint:'Choose muktalent.com/your-name',onSelect:()=>{editor?.focus();editor?.scrollIntoView({block:'center',behavior:'smooth'});}},{icon:'users',label:'Edit social links',hint:'LinkedIn, Instagram, TikTok…',onSelect:()=>openTab('social')}];
-  stage.append(createCardMenu({url:qr.url,display:qr.display,qrImage:qr.image,name:d.full_name,data,slug:qr.slug,socials,showOpen:true,extras}));}
+  menu=createCardMenu({url:qr.url,display:qr.display,qrImage:qr.image,name:d.full_name,data,slug:qr.slug,socials,showOpen:true,extras});}
+ // ClickCard layout: Wallet / Share / QR tiles, the card (two styles), then the full actions menu.
+ if(menu)stage.append(createActionTiles(menu,{onEdit:readOnly?null:()=>openTab('profile')}));
+ stage.append(createCardFaces({data,photoUrl:d.avatar_url,link:{display:data.short_display,url:qr?.url},socials,onSaveContact:menu?()=>menu.saveContact():null}));
+ if(socials.length){const list=createSocialLinks(socials,d.full_name);list.classList.add('cs-badge-socials');stage.append(list);}
+ if(menu)stage.append(menu);
  else stage.append(E('p','Preview only. Your administrator will publish your card once your professional details are ready. You can already reserve your short link.','cs-note'));
+ const wallet=E('section',undefined,'lx-panel cs-panel cs-wallet');wallet.append(E('p','WALLET PASS','lx-overline'),E('h2','How it looks in Wallet'),E('p','Clients save your card to Google Wallet or Apple Wallet. The pass keeps your photo, QR code, booking and contact links.','lx-muted'),createWalletPreview({data,photoUrl:d.avatar_url,qrImage:qr?.image,display:data.short_display}));
+ if(menu){const b=btn('Add to Wallet',()=>menu.openWallet(),'lx-button lx-primary');b.prepend(icon('wallet','lx-btn-icon'));wallet.append(b);}
+ side.append(wallet);
  stage.append(E('p','Name, position, territory and ID are managed by MUK Talent. Your photo and work contact are in Profile.','cs-note'));
  editor=await shortLinkPanel({host:side,api,owner,readOnly,onChanged});
  side.append(socialSummary({socials,readOnly,openTab}));

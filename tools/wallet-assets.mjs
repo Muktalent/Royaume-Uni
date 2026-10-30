@@ -29,4 +29,8 @@ for(const withPhoto of [true,false]){
  const logo=await fit(src,{width:withPhoto?300:360}),lm=await meta(logo);
  const left=withPhoto?Math.round(132+(560-132-lm.width)/2):Math.round(132+(1032-132-lm.width)/2);
  await save(withPhoto?'hero-base.png':'hero-nophoto.png',sharp(Buffer.from(svg)).composite([{input:logo,left,top:Math.round((336-lm.height)/2)}]));}
+// v8 · ClickCard-style brand hero (1032x336): black, centred mark + wordmark + tagline, gold stripe at the bottom.
+{const m=await fit(mark,{height:150}),w=await fit(word,{height:58}),mw=(await meta(m)).width,ww=(await meta(w)).width,x=Math.round((1032-(mw+34+ww))/2);
+ const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="1032" height="336"><defs><linearGradient id="b" x1="0" x2="1"><stop offset="0" stop-color="#a88446"/><stop offset=".5" stop-color="#f1d27a"/><stop offset="1" stop-color="#c8a464"/></linearGradient><radialGradient id="r" cx=".5" cy=".1" r=".9"><stop offset="0" stop-color="#22201c"/><stop offset="1" stop-color="#111111"/></radialGradient></defs><rect width="1032" height="336" fill="url(#r)"/><rect y="318" width="1032" height="18" fill="url(#b)"/><text x="${x+mw+34+ww/2}" y="236" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-size="20" letter-spacing="4" fill="#b7ad9a">YOUR DIGITAL BUSINESS CARD</text></svg>`;
+ await save('hero-brand.png',sharp(Buffer.from(svg)).composite([{input:m,left:x,top:72},{input:w,left:x+mw+34,top:132}]));}
 console.log('wallet assets written');
