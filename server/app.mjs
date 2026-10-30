@@ -8,6 +8,7 @@ import { mountStaffAccounts } from "./staff-accounts.mjs";
 import { mountPersonal } from "./personal-public.mjs";
 import { mountExports } from "./exports.mjs";
 import { mountEvaluation } from "./evaluation-public.mjs";
+import { mountCardLinks } from "./card-links.mjs";
 import "dotenv/config";
 import express from "express";
 import helmet from "helmet";
@@ -36,7 +37,7 @@ const root = fileURLToPath(new URL("../", import.meta.url));
 const app = express();
 app.disable("x-powered-by");
 app.use(helmet({contentSecurityPolicy:{directives:{connectSrc:["'self'",origin],imgSrc:["'self'","data:",origin]}}}));
-app.use((req,res,next)=>{req.requestId=randomUUID();res.set("X-Request-Id",req.requestId);res.set("Cache-Control","no-store");next();});
+app.use((req,res,next)=>{req.requestId=randomUUID();res.set("X-Request-Id",req.requestId);res.set("Cache-Control","no-store");res.set("Permissions-Policy","camera=(), microphone=(), geolocation=(), payment=()");next();});
 app.use("/api",rateLimit({keyGenerator:(req)=>ipKeyGenerator((process.env.VERCEL?String(req.headers["x-vercel-forwarded-for"]||req.headers["x-forwarded-for"]||"").split(",")[0].trim():req.ip)||"127.0.0.1"),validate:{xForwardedForHeader:false},windowMs:60000,limit:240,standardHeaders:"draft-7",legacyHeaders:false,message:{error:"Demasiadas peticiones. Espera un minuto."}}));
 app.use(express.json({limit:"64kb",strict:true}));
 function fail(req,res,status,message){return res.status(status).json({error:message,requestId:req.requestId});}
@@ -70,6 +71,8 @@ function requireAdmin(req,res,next){if(req.staff.role!=="admin")return fail(req,
 app.get("/api/health",(req,res)=>res.json({status:"ok"}));
 app.get("/api/public-config",(req,res)=>res.json({supabaseUrl,supabasePublicKey:supabaseKey}));
 app.get("/api/me",requireStaff,(req,res)=>res.json({staff:req.staff}));
+// Short card links must resolve before the public card routes are matched.
+mountCardLinks(app, { requireStaff });
 mountProfessionalWorkspace(app, { requireStaff, requireAdmin });
 mountAdminPipeline(app, { requireStaff, requireAdmin });
 mountEvaluation(app);
@@ -228,3 +231,5 @@ app.use((error,req,res,next)=>{
 });
 
 export default app;
+
+

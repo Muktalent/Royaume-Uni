@@ -40,7 +40,7 @@ async function api(url,options={}){
  if(epoch!==state.epoch)throw new Error("La sesión ha cambiado.");
  let result;try{result=await response.json();}catch{throw new Error("Respuesta inesperada del servidor.");}
  if(response.status===401){resetLogin("La sesión ha caducado. Vuelve a entrar.");throw new Error("Sesión caducada.");}
- if(!response.ok)throw new Error(`${result.error||"No se pudo completar la operación."}${result.requestId?` · ID: ${result.requestId}`:""}`);
+ if(!response.ok)throw Object.assign(new Error(`${result.error||"No se pudo completar la operación."}${result.requestId&&response.status>=500?` · ID: ${result.requestId}`:""}`),{status:response.status,platform:result.platform,fields:result.fields});
  return result;
 }
 function resource(){return state.config.resources[state.section];}
@@ -310,3 +310,5 @@ mountExportButtons(async()=>{
 });
 
 mountAdminExperience({api,getState:()=>state,openRecord});
+
+

@@ -4,6 +4,7 @@ import {randomUUID} from 'node:crypto';
 import {rateLimit,ipKeyGenerator} from 'express-rate-limit';
 import {z} from 'zod';
 import QRCode from 'qrcode';
+import {cardLinkFor} from './card-links.mjs';
 const bucket='mt-employee-private';
 function admin(){if(!process.env.SUPABASE_SERVICE_ROLE_KEY)throw Error('Private services not configured');return createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});}
 function checked(r){if(r.error)throw Error('Database operation failed');return r.data;}
@@ -36,7 +37,7 @@ export function mountWorkspaceExtras(app,{requireStaff}){
  function scope(req){if(!req.query.owner)return req.staff.user_id;if(req.staff.role!=='admin')throw Error('Forbidden');return z.string().uuid().parse(req.query.owner);}
  app.get('/api/workspace/card',requireStaff,wrap(async(req,res)=>{const db=admin(),owner=scope(req),data=checked(await db.from('mt_public_cards').select('*').eq('owner_id',owner).maybeSingle());res.json({data});}));
  app.post('/api/workspace/card',requireStaff,writeLimit,wrap(async(req,res)=>{const v=cardSchema.parse(req.body),db=admin();const data=checked(await db.from('mt_public_cards').upsert({owner_id:req.staff.user_id,...v,updated_at:new Date().toISOString()},{onConflict:'owner_id'}).select().single());res.json({data});}));
- app.get('/api/workspace/card/qr',requireStaff,wrap(async(req,res)=>{const db=admin(),card=checked(await db.from('mt_public_cards').select('slug,published').eq('owner_id',scope(req)).maybeSingle());if(!card?.published)return res.status(400).json({error:'Publish your card first.'});const origin=process.env.PUBLIC_SITE_URL||'https://muktalent.com';const url=new URL('/book/?c='+card.slug,origin).href;res.json({url,image:await QRCode.toDataURL(url,{width:600,margin:2,errorCorrectionLevel:'M'})});}));
+ app.get('/api/workspace/card/qr',requireStaff,wrap(async(req,res)=>{const db=admin(),owner=scope(req),card=checked(await db.from('mt_public_cards').select('slug,published').eq('owner_id',owner).maybeSingle());if(!card?.published)return res.status(400).json({error:'Publish your card first.'});const link=await cardLinkFor(db,owner,card.slug),url=link.url;res.json({url,display:link.display,handle:link.handle,slug:card.slug,image:await QRCode.toDataURL(url,{width:600,margin:2,errorCorrectionLevel:'M'})});}));
  app.get('/api/workspace/assets',requireStaff,wrap(async(req,res)=>{const db=admin(),rows=checked(await db.from('mt_employee_assets').select('id,category,original_name,mime,created_at,object_path').eq('owner_id',scope(req)).eq('state','uploaded').order('created_at',{ascending:false}).limit(100));const data=[];for(const row of rows){const s=await db.storage.from(bucket).createSignedUrl(row.object_path,60,{download:row.category!=='avatar'});data.push({...row,url:s.data?.signedUrl||null});}res.json({data});}));
  app.post('/api/workspace/assets/start',requireStaff,writeLimit,wrap(async(req,res)=>{
  const v=z.object({category:z.enum(['avatar','identity','content']),name:z.string().min(1).max(200),mime:z.enum(['image/jpeg','image/png','application/pdf']),bytes:z.number().int().min(1).max(10485760)}).strict().parse(req.body);
@@ -76,3 +77,5 @@ export function mountWorkspaceExtras(app,{requireStaff}){
  res.status(201).json({data:r.data,email_confirmation});
  }));
 }
+
+
