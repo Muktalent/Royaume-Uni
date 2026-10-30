@@ -5,7 +5,7 @@
   "outputDirectory": "web-dist",
   "functions": {
     "api/index.mjs": {
-      "includeFiles": "server/{app.mjs,crm-config.json,validation.mjs,vercel-route.mjs,evaluation-public.mjs,evaluation-validation.mjs,exports.mjs,export-data.mjs,personal-public.mjs,staff-accounts.mjs,workspace.mjs,employee-security.mjs,workspace-extras.mjs,professional-workspace.mjs,business-wallet.mjs,admin-pipeline.mjs,wallet-brand.json}",
+      "includeFiles": "server/**"
       "maxDuration": 30
     }
   },
