@@ -1,54 +1,509 @@
-// admin-src/exports.js
-function mountExportButtons(getSession) {
-  const host = document.querySelector("#appShell .page-header");
-  if (!host || document.getElementById("crmExportControls")) return;
-  const box = document.createElement("div");
-  box.id = "crmExportControls";
-  box.className = "form-actions";
-  const msg = document.createElement("p");
-  msg.className = "message";
-  msg.setAttribute("role", "status");
-  const buttons = [];
-  for (const [mode, label2] of [["internal", "Exporter le CRM (.xlsx)"], ["partners", "Rapport partenaires (.xlsx)"]]) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "secondary";
-    b.textContent = label2;
-    buttons.push(b);
-    b.addEventListener("click", async () => {
-      const warning = mode === "internal" ? "Cet export contient des donn\xE9es personnelles. Usage interne uniquement. Continuer ?" : "Ce rapport minimise les donn\xE9es mais n\u2019est pas anonyme. V\xE9rifiez le cadre de partage et retirez les doublons et profils de test avant toute transmission \xE0 une universit\xE9. T\xE9l\xE9charger pour r\xE9vision ?";
-      if (!window.confirm(warning)) return;
-      buttons.forEach((v) => v.disabled = true);
-      msg.textContent = "G\xE9n\xE9ration du fichier\u2026";
-      try {
-        const session = await getSession();
-        if (!session) throw new Error("Reconnectez-vous au panel.");
-        const r = await fetch("/api/exports/" + mode, { headers: { Authorization: "Bearer " + session.access_token }, cache: "no-store" });
-        if (!r.ok) {
-          let data;
-          try {
-            data = await r.json();
-          } catch {
-          }
-          throw new Error(data?.error || "Export impossible.");
-        }
-        const blob = await r.blob(), url = URL.createObjectURL(blob), a = document.createElement("a");
-        a.href = url;
-        a.download = `muktalent-${mode}-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}.xlsx`;
-        document.body.append(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 6e4);
-        msg.textContent = "Fichier g\xE9n\xE9r\xE9. V\xE9rifiez son contenu avant de l\u2019utiliser.";
-      } catch (e) {
-        msg.textContent = e.message;
-      } finally {
-        buttons.forEach((v) => v.disabled = false);
-      }
-    });
-    box.append(b);
+// admin-src/admin-experience.js
+var E = (t, v, c) => {
+  const n = document.createElement(t);
+  if (v !== void 0) n.textContent = String(v);
+  if (c) n.className = c;
+  return n;
+};
+function button(text, fn, cls = "secondary") {
+  const b = E("button", text, cls);
+  b.type = "button";
+  b.onclick = fn;
+  return b;
+}
+function display(v, key = "") {
+  if (v === null || v === void 0 || v === "") return "\u2014";
+  if (key.includes("_at") || key === "last_updated") return new Date(v).toLocaleString("en-GB", { timeZone: "UTC" }) + " UTC";
+  return String(v).replaceAll("_", " ");
+}
+async function binary(getState, url, options = {}) {
+  const { data, error } = await getState().client.auth.getSession();
+  if (error || !data.session) throw Error("Vuelve a iniciar sesi\xF3n.");
+  const response = await fetch(url, { ...options, cache: "no-store", headers: { Authorization: "Bearer " + data.session.access_token, ...options.body ? { "Content-Type": "application/json" } : {} } });
+  if (!response.ok) {
+    let message2 = "No se pudo generar el archivo.";
+    try {
+      message2 = (await response.json()).error || message2;
+    } catch {
+    }
+    throw Error(message2);
   }
-  host.after(box, msg);
+  const blob = await response.blob(), link = E("a"), object = URL.createObjectURL(blob);
+  link.href = object;
+  link.download = url.includes("/exports/internal") ? "muktalent-crm-interno.xlsx" : options.body && JSON.parse(options.body).mode === "partners" ? "muktalent-partner-pipeline.xlsx" : "muktalent-pipeline-interna.xlsx";
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(object), 1e3);
+}
+function dialog(title) {
+  const d = E("dialog", void 0, "record-dialog admin-report-dialog"), body = E("div", void 0, "dialog-body");
+  d.lang = "es";
+  const top = E("div", void 0, "admin-report-top");
+  top.append(E("h2", title));
+  let busy = false;
+  const close = button("Cerrar", () => {
+    if (!busy) d.remove();
+  });
+  top.append(close);
+  body.append(top);
+  d.append(body);
+  document.body.append(d);
+  d.oncancel = (e) => {
+    if (busy) e.preventDefault();
+  };
+  d.onclose = () => d.remove();
+  d.showModal();
+  return { d, body, lock: (v) => {
+    busy = v;
+    close.disabled = v;
+  } };
+}
+function field(form, name, label2, type = "text", options = null, value = "") {
+  const wrap = E("div", void 0, "field"), caption = E("label", label2), f = E(options ? "select" : type === "textarea" ? "textarea" : "input");
+  if (!options && f.tagName === "INPUT") f.type = type;
+  if (options) for (const [v, t] of options) f.append(new Option(t, v));
+  f.name = name;
+  f.id = "report-field-" + name;
+  caption.htmlFor = f.id;
+  f.value = value ?? "";
+  if (f.tagName === "TEXTAREA") f.rows = 4;
+  wrap.append(caption, f);
+  form.append(wrap);
+  return f;
+}
+function mountAdminExperience({ api: api2, getState, openRecord: openRecord2 }) {
+  const shell = document.getElementById("appShell"), head2 = shell.querySelector(".page-header");
+  shell.classList.add("admin-premium");
+  let group = document.getElementById("adminTeamActions");
+  if (!group) {
+    group = E("section", void 0, "admin-team-actions");
+    group.id = "adminTeamActions";
+    group.setAttribute("aria-label", "Gesti\xF3n del equipo");
+    head2.after(group);
+  }
+  function sync() {
+    const s = getState();
+    for (const id of ["professionalTeamButton", "workspaceAdminButton"]) {
+      const b = document.getElementById(id);
+      if (b) {
+        const label2 = id === "professionalTeamButton" ? "Perfiles y tarjetas" : "Espacios de trabajo";
+        if (b.textContent !== label2) b.textContent = label2;
+        const wrap = b.parentElement;
+        if (wrap !== group && wrap.parentElement !== group) group.append(wrap);
+      }
+    }
+    const accounts = document.getElementById("teamAccountControls");
+    if (accounts) {
+      const create = accounts.querySelector("button");
+      if (create && create.textContent !== "Crear colaborador") create.textContent = "Crear colaborador";
+      if (accounts.parentElement !== group) group.append(accounts);
+    }
+    group.hidden = s.section !== "staff" || s.staff?.role !== "admin";
+    const old = document.getElementById("crmExportControls");
+    if (old) {
+      const next = old.nextElementSibling;
+      if (next?.classList.contains("message")) next.remove();
+      old.remove();
+    }
+    if (s.section === "staff") document.getElementById("createRecord").hidden = true;
+  }
+  sync();
+  new MutationObserver(sync).observe(document.getElementById("navigation"), { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
+  new MutationObserver(sync).observe(shell, { attributes: true, attributeFilter: ["hidden"] });
+  const recordDialog = document.getElementById("recordDialog");
+  function caseAction() {
+    const s = getState(), context = s.detail;
+    let b = document.getElementById("adminAcceptCase");
+    if (s.staff?.role !== "admin" || context?.name !== "candidates" || !context.id) {
+      b?.remove();
+      return;
+    }
+    if (!b) {
+      b = button("Aceptar como caso", async () => {
+        const current = getState().detail;
+        if (current?.name !== "candidates" || !current.id) return;
+        if (getState().dirty) {
+          alert("Guarda primero los cambios del lead.");
+          return;
+        }
+        if (!confirm("Aceptar este lead como caso gestionado por MUK Talent e incorporarlo a la pipeline?")) return;
+        b.disabled = true;
+        try {
+          await api2("/api/admin-pipeline/accept", { method: "POST", body: JSON.stringify({ candidate_id: current.id }) });
+          await openRecord2("candidates", current.id);
+        } catch (error) {
+          alert(error.message);
+          b.disabled = false;
+        }
+      });
+      b.id = "adminAcceptCase";
+      document.querySelector("#recordForm .form-actions").append(b);
+    }
+    const accepted = Boolean(context.record.case_accepted_at);
+    const text = accepted ? "Caso aceptado \xB7 en pipeline" : "Aceptar como caso";
+    if (b.textContent !== text) b.textContent = text;
+    b.disabled = accepted;
+  }
+  new MutationObserver(caseAction).observe(recordDialog, { childList: true, subtree: true });
+}
+async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord2, host }) {
+  let page = 1, query = "", stage = "", mode = "internal", result = null, busy = false, selected = /* @__PURE__ */ new Set(), loadEpoch = 0;
+  host.replaceChildren();
+  host.className = "admin-report-view";
+  const notice = E("p", "", "message");
+  notice.setAttribute("role", "status");
+  const intro = E("section", void 0, "admin-report-intro");
+  intro.append(E("p", "MUK TALENT / COMMERCIAL INTELLIGENCE", "eyebrow"), E("h2", "Un \xFAnico registro de casos aceptados"), E("p", "Solo casos aceptados por administraci\xF3n. La hoja consulta el CRM actual; no es una lista manual duplicada.", "muted"));
+  host.append(intro, notice);
+  const tools = E("div", void 0, "admin-report-actions");
+  tools.append(button("Incorporar lead existente", () => acceptExisting()), button("A\xF1adir caso manual", () => manual()), button("CRM completo \xB7 interno", async () => {
+    if (!confirm("Este archivo contiene datos personales de todo el CRM. \xBFDescargar para uso interno?")) return;
+    try {
+      await binary(getState, "/api/exports/internal");
+    } catch (error) {
+      message2(error.message, true);
+    }
+  }));
+  host.append(tools);
+  const filters = E("form", void 0, "admin-report-toolbar"), search = E("input");
+  search.type = "search";
+  search.placeholder = "Referencia, nombre, instituci\xF3n, convocatoria\u2026";
+  search.maxLength = 100;
+  search.setAttribute("aria-label", "Buscar casos");
+  const status = E("select");
+  status.setAttribute("aria-label", "Etapa de pipeline");
+  status.append(new Option("Todas las etapas", ""));
+  const filter = E("button", "Aplicar filtros", "secondary");
+  filter.type = "submit";
+  filters.append(search, status, filter);
+  filters.onsubmit = (e) => {
+    e.preventDefault();
+    if (busy) return;
+    query = search.value.trim();
+    stage = status.value;
+    page = 1;
+    selected.clear();
+    load();
+  };
+  host.append(filters);
+  const tabs = E("div", void 0, "admin-report-tabs"), internal = button("Hoja interna", () => {
+    mode = "internal";
+    paint();
+  }), external = button("Vista para universidades / partners", () => {
+    mode = "partners";
+    paint();
+  });
+  tabs.append(internal, external);
+  host.append(tabs);
+  const summary = E("div", void 0, "admin-report-summary"), selection = E("p", "", "muted"), actions = E("div", void 0, "admin-report-actions");
+  actions.append(button("Seleccionar esta p\xE1gina", () => {
+    for (const r of result?.data || []) {
+      if (selected.size >= 300) break;
+      selected.add(r.candidate_id);
+    }
+    paint();
+  }), button("Limpiar selecci\xF3n", () => {
+    selected.clear();
+    paint();
+  }), button("Exportar selecci\xF3n (.xlsx)", () => exportRows()), button("Crear enlace para partner", () => share()), button("Enlaces compartidos", () => shares()));
+  host.append(summary, selection, actions);
+  const warning = E("p", "", "admin-report-warning"), sheet = E("div", void 0, "admin-sheet-wrap"), pager = E("div", void 0, "pagination");
+  host.append(warning, sheet, pager);
+  function message2(text, error = false) {
+    if (!host.isConnected) return;
+    notice.textContent = text;
+    notice.classList.toggle("error", error);
+  }
+  async function load() {
+    if (busy) return;
+    const epoch = ++loadEpoch;
+    busy = true;
+    filter.disabled = true;
+    message2("Actualizando pipeline\u2026");
+    try {
+      const params = new URLSearchParams({ page: String(page) });
+      if (query) params.set("q", query);
+      if (stage) params.set("stage", stage);
+      const response = await api2("/api/admin-pipeline?" + params);
+      if (epoch !== loadEpoch || !host.isConnected) return;
+      result = response;
+      if (status.options.length === 1) for (const s of result.stages) status.append(new Option(s, s));
+      paint();
+      message2("Actualizado: " + new Date(result.as_of).toLocaleString("es-ES") + " \xB7 La exportaci\xF3n es una instant\xE1nea de los casos seleccionados.");
+    } catch (error) {
+      message2(error.message, true);
+    } finally {
+      busy = false;
+      filter.disabled = false;
+    }
+  }
+  function paint() {
+    if (!result || !host.isConnected) return;
+    internal.classList.toggle("primary", mode === "internal");
+    external.classList.toggle("primary", mode === "partners");
+    summary.replaceChildren();
+    for (const [title, value] of [["Casos aceptados \xB7 filtro actual", result.total], ["Casos en esta p\xE1gina", result.data.length], ["Seleccionados", selected.size]]) {
+      const c = E("article", void 0, "admin-report-metric");
+      c.append(E("span", title), E("strong", value));
+      summary.append(c);
+    }
+    selection.textContent = selected.size + " casos seleccionados; la selecci\xF3n puede abarcar varias p\xE1ginas. Al cambiar filtros se limpia.";
+    warning.textContent = mode === "partners" ? "Vista externa: sin nombres, tel\xE9fonos, correos ni notas internas. Las referencias siguen siendo datos seudonimizados, no una garant\xEDa de anonimato. Revisa tambi\xE9n los textos de curso y pr\xF3ximo paso antes de compartir." : "Vista interna confidencial. La etapa acad\xE9mica de la pipeline es independiente del estado operativo del lead.";
+    sheet.replaceChildren();
+    const table = E("table"), caption = E("caption", "MUK Talent \xB7 " + (mode === "partners" ? "Partner pipeline briefing" : "Internal case pipeline"));
+    caption.className = "sr-only";
+    table.append(caption);
+    const head2 = E("thead"), tr = E("tr");
+    tr.append(E("th", "Seleccionar"));
+    const columns = result.columns[mode];
+    for (const [, label2] of columns) {
+      const th = E("th", label2);
+      th.scope = "col";
+      tr.append(th);
+    }
+    tr.append(E("th", "Gesti\xF3n"));
+    head2.append(tr);
+    const body = E("tbody");
+    for (const row of result.data) {
+      const line = E("tr"), cell = E("td"), check = E("input");
+      check.type = "checkbox";
+      check.checked = selected.has(row.candidate_id);
+      check.setAttribute("aria-label", "Seleccionar " + row.reference);
+      check.onchange = () => {
+        if (check.checked && selected.size >= 300) {
+          check.checked = false;
+          message2("M\xE1ximo 300 casos por exportaci\xF3n o enlace.", true);
+          return;
+        }
+        if (check.checked) selected.add(row.candidate_id);
+        else selected.delete(row.candidate_id);
+        paint();
+      };
+      cell.append(check);
+      line.append(cell);
+      for (const [key] of columns) {
+        const td = E("td");
+        if (key === "stage") td.append(E("span", row.stage, "admin-stage-badge"));
+        else td.textContent = display(row[key], key);
+        line.append(td);
+      }
+      const control = E("td");
+      control.append(button("Gestionar", () => manage(row)), button("Expediente", () => openRecord2("candidates", row.candidate_id)));
+      line.append(control);
+      body.append(line);
+    }
+    table.append(head2, body);
+    sheet.append(table);
+    if (!result.data.length) sheet.append(E("p", "Todav\xEDa no hay casos aceptados con estos filtros. Acepta un lead real o crea un caso manual desde administraci\xF3n.", "admin-report-empty"));
+    pager.replaceChildren();
+    const prev = button("Anterior", () => {
+      if (busy) return;
+      page--;
+      load();
+    }), next = button("Siguiente", () => {
+      if (busy) return;
+      page++;
+      load();
+    });
+    prev.disabled = page <= 1;
+    next.disabled = page * 50 >= result.total;
+    pager.append(E("span", "P\xE1gina " + page + " de " + Math.max(1, Math.ceil(result.total / 50))), prev, next);
+  }
+  async function exportRows() {
+    if (!selected.size) {
+      message2("Selecciona los casos que quieres exportar.", true);
+      return;
+    }
+    try {
+      await binary(getState, "/api/admin-pipeline/export", { method: "POST", body: JSON.stringify({ ids: [...selected], mode }) });
+      message2("Archivo generado. Revisa la instant\xE1nea antes de compartirla.");
+    } catch (error) {
+      message2(error.message, true);
+    }
+  }
+  function manage(row) {
+    const modal = dialog("Gestionar " + row.reference), form = E("form"), grid = E("div", void 0, "form-grid");
+    const stage2 = field(grid, "stage", "Etapa acad\xE9mica", "select", result.stages.map((s) => [s, s]), row.stage), university = field(grid, "target_university", "Instituci\xF3n objetivo", "text", null, row.target_university), course = field(grid, "target_course", "Curso objetivo", "text", null, row.target_course), next = field(grid, "external_next_step", "Pr\xF3ximo paso \xB7 visible en informe externo", "textarea", null, row.external_next_step);
+    university.maxLength = 200;
+    course.maxLength = 300;
+    next.maxLength = 500;
+    const msg = E("p", "No incluyas nombres ni informaci\xF3n privada en los campos externos.", "notice"), save = E("button", "Guardar", "primary");
+    save.type = "submit";
+    form.append(grid, msg, save);
+    modal.body.append(form);
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      modal.lock(true);
+      save.disabled = true;
+      try {
+        await api2("/api/admin-pipeline/" + row.candidate_id, { method: "PATCH", body: JSON.stringify({ stage: stage2.value, target_university: university.value.trim(), target_course: course.value.trim(), external_next_step: next.value.trim(), version: row.version }) });
+        modal.d.remove();
+        await load();
+      } catch (error) {
+        msg.textContent = error.message;
+      } finally {
+        modal.lock(false);
+        save.disabled = false;
+      }
+    };
+  }
+  async function acceptExisting() {
+    const modal = dialog("Incorporar un lead real"), form = E("form"), q = field(form, "search", "Buscar en leads"), find = button("Buscar", async () => {
+      find.disabled = true;
+      choice.disabled = true;
+      try {
+        const p = new URLSearchParams({ page: "1", page_size: "100" });
+        if (q.value.trim()) p.set("q", q.value.trim());
+        const r = await api2("/api/candidates?" + p);
+        choice.replaceChildren();
+        const rows = r.data.filter((c) => !c.case_accepted_at);
+        for (const c of rows) choice.append(new Option(c.reference + " \xB7 " + c.first_name + " " + c.last_name, c.id));
+        msg.textContent = rows.length ? "Selecciona el lead. Se incorporar\xE1 una sola vez a la pipeline." : "No hay leads pendientes entre los primeros 100 resultados. Ajusta la b\xFAsqueda.";
+        save.disabled = !rows.length;
+      } catch (error) {
+        msg.textContent = error.message;
+      } finally {
+        find.disabled = false;
+        choice.disabled = false;
+      }
+    }), choice = E("select"), msg = E("p", "Busca el lead que administraci\xF3n acepta gestionar.", "muted"), save = E("button", "Aceptar como caso", "primary");
+    choice.setAttribute("aria-label", "Lead a aceptar");
+    save.type = "submit";
+    save.disabled = true;
+    form.append(find, choice, msg, save);
+    modal.body.append(form);
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      if (!choice.value || !confirm("\xBFAceptar este lead como caso gestionado por MUK Talent?")) return;
+      modal.lock(true);
+      save.disabled = true;
+      try {
+        await api2("/api/admin-pipeline/accept", { method: "POST", body: JSON.stringify({ candidate_id: choice.value }) });
+        modal.d.remove();
+        page = 1;
+        await load();
+      } catch (error) {
+        msg.textContent = error.message;
+      } finally {
+        modal.lock(false);
+        save.disabled = false;
+      }
+    };
+  }
+  async function manual() {
+    const modal = dialog("Nuevo caso manual \xB7 solo administraci\xF3n"), form = E("form"), grid = E("div", void 0, "form-grid"), inputs = {};
+    for (const [key, label2, type, options] of [["first_name", "Nombre", "text"], ["last_name", "Apellidos", "text"], ["email", "Correo", "email"], ["phone", "Tel\xE9fono internacional (+...)", "tel"], ["city", "Ciudad", "text"], ["study_level", "Nivel previsto", "select", [["", "Sin definir"], ["foundation", "Foundation"], ["undergraduate", "Undergraduate"], ["postgraduate", "Postgraduate"], ["phd", "PhD"], ["english_course", "English course"], ["other", "Other"]]], ["subject", "\xC1rea de inter\xE9s", "text"], ["intake", "Convocatoria prevista", "text"]]) {
+      inputs[key] = field(grid, key, label2, type, options || null);
+      inputs[key].required = ["first_name", "last_name"].includes(key);
+    }
+    inputs.first_name.maxLength = inputs.last_name.maxLength = 150;
+    inputs.email.maxLength = 320;
+    inputs.phone.maxLength = 16;
+    inputs.city.maxLength = 200;
+    inputs.subject.maxLength = 500;
+    inputs.intake.maxLength = 100;
+    inputs.assigned_to = field(grid, "assigned_to", "Responsable", "select", [["", "Sin asignar"]]);
+    try {
+      const r = await api2("/api/staff?page=1&page_size=100");
+      for (const s of r.data.filter((s2) => s2.active)) inputs.assigned_to.append(new Option(s.full_name, s.user_id));
+    } catch {
+    }
+    const msg = E("p", "Se crear\xE1 el candidato y se aceptar\xE1 como caso en una sola operaci\xF3n.", "notice"), save = E("button", "Crear y aceptar caso", "primary");
+    save.type = "submit";
+    form.append(grid, msg, save);
+    modal.body.append(form);
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      if (!form.reportValidity() || !confirm("\xBFCrear este expediente y aceptarlo como caso?")) return;
+      modal.lock(true);
+      save.disabled = true;
+      try {
+        await api2("/api/admin-pipeline/manual", { method: "POST", body: JSON.stringify(Object.fromEntries(Object.entries(inputs).map(([k, v]) => [k, v.value.trim()]))) });
+        modal.d.remove();
+        page = 1;
+        await load();
+      } catch (error) {
+        msg.textContent = error.message;
+      } finally {
+        modal.lock(false);
+        save.disabled = false;
+      }
+    };
+  }
+  function share() {
+    if (!selected.size) {
+      message2("Selecciona los casos y revisa la vista externa antes de compartir.", true);
+      return;
+    }
+    const modal = dialog("Compartir instant\xE1nea para partner"), form = E("form"), title = field(form, "title", "T\xEDtulo del informe", "text", null, "MUK Talent \xB7 Accepted case pipeline"), recipient = field(form, "recipient", "Destinatario / instituci\xF3n"), days = field(form, "days", "Caducidad en d\xEDas", "number", null, "7");
+    title.maxLength = recipient.maxLength = 200;
+    title.required = recipient.required = true;
+    days.min = "1";
+    days.max = "30";
+    days.required = true;
+    const label2 = E("label", "He revisado los casos seleccionados, los textos externos, el destinatario y el marco autorizado para compartir estos datos."), confirmBox = E("input");
+    confirmBox.type = "checkbox";
+    confirmBox.required = true;
+    label2.prepend(confirmBox);
+    const msg = E("p", "Se compartir\xE1n " + selected.size + " casos sin identificadores directos. Cualquiera que tenga el enlace podr\xE1 ver la instant\xE1nea hasta que caduque o lo revoques. No contiene acceso al CRM.", "notice"), save = E("button", "Crear enlace de lectura", "primary");
+    save.type = "submit";
+    form.append(label2, msg, save);
+    modal.body.append(form);
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      modal.lock(true);
+      save.disabled = true;
+      try {
+        const r = await api2("/api/admin-pipeline/shares", { method: "POST", body: JSON.stringify({ ids: [...selected], title: title.value.trim(), recipient: recipient.value.trim(), days: Number(days.value), review_confirmed: confirmBox.checked }) });
+        const link = E("input");
+        link.readOnly = true;
+        link.value = r.url;
+        link.setAttribute("aria-label", "Enlace del informe");
+        form.replaceChildren(E("h3", "Enlace creado"), link, E("p", "Caduca: " + new Date(r.expires_at).toLocaleString("es-ES")), button("Copiar enlace", async () => {
+          try {
+            await navigator.clipboard.writeText(r.url);
+          } catch {
+            link.select();
+          }
+        }), E("p", "Guarda el enlace ahora. El servidor almacena su hash, no una copia recuperable del token.", "muted"));
+      } catch (error) {
+        msg.textContent = error.message;
+      } finally {
+        modal.lock(false);
+        save.disabled = false;
+      }
+    };
+  }
+  async function shares() {
+    const modal = dialog("Enlaces de informes"), msg = E("p", "Cargando\u2026");
+    modal.body.append(msg);
+    try {
+      const result2 = await api2("/api/admin-pipeline/shares");
+      msg.textContent = "Revocar impide nuevas consultas al enlace, pero no elimina copias ya descargadas.";
+      for (const s of result2.data) {
+        const row = E("article", void 0, "admin-share-row");
+        row.append(E("strong", s.title), E("p", s.recipient + " \xB7 caduca " + new Date(s.expires_at).toLocaleString("es-ES")));
+        if (s.revoked_at) row.append(E("span", "Revocado"));
+        else if (new Date(s.expires_at) <= /* @__PURE__ */ new Date()) row.append(E("span", "Caducado"));
+        else row.append(button("Revocar", async () => {
+          if (!confirm("\xBFRevocar este enlace?")) return;
+          try {
+            await api2("/api/admin-pipeline/shares/" + s.id + "/revoke", { method: "POST" });
+            row.replaceChildren(E("strong", s.title), E("p", "Enlace revocado"));
+          } catch (error) {
+            msg.textContent = error.message;
+          }
+        }));
+        modal.body.append(row);
+      }
+      if (!result2.data.length) msg.textContent = "No hay enlaces de informes.";
+    } catch (error) {
+      msg.textContent = error.message;
+    }
+  }
+  await load();
 }
 
 // node_modules/tslib/tslib.es6.mjs
@@ -6343,8 +6798,8 @@ var Ajax = class {
       const _timeoutId = setTimeout(() => controller.abort(), timeout);
       options.signal = controller.signal;
     }
-    global2.fetch(endPoint, options).then((response) => response.text()).then((data) => this.parseJSON(data)).then((data) => callback && callback(data)).catch((err) => {
-      if (err.name === "AbortError" && ontimeout) {
+    global2.fetch(endPoint, options).then((response) => response.text()).then((data) => this.parseJSON(data)).then((data) => callback && callback(data)).catch((err2) => {
+      if (err2.name === "AbortError" && ontimeout) {
         ontimeout();
       } else {
         callback && callback(null);
@@ -6422,13 +6877,13 @@ var Ajax = class {
   }
 };
 var arrayBufferToBase64 = (buffer) => {
-  let binary = "";
+  let binary2 = "";
   let bytes = new Uint8Array(buffer);
   let len = bytes.byteLength;
   for (let i = 0; i < len; i++) {
-    binary += String.fromCharCode(bytes[i]);
+    binary2 += String.fromCharCode(bytes[i]);
   }
-  return btoa(binary);
+  return btoa(binary2);
 };
 var LongPoll = class {
   constructor(endPoint, protocols) {
@@ -9900,7 +10355,7 @@ var isPlainObject = (value) => {
   return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 };
 var recursiveToCamel = (item) => {
-  if (Array.isArray(item)) return item.map((el2) => recursiveToCamel(el2));
+  if (Array.isArray(item)) return item.map((el3) => recursiveToCamel(el3));
   else if (typeof item === "function" || item !== Object(item)) return item;
   const result = {};
   Object.entries(item).forEach(([key, value]) => {
@@ -9916,9 +10371,9 @@ var isValidBucketName = (bucketName) => {
   if (bucketName.includes("/") || bucketName.includes("\\")) return false;
   return /^[\w!.\*'() &$@=;:+,?-]+$/.test(bucketName);
 };
-var _getErrorMessage = (err) => {
-  if (typeof err === "object" && err !== null) {
-    const e = err;
+var _getErrorMessage = (err2) => {
+  if (typeof err2 === "object" && err2 !== null) {
+    const e = err2;
     if (typeof e.msg === "string") return e.msg;
     if (typeof e.message === "string") return e.message;
     if (typeof e.error_description === "string") return e.error_description;
@@ -9928,16 +10383,16 @@ var _getErrorMessage = (err) => {
       if (typeof nested.message === "string") return nested.message;
     }
   }
-  return JSON.stringify(err);
+  return JSON.stringify(err2);
 };
 var handleError = async (error, reject, options, namespace) => {
   if (error !== null && typeof error === "object" && "json" in error && typeof error.json === "function") {
     const responseError = error;
     let status = parseInt(String(responseError.status), 10);
     if (!Number.isFinite(status)) status = 500;
-    responseError.json().then((err) => {
-      const statusCode = (err === null || err === void 0 ? void 0 : err.statusCode) || (err === null || err === void 0 ? void 0 : err.code) || status + "";
-      reject(new StorageApiError(_getErrorMessage(err), status, statusCode, namespace));
+    responseError.json().then((err2) => {
+      const statusCode = (err2 === null || err2 === void 0 ? void 0 : err2.statusCode) || (err2 === null || err2 === void 0 ? void 0 : err2.code) || status + "";
+      reject(new StorageApiError(_getErrorMessage(err2), status, statusCode, namespace));
     }).catch(() => {
       const statusCode = status + "";
       reject(new StorageApiError(responseError.statusText || `HTTP ${status} error`, status, statusCode, namespace));
@@ -12862,9 +13317,9 @@ function decodeJWT(token) {
   };
   return data;
 }
-async function sleep2(time) {
+async function sleep2(time2) {
   return await new Promise((accept) => {
-    setTimeout(() => accept(null), time);
+    setTimeout(() => accept(null), time2);
   });
 }
 function retryable(fn, isRetryable) {
@@ -13035,9 +13490,9 @@ function deepClone(obj) {
 }
 
 // node_modules/@supabase/auth-js/dist/module/lib/fetch.js
-var _getErrorMessage2 = (err) => {
-  if (typeof err === "object" && err !== null) {
-    const e = err;
+var _getErrorMessage2 = (err2) => {
+  if (typeof err2 === "object" && err2 !== null) {
+    const e = err2;
     if (typeof e.msg === "string")
       return e.msg;
     if (typeof e.message === "string")
@@ -13047,7 +13502,7 @@ var _getErrorMessage2 = (err) => {
     if (typeof e.error === "string")
       return e.error;
   }
-  return JSON.stringify(err);
+  return JSON.stringify(err2);
 };
 var NETWORK_ERROR_CODES = [502, 503, 504, 520, 521, 522, 523, 524, 530];
 async function handleError2(error) {
@@ -14822,11 +15277,11 @@ async function createCredential(options) {
       };
     }
     return { data: response, error: null };
-  } catch (err) {
+  } catch (err2) {
     return {
       data: null,
       error: identifyRegistrationError({
-        error: err,
+        error: err2,
         options
       })
     };
@@ -14851,11 +15306,11 @@ async function getCredential(options) {
       };
     }
     return { data: response, error: null };
-  } catch (err) {
+  } catch (err2) {
     return {
       data: null,
       error: identifyAuthenticationError({
-        error: err,
+        error: err2,
         options
       })
     };
@@ -18425,13 +18880,13 @@ var GoTrueClient = class _GoTrueClient {
           throw error;
         await ((_a = this.stateChangeEmitters.get(id)) === null || _a === void 0 ? void 0 : _a.callback("INITIAL_SESSION", session));
         this._debug("INITIAL_SESSION", "callback id", id, "session", session);
-      } catch (err) {
+      } catch (err2) {
         await ((_b = this.stateChangeEmitters.get(id)) === null || _b === void 0 ? void 0 : _b.callback("INITIAL_SESSION", null));
-        this._debug("INITIAL_SESSION", "callback id", id, "error", err);
-        if (isAuthSessionMissingError(err)) {
-          console.warn(err);
+        this._debug("INITIAL_SESSION", "callback id", id, "error", err2);
+        if (isAuthSessionMissingError(err2)) {
+          console.warn(err2);
         } else {
-          console.error(err);
+          console.error(err2);
         }
       }
     });
@@ -18862,9 +19317,9 @@ var GoTrueClient = class _GoTrueClient {
       } else {
         await this._notifyAllSubscribers("SIGNED_IN", currentSession);
       }
-    } catch (err) {
-      this._debug(debugName, "error", err);
-      console.error(err);
+    } catch (err2) {
+      this._debug(debugName, "error", err2);
+      console.error(err2);
       return;
     } finally {
       this._debug(debugName, "end");
@@ -20613,13 +21068,1566 @@ function shouldShowDeprecationWarning() {
 }
 if (shouldShowDeprecationWarning()) console.warn("\u26A0\uFE0F  Node.js 18 and below are deprecated and will no longer be supported in future versions of @supabase/supabase-js. Please upgrade to Node.js 20 or later. For more information, visit: https://github.com/orgs/supabase/discussions/37217");
 
+// book/business-card.js
+var E2 = (t, v, c) => {
+  const n = document.createElement(t);
+  if (v !== void 0) n.textContent = String(v);
+  if (c) n.className = c;
+  return n;
+};
+function createBusinessCard({ data, photoUrl, qrImage }) {
+  const scene = E2("div", void 0, "biz-scene mk-scene"), card = E2("article", void 0, "mk-card");
+  card.setAttribute("aria-label", "MUK Talent digital business card");
+  const header = E2("header", void 0, "mk-brand");
+  header.append(E2("span", "MUK TALENT", "mk-wordmark"), E2("span", "STUDENT COUNSELLING", "mk-brand-caption"));
+  const portrait = E2("div", void 0, "mk-portrait"), circle = E2("div", void 0, "mk-avatar"), name = data.display_name || data.full_name || "MUK Talent";
+  circle.append(E2("span", name.split(/\s+/).slice(0, 2).map((v) => v[0]).join(""), "mk-initials"));
+  if (photoUrl) {
+    const image = E2("img");
+    image.src = photoUrl;
+    image.alt = name;
+    image.width = image.height = 132;
+    image.decoding = "async";
+    image.onerror = () => image.remove();
+    circle.append(image);
+  }
+  portrait.append(circle);
+  const identity = E2("section", void 0, "mk-identity");
+  identity.append(E2("h2", name), E2("p", data.job_title || "Team member", "mk-position"));
+  if (name.length > 28) identity.classList.add("mk-long-name");
+  if (data.assigned_city) identity.append(E2("p", data.assigned_city, "mk-location"));
+  const contacts = E2("dl", void 0, "mk-contacts");
+  for (const [label2, value] of [["Work phone", data.contact_phone], ["Work email", data.contact_email]]) if (value) {
+    const row = E2("div");
+    row.append(E2("dt", label2), E2("dd", value));
+    contacts.append(row);
+  }
+  const connection = E2("section", void 0, "mk-connect");
+  connection.setAttribute("aria-label", "Scan this card");
+  if (qrImage) {
+    const qr = E2("img");
+    qr.src = qrImage;
+    qr.alt = "Scan to open this business card, book an appointment and save it to Wallet";
+    qr.width = qr.height = 160;
+    connection.append(qr, E2("p", "SCAN TO CONNECT", "mk-scan-label"));
+  } else connection.append(E2("p", "Your QR is available once the public card is enabled.", "mk-qr-pending"));
+  const footer = E2("footer", "muktalent.com", "mk-footer");
+  card.append(header, portrait, identity);
+  if (contacts.children.length) card.append(contacts);
+  card.append(connection, footer);
+  scene.append(card);
+  return scene;
+}
+function createShareTools({ url, qrImage, name, data }) {
+  const box = E2("div", void 0, "biz-share-tools"), message2 = E2("p", "", "biz-share-message");
+  message2.setAttribute("role", "status");
+  message2.setAttribute("aria-live", "polite");
+  const share = E2("button", "Share card", "biz-action"), copy = E2("button", "Copy link", "biz-action");
+  share.type = copy.type = "button";
+  share.onclick = async () => {
+    try {
+      if (navigator.share) await navigator.share({ title: name + " \xB7 MUK Talent", url });
+      else {
+        await navigator.clipboard.writeText(url);
+        message2.textContent = "Link copied.";
+      }
+    } catch (error) {
+      if (error.name !== "AbortError") message2.textContent = url;
+    }
+  };
+  copy.onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      message2.textContent = "Link copied.";
+    } catch {
+      message2.textContent = url;
+    }
+  };
+  box.append(share, copy);
+  if (qrImage) {
+    const download = E2("a", "Download QR", "biz-action");
+    download.href = qrImage;
+    download.download = "muktalent-business-card-qr.png";
+    box.append(download);
+  }
+  if (data) {
+    const save = E2("button", "Save contact", "biz-action");
+    save.type = "button";
+    save.onclick = () => {
+      const safe = (v) => String(v || "").replace(/\\/g, "\\\\").replace(/[\r\n]+/g, "\\n").replace(/;/g, "\\;").replace(/,/g, "\\,");
+      const lines = ["BEGIN:VCARD", "VERSION:3.0", "FN:" + safe(name), "ORG:MUK Talent", "TITLE:" + safe(data.job_title), "URL:" + url];
+      if (data.contact_phone) lines.push("TEL;TYPE=WORK:" + safe(data.contact_phone));
+      if (data.contact_email) lines.push("EMAIL;TYPE=WORK:" + safe(data.contact_email));
+      lines.push("END:VCARD");
+      const blob = new Blob([lines.join("\r\n")], { type: "text/vcard;charset=utf-8" }), a = E2("a"), link = URL.createObjectURL(blob);
+      a.href = link;
+      a.download = "muktalent-contact.vcf";
+      document.body.append(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(link), 1e3);
+    };
+    box.append(save);
+  }
+  const wallet = E2("button", "Add to Wallet", "biz-action biz-wallet biz-wallet-main");
+  wallet.type = "button";
+  wallet.setAttribute("aria-expanded", "false");
+  const choices = E2("section", void 0, "biz-wallet-options");
+  choices.setAttribute("aria-label", "Wallet options");
+  choices.hidden = true;
+  let busy = false;
+  box.append(wallet, choices, message2);
+  async function readResponse(response) {
+    const text = await response.text();
+    let value;
+    try {
+      value = JSON.parse(text);
+    } catch {
+      value = { error: response.status === 429 ? "Too many Wallet requests. Please wait before trying again." : "This server did not return the Wallet response expected. Check the public deployment." };
+    }
+    if (!response.ok) {
+      const e = new Error(value.error || "Wallet is unavailable.");
+      e.status = response.status;
+      throw e;
+    }
+    return value;
+  }
+  wallet.onclick = async () => {
+    if (busy) return;
+    if (!choices.hidden) {
+      choices.hidden = true;
+      wallet.setAttribute("aria-expanded", "false");
+      return;
+    }
+    busy = true;
+    wallet.disabled = true;
+    wallet.textContent = "Checking Wallet\u2026";
+    message2.textContent = "";
+    choices.replaceChildren();
+    choices.hidden = false;
+    wallet.setAttribute("aria-expanded", "true");
+    try {
+      const slug = new URL(url, location.origin).searchParams.get("c");
+      if (!slug) throw Error("This card link has no card identifier. Reopen the public business card.");
+      const info = await readResponse(await fetch("/api/business-card/" + encodeURIComponent(slug) + "/wallet", { cache: "no-store" }));
+      if (info.version !== 2) throw Error("This server is running an older Wallet integration. Publish the latest version.");
+      if (info.apple) {
+        const apple = E2("a", "Add to Apple Wallet", "biz-action biz-wallet");
+        const target = new URL(info.appleUrl, location.origin);
+        if (target.origin !== location.origin) throw Error("Unexpected Apple Wallet endpoint.");
+        apple.href = target.href;
+        choices.append(apple);
+      }
+      if (info.google) {
+        const google = E2("button", "Add to Google Wallet", "biz-action biz-wallet");
+        google.type = "button";
+        choices.append(google);
+        google.onclick = async () => {
+          if (busy) return;
+          busy = true;
+          google.disabled = wallet.disabled = true;
+          google.textContent = "Preparing your card\u2026";
+          message2.textContent = "";
+          try {
+            const endpoint = new URL(info.googleEndpoint, location.origin);
+            if (endpoint.origin !== location.origin) throw Error("Unexpected Google Wallet endpoint.");
+            const result = await readResponse(await fetch(endpoint.href, { method: "POST", cache: "no-store", headers: { "Content-Type": "application/json" }, body: "{}" }));
+            if (!result.url) throw Error("The server did not return a Wallet save link.");
+            const target = new URL(result.url);
+            if (target.origin !== "https://pay.google.com") throw Error("Unexpected Wallet save destination.");
+            window.location.assign(target.href);
+          } catch (error) {
+            message2.textContent = error.message;
+          } finally {
+            busy = false;
+            google.disabled = wallet.disabled = false;
+            google.textContent = "Add to Google Wallet";
+          }
+        };
+      }
+      if (!info.apple && !info.google) message2.textContent = "Wallet is not enabled on the server serving this page. Check its issuer credentials and public HTTPS site URL. Local configuration does not configure the public deployment.";
+    } catch (error) {
+      message2.textContent = error.message;
+    } finally {
+      busy = false;
+      wallet.disabled = false;
+      wallet.textContent = "Add to Wallet";
+    }
+  };
+  return box;
+}
+
+// admin-src/professional-workspace.js
+var E3 = (tag, text, cls) => {
+  const n = document.createElement(tag);
+  if (text !== void 0) n.textContent = String(text);
+  if (cls) n.className = cls;
+  return n;
+};
+function styles() {
+  for (const [id, href] of [["professionalStyles", "/admin/professional.css"], ["businessCardStyles", "/book/business-card.css"]]) if (!document.getElementById(id)) {
+    const l = E3("link");
+    l.id = id;
+    l.rel = "stylesheet";
+    l.href = href;
+    document.head.append(l);
+  }
+}
+async function fetchDirectory(api2, owner) {
+  return (await api2("/api/team-directory" + (owner ? "?owner=" + encodeURIComponent(owner) : ""))).data;
+}
+function money(value, currency) {
+  try {
+    return new Intl.NumberFormat("en-GB", { style: "currency", currency, maximumFractionDigits: 0 }).format(value);
+  } catch {
+    return value + " " + currency;
+  }
+}
+async function mountProfessionalIdentity({ root, api: api2, owner, staff }) {
+  if (root.dataset.section !== "overview") return;
+  styles();
+  try {
+    const d = await fetchDirectory(api2, owner);
+    if (!root.isConnected) return;
+    root.querySelector(".ws-member-banner")?.remove();
+    root.querySelector(".ws-header-photo")?.remove();
+    const hero = E3("section", void 0, "ws-member-banner");
+    const portrait = E3("div", void 0, "ws-member-portrait");
+    if (d.avatar_url) {
+      const img = E3("img");
+      img.src = d.avatar_url;
+      img.alt = d.full_name;
+      portrait.append(img);
+    } else portrait.append(E3("span", d.full_name.split(" ").slice(0, 2).map((v) => v[0]).join("")));
+    const identity = E3("div", void 0, "ws-member-identity");
+    identity.append(E3("p", "MUK TALENT \xB7 OUR PEOPLE", "ws-member-overline"), E3("h2", d.full_name), E3("p", d.job_title, "ws-member-role"), E3("p", d.assigned_city ? "Leading our presence in " + d.assigned_city : "Territory pending assignment", "ws-member-city"), E3("span", d.employee_code, "ws-member-code"));
+    const metric = E3("div", void 0, "ws-member-impact");
+    metric.append(E3("span", "YOUR PIPELINE POTENTIAL"), E3("strong", d.ready_count), E3("p", "Attributed leads ready for review"));
+    if (d.potential_commission !== null) metric.append(E3("b", money(d.potential_commission, d.commission_currency) + " potential"), E3("small", "Indicative only \xB7 subject to approval and commission terms"));
+    else metric.append(E3("small", "Your administrator has not set a commission rate."));
+    hero.append(portrait, identity, metric);
+    root.querySelector(".ws-header").after(hero);
+  } catch {
+  }
+}
+async function upload({ api: api2, file, category }) {
+  if (!file) throw Error("Choose a file first.");
+  const started = await api2("/api/workspace/assets/start", { method: "POST", body: JSON.stringify({ category, name: file.name, mime: file.type, bytes: file.size }) });
+  const response = await fetch("/api/public-config", { cache: "no-store" });
+  if (!response.ok) throw Error("Upload configuration unavailable.");
+  const cfg = await response.json(), client = createClient(cfg.supabaseUrl, cfg.supabasePublicKey, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
+  const sent = await client.storage.from("mt-employee-private").uploadToSignedUrl(started.path, started.token, file, { contentType: file.type });
+  if (sent.error) throw Error("Upload interrupted. Please try again.");
+  await api2("/api/workspace/assets/finish", { method: "POST", body: JSON.stringify({ id: started.id }) });
+}
+async function renderMyProfile({ host, root, api: api2, owner, readOnly, staff }) {
+  styles();
+  const pending = E3("p", "Loading your profile\u2026", "ws-muted");
+  host.append(pending);
+  try {
+    const d = await fetchDirectory(api2, owner);
+    if (!pending.isConnected) return;
+    pending.remove();
+    const card = E3("section", void 0, "ws-card ws-profile-card"), top = E3("div", void 0, "ws-profile-top"), photo = E3("div", void 0, "ws-profile-portrait");
+    if (d.avatar_url) {
+      const image = E3("img");
+      image.src = d.avatar_url;
+      image.alt = d.full_name;
+      photo.append(image);
+    } else photo.append(E3("span", d.full_name.split(" ").slice(0, 2).map((v) => v[0]).join("")));
+    const info = E3("div");
+    info.append(E3("p", "YOUR PLACE IN MUK TALENT", "ws-member-overline"), E3("h2", d.full_name), E3("p", d.job_title, "ws-profile-role"), E3("p", d.assigned_city || "Territory pending assignment", "ws-muted"), E3("span", d.employee_code, "ws-member-code"));
+    top.append(photo, info);
+    card.append(top);
+    const facts = E3("div", void 0, "ws-profile-facts");
+    for (const [label2, value] of [["Assigned city", d.assigned_city || "Pending"], ["Languages", d.languages || "Not set"], ["Identity document", d.identity_received ? "Received" : "Not submitted"], ["Account", d.active ? "Active team member" : "Inactive"]]) {
+      const item = E3("div");
+      item.append(E3("small", label2), E3("strong", value));
+      facts.append(item);
+    }
+    card.append(facts, E3("p", "Your professional details are maintained by MUK Talent. You can update your profile photo and contact details below.", "ws-footnote"));
+    const message2 = E3("p", "", "ws-message");
+    message2.setAttribute("role", "status");
+    card.append(message2);
+    host.append(card);
+    if (!readOnly) {
+      const form = E3("form", void 0, "ws-form-grid");
+      const values = {};
+      for (const [key, label2, type] of [["contact_phone", "Work phone", "tel"], ["contact_email", "Contact email", "email"]]) {
+        const wrap = E3("div", void 0, "ws-field"), caption = E3("label", label2), f = E3("input");
+        f.type = type;
+        f.id = "directory-" + key;
+        caption.htmlFor = f.id;
+        f.value = d[key];
+        f.maxLength = key === "contact_phone" ? 100 : 320;
+        values[key] = f;
+        wrap.append(caption, f);
+        form.append(wrap);
+      }
+      const save = E3("button", "Update contact details", "ws-button ws-primary");
+      save.type = "submit";
+      form.append(save);
+      form.onsubmit = async (e) => {
+        e.preventDefault();
+        save.disabled = true;
+        try {
+          await api2("/api/team-directory/contact", { method: "PATCH", body: JSON.stringify(Object.fromEntries(Object.entries(values).map(([k, f]) => [k, f.value.trim()]))) });
+          message2.textContent = "Contact details updated.";
+        } catch (error) {
+          message2.textContent = error.message;
+        } finally {
+          save.disabled = false;
+        }
+      };
+      card.append(form);
+      if (d.publish_contact) card.append(E3("p", "Your work contact details are also displayed on your public business card.", "ws-footnote"));
+      for (const [category, label2, accept] of [["avatar", "Update profile photo", "image/jpeg,image/png"], ...!d.identity_received ? [["identity", "Submit identity document", "image/jpeg,image/png,application/pdf"]] : []]) {
+        const row = E3("form", void 0, "ws-profile-upload"), caption = E3("label", label2), file = E3("input");
+        file.type = "file";
+        file.accept = accept;
+        file.setAttribute("aria-label", label2);
+        const send = E3("button", category === "avatar" ? "Update photo" : "Submit document", "ws-button");
+        send.type = "submit";
+        row.append(caption, file, send);
+        row.onsubmit = async (e) => {
+          e.preventDefault();
+          send.disabled = true;
+          message2.textContent = "Updating\u2026";
+          try {
+            await upload({ api: api2, file: file.files[0], category });
+            host.replaceChildren();
+            await renderMyProfile({ host, root, api: api2, owner, readOnly, staff });
+            await mountProfessionalIdentity({ root, api: api2, owner, staff });
+          } catch (error) {
+            message2.textContent = error.message;
+            send.disabled = false;
+          }
+        };
+        card.append(row);
+      }
+      card.append(E3("p", "Photo: JPG/PNG, up to 2 MB. Identity: JPG/PNG/PDF, up to 10 MB. Identity documents are not displayed here. Receipt does not mean identity verification. Contact your administrator to replace an identity document.", "ws-footnote"));
+    }
+  } catch (error) {
+    pending.textContent = error.message;
+  }
+}
+async function renderManagedCard({ host, api: api2, owner, staff }) {
+  styles();
+  const section = E3("section", void 0, "ws-managed-card"), message2 = E3("p", "Preparing your business card\u2026", "ws-muted");
+  section.append(message2);
+  host.append(section);
+  try {
+    const d = await fetchDirectory(api2, owner);
+    if (!section.isConnected) return;
+    section.replaceChildren();
+    let qr = null;
+    if (d.card?.published) qr = await api2("/api/workspace/card/qr" + (owner ? "?owner=" + encodeURIComponent(owner) : ""));
+    const data = { display_name: d.full_name, job_title: d.job_title, assigned_city: d.assigned_city, contact_phone: d.publish_contact ? d.contact_phone : "", contact_email: d.publish_contact ? d.contact_email : "" };
+    section.append(createBusinessCard({ data, photoUrl: d.avatar_url, qrImage: qr?.image }));
+    if (qr) section.append(createShareTools({ url: qr.url, qrImage: qr.image, name: d.full_name, data }));
+    else section.append(E3("p", "Your administrator will enable your public card once your professional details are ready.", "ws-card-notice"));
+    section.append(E3("p", "Your name, position and territory are managed by MUK Talent. Update your photo and work contact details in My profile.", "ws-card-notice"));
+  } catch (error) {
+    message2.textContent = error.message;
+  }
+}
+function mountProfessionalAdmin({ api: api2, getStaff }) {
+  if (document.getElementById("professionalTeamButton")) return;
+  const header = document.querySelector("#appShell .page-header");
+  if (!header) return;
+  const box = E3("div", void 0, "form-actions"), open = E3("button", "Team profiles & business cards", "secondary");
+  open.id = "professionalTeamButton";
+  open.type = "button";
+  box.append(open);
+  header.after(box);
+  open.onclick = async () => {
+    if (getStaff()?.role !== "admin") return;
+    open.disabled = true;
+    const dialog2 = E3("dialog", void 0, "record-dialog");
+    dialog2.lang = "en";
+    const body = E3("div", void 0, "dialog-body"), select = E3("select"), content = E3("div"), message2 = E3("p", "Loading team\u2026", "message");
+    select.setAttribute("aria-label", "Select team member");
+    const close = E3("button", "Close", "secondary");
+    close.type = "button";
+    let busy = false;
+    close.onclick = () => {
+      if (!busy) dialog2.remove();
+    };
+    body.append(E3("h2", "Professional identity & territory"), select, message2, content, close);
+    dialog2.append(body);
+    document.body.append(dialog2);
+    dialog2.oncancel = (e) => {
+      if (busy) e.preventDefault();
+    };
+    dialog2.onclose = () => dialog2.remove();
+    dialog2.showModal();
+    let epoch = 0;
+    async function load() {
+      const request = ++epoch;
+      select.disabled = true;
+      content.replaceChildren();
+      try {
+        const d = await fetchDirectory(api2, select.value);
+        if (request !== epoch || !dialog2.isConnected) return;
+        const form = E3("form"), grid = E3("div", void 0, "form-grid"), fields2 = {};
+        const defs = [["full_name", "Full legal / professional name", "text"], ["job_title", "Position", "text"], ["assigned_city", "Assigned city / territory", "text"], ["languages", "Languages", "text"], ["public_bio", "Public introduction", "textarea"], ["contact_phone", "Work phone", "tel"], ["contact_email", "Contact email", "email"], ["commission_rate", "Potential commission per ready lead (blank = not configured)", "number"], ["commission_currency", "Currency (3 letters)", "text"], ["publish_contact", "Show work contact on public card", "checkbox"], ["card_enabled", "Enable public card and bookings", "checkbox"]];
+        for (const [key, label2, type] of defs) {
+          const wrap = E3("div", void 0, "field"), caption = E3("label", label2), f = E3(type === "textarea" ? "textarea" : "input");
+          f.id = "team-profile-" + key;
+          caption.htmlFor = f.id;
+          if (f.tagName === "INPUT") f.type = type;
+          if (type === "checkbox") f.checked = Boolean(d[key]);
+          else f.value = d[key] ?? "";
+          if (type === "number") {
+            f.min = "0";
+            f.max = "1000000";
+            f.step = "0.01";
+          }
+          f.required = ["full_name", "job_title", "commission_currency"].includes(key);
+          if (type === "text" || type === "textarea") f.maxLength = key === "public_bio" ? 2e3 : 200;
+          fields2[key] = f;
+          wrap.append(caption, f);
+          grid.append(wrap);
+        }
+        const save = E3("button", "Save professional profile", "primary");
+        save.type = "submit";
+        form.append(grid, E3("p", "Ready-lead potential is an estimate, not an approved commission or payment. Existing public cards will reflect these details.", "notice"), save);
+        content.append(E3("p", d.employee_code + " \xB7 " + d.ready_count + " attributed ready leads"), form);
+        if (d.documents.length) {
+          const docs = E3("div");
+          docs.append(E3("h3", "Private identity documents"));
+          for (const item of d.documents) if (item.url) {
+            const a = E3("a", "Download identity document");
+            a.href = item.url;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            docs.append(a);
+          }
+          content.append(docs);
+        } else content.append(E3("p", "No identity document received."));
+        form.onsubmit = async (e) => {
+          e.preventDefault();
+          if (busy || !form.reportValidity()) return;
+          busy = true;
+          save.disabled = select.disabled = close.disabled = true;
+          message2.textContent = "Saving\u2026";
+          try {
+            const v = Object.fromEntries(Object.entries(fields2).map(([k, f]) => [k, f.type === "checkbox" ? f.checked : f.value.trim()]));
+            v.commission_rate = v.commission_rate === "" ? null : Number(v.commission_rate);
+            v.commission_currency = v.commission_currency.toUpperCase();
+            await api2("/api/team-directory/" + d.user_id, { method: "PUT", body: JSON.stringify(v) });
+            message2.textContent = "Profile saved. The employee workspace and public card use these details.";
+          } catch (error) {
+            message2.textContent = error.message;
+          } finally {
+            busy = false;
+            save.disabled = select.disabled = close.disabled = false;
+          }
+        };
+        message2.textContent = "The employee can update only their photo and work contact details.";
+      } catch (error) {
+        message2.textContent = error.message;
+      } finally {
+        select.disabled = false;
+      }
+    }
+    try {
+      const result = await api2("/api/staff?page=1&page_size=100");
+      for (const s of result.data) select.append(new Option(s.full_name, s.user_id));
+      select.onchange = load;
+      if (result.data.length) await load();
+      else message2.textContent = "No team members available.";
+    } catch (error) {
+      message2.textContent = error.message;
+    } finally {
+      open.disabled = false;
+    }
+  };
+}
+
+// admin-src/employee-security.js
+function requirePasswordChange({ api: api2, mandatory = true }) {
+  return new Promise((resolve, reject) => {
+    const d = document.createElement("dialog");
+    d.className = "record-dialog";
+    d.lang = "en";
+    const body = document.createElement("div");
+    body.className = "dialog-body";
+    const title = document.createElement("h2");
+    title.textContent = mandatory ? "Secure your account" : "Change password";
+    title.id = "employeePasswordTitle";
+    d.setAttribute("aria-labelledby", title.id);
+    const intro = document.createElement("p");
+    intro.textContent = mandatory ? "Before opening your workspace, replace your initial password with one that only you know." : "Enter your current password and choose a new one.";
+    const form = document.createElement("form"), fields2 = {};
+    for (const [name, label2, autocomplete] of [["current", "Current password", "current-password"], ["next", "New password (14\u2013128 characters)", "new-password"], ["confirm", "Confirm new password", "new-password"]]) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "field";
+      const caption = document.createElement("label");
+      caption.textContent = label2;
+      const field2 = document.createElement("input");
+      field2.id = "employee-password-" + name;
+      field2.type = "password";
+      field2.autocomplete = autocomplete;
+      field2.required = true;
+      field2.maxLength = name === "current" ? 1024 : 128;
+      if (name !== "current") field2.minLength = 14;
+      caption.htmlFor = field2.id;
+      wrapper.append(caption, field2);
+      form.append(wrapper);
+      fields2[name] = field2;
+    }
+    const message2 = document.createElement("p");
+    message2.className = "message";
+    message2.setAttribute("role", "status");
+    message2.setAttribute("aria-live", "polite");
+    const controls = document.createElement("div");
+    controls.className = "form-actions";
+    const save = document.createElement("button");
+    save.textContent = "Save new password";
+    save.type = "submit";
+    save.className = "primary";
+    const cancel = document.createElement("button");
+    cancel.type = "button";
+    cancel.textContent = mandatory ? "Cancel sign-in" : "Cancel";
+    cancel.className = "secondary";
+    controls.append(save, cancel);
+    form.append(message2, controls);
+    body.append(title, intro, form);
+    d.append(body);
+    document.body.append(d);
+    let busy = false;
+    function clear() {
+      for (const f of Object.values(fields2)) f.value = "";
+      d.remove();
+    }
+    function dismiss() {
+      if (busy) return;
+      clear();
+      if (mandatory) reject(new Error("Sign-in cancelled. Change your initial password next time to access your workspace."));
+      else resolve(false);
+    }
+    cancel.onclick = dismiss;
+    d.oncancel = (e) => {
+      e.preventDefault();
+      dismiss();
+    };
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      if (busy || !form.reportValidity()) return;
+      if (fields2.next.value !== fields2.confirm.value) {
+        message2.textContent = "The new passwords do not match.";
+        return;
+      }
+      if (fields2.next.value === fields2.current.value) {
+        message2.textContent = "Choose a password different from your current password.";
+        return;
+      }
+      busy = true;
+      save.disabled = cancel.disabled = true;
+      message2.classList.remove("error");
+      message2.textContent = "Updating your password\u2026";
+      try {
+        await api2("/api/employee-security/password", { method: "POST", body: JSON.stringify({ current_password: fields2.current.value, new_password: fields2.next.value }) });
+        clear();
+        resolve(true);
+      } catch (error) {
+        message2.textContent = error.message;
+        message2.classList.add("error");
+        for (const f of Object.values(fields2)) f.value = "";
+      } finally {
+        busy = false;
+        save.disabled = cancel.disabled = false;
+      }
+    };
+    d.showModal();
+    fields2.current.focus();
+  });
+}
+
+// admin-src/staff-accounts.js
+function el(tag, text, cls) {
+  const node = document.createElement(tag);
+  if (text !== void 0) node.textContent = text;
+  if (cls) node.className = cls;
+  return node;
+}
+function mountStaffAccounts({ api: api2, onCreated }) {
+  if (document.getElementById("teamAccountControls")) return;
+  const host = document.querySelector("#appShell .page-header");
+  if (!host) return;
+  const controls = el("div", void 0, "form-actions");
+  controls.id = "teamAccountControls";
+  const open = el("button", "Create collaborator", "secondary");
+  open.type = "button";
+  controls.append(open);
+  host.after(controls);
+  const dialog2 = el("dialog", void 0, "record-dialog");
+  dialog2.lang = "en";
+  dialog2.setAttribute("aria-labelledby", "teamAccountTitle");
+  const header = el("header", void 0, "dialog-header");
+  const title = el("h2", "Create collaborator");
+  title.id = "teamAccountTitle";
+  const close = el("button", "Close", "secondary");
+  close.type = "button";
+  header.append(title, close);
+  const body = el("div", void 0, "dialog-body");
+  body.append(el("p", "Creates a Supabase Auth account and links it to Team as an active collaborator. No invitation email is sent. Automatic password change at first login is not enabled yet.", "notice"));
+  const form = el("form");
+  const fields2 = {};
+  for (const [name, label2, type, max] of [
+    ["full_name", "Full name", "text", 200],
+    ["email", "Work email", "email", 320],
+    ["password", "Initial password (at least 14 characters)", "password", 128]
+  ]) {
+    const wrapper = el("div", void 0, "field");
+    const caption = el("label", label2);
+    const input = el("input");
+    input.id = `team-account-${name}`;
+    caption.htmlFor = input.id;
+    input.name = name;
+    input.type = type;
+    input.required = true;
+    input.maxLength = max;
+    input.autocomplete = name === "password" ? "new-password" : name === "email" ? "email" : "name";
+    if (name === "password") input.minLength = 14;
+    fields2[name] = input;
+    wrapper.append(caption, input);
+    form.append(wrapper);
+  }
+  const submit = el("button", "Create account", "primary");
+  submit.type = "submit";
+  const actions = el("div", void 0, "form-actions");
+  actions.append(submit);
+  form.append(actions);
+  const status = el("p", "", "message");
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+  body.append(form, status);
+  dialog2.append(header, body);
+  document.getElementById("appShell").append(dialog2);
+  let busy = false;
+  let completed = false;
+  function dismiss() {
+    if (busy) return;
+    fields2.password.value = "";
+    dialog2.close();
+  }
+  close.addEventListener("click", dismiss);
+  dialog2.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    dismiss();
+  });
+  open.addEventListener("click", () => {
+    form.reset();
+    completed = false;
+    submit.disabled = false;
+    status.textContent = "";
+    status.classList.remove("error");
+    dialog2.showModal();
+    fields2.full_name.focus();
+  });
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (busy || completed || !form.reportValidity()) return;
+    if (!window.confirm(`Create an active collaborator account for ${fields2.email.value.trim()}?`)) return;
+    busy = true;
+    submit.disabled = true;
+    close.disabled = true;
+    status.classList.remove("error");
+    status.textContent = "Creating account. Do not close this window\u2026";
+    try {
+      const result = await api2("/api/team-accounts", {
+        method: "POST",
+        body: JSON.stringify({
+          full_name: fields2.full_name.value.trim(),
+          email: fields2.email.value.trim(),
+          password: fields2.password.value
+        })
+      });
+      completed = true;
+      status.textContent = `Account created for ${result.email}. Role: collaborator. Share the password securely. You can now sign in with this account.`;
+      if (onCreated) {
+        try {
+          await onCreated();
+        } catch {
+          status.textContent += " Refresh Team to update the list.";
+        }
+      }
+    } catch (error) {
+      status.textContent = `${error.message} If the request was interrupted, check Supabase Auth and Team before retrying.`;
+      status.classList.add("error");
+    } finally {
+      fields2.password.value = "";
+      busy = false;
+      close.disabled = false;
+      submit.disabled = completed;
+    }
+  });
+  const observer = new MutationObserver(() => {
+    if (document.getElementById("appShell").hidden) {
+      fields2.password.value = "";
+      if (dialog2.open) dialog2.close();
+      status.textContent = "";
+    }
+  });
+  observer.observe(document.getElementById("appShell"), { attributes: true, attributeFilter: ["hidden"] });
+}
+
+// admin-src/workspace-extras.js
+var E4 = (tag, text, cls) => {
+  const n = document.createElement(tag);
+  if (text !== void 0) n.textContent = String(text);
+  if (cls) n.className = cls;
+  return n;
+};
+function err(host, text) {
+  host.textContent = text;
+  host.className = "ws-message ws-error";
+}
+async function editQualification({ lead, api: api2, readOnly, root }) {
+  const dialog2 = E4("dialog", void 0, "ws-dialog");
+  dialog2.lang = "en";
+  const form = E4("form"), title = E4("h2", `Qualification \xB7 ${lead.first_name} ${lead.last_name}`), status = E4("p", "Loading\u2026", "ws-message"), grid = E4("div", void 0, "ws-form-grid");
+  form.append(title, status, grid);
+  dialog2.append(form);
+  root.append(dialog2);
+  dialog2.showModal();
+  const fields2 = {};
+  const defs = [["english_test", "English test", ["Not assessed", "No test", "IELTS", "Other test"]], ["english_score", "IELTS overall band (0\u20139)", "number"], ["passport", "Passport", ["Unknown", "Available", "In progress", "Not available"]], ["school_status", "Baccalaureate / secondary school", ["Unknown", "In progress", "Completed"]], ["funding", "Funding", ["Unknown", "Confirmed", "Partial", "Not defined"]], ["notes", "Qualification notes", "textarea"]];
+  let busy = false;
+  try {
+    const r = await api2("/api/workspace/qualification/" + lead.id);
+    status.textContent = "Record readiness without uploading passport or academic documents here.";
+    for (const [key, label2, type] of defs) {
+      const wrap = E4("div", void 0, "ws-field"), caption = E4("label", label2);
+      let f;
+      if (Array.isArray(type)) {
+        f = E4("select");
+        for (const option of type) f.append(new Option(option, option));
+      } else {
+        f = E4(type === "textarea" ? "textarea" : "input");
+        if (type === "number") {
+          f.type = "number";
+          f.min = "0";
+          f.max = "9";
+          f.step = "0.5";
+        }
+      }
+      f.id = "qualification-" + key;
+      caption.htmlFor = f.id;
+      f.disabled = readOnly;
+      if (r.data?.[key] != null) f.value = r.data[key];
+      fields2[key] = f;
+      wrap.append(caption, f);
+      grid.append(wrap);
+    }
+    const save = E4("button", "Save qualification", "ws-button ws-primary");
+    save.type = "submit";
+    save.hidden = readOnly;
+    const close = E4("button", "Close", "ws-button");
+    close.type = "button";
+    close.onclick = () => {
+      if (!busy) dialog2.remove();
+    };
+    form.append(save, close);
+    dialog2.oncancel = (e) => {
+      if (busy) e.preventDefault();
+    };
+    dialog2.onclose = () => dialog2.remove();
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      if (readOnly || busy) return;
+      busy = true;
+      save.disabled = true;
+      try {
+        const v = Object.fromEntries(Object.entries(fields2).map(([k, f]) => [k, f.value]));
+        v.english_score = v.english_score === "" ? null : Number(v.english_score);
+        await api2("/api/workspace/qualification/" + lead.id, { method: "POST", body: JSON.stringify(v) });
+        dialog2.remove();
+      } catch (error) {
+        err(status, error.message);
+      } finally {
+        busy = false;
+        save.disabled = false;
+      }
+    };
+  } catch (error) {
+    err(status, error.message);
+    const close = E4("button", "Close", "ws-button");
+    close.type = "button";
+    close.onclick = () => dialog2.remove();
+    form.append(close);
+  }
+}
+function manageAppointment({ a, api: api2, root, onSaved }) {
+  const d = E4("dialog", void 0, "ws-dialog");
+  d.lang = "en";
+  const f = E4("form"), status = E4("select"), reason = E4("textarea"), msg = E4("p", "", "ws-message");
+  f.append(E4("h2", "Update appointment"), E4("p", a.full_name));
+  for (const [value, label2] of [["completed", "Completed"], ["no_show", "No show"], ["cancelled", "Cancelled"]]) status.append(new Option(label2, value));
+  status.setAttribute("aria-label", "Appointment outcome");
+  reason.placeholder = "Cancellation reason (required when cancelling)";
+  reason.setAttribute("aria-label", "Cancellation reason");
+  reason.maxLength = 2e3;
+  const save = E4("button", "Save outcome", "ws-button ws-primary");
+  save.type = "submit";
+  const close = E4("button", "Close", "ws-button");
+  close.type = "button";
+  let busy = false;
+  close.onclick = () => {
+    if (!busy) d.remove();
+  };
+  f.append(status, reason, msg, save, close);
+  d.append(f);
+  root.append(d);
+  d.showModal();
+  d.oncancel = (e) => {
+    if (busy) e.preventDefault();
+  };
+  d.onclose = () => d.remove();
+  f.onsubmit = async (e) => {
+    e.preventDefault();
+    if (busy) return;
+    busy = true;
+    save.disabled = true;
+    try {
+      await api2("/api/workspace/appointments/" + a.id, { method: "POST", body: JSON.stringify({ status: status.value, reason: reason.value.trim(), version: a.updated_at }) });
+      d.remove();
+      await onSaved();
+    } catch (error) {
+      err(msg, error.message);
+    } finally {
+      busy = false;
+      save.disabled = false;
+    }
+  };
+}
+
+// admin-src/employee.js
+var E5 = (t, v, c) => {
+  const n = document.createElement(t);
+  if (v !== void 0) n.textContent = String(v);
+  if (c) n.className = c;
+  return n;
+};
+var states = { partner: ["Identified", "Contacted", "Meeting planned", "Negotiating", "Active", "Not interested"], task: ["To do", "In progress", "Done"], content: ["Idea", "In progress", "Pending review", "Published"], report: ["Draft", "Submitted"] };
+var leadStates = { new: "New", contacted: "Contacted", assessment_in_progress: "Assessment in progress", documents_pending: "Documents pending", ready_for_review: "Ready for review", on_hold: "On hold", closed: "Closed" };
+var fields = { partner: [["type", "Type", ["Language school", "Lycee", "Private teacher", "University", "Other"]], ["contact", "Contact person"], ["email", "Email", "email"], ["phone", "Phone"], ["city", "City"], ["website", "Website (HTTPS)", "url"], ["next_action", "Next action", "textarea"], ["notes", "Notes", "textarea"]], task: [["priority", "Priority", ["Low", "Medium", "High"]], ["notes", "Description", "textarea"]], content: [["platform", "Platform", ["Instagram", "TikTok", "LinkedIn", "Facebook", "YouTube", "Other"]], ["format", "Format", ["Video", "Image", "Carousel", "Story", "Article", "Other"]], ["asset_url", "External asset / video URL (HTTPS)", "url"], ["caption", "Caption", "textarea"], ["publication_url", "Published post URL (HTTPS)", "url"], ["notes", "Production notes", "textarea"]], report: [["work_done", "Work completed", "textarea"], ["achievements", "Achievements", "textarea"], ["difficulties", "Difficulties", "textarea"], ["support_needed", "Support needed", "textarea"], ["tomorrow", "Plan for tomorrow", "textarea"]], lead: [["first_name", "First name"], ["last_name", "Last name"], ["email", "Email", "email"], ["whatsapp_phone_e164", "Phone / WhatsApp (+country code)"], ["residence_city", "City"], ["status", "Pipeline stage", Object.keys(leadStates)], ["target_study_level", "Study level", ["", "foundation", "undergraduate", "postgraduate", "phd", "english_course", "other"]], ["subject_interest", "Subject interest"], ["funding_plan", "Funding notes", "textarea"], ["source", "Source / referring partner"], ["next_action", "Next action", "textarea"], ["next_action_at", "Follow-up (your device time)", "datetime-local"]] };
+function dateKey(value = /* @__PURE__ */ new Date()) {
+  const parts = new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Casablanca", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date(value)), get2 = (k) => parts.find((p) => p.type === k).value;
+  return get2("year") + "-" + get2("month") + "-" + get2("day");
+}
+function time(value, zone = "Africa/Casablanca") {
+  if (!value) return "Not scheduled";
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? "Invalid date" : new Intl.DateTimeFormat("en-GB", { timeZone: zone, dateStyle: "medium", timeStyle: "short" }).format(d);
+}
+function money2(v, c) {
+  try {
+    return new Intl.NumberFormat("en-GB", { style: "currency", currency: c, maximumFractionDigits: 0 }).format(v);
+  } catch {
+    return v + " " + c;
+  }
+}
+function linkStyles() {
+  for (const [id, href] of [["professionalStyles", "/admin/professional.css"], ["businessCardStyles", "/book/business-card.css"], ["luxuryWorkspaceStyles", "/admin/luxury-workspace.css"]]) if (!document.getElementById(id)) {
+    const l = E5("link");
+    l.id = id;
+    l.rel = "stylesheet";
+    l.href = href;
+    document.head.append(l);
+  }
+}
+async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack = null }) {
+  document.getElementById("employeeWorkspace")?.remove();
+  linkStyles();
+  const readOnly = Boolean(owner), root = E5("div", void 0, "lux");
+  root.id = "employeeWorkspace";
+  root.lang = "en";
+  const sidebar = E5("aside", void 0, "lx-sidebar"), brand = E5("a", "MUK TALENT", "lx-brand");
+  brand.href = "/";
+  sidebar.append(brand, E5("p", "PRIVATE TEAM WORKSPACE", "lx-overline"));
+  const nav2 = E5("nav");
+  nav2.setAttribute("aria-label", "Workspace");
+  sidebar.append(nav2);
+  const footer = E5("div", void 0, "lx-sidebar-footer");
+  footer.append(E5("strong", staff.full_name), E5("small", readOnly ? "Administrator preview" : "MUK Talent team"));
+  const exit = button2(readOnly ? "Back to administration" : "Sign out", async () => {
+    exit.disabled = true;
+    try {
+      if (onBack) {
+        root.remove();
+        onBack();
+      } else await onLogout();
+    } catch {
+      notice("Unable to sign out. Try again.", true);
+      exit.disabled = false;
+    }
+  });
+  footer.append(exit);
+  if (!readOnly) footer.append(button2("Change password", async () => {
+    const changed = await requirePasswordChange({ api: api2, mandatory: false });
+    if (changed) notice("Password changed.");
+  }));
+  sidebar.append(footer);
+  const main = E5("main", void 0, "lx-main"), header = E5("header", void 0, "lx-header"), intro = E5("div"), title = E5("h1"), subtitle = E5("p", void 0, "lx-muted");
+  intro.append(E5("p", "MUK TALENT / TEAM OPERATIONS", "lx-overline"), title, subtitle);
+  const actions = E5("div", void 0, "lx-actions"), refresh = button2("Refresh", () => load()), add = button2("Add record", () => {
+  });
+  add.classList.add("lx-primary");
+  actions.append(refresh, add);
+  header.append(intro, actions);
+  const status = E5("p", "", "lx-status");
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+  const body = E5("div", void 0, "lx-body");
+  main.append(header, status, body);
+  root.append(sidebar, main);
+  document.body.append(root);
+  let data = { records: [], leads: [], appointments: [], activity: [] }, directory = null, assets = [], section = "overview", busy = false, dialogBusy = false, loadVersion = 0;
+  let selectedDay = dateKey(), month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1), studioTab = "productions";
+  const pages = [["overview", "Overview", "\u25C8"], ["leads", "My leads", "\u25CE"], ["partner", "Partners", "\u25C7"], ["content", "Content studio", "\u25A7"], ["calendar", "Calendar", "\u25A6"], ["task", "Tasks", "\u2713"], ["profile", "My profile", "\u25CB"], ["card", "My business card", "\u25B1"]];
+  const navButtons = {};
+  for (const [id, label2, symbol] of pages) {
+    const b = E5("button", void 0, "lx-nav");
+    b.type = "button";
+    b.append(E5("span", symbol), E5("span", label2));
+    b.onclick = () => navigate2(id);
+    navButtons[id] = b;
+    nav2.append(b);
+  }
+  const dock = E5("nav", void 0, "lx-dock");
+  dock.setAttribute("aria-label", "Mobile workspace");
+  for (const [id, label2, symbol] of [["overview", "Home", "\u25C8"], ["content", "Studio", "\u25A7"], ["calendar", "Calendar", "\u25A6"], ["more", "More", "\u2630"]]) {
+    const b = E5("button");
+    b.type = "button";
+    b.append(E5("span", symbol), E5("small", label2));
+    b.onclick = () => {
+      if (id !== "more") {
+        navigate2(id);
+        return;
+      }
+      const sheet = E5("dialog", void 0, "lx-menu");
+      sheet.lang = "en";
+      sheet.append(E5("h2", "Your workspace"));
+      for (const [page, text] of pages) sheet.append(button2(text, () => {
+        sheet.remove();
+        navigate2(page);
+      }));
+      if (!readOnly) sheet.append(button2("Change password", () => {
+        sheet.remove();
+        requirePasswordChange({ api: api2, mandatory: false }).catch(() => {
+        });
+      }));
+      sheet.append(button2(readOnly ? "Back to administration" : "Sign out", () => {
+        sheet.remove();
+        exit.click();
+      }), button2("Close", () => sheet.remove()));
+      root.append(sheet);
+      sheet.onclose = () => sheet.remove();
+      sheet.showModal();
+    };
+    dock.append(b);
+  }
+  root.append(dock);
+  function button2(text, fn) {
+    const b = E5("button", text, "lx-button");
+    b.type = "button";
+    b.onclick = fn;
+    return b;
+  }
+  function notice(text, error = false) {
+    if (!root.isConnected) return;
+    status.textContent = text;
+    status.className = error ? "lx-status lx-error" : "lx-status";
+  }
+  function panel(text) {
+    const p = E5("section", void 0, "lx-panel");
+    if (text) p.append(E5("h2", text));
+    return p;
+  }
+  function empty(target, text) {
+    target.append(E5("p", text, "lx-empty"));
+  }
+  function records(kind) {
+    return data.records.filter((r) => r.kind === kind);
+  }
+  function navigate2(id) {
+    if (dialogBusy) return;
+    section = id;
+    render();
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }
+  async function load() {
+    if (busy) return;
+    const version5 = ++loadVersion;
+    busy = true;
+    refresh.disabled = true;
+    notice("Updating your workspace\u2026");
+    try {
+      const query = owner ? "?owner=" + encodeURIComponent(owner) : "";
+      const results = await Promise.all([api2("/api/workspace" + query), api2("/api/team-directory" + query), api2("/api/workspace/assets" + query)]);
+      if (version5 !== loadVersion || !root.isConnected) return;
+      [data, { data: directory }, { data: assets }] = results;
+      render();
+      notice("Updated \xB7 " + time((/* @__PURE__ */ new Date()).toISOString()) + " \xB7 Morocco time");
+    } catch (error) {
+      notice("Unable to load the workspace. Sign in again or contact your administrator. " + error.message, true);
+    } finally {
+      busy = false;
+      refresh.disabled = false;
+    }
+  }
+  function render() {
+    if (!root.isConnected) return;
+    root.dataset.section = section;
+    root.querySelectorAll(".ws-member-banner").forEach((n) => n.remove());
+    body.replaceChildren();
+    title.textContent = section === "overview" ? "Hello, " + (directory?.full_name || staff.full_name).split(" ")[0] : pages.find((p) => p[0] === section)?.[1];
+    subtitle.textContent = readOnly ? "Read-only employee workspace." : { overview: "Your people, your priorities, your impact.", leads: "Build a pipeline with clear next steps.", partner: "Relationships that create opportunities.", content: "A studio for ideas, production and published work.", calendar: "Your appointments, daily report and work history in one place.", task: "Turn priorities into progress.", profile: "Your professional identity within MUK Talent.", card: "Your digital introduction. Ready to share." }[section];
+    for (const [id, b] of Object.entries(navButtons)) {
+      b.classList.toggle("active", id === section);
+      if (id === section) b.setAttribute("aria-current", "page");
+      else b.removeAttribute("aria-current");
+    }
+    add.hidden = readOnly || !["leads", "partner", "task", "content"].includes(section);
+    add.textContent = section === "content" ? "New production" : section === "leads" ? "Add lead" : "Add " + section;
+    add.onclick = () => edit(section === "leads" ? "lead" : section);
+    if (section === "overview") overview();
+    else if (section === "leads") leads();
+    else if (section === "partner" || section === "task") listRecords(section);
+    else if (section === "calendar") calendarPage();
+    else if (section === "content") studio();
+    else if (section === "profile") renderMyProfile({ host: body, root, api: api2, owner, readOnly, staff });
+    else if (section === "card") renderManagedCard({ host: body, api: api2, owner, staff });
+  }
+  function metric(label2, value, detail) {
+    const c = panel();
+    c.classList.add("lx-metric");
+    c.append(E5("p", label2, "lx-muted"), E5("strong", value), E5("small", detail));
+    return c;
+  }
+  function overview() {
+    const metrics = E5("div", void 0, "lx-metrics");
+    metrics.append(metric("Assigned leads", data.leads.length, "Loaded non-archived records"), metric("Ready for review", directory?.ready_count || 0, "Attributed leads \xB7 exact count"), metric("Open tasks", records("task").filter((t) => t.status !== "Done").length, "In your workspace"), metric("Content in production", records("content").filter((c) => c.status !== "Published").length, "Ideas and work in progress"));
+    body.append(metrics);
+    const board = E5("div", void 0, "lx-board"), left = E5("div", void 0, "lx-board-left"), centre = E5("div", void 0, "lx-board-centre"), right = E5("div", void 0, "lx-board-right");
+    const portrait = E5("section", void 0, "lx-portrait-card");
+    if (directory?.avatar_url) {
+      const img = E5("img");
+      img.src = directory.avatar_url;
+      img.alt = directory.full_name;
+      portrait.append(img);
+    } else portrait.append(E5("div", (directory?.full_name || staff.full_name).split(" ").slice(0, 2).map((s) => s[0]).join(""), "lx-photo-placeholder"));
+    const caption = E5("div", void 0, "lx-portrait-caption");
+    caption.append(E5("span", "MUK TALENT \xB7 OUR PEOPLE", "lx-overline"), E5("h2", directory?.full_name || staff.full_name), E5("p", directory?.job_title || "Team member"), E5("span", directory?.assigned_city || "Territory pending assignment", "lx-role-pill"), E5("small", directory?.employee_code || ""));
+    portrait.append(caption);
+    left.append(portrait);
+    const impact = panel("Your pipeline potential");
+    impact.classList.add("lx-impact");
+    impact.append(E5("strong", directory?.ready_count || 0, "lx-impact-number"), E5("p", "Attributed leads ready for review", "lx-muted"));
+    if (directory?.potential_commission != null) impact.append(E5("b", money2(directory.potential_commission, directory.commission_currency) + " potential"));
+    impact.append(E5("small", directory?.potential_commission != null ? "Estimate only. Subject to approval and commission terms." : "Your administrator has not configured a commission rate."));
+    left.append(impact);
+    const tasks = panel("Your priorities"), open = records("task").filter((t) => t.status !== "Done").sort((a, b) => (a.record_date || "9999").localeCompare(b.record_date || "9999")).slice(0, 4);
+    for (const t of open) {
+      const row = E5("div", void 0, "lx-row");
+      row.append(E5("span", t.payload.priority || "Medium", "lx-tag"), E5("h3", t.title), E5("p", t.record_date || "No due date", "lx-muted"));
+      if (!readOnly) row.append(button2("Open task", () => edit("task", t)));
+      tasks.append(row);
+    }
+    if (!open.length) empty(tasks, "Your day is clear. Add a task to plan your next action.");
+    centre.append(tasks);
+    const follow = panel("Follow-ups that need attention"), overdue = data.leads.filter((l) => l.status !== "closed" && l.next_action_at && new Date(l.next_action_at) < /* @__PURE__ */ new Date()).slice(0, 3);
+    for (const lead of overdue) {
+      const row = E5("div", void 0, "lx-row");
+      row.append(E5("h3", lead.first_name + " " + lead.last_name), E5("p", lead.next_action || "Follow-up required", "lx-muted"));
+      if (!readOnly) row.append(button2("Open lead", () => edit("lead", lead)));
+      follow.append(row);
+    }
+    if (!overdue.length) empty(follow, "No overdue follow-ups among loaded leads.");
+    centre.append(follow);
+    const day = panel("Your calendar");
+    miniCalendar(day, true);
+    right.append(day);
+    const todayReport = records("report").find((r) => r.record_date === dateKey()), checkin = panel("Daily check-in");
+    checkin.append(E5("p", todayReport ? "Today\u2019s report \xB7 " + todayReport.status : "Capture the progress behind the numbers.", "lx-muted"), button2("Open today", () => {
+      selectedDay = dateKey();
+      month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
+      navigate2("calendar");
+    }));
+    right.append(checkin);
+    board.append(left, centre, right);
+    body.append(board, E5("p", "Operational view: up to 100 leads, 500 workspace records, 200 appointments and 100 recent activity events. Ready-lead potential uses a separate exact count.", "lx-footnote"));
+  }
+  function searchList(host, rows, draw) {
+    const input = E5("input");
+    input.type = "search";
+    input.className = "lx-search";
+    input.placeholder = "Search loaded records";
+    input.setAttribute("aria-label", "Search loaded records");
+    const results = E5("div");
+    host.append(input, results);
+    const paint = () => {
+      results.replaceChildren();
+      const q = input.value.toLowerCase(), filtered = rows.filter((v) => JSON.stringify(v).toLowerCase().includes(q));
+      for (const v of filtered) draw(results, v);
+      if (!filtered.length) empty(results, "No matching records.");
+    };
+    input.oninput = paint;
+    paint();
+  }
+  function leads() {
+    const host = panel();
+    searchList(host, data.leads, (target, l) => {
+      const row = E5("article", void 0, "lx-row"), top = E5("div", void 0, "lx-row-top");
+      top.append(E5("h3", l.first_name + " " + l.last_name), E5("span", leadStates[l.status] || l.status, "lx-tag"));
+      row.append(top, E5("p", l.reference + " \xB7 " + (l.subject_interest || "Study interest not set"), "lx-muted"), E5("p", l.next_action || "No next action recorded."), E5("small", "Follow-up: " + time(l.next_action_at)));
+      const controls = E5("div", void 0, "lx-actions");
+      if (!readOnly) controls.append(button2("Open lead", () => edit("lead", l)));
+      controls.append(button2("Qualification", () => editQualification({ lead: l, api: api2, readOnly, root })));
+      row.append(controls);
+      target.append(row);
+    });
+    body.append(host);
+  }
+  function listRecords(kind) {
+    const host = panel();
+    searchList(host, records(kind), (target, r) => {
+      const row = E5("article", void 0, "lx-row");
+      row.append(E5("div", r.status, "lx-tag"), E5("h3", r.title), E5("p", kind === "partner" ? [r.payload.type, r.payload.contact, r.payload.city].filter(Boolean).join(" \xB7 ") : [r.payload.priority, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E5("p", r.payload.next_action || r.payload.notes || ""));
+      if (!readOnly) row.append(button2("Open / edit", () => edit(kind, r)));
+      target.append(row);
+    });
+    body.append(host);
+  }
+  function appointment(host, a) {
+    const row = E5("article", void 0, "lx-appointment");
+    row.append(E5("span", new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Casablanca", hour: "2-digit", minute: "2-digit" }).format(new Date(a.starts_at)), "lx-appointment-time"), E5("h3", a.full_name), E5("p", a.subject || "Student consultation"), E5("p", (a.institution || "") + (a.institution ? " \xB7 " : "") + (a.meeting_mode === "in_person" ? "In person \xB7 confirm location" : "Phone consultation"), "lx-muted"), E5("p", (a.whatsapp_phone_e164 || "No phone") + " \xB7 " + (a.email || "No email"), "lx-muted"), E5("small", "UK: " + time(a.starts_at, "Europe/London")), E5("span", a.status, "lx-tag"));
+    if (!readOnly && a.status !== "cancelled") row.append(button2("Manage appointment", () => manageAppointment({ a, api: api2, root, onSaved: load })));
+    host.append(row);
+  }
+  function miniCalendar(host, compact = false) {
+    const tools = E5("div", void 0, "lx-calendar-tools");
+    tools.append(button2("\u2039", () => {
+      month = new Date(month.getFullYear(), month.getMonth() - 1, 1);
+      render();
+    }), E5("strong", new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month)), button2("\u203A", () => {
+      month = new Date(month.getFullYear(), month.getMonth() + 1, 1);
+      render();
+    }));
+    host.append(tools);
+    const grid = E5("div", void 0, "lx-calendar");
+    for (const day of ["M", "T", "W", "T", "F", "S", "S"]) grid.append(E5("span", day, "lx-weekday"));
+    for (let i = 0; i < (month.getDay() + 6) % 7; i++) grid.append(E5("span"));
+    for (let d = 1; d <= new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate(); d++) {
+      const key = month.getFullYear() + "-" + String(month.getMonth() + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"), cell = E5("button", d, "lx-date");
+      cell.type = "button";
+      cell.classList.toggle("today", key === dateKey());
+      cell.classList.toggle("selected", key === selectedDay);
+      const appointments = data.appointments.filter((a) => dateKey(a.starts_at) === key), report = records("report").find((r) => r.record_date === key);
+      if (appointments.length || report) cell.classList.add("has-events");
+      cell.setAttribute("aria-label", key + (key === dateKey() ? " Today" : "") + " \xB7 " + appointments.length + " appointments" + (report ? " \xB7 daily report " + report.status : ""));
+      if (key === dateKey()) cell.setAttribute("aria-current", "date");
+      cell.onclick = () => {
+        selectedDay = key;
+        if (compact) navigate2("calendar");
+        else render();
+      };
+      grid.append(cell);
+    }
+    host.append(grid, E5("p", "Gold ring: today \xB7 dot: appointments or daily report", "lx-footnote"));
+    if (compact) {
+      const upcoming = data.appointments.filter((a) => a.status === "confirmed" && new Date(a.starts_at) > /* @__PURE__ */ new Date()).sort((a, b) => a.starts_at.localeCompare(b.starts_at)).slice(0, 2);
+      for (const a of upcoming) {
+        const row = E5("div", void 0, "lx-row");
+        row.append(E5("strong", a.full_name), E5("p", time(a.starts_at), "lx-muted"));
+        host.append(row);
+      }
+    }
+  }
+  function calendarPage() {
+    const grid = E5("div", void 0, "lx-day-layout"), calendar = panel("Plan your day");
+    calendar.append(button2("Today", () => {
+      selectedDay = dateKey();
+      month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
+      render();
+    }));
+    miniCalendar(calendar);
+    const day = panel(new Intl.DateTimeFormat("en-GB", { dateStyle: "full", timeZone: "UTC" }).format(/* @__PURE__ */ new Date(selectedDay + "T12:00:00Z"))), report = records("report").find((r) => r.record_date === selectedDay);
+    day.append(E5("span", selectedDay === dateKey() ? "TODAY" : "SELECTED DAY", "lx-overline"));
+    const checkin = E5("section", void 0, "lx-day-report");
+    checkin.append(E5("h3", "Daily report"), E5("p", report ? "Status: " + report.status : "No daily report recorded.", "lx-muted"));
+    if (report) {
+      for (const [key, label2] of fields.report) if (report.payload[key]) checkin.append(E5("strong", label2), E5("p", report.payload[key]));
+    }
+    if (!readOnly) checkin.append(button2(report ? "Edit daily report" : "Write daily report", () => edit("report", report, selectedDay)));
+    day.append(checkin, E5("h3", "Appointments"));
+    const appointments = data.appointments.filter((a) => dateKey(a.starts_at) === selectedDay).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+    for (const a of appointments) appointment(day, a);
+    if (!appointments.length) empty(day, "No appointments on this day among loaded records.");
+    day.append(E5("h3", "Tasks for this day"));
+    const tasks = records("task").filter((t) => t.record_date === selectedDay);
+    for (const t of tasks) {
+      const row = E5("div", void 0, "lx-row");
+      row.append(E5("strong", t.title), E5("span", t.status, "lx-tag"));
+      if (!readOnly) row.append(button2("Open task", () => edit("task", t)));
+      day.append(row);
+    }
+    if (!tasks.length) empty(day, "No dated tasks.");
+    day.append(E5("h3", "Recorded workspace activity"));
+    const history = data.activity.filter((a) => dateKey(a.created_at) === selectedDay);
+    for (const a of history) {
+      const row = E5("div", void 0, "lx-history-line");
+      row.append(E5("strong", a.title), E5("small", a.kind + " \xB7 " + a.action + " \xB7 " + time(a.created_at)));
+      day.append(row);
+    }
+    if (!history.length) empty(day, "No recorded workspace changes for this day among loaded activity.");
+    grid.append(calendar, day);
+    body.append(grid);
+  }
+  function studio() {
+    const toolbar = E5("div", void 0, "lx-studio-tools");
+    for (const [id, label2] of [["productions", "Productions"], ["library", "Media library"]]) {
+      const b = button2(label2, () => {
+        studioTab = id;
+        render();
+      });
+      b.classList.toggle("lx-primary", studioTab === id);
+      toolbar.append(b);
+    }
+    const upload2 = button2("Upload media", () => uploadDialog());
+    upload2.hidden = readOnly;
+    toolbar.append(upload2);
+    body.append(toolbar);
+    const gallery = E5("div", void 0, "lx-gallery");
+    body.append(gallery);
+    if (studioTab === "library") {
+      const media = assets.filter((a) => a.category === "content");
+      for (const a of media) {
+        const c = E5("article", void 0, "lx-media-card"), cover = mediaCover(a);
+        c.append(cover, E5("h3", a.original_name), E5("p", a.mime === "application/pdf" ? "PDF asset" : "Image asset", "lx-muted"));
+        if (a.url) {
+          const link = E5("a", "Download", "lx-link");
+          link.href = a.url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          c.append(link);
+        }
+        if (!readOnly) c.append(button2("Delete", async () => {
+          if (!confirm("Delete this media file?")) return;
+          try {
+            await api2("/api/workspace/assets/" + a.id, { method: "DELETE" });
+            await load();
+          } catch (error) {
+            notice(error.message, true);
+          }
+        }));
+        gallery.append(c);
+      }
+      if (!media.length) empty(gallery, "Your media library is ready. Upload your first image or PDF.");
+      return;
+    }
+    const items = records("content");
+    for (const r of items) {
+      const c = E5("article", void 0, "lx-media-card"), asset = assets.find((a) => a.id === r.payload.asset_id && a.category === "content");
+      c.append(mediaCover(asset, r.payload.format), E5("span", r.status, "lx-tag"), E5("h3", r.title), E5("p", [r.payload.platform, r.payload.format, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E5("p", (r.payload.caption || r.payload.notes || "").slice(0, 180), "lx-media-caption"));
+      for (const [key, label2] of [["asset_url", "Open asset"], ["publication_url", "View publication"]]) if (/^https:\/\//i.test(r.payload[key] || "")) {
+        const a = E5("a", label2, "lx-link");
+        a.href = r.payload[key];
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        c.append(a);
+      }
+      if (!readOnly) c.append(button2("Open production", () => edit("content", r)));
+      else c.append(E5("p", r.payload.caption || "", "lx-muted"));
+      gallery.append(c);
+    }
+    if (!items.length) empty(gallery, "Create your first production. Attach a library image or use an external video link.");
+  }
+  function mediaCover(asset, format = "Creative") {
+    const cover = E5("div", void 0, "lx-media-cover");
+    if (asset?.url && asset.mime.startsWith("image/")) {
+      const img = E5("img");
+      img.src = asset.url;
+      img.alt = asset.original_name;
+      img.loading = "lazy";
+      cover.append(img);
+    } else cover.append(E5("span", asset?.mime === "application/pdf" ? "PDF" : format));
+    return cover;
+  }
+  function uploadDialog() {
+    const d = E5("dialog", void 0, "lx-dialog");
+    d.lang = "en";
+    const f = E5("form"), file = E5("input");
+    file.type = "file";
+    file.accept = "image/jpeg,image/png,application/pdf";
+    file.setAttribute("aria-label", "Select media file");
+    const msg = E5("p", "Images and PDFs up to 10 MB. Large videos use an HTTPS link.", "lx-muted"), send = E5("button", "Upload to library", "lx-button lx-primary");
+    send.type = "submit";
+    const close = button2("Close", () => {
+      if (!dialogBusy) d.remove();
+    });
+    f.append(E5("h2", "Upload media"), msg, file, send, close);
+    d.append(f);
+    root.append(d);
+    d.showModal();
+    d.oncancel = (e) => {
+      if (dialogBusy) e.preventDefault();
+    };
+    d.onclose = () => d.remove();
+    f.onsubmit = async (e) => {
+      e.preventDefault();
+      if (dialogBusy) return;
+      const asset = file.files[0];
+      if (!asset) {
+        msg.textContent = "Choose a file.";
+        return;
+      }
+      dialogBusy = true;
+      send.disabled = close.disabled = true;
+      try {
+        const started = await api2("/api/workspace/assets/start", { method: "POST", body: JSON.stringify({ category: "content", name: asset.name, mime: asset.type, bytes: asset.size }) }), r = await fetch("/api/public-config", { cache: "no-store" }), cfg = await r.json(), client = createClient(cfg.supabaseUrl, cfg.supabasePublicKey, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
+        const uploaded = await client.storage.from("mt-employee-private").uploadToSignedUrl(started.path, started.token, asset, { contentType: asset.type });
+        if (uploaded.error) throw Error("Upload interrupted.");
+        await api2("/api/workspace/assets/finish", { method: "POST", body: JSON.stringify({ id: started.id }) });
+        d.remove();
+        studioTab = "library";
+        await load();
+      } catch (error) {
+        msg.textContent = error.message;
+      } finally {
+        dialogBusy = false;
+        send.disabled = close.disabled = false;
+      }
+    };
+  }
+  function edit(kind, record = null, day = null) {
+    if (readOnly || dialogBusy) return;
+    const d = E5("dialog", void 0, "lx-dialog");
+    d.lang = "en";
+    const form = E5("form"), top = E5("div", void 0, "lx-row-top");
+    top.append(E5("h2", (record ? "Edit " : "New ") + (kind === "content" ? "production" : kind)));
+    const close = button2("Close", () => dismiss());
+    top.append(close);
+    form.append(top);
+    const grid = E5("div", void 0, "lx-form-grid"), inputs = {};
+    let definitions = kind === "lead" ? fields.lead : [["title", "Title"], ["status", "Status", states[kind]], ["record_date", kind === "report" ? "Report date" : "Date / next action", "date"], ...fields[kind]];
+    if (kind === "content") definitions = [...definitions, ["asset_id", "Media library asset", "asset-select"]];
+    for (const [key, label2, type] of definitions) {
+      const wrap = E5("div", void 0, type === "textarea" ? "lx-field lx-wide" : "lx-field"), caption = E5("label", label2);
+      let input;
+      if (Array.isArray(type) || type === "asset-select") {
+        input = E5("select");
+        if (type === "asset-select") {
+          input.append(new Option("No library asset", ""));
+          for (const a of assets.filter((a2) => a2.category === "content")) input.append(new Option(a.original_name, a.id));
+        } else for (const v of type) input.append(new Option(kind === "lead" && key === "status" ? leadStates[v] : v || "Not specified", v));
+      } else {
+        input = E5(type === "textarea" ? "textarea" : "input");
+        if (input.tagName === "INPUT") input.type = type || "text";
+      }
+      input.id = "lx-edit-" + key;
+      caption.htmlFor = input.id;
+      input.name = key;
+      if (input.tagName === "TEXTAREA") {
+        input.rows = 4;
+        input.maxLength = 8e3;
+      } else if (input.tagName === "INPUT") input.maxLength = ["first_name", "last_name"].includes(key) ? 150 : 2e3;
+      input.required = ["title", "first_name", "last_name"].includes(key) || kind === "report" && key === "record_date";
+      if (key === "title") input.maxLength = 200;
+      let value = kind === "lead" ? record?.[key] : ["title", "status", "record_date"].includes(key) ? record?.[key] : record?.payload?.[key];
+      if (key === "next_action_at" && value) {
+        const date = new Date(value);
+        value = new Date(date.getTime() - date.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
+      }
+      if (value != null) input.value = value;
+      else if (key === "record_date" && kind === "report") input.value = day || selectedDay;
+      if (key === "record_date" && kind === "report" && day) input.readOnly = true;
+      wrap.append(caption, input);
+      grid.append(wrap);
+      inputs[key] = input;
+    }
+    form.append(grid);
+    const message2 = E5("p", "", "lx-status");
+    message2.setAttribute("role", "status");
+    const controls = E5("div", void 0, "lx-actions"), save = E5("button", "Save changes", "lx-button lx-primary");
+    save.type = "submit";
+    controls.append(save);
+    let dirty = false;
+    form.oninput = () => dirty = true;
+    if (record && kind !== "lead") {
+      const del = button2("Delete", async () => {
+        if (dialogBusy || !confirm("Delete this record? Its recorded history remains.")) return;
+        dialogBusy = true;
+        save.disabled = close.disabled = del.disabled = true;
+        try {
+          await api2("/api/workspace/records/" + record.id, { method: "DELETE", body: JSON.stringify({ version: record.updated_at }) });
+          d.remove();
+          await load();
+        } catch (error) {
+          message2.textContent = error.message;
+        } finally {
+          dialogBusy = false;
+          save.disabled = close.disabled = del.disabled = false;
+        }
+      });
+      controls.append(del);
+    }
+    form.append(message2, controls);
+    d.append(form);
+    root.append(d);
+    function dismiss() {
+      if (dialogBusy) return;
+      if (dirty && !confirm("Discard unsaved changes?")) return;
+      d.remove();
+    }
+    d.oncancel = (e) => {
+      e.preventDefault();
+      dismiss();
+    };
+    d.showModal();
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      if (dialogBusy || !form.reportValidity()) return;
+      dialogBusy = true;
+      save.disabled = close.disabled = true;
+      message2.textContent = "Saving\u2026";
+      try {
+        let v;
+        if (kind === "lead") v = Object.fromEntries(Object.entries(inputs).map(([k, f]) => [k, k === "next_action_at" && f.value ? new Date(f.value).toISOString() : f.value.trim()]));
+        else {
+          const payload = {};
+          for (const [key] of fields[kind]) payload[key] = inputs[key].value.trim();
+          if (kind === "content") payload.asset_id = inputs.asset_id.value || null;
+          v = { kind, title: inputs.title.value.trim(), status: inputs.status.value, record_date: inputs.record_date.value || null, payload };
+        }
+        if (record) v.version = record.updated_at;
+        await api2("/api/workspace/" + (kind === "lead" ? "leads" : "records") + (record ? "/" + record.id : ""), { method: record ? "PATCH" : "POST", body: JSON.stringify(v) });
+        d.remove();
+        await load();
+      } catch (error) {
+        message2.textContent = error.message + " Check required fields, valid contact details and HTTPS links. A daily report may already exist for this date.";
+      } finally {
+        dialogBusy = false;
+        save.disabled = close.disabled = false;
+      }
+    };
+  }
+  render();
+  await load();
+}
+function mountWorkspaceAdmin({ api: api2, getStaff }) {
+  if (document.getElementById("workspaceAdminButton")) return;
+  const host = document.querySelector("#appShell .page-header");
+  if (!host) return;
+  const box = E5("div", void 0, "form-actions"), open = E5("button", "Employee workspaces", "secondary");
+  open.type = "button";
+  open.id = "workspaceAdminButton";
+  box.append(open);
+  host.after(box);
+  open.onclick = async () => {
+    if (getStaff()?.role !== "admin") return;
+    open.disabled = true;
+    const d = E5("dialog", void 0, "record-dialog"), body = E5("div", void 0, "dialog-body"), select = E5("select"), message2 = E5("p", "Loading team\u2026");
+    d.lang = "en";
+    select.setAttribute("aria-label", "Team member");
+    const close = E5("button", "Close", "secondary");
+    close.type = "button";
+    close.onclick = () => d.remove();
+    const view = E5("button", "Open read-only workspace", "primary");
+    view.type = "button";
+    view.disabled = true;
+    let people = [];
+    view.onclick = async () => {
+      const person = people.find((p) => p.user_id === select.value);
+      if (!person) return;
+      d.remove();
+      document.getElementById("appShell").hidden = true;
+      await mountEmployee({ staff: person, api: api2, owner: person.user_id, onBack: () => {
+        document.getElementById("appShell").hidden = false;
+      } });
+    };
+    body.append(E5("h2", "Employee workspaces"), select, message2, view, close);
+    d.append(body);
+    document.body.append(d);
+    d.onclose = () => d.remove();
+    d.showModal();
+    try {
+      const r = await api2("/api/staff?page=1&page_size=100");
+      people = r.data;
+      for (const p of people) select.append(new Option(p.full_name, p.user_id));
+      view.disabled = !people.length;
+      message2.textContent = "Read-only workspace preview. Up to 100 team members.";
+    } catch (error) {
+      message2.textContent = error.message;
+    } finally {
+      open.disabled = false;
+    }
+  };
+}
+
+// admin-src/exports.js
+function mountExportButtons(getSession) {
+  const host = document.querySelector("#appShell .page-header");
+  if (!host || document.getElementById("crmExportControls")) return;
+  const box = document.createElement("div");
+  box.id = "crmExportControls";
+  box.className = "form-actions";
+  const msg = document.createElement("p");
+  msg.className = "message";
+  msg.setAttribute("role", "status");
+  const buttons = [];
+  for (const [mode, label2] of [["internal", "Exporter le CRM (.xlsx)"], ["partners", "Rapport partenaires (.xlsx)"]]) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "secondary";
+    b.textContent = label2;
+    buttons.push(b);
+    b.addEventListener("click", async () => {
+      const warning = mode === "internal" ? "Cet export contient des donn\xE9es personnelles. Usage interne uniquement. Continuer ?" : "Ce rapport minimise les donn\xE9es mais n\u2019est pas anonyme. V\xE9rifiez le cadre de partage et retirez les doublons et profils de test avant toute transmission \xE0 une universit\xE9. T\xE9l\xE9charger pour r\xE9vision ?";
+      if (!window.confirm(warning)) return;
+      buttons.forEach((v) => v.disabled = true);
+      msg.textContent = "G\xE9n\xE9ration du fichier\u2026";
+      try {
+        const session = await getSession();
+        if (!session) throw new Error("Reconnectez-vous au panel.");
+        const r = await fetch("/api/exports/" + mode, { headers: { Authorization: "Bearer " + session.access_token }, cache: "no-store" });
+        if (!r.ok) {
+          let data;
+          try {
+            data = await r.json();
+          } catch {
+          }
+          throw new Error(data?.error || "Export impossible.");
+        }
+        const blob = await r.blob(), url = URL.createObjectURL(blob), a = document.createElement("a");
+        a.href = url;
+        a.download = `muktalent-${mode}-${(/* @__PURE__ */ new Date()).toISOString().slice(0, 10)}.xlsx`;
+        document.body.append(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 6e4);
+        msg.textContent = "Fichier g\xE9n\xE9r\xE9. V\xE9rifiez son contenu avant de l\u2019utiliser.";
+      } catch (e) {
+        msg.textContent = e.message;
+      } finally {
+        buttons.forEach((v) => v.disabled = false);
+      }
+    });
+    box.append(b);
+  }
+  host.after(box, msg);
+}
+
 // admin-src/app.js
 var $ = (id) => document.getElementById(id);
 var state = { client: null, session: null, staff: null, config: null, section: "overview", page: 1, total: 0, epoch: 0, listRequest: 0, detailRequest: 0, relatedRequest: 0, busy: false, loading: false, detail: null, dirty: false, related: "notes", relatedPage: 1, staffOptions: [] };
-var titles = { overview: "Resumen", candidates: "Candidatos", enquiries: "Consultas", appointments: "Citas", blocks: "Bloqueos de agenda", staff: "Equipo", settings: "Horario de reservas", documents: "Documentos", "document-requests": "Solicitudes documentales" };
+var titles = { overview: "Resumen", candidates: "Leads y casos", enquiries: "Consultas", appointments: "Citas", staff: "Equipo", documents: "Documentos", intelligence: "Pipeline e informes" };
 var statusText = { new: "Nuevo", contacted: "Contactado", assessment_in_progress: "Evaluaci\xF3n en curso", documents_pending: "Documentos pendientes", ready_for_review: "Listo para revisi\xF3n", on_hold: "En espera", closed: "Cerrado", in_progress: "En curso", awaiting_reply: "Esperando respuesta", resolved: "Resuelto", archived: "Archivado", confirmed: "Confirmada", completed: "Completada", cancelled: "Cancelada", no_show: "No se present\xF3", pending: "Pendiente", accepted: "Aceptado", rejected: "Rechazado", clean: "Limpio", infected: "Infectado", failed: "Fallido", open: "Abierta", revoked: "Revocada", admin: "Administrador", collaborator: "Colaborador", fr: "Franc\xE9s", en: "Ingl\xE9s" };
-var descriptions = { overview: "Una vista global de la actividad y los pr\xF3ximos pasos.", candidates: "Expedientes, responsables y seguimiento del proceso.", enquiries: "Revisa las consultas recibidas y organiza su seguimiento.", appointments: "Consulta las citas existentes y registra su resultado. Horas mostradas en Africa/Casablanca.", blocks: "Gestiona indisponibilidades de los asesores. No cancela citas existentes.", staff: "Personal vinculado a usuarios existentes de Supabase Authentication.", settings: "Horario de apertura. Duraci\xF3n fija: 30 minutos y margen de 10 minutos.", documents: "Inventario de documentos existentes. No incluye descarga, subida ni an\xE1lisis antivirus.", "document-requests": "Consulta de solicitudes existentes. No genera enlaces privados." };
-function el(tag, text, cls) {
+var descriptions = { overview: "Una vista global de la actividad y los pr\xF3ximos pasos.", candidates: "Leads y expedientes. Acepta como caso los leads que MUK Talent vaya a gestionar.", enquiries: "Revisa las consultas recibidas y organiza su seguimiento.", appointments: "Consulta las citas existentes y registra su resultado. Horas mostradas en Africa/Casablanca.", blocks: "Gestiona indisponibilidades de los asesores. No cancela citas existentes.", staff: "Cuentas, identidad profesional, territorios y acceso de los miembros del equipo.", settings: "Horario de apertura. Duraci\xF3n fija: 30 minutos y margen de 10 minutos.", documents: "Inventario de documentos existentes. No incluye descarga, subida ni an\xE1lisis antivirus.", "document-requests": "Consulta de solicitudes existentes. No genera enlaces privados." };
+function el2(tag, text, cls) {
   const n = document.createElement(tag);
   if (text !== void 0) n.textContent = String(text);
   if (cls) n.className = cls;
@@ -20644,6 +22652,7 @@ function valueText(key, value) {
   return statusText[value] || String(value).replaceAll("_", " ");
 }
 function resetLogin(text = "") {
+  document.getElementById("employeeWorkspace")?.remove();
   state.epoch++;
   state.session = null;
   state.staff = null;
@@ -20697,7 +22706,7 @@ function nav() {
   const nav2 = $("navigation");
   nav2.replaceChildren();
   for (const [name, title] of Object.entries(titles)) {
-    const b = el("button", title, "nav-button");
+    const b = el2("button", title, "nav-button");
     b.type = "button";
     b.dataset.section = name;
     b.addEventListener("click", () => navigate(name));
@@ -20706,6 +22715,28 @@ function nav() {
 }
 async function navigate(name, overdue = false) {
   if (!state.session || !state.config) return;
+  document.getElementById("adminPipelineView")?.remove();
+  if (name === "intelligence") {
+    state.section = name;
+    state.page = 1;
+    state.listRequest++;
+    state.loading = false;
+    $("overview").hidden = true;
+    $("listView").hidden = true;
+    $("createRecord").hidden = true;
+    $("pageTitle").textContent = "Pipeline e informes";
+    $("pageDescription").textContent = "Casos aceptados, hoja interna e informes de pipeline para universidades y partners.";
+    message("globalMessage");
+    for (const b of $("navigation").children) {
+      b.classList.toggle("active", b.dataset.section === name);
+      if (b.dataset.section === name) b.setAttribute("aria-current", "page");
+      else b.removeAttribute("aria-current");
+    }
+    const host = document.createElement("section");
+    host.id = "adminPipelineView";
+    $("globalMessage").after(host);
+    return renderAdminPipeline({ api, getState: () => state, openRecord, host });
+  }
   state.section = name;
   state.page = 1;
   state.listRequest++;
@@ -20744,15 +22775,15 @@ async function loadOverview() {
     const { data } = await api("/api/overview");
     if (epoch !== state.epoch || request !== state.listRequest) return;
     for (const [key, title] of [["candidates", "Candidatos activos"], ["enquiries", "Consultas abiertas"], ["appointments", "Pr\xF3ximas citas"], ["overdue", "Seguimientos vencidos"], ["documents", "Documentos pendientes"]]) {
-      const card = el("article", void 0, "metric");
-      card.append(el("p", title, "muted"), el("strong", data[key]));
+      const card = el2("article", void 0, "metric");
+      card.append(el2("p", title, "muted"), el2("strong", data[key]));
       $("metrics").append(card);
     }
     for (const [status, count] of Object.entries(data.statuses)) {
-      const row = el("div", void 0, "pipeline-row");
-      const info = el("div");
-      info.append(el("span", valueText("status", status)), el("strong", count));
-      const meter = el("progress");
+      const row = el2("div", void 0, "pipeline-row");
+      const info = el2("div");
+      info.append(el2("span", valueText("status", status)), el2("strong", count));
+      const meter = el2("progress");
       meter.max = Math.max(data.candidates, 1);
       meter.value = count;
       meter.setAttribute("aria-label", valueText("status", status));
@@ -20786,28 +22817,28 @@ async function loadList() {
     const result = await api(`/api/${name}?${params}`);
     if (request !== state.listRequest || epoch !== state.epoch) return;
     state.total = result.total || 0;
-    const head2 = el("tr");
+    const head2 = el2("tr");
     for (const f of r.summary) {
-      const th = el("th", label(f));
+      const th = el2("th", label(f));
       th.scope = "col";
       head2.append(th);
     }
-    head2.append(el("th", "Acci\xF3n"));
+    head2.append(el2("th", "Acci\xF3n"));
     $("tableHead").replaceChildren(head2);
     $("tableCaption").textContent = r.title;
     for (const record of result.data || []) {
-      const tr = el("tr");
+      const tr = el2("tr");
       for (const f of r.summary) {
-        const td2 = el("td");
+        const td2 = el2("td");
         const text = valueText(f, record[f]);
-        td2.append(el("span", text, f === "status" ? "badge" : "cell-text"));
+        td2.append(el2("span", text, f === "status" ? "badge" : "cell-text"));
         tr.append(td2);
       }
-      const td = el("td"), button = el("button", "Abrir", "table-action");
-      button.type = "button";
-      button.setAttribute("aria-label", `Abrir ${record.reference || record.full_name || r.title}`);
-      button.addEventListener("click", () => openRecord(name, record[r.key]));
-      td.append(button);
+      const td = el2("td"), button2 = el2("button", "Abrir", "table-action");
+      button2.type = "button";
+      button2.setAttribute("aria-label", `Abrir ${record.reference || record.full_name || r.title}`);
+      button2.addEventListener("click", () => openRecord(name, record[r.key]));
+      td.append(button2);
       tr.append(td);
       $("tableBody").append(tr);
     }
@@ -20837,53 +22868,53 @@ function closeDialog() {
   $("recordDialog").close();
 }
 function inputFor(name, key, rule, record, create) {
-  let field;
+  let field2;
   if (["assigned_to", "advisor_id"].includes(key)) {
-    field = el("select");
-    field.append(new Option("Sin asignar", ""));
-    for (const staff of state.staffOptions.filter((s) => s.active || s.user_id === record[key])) field.append(new Option(`${staff.full_name}${staff.active ? "" : " (inactivo)"}`, staff.user_id));
+    field2 = el2("select");
+    field2.append(new Option("Sin asignar", ""));
+    for (const staff of state.staffOptions.filter((s) => s.active || s.user_id === record[key])) field2.append(new Option(`${staff.full_name}${staff.active ? "" : " (inactivo)"}`, staff.user_id));
   } else if (rule.options) {
-    field = el("select");
-    if (rule.nullable) field.append(new Option("No especificado", ""));
-    for (const v of rule.options) field.append(new Option(valueText(key, v), v));
+    field2 = el2("select");
+    if (rule.nullable) field2.append(new Option("No especificado", ""));
+    for (const v of rule.options) field2.append(new Option(valueText(key, v), v));
   } else if (rule.type === "boolean") {
-    field = el("input");
-    field.type = "checkbox";
-    field.checked = record[key] ?? key === "active";
+    field2 = el2("input");
+    field2.type = "checkbox";
+    field2.checked = record[key] ?? key === "active";
   } else if (["body", "message", "funding_plan", "next_action", "result_text"].includes(key)) {
-    field = el("textarea");
-    field.rows = key === "body" || key === "message" ? 5 : 3;
+    field2 = el2("textarea");
+    field2.rows = key === "body" || key === "message" ? 5 : 3;
   } else {
-    field = el("input");
-    field.type = rule.format === "email" ? "email" : rule.type === "timestamp with time zone" ? "datetime-local" : rule.type === "date" ? "date" : rule.type === "time without time zone" ? "time" : ["numeric", "integer", "bigint"].includes(rule.type) ? "number" : key.endsWith("_e164") ? "tel" : "text";
-    if (field.type === "number") {
-      field.min = "0";
-      field.step = rule.type === "numeric" ? "0.01" : "1";
+    field2 = el2("input");
+    field2.type = rule.format === "email" ? "email" : rule.type === "timestamp with time zone" ? "datetime-local" : rule.type === "date" ? "date" : rule.type === "time without time zone" ? "time" : ["numeric", "integer", "bigint"].includes(rule.type) ? "number" : key.endsWith("_e164") ? "tel" : "text";
+    if (field2.type === "number") {
+      field2.min = "0";
+      field2.step = rule.type === "numeric" ? "0.01" : "1";
     }
   }
-  field.id = `edit-${key}`;
-  field.name = key;
+  field2.id = `edit-${key}`;
+  field2.name = key;
   if (rule.type !== "boolean") {
     let value = record[key];
     if (value && rule.type === "timestamp with time zone") {
       const date = new Date(value);
       value = new Date(date.getTime() - date.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
     }
-    if (value != null) field.value = String(value);
-    else if (field.tagName !== "SELECT") field.value = "";
+    if (value != null) field2.value = String(value);
+    else if (field2.tagName !== "SELECT") field2.value = "";
   }
-  field.required = !rule.nullable && (rule.required || !create) && rule.type !== "boolean";
-  if (field.tagName === "INPUT" && ["text", "email", "tel"].includes(field.type) || field.tagName === "TEXTAREA") field.maxLength = rule.maxLength;
-  if (name === "staff" && !create && key === "active" && record.role === "admin") field.disabled = true;
-  field.addEventListener("input", () => {
+  field2.required = !rule.nullable && (rule.required || !create) && rule.type !== "boolean";
+  if (field2.tagName === "INPUT" && ["text", "email", "tel"].includes(field2.type) || field2.tagName === "TEXTAREA") field2.maxLength = rule.maxLength;
+  if (name === "staff" && !create && key === "active" && record.role === "admin") field2.disabled = true;
+  field2.addEventListener("input", () => {
     state.dirty = true;
   });
-  const wrap = el("div", void 0, rule.type === "boolean" ? "boolean-field" : "field");
-  const title = el("label", `${rule.label}${field.required ? " *" : ""}`);
-  title.htmlFor = field.id;
-  wrap.append(title, field);
-  if (rule.type === "timestamp with time zone") wrap.append(el("small", `Introduce la hora en tu zona del navegador: ${Intl.DateTimeFormat().resolvedOptions().timeZone}. Se guardar\xE1 con zona horaria.`));
-  if (rule.format === "uuid" && !["assigned_to", "advisor_id"].includes(key)) wrap.append(el("small", "Identificador UUID del registro existente; no es un correo electr\xF3nico."));
+  const wrap = el2("div", void 0, rule.type === "boolean" ? "boolean-field" : "field");
+  const title = el2("label", `${rule.label}${field2.required ? " *" : ""}`);
+  title.htmlFor = field2.id;
+  wrap.append(title, field2);
+  if (rule.type === "timestamp with time zone") wrap.append(el2("small", `Introduce la hora en tu zona del navegador: ${Intl.DateTimeFormat().resolvedOptions().timeZone}. Se guardar\xE1 con zona horaria.`));
+  if (rule.format === "uuid" && !["assigned_to", "advisor_id"].includes(key)) wrap.append(el2("small", "Identificador UUID del registro existente; no es un correo electr\xF3nico."));
   return wrap;
 }
 async function openRecord(name, id = null, candidateId = null) {
@@ -20916,23 +22947,23 @@ async function openRecord(name, id = null, candidateId = null) {
     if (id !== null) {
       for (const key of r.select.split(",").filter((k) => !r.fields.includes(k))) {
         if (record[key] === void 0) continue;
-        const item = el("div");
-        item.append(el("small", label(key)), el("p", valueText(key, record[key])));
+        const item = el2("div");
+        item.append(el2("small", label(key)), el2("p", valueText(key, record[key])));
         $("detailMetadata").append(item);
       }
     }
     const editable = !r.readonly && !(id !== null && r.immutable);
     $("recordForm").hidden = !editable;
     if (editable) {
-      const fields = [...r.fields];
-      if (name === "staff" && id === null) fields.unshift("user_id");
-      for (const key of fields) $("formFields").append(inputFor(name, key, r.columns[key], record, id === null));
+      const fields2 = [...r.fields];
+      if (name === "staff" && id === null) fields2.unshift("user_id");
+      for (const key of fields2) $("formFields").append(inputFor(name, key, r.columns[key], record, id === null));
       $("saveRecord").textContent = id === null ? "Crear registro" : "Guardar cambios";
       $("saveRecord").disabled = false;
     } else if (r.immutable) {
       for (const key of r.fields) {
-        const item = el("div");
-        item.append(el("small", label(key)), el("p", valueText(key, record[key])));
+        const item = el2("div");
+        item.append(el2("small", label(key)), el2("p", valueText(key, record[key])));
         $("detailMetadata").append(item);
       }
     }
@@ -20954,9 +22985,9 @@ async function openRecord(name, id = null, candidateId = null) {
 }
 function renderRelatedTabs() {
   $("relatedTabs").replaceChildren();
-  for (const name of ["notes", "admin-notes", "education", "documents", "document-requests"]) {
+  for (const name of ["notes", "admin-notes", "education", "documents"]) {
     const r = state.config.resources[name];
-    const b = el("button", r.title, "tab");
+    const b = el2("button", r.title, "tab");
     b.type = "button";
     b.classList.toggle("active", state.related === name);
     b.addEventListener("click", () => {
@@ -20982,13 +23013,13 @@ async function loadRelated() {
     const result = await api(`/api/${name}?candidate_id=${encodeURIComponent(context.id)}&page=${state.relatedPage}&page_size=10`);
     if (request !== state.relatedRequest || epoch !== state.epoch || state.detail !== context) return;
     for (const record of result.data || []) {
-      const card = el("article", void 0, "related-card");
+      const card = el2("article", void 0, "related-card");
       for (const f of r.summary) {
-        const line = el("p");
-        line.append(el("small", `${label(f)}: `), el("span", valueText(f, record[f])));
+        const line = el2("p");
+        line.append(el2("small", `${label(f)}: `), el2("span", valueText(f, record[f])));
         card.append(line);
       }
-      const b = el("button", r.readonly || r.immutable ? "Ver registro" : "Ver / editar", "ghost");
+      const b = el2("button", r.readonly || r.immutable ? "Ver registro" : "Ver / editar", "ghost");
       b.type = "button";
       b.addEventListener("click", () => openRecord(name, record[r.key], context.id));
       card.append(b);
@@ -21007,16 +23038,16 @@ $("recordForm").addEventListener("submit", async (event) => {
   if (state.busy || !state.detail) return;
   const context = state.detail, { name, id, record, candidateId } = context, r = state.config.resources[name], values = {};
   try {
-    for (const field of $("formFields").querySelectorAll("input,select,textarea")) {
-      if (field.disabled) continue;
-      const rule = r.columns[field.name];
-      let v = field.type === "checkbox" ? field.checked : field.value.trim();
+    for (const field2 of $("formFields").querySelectorAll("input,select,textarea")) {
+      if (field2.disabled) continue;
+      const rule = r.columns[field2.name];
+      let v = field2.type === "checkbox" ? field2.checked : field2.value.trim();
       if (v === "") {
         if (id === null) continue;
         v = rule.nullable ? null : "";
       } else if (rule.type === "timestamp with time zone") v = new Date(v).toISOString();
       else if (["numeric", "integer", "bigint"].includes(rule.type)) v = Number(v);
-      values[field.name] = v;
+      values[field2.name] = v;
     }
     state.busy = true;
     $("saveRecord").disabled = true;
@@ -21074,18 +23105,42 @@ async function loadStaffOptions() {
 }
 $("loginForm").addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!state.client) return;
+  if (!state.client || $("loginSubmit").disabled) return;
   $("loginSubmit").disabled = true;
   message("loginMessage", "Entrando\u2026");
   try {
-    const { data, error } = await state.client.auth.signInWithPassword({ email: $("email").value.trim(), password: $("password").value });
+    const { data, error } = await state.client.auth.signInWithPassword({
+      email: $("email").value.trim(),
+      password: $("password").value
+    });
     $("password").value = "";
-    if (error) throw new Error(error.message);
+    if (error) throw new Error("No se pudo iniciar sesi\xF3n. Revisa tus credenciales.");
     if (!data.session) throw new Error("No se recibi\xF3 una sesi\xF3n.");
     state.session = data.session;
     state.epoch++;
     state.staff = (await api("/api/me")).staff;
-    if (state.staff.role !== "admin") throw new Error("Esta versi\xF3n del panel es exclusiva para administradores.");
+    if (state.staff.must_change_password) {
+      await requirePasswordChange({ api, mandatory: true });
+      state.staff = (await api("/api/me")).staff;
+    }
+    if (!["admin", "collaborator"].includes(state.staff.role)) {
+      throw new Error("Esta cuenta no tiene un rol de acceso v\xE1lido.");
+    }
+    if (state.staff.role === "collaborator") {
+      $("loginView").hidden = true;
+      $("appShell").hidden = true;
+      await mountEmployee({
+        staff: state.staff,
+        api,
+        onLogout: async () => {
+          const { error: error2 } = await state.client.auth.signOut({ scope: "local" });
+          if (error2) throw error2;
+          resetLogin();
+          message("loginMessage", "Sesi\xF3n cerrada.");
+        }
+      });
+      return;
+    }
     state.config = await api("/api/admin-config");
     await loadStaffOptions();
     nav();
@@ -21093,8 +23148,8 @@ $("loginForm").addEventListener("submit", async (event) => {
     $("loginView").hidden = true;
     $("appShell").hidden = false;
     await navigate("overview");
-  } catch (e) {
-    resetLogin(e.message);
+  } catch (error) {
+    resetLogin(error.message);
     await state.client.auth.signOut({ scope: "local" }).catch(() => {
     });
   } finally {
@@ -21136,7 +23191,7 @@ $("recordDialog").addEventListener("cancel", (event) => {
   closeDialog();
 });
 $("recordDialog").addEventListener("close", () => {
-  if (state.session) {
+  if (state.session && state.staff?.role === "admin" && state.config) {
     if (state.section === "overview") loadOverview();
     else loadList();
   }
@@ -21178,6 +23233,16 @@ async function initialise() {
     message("loginMessage", `No se pudo conectar con la administraci\xF3n. ${e.message}`, true);
   }
 }
+mountStaffAccounts({
+  api,
+  onCreated: async () => {
+    if (state.staff?.role !== "admin") return;
+    await loadStaffOptions();
+    if (state.section === "staff") await loadList();
+  }
+});
+mountWorkspaceAdmin({ api, getStaff: () => state.staff });
+mountProfessionalAdmin({ api, getStaff: () => state.staff });
 initialise();
 mountExportButtons(async () => {
   if (!state.staff || state.staff.role !== "admin" || !state.client) return null;
@@ -21185,3 +23250,4 @@ mountExportButtons(async () => {
   if (error) return null;
   return data.session;
 });
+mountAdminExperience({ api, getState: () => state, openRecord });

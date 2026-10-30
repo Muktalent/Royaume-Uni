@@ -1,0 +1,16 @@
+{
+  "name": "MUK Talent Team",
+  "short_name": "MUK Team",
+  "id": "/admin/",
+  "start_url": "/admin/",
+  "scope": "/admin/",
+  "display": "standalone",
+  "background_color": "#0d0f11",
+  "theme_color": "#111518",
+  "icons": [
+    {
+      "src": "/assets/logo.png",
+      "type": "image/png"
+    }
+  ]
+}
