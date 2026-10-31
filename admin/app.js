@@ -607,13 +607,13 @@ function __rest(s, e) {
     }
   return t2;
 }
-function __awaiter(thisArg, _arguments, P2, generator) {
+function __awaiter(thisArg, _arguments, P3, generator) {
   function adopt(value) {
-    return value instanceof P2 ? value : new P2(function(resolve) {
+    return value instanceof P3 ? value : new P3(function(resolve) {
       resolve(value);
     });
   }
-  return new (P2 || (P2 = Promise))(function(resolve, reject) {
+  return new (P3 || (P3 = Promise))(function(resolve, reject) {
     function fulfilled(value) {
       try {
         step(generator.next(value));
@@ -22053,8 +22053,1044 @@ function mountStaffAccounts({ api: api2, onCreated }) {
   observer.observe(document.getElementById("appShell"), { attributes: true, attributeFilter: ["hidden"] });
 }
 
+// admin-src/muk-chat.js
+var SVG2 = "http://www.w3.org/2000/svg";
+var E4 = (t2, v, c) => {
+  const n = document.createElement(t2);
+  if (v !== void 0 && v !== null) n.textContent = String(v);
+  if (c) n.className = c;
+  return n;
+};
+var P = {
+  back: ["m15 5-7 7 7 7"],
+  close: ["M6 6l12 12M18 6 6 18"],
+  search: ["M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14Z", "m20 20-4-4"],
+  send: ["M4 12 20 4l-6 16-3-7-7-1Z"],
+  mic: ["M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z", "M5 11a7 7 0 0 0 14 0", "M12 18v3"],
+  trash: ["M5 7h14", "M10 7V4h4v3", "M7 7l1 13h8l1-13"],
+  play: ["M8 5v14l11-7Z"],
+  pause: ["M8 5v14", "M16 5v14"],
+  plus: ["M12 5v14M5 12h14"],
+  heart: ["M12 20s-7-4.4-9-9a5 5 0 0 1 9-3.5A5 5 0 0 1 21 11c-2 4.6-9 9-9 9Z"],
+  chat: ["M4 5h16v11H8l-4 4V5Z"],
+  news: ["M5 4h11v16H6a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1Z", "M16 8h3v10a2 2 0 0 1-2 2", "M8 8h5M8 12h5M8 16h3"],
+  live: ["M12 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z", "M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4", "M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14"],
+  video: ["M4 6h11v12H4z", "m15 10 5-3v10l-5-3"],
+  share: ["M12 3v12", "m7 8 5-5 5 5", "M5 13v6h14v-6"],
+  bookmark: ["M7 4h10v16l-5-4-5 4V4Z"],
+  check: ["m5 12 4 4 10-10"],
+  checks: ["m2 12 4 4 9-9", "m10 15 1 1 9-9"],
+  upload: ["M12 16V4", "m7 9 5-5 5 5", "M5 20h14"],
+  link: ["M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1", "M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"],
+  calendar: ["M7 3v3M17 3v3M4 8h16", "M5 5h14v15H5z"],
+  globe: ["M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z", "M3 12h18", "M12 3c2.6 2.8 3.8 5.8 3.8 9s-1.2 6.2-3.8 9c-2.6-2.8-3.8-5.8-3.8-9S9.4 5.8 12 3Z"]
+};
+function icon2(name, cls = "mkc-i") {
+  const s = document.createElementNS(SVG2, "svg");
+  s.setAttribute("viewBox", "0 0 24 24");
+  s.setAttribute("aria-hidden", "true");
+  s.setAttribute("class", cls);
+  for (const d of P[name] || []) {
+    const p = document.createElementNS(SVG2, "path");
+    p.setAttribute("d", d);
+    s.append(p);
+  }
+  return s;
+}
+var ibtn = (name, label2, cls = "mkc-ib") => {
+  const b = E4("button", void 0, cls);
+  b.type = "button";
+  b.setAttribute("aria-label", label2);
+  b.title = label2;
+  b.append(icon2(name));
+  return b;
+};
+var TX = {
+  en: { chats: "Chats", search: "Search", newChat: "New chat", write: "Message", send: "Send", record: "Hold to record a voice note", recording: "Recording\u2026", cancel: "Cancel", voice: "Voice message", empty: "No conversations yet. Start one with the + button.", emptyThread: "Say hello. Messages are private between the people in this chat.", counsellor: "Your counsellor", students: "Students", team: "MUK Talent team", you: "You", today: "Today", yesterday: "Yesterday", online: "MUK Talent", micDenied: "Microphone access is blocked. Allow it in your browser settings.", noMic: "Voice notes are not supported in this browser.", notif: "Notifications", messages: "Messages", unread: "{n} unread", allRead: "You are up to date", news: "News", live: "Live", video: "Video", noFeed: "No news yet. The MUK Talent team will post updates, lives and videos here.", watch: "Watch", ago: "ago", share: "Share", save: "Save", saved: "Saved", copied: "Link copied", openLink: "Open video", liveOn: "Live on {d}", publish: "Publish to students", title: "Title", description: "Description", kind: "Type", when: "Date and time", audience: "Audience", all: "All students", mine: "My students", videoSrc: "Video", upload: "Upload to Cloudinary", paste: "Paste a link", urlPh: "https://res.cloudinary.com/\u2026 or YouTube / Drive link", uploading: "Uploading\u2026 {p}%", published: "Published. Students will see it in their notifications.", remove: "Delete", close: "Close", fromLib: "From your library", retry: "Try again", loading: "Loading\u2026", hours: { s: "Just now", m: "{n} min ago", h: "{n} hours ago", h1: "1 hour ago", d: "{n} days ago", d1: "Yesterday" } },
+  fr: { chats: "Discussions", search: "Rechercher", newChat: "Nouvelle discussion", write: "Message", send: "Envoyer", record: "Maintenez pour enregistrer un vocal", recording: "Enregistrement\u2026", cancel: "Annuler", voice: "Message vocal", empty: "Aucune discussion. Commencez avec le bouton +.", emptyThread: "Dites bonjour. Les messages restent priv\xE9s entre les participants.", counsellor: "Votre conseill\xE8re", students: "\xC9tudiants", team: "\xC9quipe MUK Talent", you: "Vous", today: "Aujourd\u2019hui", yesterday: "Hier", online: "MUK Talent", micDenied: "Le micro est bloqu\xE9. Autorisez-le dans les r\xE9glages du navigateur.", noMic: "Les vocaux ne sont pas pris en charge par ce navigateur.", notif: "Notifications", messages: "Messages", unread: "{n} non lus", allRead: "Vous \xEAtes \xE0 jour", news: "Actualit\xE9", live: "Direct", video: "Vid\xE9o", noFeed: "Pas encore d\u2019actualit\xE9s. L\u2019\xE9quipe MUK Talent publiera ici infos, directs et vid\xE9os.", watch: "Regarder", ago: "", share: "Partager", save: "Enregistrer", saved: "Enregistr\xE9", copied: "Lien copi\xE9", openLink: "Ouvrir la vid\xE9o", liveOn: "En direct le {d}", publish: "Publier aux \xE9tudiants", title: "Titre", description: "Description", kind: "Type", when: "Date et heure", audience: "Public", all: "Tous les \xE9tudiants", mine: "Mes \xE9tudiants", videoSrc: "Vid\xE9o", upload: "Envoyer sur Cloudinary", paste: "Coller un lien", urlPh: "https://res.cloudinary.com/\u2026 ou lien YouTube / Drive", uploading: "Envoi\u2026 {p} %", published: "Publi\xE9. Les \xE9tudiants le verront dans leurs notifications.", remove: "Supprimer", close: "Fermer", fromLib: "Depuis votre biblioth\xE8que", retry: "R\xE9essayer", loading: "Chargement\u2026", hours: { s: "\xC0 l\u2019instant", m: "Il y a {n} min", h: "Il y a {n} heures", h1: "Il y a 1 heure", d: "Il y a {n} jours", d1: "Hier" } },
+  es: { chats: "Chats", search: "Buscar", newChat: "Nuevo chat", write: "Mensaje", send: "Enviar", record: "Mant\xE9n pulsado para grabar un audio", recording: "Grabando\u2026", cancel: "Cancelar", voice: "Mensaje de voz", empty: "A\xFAn no hay chats. Empieza uno con el bot\xF3n +.", emptyThread: "Saluda. Los mensajes son privados entre los participantes.", counsellor: "Tu counsellor", students: "Estudiantes", team: "Equipo MUK Talent", you: "T\xFA", today: "Hoy", yesterday: "Ayer", online: "MUK Talent", micDenied: "El micr\xF3fono est\xE1 bloqueado. Perm\xEDtelo en los ajustes del navegador.", noMic: "Este navegador no permite grabar audios.", notif: "Notificaciones", messages: "Mensajes", unread: "{n} sin leer", allRead: "Est\xE1s al d\xEDa", news: "Noticia", live: "Directo", video: "V\xEDdeo", noFeed: "A\xFAn no hay novedades. El equipo publicar\xE1 aqu\xED noticias, directos y v\xEDdeos.", watch: "Ver", ago: "", share: "Compartir", save: "Guardar", saved: "Guardado", copied: "Enlace copiado", openLink: "Abrir v\xEDdeo", liveOn: "En directo el {d}", publish: "Publicar a estudiantes", title: "T\xEDtulo", description: "Descripci\xF3n", kind: "Tipo", when: "Fecha y hora", audience: "P\xFAblico", all: "Todos los estudiantes", mine: "Mis estudiantes", videoSrc: "V\xEDdeo", upload: "Subir a Cloudinary", paste: "Pegar enlace", urlPh: "https://res.cloudinary.com/\u2026 o enlace de YouTube / Drive", uploading: "Subiendo\u2026 {p} %", published: "Publicado. Los estudiantes lo ver\xE1n en sus notificaciones.", remove: "Eliminar", close: "Cerrar", fromLib: "De tu biblioteca", retry: "Reintentar", loading: "Cargando\u2026", hours: { s: "Ahora", m: "Hace {n} min", h: "Hace {n} horas", h1: "Hace 1 hora", d: "Hace {n} d\xEDas", d1: "Ayer" } }
+};
+var tx = (lang2) => TX[lang2] || TX.en;
+var fill = (s, v) => String(s).replace(/\{(\w+)\}/g, (_, k) => v[k] ?? "");
+var loc = (lang2) => ({ fr: "fr-FR", es: "es-ES" })[lang2] || "en-GB";
+function since(iso2, lang2) {
+  const L = tx(lang2).hours, s = (Date.now() - new Date(iso2).getTime()) / 1e3;
+  if (s < 60) return L.s;
+  if (s < 3600) return fill(L.m, { n: Math.floor(s / 60) });
+  if (s < 7200) return L.h1;
+  if (s < 86400) return fill(L.h, { n: Math.floor(s / 3600) });
+  if (s < 172800) return L.d1;
+  return fill(L.d, { n: Math.floor(s / 86400) });
+}
+var clock = (iso2, lang2) => new Intl.DateTimeFormat(loc(lang2), { hour: "2-digit", minute: "2-digit" }).format(new Date(iso2));
+function dayLabel(iso2, lang2) {
+  const d = new Date(iso2), t2 = /* @__PURE__ */ new Date();
+  const k = (x) => x.toDateString();
+  if (k(d) === k(t2)) return tx(lang2).today;
+  const y = new Date(t2);
+  y.setDate(t2.getDate() - 1);
+  if (k(d) === k(y)) return tx(lang2).yesterday;
+  return new Intl.DateTimeFormat(loc(lang2), { day: "numeric", month: "long", year: d.getFullYear() === t2.getFullYear() ? void 0 : "numeric" }).format(d);
+}
+var listTime = (iso2, lang2) => {
+  const d = new Date(iso2);
+  return d.toDateString() === (/* @__PURE__ */ new Date()).toDateString() ? clock(iso2, lang2) : dayLabel(iso2, lang2);
+};
+var mmss = (ms) => {
+  const s = Math.max(0, Math.round(ms / 1e3));
+  return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+};
+var initials = (n) => String(n || "M").split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+function avatar(name, url, cls = "mkc-av") {
+  const a = E4("span", void 0, cls);
+  a.dataset.tone = String([...String(name || "")].reduce((x, c) => x + c.charCodeAt(0), 0) % 5);
+  if (url) {
+    const i = E4("img");
+    i.src = url;
+    i.alt = "";
+    i.referrerPolicy = "no-referrer";
+    i.onerror = () => {
+      i.remove();
+      a.textContent = initials(name);
+    };
+    a.append(i);
+  } else a.textContent = initials(name);
+  return a;
+}
+function linkChatCss() {
+  if (document.getElementById("mukChatCss")) return;
+  const l = E4("link");
+  l.id = "mukChatCss";
+  l.rel = "stylesheet";
+  l.href = "/admin/muk-chat.css?v=12";
+  document.head.append(l);
+}
+function toast(text) {
+  const t2 = E4("div", text, "mkc-toast");
+  t2.setAttribute("role", "status");
+  document.body.append(t2);
+  setTimeout(() => t2.remove(), 2600);
+}
+function overlay(cls, label2) {
+  linkChatCss();
+  const o = E4("div", void 0, "mkc-layer " + cls);
+  o.setAttribute("role", "dialog");
+  o.setAttribute("aria-modal", "true");
+  o.setAttribute("aria-label", label2);
+  document.body.append(o);
+  document.documentElement.classList.add("mkc-lock");
+  const prev = document.activeElement;
+  const close = () => {
+    o.remove();
+    if (!document.querySelector(".mkc-layer")) document.documentElement.classList.remove("mkc-lock");
+    prev?.focus?.();
+  };
+  o.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      e.stopPropagation();
+      close();
+    }
+  });
+  return { o, close };
+}
+function hideOnScroll(el3, { offset = 64 } = {}) {
+  let last = scrollY, ticking = false;
+  const onScroll = () => {
+    if (!el3.isConnected) {
+      removeEventListener("scroll", onScroll);
+      return;
+    }
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const y = Math.max(0, scrollY);
+      if (document.documentElement.classList.contains("mkc-lock")) {
+        ticking = false;
+        return;
+      }
+      if (y > offset && y > last + 4) el3.classList.add("is-hidden");
+      else if (y < last - 4 || y <= offset) el3.classList.remove("is-hidden");
+      last = y;
+      ticking = false;
+    });
+  };
+  addEventListener("scroll", onScroll, { passive: true });
+  return () => removeEventListener("scroll", onScroll);
+}
+function heartButton(lang2, onClick) {
+  linkChatCss();
+  const b = E4("button", void 0, "mkc-heart");
+  b.type = "button";
+  b.setAttribute("aria-label", tx(lang2).notif);
+  b.title = tx(lang2).notif;
+  b.append(icon2("heart"), E4("i", void 0, "mkc-dot"));
+  b.onclick = onClick;
+  return b;
+}
+function watchNotifications(api2, onChange) {
+  let stopped = false, timer = null, last = null;
+  const tick = async () => {
+    if (stopped) return;
+    if (!document.hidden) {
+      try {
+        const s = (await api2("/api/notifications/summary")).data;
+        last = s;
+        onChange(s);
+      } catch {
+      }
+    }
+    timer = setTimeout(tick, 3e4);
+  };
+  const vis = () => {
+    if (!document.hidden) {
+      clearTimeout(timer);
+      tick();
+    }
+  };
+  document.addEventListener("visibilitychange", vis);
+  tick();
+  return { stop() {
+    stopped = true;
+    clearTimeout(timer);
+    document.removeEventListener("visibilitychange", vis);
+  }, refresh() {
+    clearTimeout(timer);
+    tick();
+  }, get last() {
+    return last;
+  } };
+}
+function setDot(btn3, s) {
+  const n = (s?.chat_unread || 0) + (s?.feed_unread || 0);
+  btn3.classList.toggle("has-new", n > 0);
+  btn3.dataset.count = n > 9 ? "9+" : String(n);
+}
+function openMessenger({ api: api2, lang: lang2 = "en", threadId = null, onChange = () => {
+} }) {
+  const L = tx(lang2);
+  const { o, close: closeLayer } = overlay("mkc-chat", L.chats);
+  o.lang = lang2;
+  const close = () => {
+    stopPoll();
+    closeLayer();
+    onChange();
+  };
+  let threads = [], me = null, current = null, poll = null;
+  const stopPoll = () => {
+    clearInterval(poll);
+    poll = null;
+  };
+  const listView = E4("section", void 0, "mkc-list");
+  const convView = E4("section", void 0, "mkc-conv");
+  o.append(listView, convView);
+  const lh = E4("header", void 0, "mkc-bar");
+  const back = ibtn("back", L.close);
+  back.onclick = close;
+  const h = E4("h2", L.chats);
+  const add = ibtn("plus", L.newChat);
+  add.onclick = () => contacts();
+  lh.append(back, h, add);
+  const sbox = E4("label", void 0, "mkc-search");
+  sbox.append(icon2("search"));
+  const q2 = E4("input");
+  q2.type = "search";
+  q2.placeholder = L.search;
+  q2.setAttribute("aria-label", L.search);
+  sbox.append(q2);
+  q2.oninput = () => drawList();
+  const ul = E4("ul", void 0, "mkc-threads");
+  listView.append(lh, sbox, ul);
+  async function loadThreads() {
+    try {
+      const r = await api2("/api/chat/threads");
+      threads = r.data;
+      me = r.me;
+      drawList();
+    } catch (e) {
+      ul.replaceChildren(E4("li", e.message, "mkc-empty"));
+    }
+  }
+  function drawList() {
+    ul.replaceChildren();
+    const term = q2.value.trim().toLowerCase();
+    const rows = threads.filter((t2) => !term || t2.title.toLowerCase().includes(term));
+    if (!rows.length) {
+      ul.append(E4("li", L.empty, "mkc-empty"));
+      return;
+    }
+    for (const t2 of rows) {
+      const li = E4("li");
+      const b = E4("button", void 0, "mkc-trow");
+      b.type = "button";
+      b.append(avatar(t2.title, t2.avatar_url));
+      const mid = E4("span", void 0, "mkc-tmid");
+      const top = E4("span", void 0, "mkc-ttop");
+      top.append(E4("strong", t2.title), E4("small", t2.last ? listTime(t2.last.at, lang2) : "", t2.unread ? "is-new" : ""));
+      const bot = E4("span", void 0, "mkc-tbot");
+      const prev = E4("span", void 0, "mkc-prev");
+      if (t2.last?.mine) prev.append(icon2("checks", "mkc-i mkc-tick"));
+      if (t2.last?.audio) {
+        prev.append(icon2("mic", "mkc-i mkc-mini"));
+        prev.append(document.createTextNode(L.voice));
+      } else prev.append(document.createTextNode(t2.last?.body || t2.subtitle || ""));
+      bot.append(prev);
+      if (t2.unread) bot.append(E4("b", t2.unread > 99 ? "99+" : t2.unread, "mkc-badge"));
+      mid.append(top, bot);
+      b.append(mid);
+      b.onclick = () => openThread(t2);
+      li.append(b);
+      ul.append(li);
+    }
+  }
+  async function openThread(t2) {
+    current = t2;
+    o.classList.add("is-conv");
+    convView.replaceChildren();
+    const bar = E4("header", void 0, "mkc-bar mkc-cbar");
+    const bk = ibtn("back", L.chats);
+    bk.onclick = () => {
+      stopPoll();
+      o.classList.remove("is-conv");
+      current = null;
+      loadThreads();
+      onChange();
+    };
+    const who = E4("div", void 0, "mkc-who");
+    who.append(avatar(t2.title, t2.avatar_url));
+    const nm = E4("div");
+    nm.append(E4("strong", t2.title), E4("small", t2.subtitle || L.online));
+    who.append(nm);
+    bar.append(bk, who);
+    const scroller = E4("div", void 0, "mkc-wall");
+    scroller.setAttribute("aria-live", "polite");
+    const list = E4("div", void 0, "mkc-msgs");
+    scroller.append(list);
+    const comp = composer(t2, async () => {
+      await refresh(true);
+    });
+    convView.append(bar, scroller, comp);
+    let sig = "";
+    async function refresh(force) {
+      try {
+        const rows = (await api2("/api/chat/threads/" + t2.id + "/messages")).data;
+        const s = rows.length + ":" + (rows.at(-1)?.id || "") + ":" + rows.filter((r) => r.read).length;
+        if (!force && s === sig) return;
+        sig = s;
+        const atEnd = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 80;
+        drawMsgs(list, rows);
+        if (atEnd || force) requestAnimationFrame(() => {
+          scroller.scrollTop = scroller.scrollHeight;
+        });
+        if (rows.some((r) => !r.mine)) api2("/api/chat/threads/" + t2.id + "/read", { method: "POST", body: "{}" }).then(onChange).catch(() => {
+        });
+      } catch (e) {
+        list.replaceChildren(E4("p", e.message, "mkc-sys"));
+      }
+    }
+    list.append(E4("p", L.loading, "mkc-sys"));
+    await refresh(true);
+    stopPoll();
+    poll = setInterval(() => {
+      if (!o.isConnected) return stopPoll();
+      if (!document.hidden) refresh(false);
+    }, 6e3);
+    comp.querySelector("textarea")?.focus({ preventScroll: true });
+  }
+  function drawMsgs(list, rows) {
+    list.replaceChildren();
+    if (!rows.length) {
+      list.append(E4("p", L.emptyThread, "mkc-sys mkc-lock-note"));
+      return;
+    }
+    let day = "", prevMine = null;
+    for (const m of rows) {
+      const dl = dayLabel(m.at, lang2);
+      if (dl !== day) {
+        day = dl;
+        list.append(E4("p", dl, "mkc-day"));
+        prevMine = null;
+      }
+      if (m.system) {
+        list.append(E4("p", m.body, "mkc-sys"));
+        prevMine = null;
+        continue;
+      }
+      const b = E4("div", void 0, "mkc-msg " + (m.mine ? "out" : "in") + (prevMine === m.mine ? " cont" : ""));
+      prevMine = m.mine;
+      if (!m.mine && current?.kind === "group") b.append(E4("span", m.sender, "mkc-sender"));
+      if (m.audio) b.append(voicePlayer(m.audio));
+      else b.append(E4("p", m.body));
+      const meta = E4("span", void 0, "mkc-meta");
+      meta.append(document.createTextNode(clock(m.at, lang2)));
+      if (m.mine) meta.append(icon2(m.read ? "checks" : "check", "mkc-i mkc-tick" + (m.read ? " is-read" : "")));
+      b.append(meta);
+      list.append(b);
+    }
+  }
+  function voicePlayer(a) {
+    const w = E4("div", void 0, "mkc-voice");
+    const pb = ibtn("play", L.voice, "mkc-vplay");
+    const track = E4("span", void 0, "mkc-vtrack");
+    const bars = E4("span", void 0, "mkc-vbars");
+    let seed = (a.ms || 1e3) % 97;
+    for (let i = 0; i < 28; i++) {
+      seed = (seed * 37 + 11) % 101;
+      const s = E4("i");
+      s.style.height = 28 + seed % 72 + "%";
+      bars.append(s);
+    }
+    const tm = E4("small", mmss(a.ms || 0));
+    track.append(bars);
+    w.append(pb, track, tm);
+    let au = null;
+    pb.onclick = () => {
+      if (!a.url) return;
+      if (!au) {
+        au = new Audio(a.url);
+        au.preload = "auto";
+        au.ontimeupdate = () => {
+          const d = au.duration && isFinite(au.duration) ? au.duration : a.ms / 1e3;
+          const p = d ? au.currentTime / d : 0;
+          [...bars.children].forEach((s, i) => s.classList.toggle("on", i / 28 < p));
+          tm.textContent = mmss(au.currentTime * 1e3);
+        };
+        au.onended = () => {
+          pb.replaceChildren(icon2("play"));
+          [...bars.children].forEach((s) => s.classList.remove("on"));
+          tm.textContent = mmss(a.ms || 0);
+        };
+      }
+      document.querySelectorAll(".mkc-voice audio");
+      if (au.paused) {
+        au.play().catch(() => {
+        });
+        pb.replaceChildren(icon2("pause"));
+      } else {
+        au.pause();
+        pb.replaceChildren(icon2("play"));
+      }
+    };
+    return w;
+  }
+  function composer(t2, after) {
+    const f = E4("form", void 0, "mkc-comp");
+    const pill = E4("div", void 0, "mkc-pill");
+    const ta = E4("textarea");
+    ta.rows = 1;
+    ta.maxLength = 2e3;
+    ta.placeholder = L.write;
+    ta.setAttribute("aria-label", L.write);
+    pill.append(ta);
+    const act = E4("button", void 0, "mkc-act");
+    act.type = "button";
+    const setMode = () => {
+      const txt = ta.value.trim().length > 0;
+      act.replaceChildren(icon2(txt ? "send" : "mic"));
+      act.setAttribute("aria-label", txt ? L.send : L.record);
+      act.title = txt ? L.send : L.record;
+      act.dataset.mode = txt ? "send" : "mic";
+    };
+    setMode();
+    ta.oninput = () => {
+      ta.style.height = "auto";
+      ta.style.height = Math.min(120, ta.scrollHeight) + "px";
+      setMode();
+    };
+    ta.onkeydown = (e) => {
+      if (e.key === "Enter" && !e.shiftKey && !matchMedia("(pointer: coarse)").matches) {
+        e.preventDefault();
+        sendText();
+      }
+    };
+    const rec = E4("div", void 0, "mkc-rec");
+    rec.hidden = true;
+    const recDot = E4("i", void 0, "mkc-recdot");
+    const recT = E4("span", "0:00");
+    const recCancel = E4("button", L.cancel, "mkc-reccancel");
+    recCancel.type = "button";
+    rec.append(recDot, recT, E4("small", L.recording), recCancel);
+    f.append(rec, pill, act);
+    async function sendText() {
+      const body = ta.value.trim();
+      if (!body) return;
+      act.disabled = true;
+      try {
+        await api2("/api/chat/threads/" + t2.id + "/messages", { method: "POST", body: JSON.stringify({ body }) });
+        ta.value = "";
+        ta.style.height = "auto";
+        setMode();
+        await after();
+      } catch (e) {
+        toast(e.message);
+      } finally {
+        act.disabled = false;
+        ta.focus({ preventScroll: true });
+      }
+    }
+    f.onsubmit = (e) => {
+      e.preventDefault();
+      sendText();
+    };
+    let mr = null, chunks = [], started = 0, tick = null, cancelled = false, stream = null;
+    async function startRec() {
+      if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+        toast(L.noMic);
+        return;
+      }
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      } catch {
+        toast(L.micDenied);
+        return;
+      }
+      const type = ["audio/webm;codecs=opus", "audio/mp4", "audio/ogg;codecs=opus", "audio/webm"].find((x) => MediaRecorder.isTypeSupported?.(x)) || "";
+      mr = new MediaRecorder(stream, type ? { mimeType: type, audioBitsPerSecond: 48e3 } : void 0);
+      chunks = [];
+      cancelled = false;
+      mr.ondataavailable = (e) => {
+        if (e.data.size) chunks.push(e.data);
+      };
+      mr.onstop = async () => {
+        stream.getTracks().forEach((x) => x.stop());
+        clearInterval(tick);
+        rec.hidden = true;
+        pill.hidden = false;
+        f.classList.remove("is-rec");
+        setMode();
+        const ms = Date.now() - started;
+        if (cancelled || ms < 600) return;
+        const blob = new Blob(chunks, { type: (mr.mimeType || "audio/webm").split(";")[0] });
+        await sendVoice(blob, Math.min(ms, 3e5));
+      };
+      mr.start(250);
+      started = Date.now();
+      rec.hidden = false;
+      pill.hidden = true;
+      f.classList.add("is-rec");
+      act.replaceChildren(icon2("send"));
+      act.dataset.mode = "rec";
+      act.setAttribute("aria-label", L.send);
+      tick = setInterval(() => {
+        const ms = Date.now() - started;
+        recT.textContent = mmss(ms);
+        if (ms >= 3e5) mr.stop();
+      }, 250);
+    }
+    async function sendVoice(blob, ms) {
+      act.disabled = true;
+      try {
+        const mime = blob.type || "audio/webm";
+        const s = (await api2("/api/chat/audio/start", { method: "POST", body: JSON.stringify({ mime, size: blob.size }) })).data;
+        const up = await fetch(s.signed_url, { method: "PUT", headers: { "Content-Type": s.mime, "x-upsert": "false" }, body: blob });
+        if (!up.ok) throw new Error(L.retry);
+        await api2("/api/chat/threads/" + t2.id + "/messages", { method: "POST", body: JSON.stringify({ audio_path: s.path, audio_ms: Math.max(300, Math.round(ms)) }) });
+        await after();
+      } catch (e) {
+        toast(e.message);
+      } finally {
+        act.disabled = false;
+      }
+    }
+    recCancel.onclick = () => {
+      cancelled = true;
+      mr?.state === "recording" && mr.stop();
+    };
+    act.onclick = () => {
+      if (act.dataset.mode === "send") return sendText();
+      if (act.dataset.mode === "rec") {
+        mr?.state === "recording" && mr.stop();
+        return;
+      }
+      startRec();
+    };
+    return f;
+  }
+  async function contacts() {
+    const sh = E4("div", void 0, "mkc-sheet");
+    const card = E4("div", void 0, "mkc-sheet-card");
+    const hd = E4("header", void 0, "mkc-bar");
+    const x = ibtn("back", L.close);
+    x.onclick = () => sh.remove();
+    hd.append(x, E4("h2", L.newChat), E4("span"));
+    card.append(hd);
+    const sb = E4("label", void 0, "mkc-search");
+    sb.append(icon2("search"));
+    const qi = E4("input");
+    qi.type = "search";
+    qi.placeholder = L.search;
+    qi.setAttribute("aria-label", L.search);
+    sb.append(qi);
+    card.append(sb);
+    const box = E4("div", void 0, "mkc-contacts");
+    box.append(E4("p", L.loading, "mkc-sys"));
+    card.append(box);
+    sh.append(card);
+    o.append(sh);
+    qi.focus();
+    let rows = [];
+    try {
+      rows = (await api2("/api/chat/contacts")).data;
+    } catch (e) {
+      box.replaceChildren(E4("p", e.message, "mkc-sys"));
+      return;
+    }
+    const draw = () => {
+      box.replaceChildren();
+      const term = qi.value.trim().toLowerCase();
+      for (const [kind, label2] of [["staff", L.team], ["student", L.students]]) {
+        const g = rows.filter((r) => r.kind === kind && (!term || r.name.toLowerCase().includes(term)));
+        if (!g.length) continue;
+        box.append(E4("h3", label2));
+        for (const c of g) {
+          const b = E4("button", void 0, "mkc-trow");
+          b.type = "button";
+          b.append(avatar(c.name));
+          const m = E4("span", void 0, "mkc-tmid");
+          m.append(E4("strong", c.name), E4("small", c.role || ""));
+          b.append(m);
+          b.onclick = async () => {
+            b.disabled = true;
+            try {
+              const id = c.thread_id || (await api2("/api/chat/direct", { method: "POST", body: JSON.stringify({ user_id: c.user_id }) })).data.id;
+              sh.remove();
+              await loadThreads();
+              openThread(threads.find((t2) => t2.id === id) || { id, title: c.name, subtitle: c.role, kind: "direct" });
+            } catch (e) {
+              toast(e.message);
+              b.disabled = false;
+            }
+          };
+          box.append(b);
+        }
+      }
+      if (!box.children.length) box.append(E4("p", L.empty, "mkc-sys"));
+    };
+    qi.oninput = draw;
+    draw();
+  }
+  loadThreads().then(() => {
+    if (threadId) {
+      const t2 = threads.find((x) => x.id === threadId);
+      if (t2) openThread(t2);
+    }
+  });
+  back.focus();
+  return { close };
+}
+function openNotifications({ api: api2, lang: lang2 = "en", onOpenChat, onChange = () => {
+}, summary = null }) {
+  const L = tx(lang2);
+  const { o, close } = overlay("mkc-notif", L.notif);
+  o.lang = lang2;
+  const bar = E4("header", void 0, "mkc-bar");
+  const bk = ibtn("back", L.close);
+  bk.onclick = () => {
+    close();
+    onChange();
+  };
+  bar.append(bk, E4("h2", L.notif), E4("span"));
+  o.append(bar);
+  const body = E4("div", void 0, "mkc-nbody");
+  o.append(body);
+  const msgRow = E4("button", void 0, "mkc-nmsg");
+  msgRow.type = "button";
+  const ic = E4("span", void 0, "mkc-nic is-chat");
+  ic.append(icon2("chat"));
+  const t2 = E4("span", void 0, "mkc-tmid");
+  const st = E4("small", summary ? summary.chat_unread ? fill(L.unread, { n: summary.chat_unread }) : L.allRead : "");
+  t2.append(E4("strong", L.messages), st);
+  msgRow.append(ic, t2);
+  if (summary?.chat_unread) msgRow.append(E4("b", summary.chat_unread, "mkc-badge"));
+  msgRow.onclick = () => {
+    close();
+    onOpenChat?.();
+  };
+  body.append(msgRow);
+  const feed = E4("div", void 0, "mkc-feed");
+  feed.append(E4("p", L.loading, "mkc-sys"));
+  body.append(feed);
+  (async () => {
+    let posts = [];
+    try {
+      posts = (await api2("/api/feed")).data;
+    } catch (e) {
+      feed.replaceChildren(E4("p", e.message, "mkc-sys"));
+      return;
+    }
+    feed.replaceChildren();
+    if (!posts.length) {
+      feed.append(E4("p", L.noFeed, "mkc-empty"));
+      return;
+    }
+    for (const p of posts) {
+      const card = E4("button", void 0, "mkc-post mkc-post-" + p.kind + (p.read ? "" : " is-new"));
+      card.type = "button";
+      const media = E4("span", void 0, "mkc-pmedia");
+      if (p.poster) {
+        const i = E4("img");
+        i.src = p.poster;
+        i.alt = "";
+        i.loading = "lazy";
+        i.referrerPolicy = "no-referrer";
+        i.onerror = () => i.remove();
+        media.append(i);
+      }
+      const k = E4("span", void 0, "mkc-nic is-" + p.kind);
+      k.append(icon2(p.kind === "video" ? "play" : p.kind === "live" ? "live" : "news"));
+      media.append(k);
+      const txt = E4("span", void 0, "mkc-ptxt");
+      const tag = E4("small", (p.kind === "video" ? L.video : p.kind === "live" ? L.live : L.news) + " \xB7 " + since(p.at, lang2), "mkc-ptag");
+      txt.append(tag, E4("strong", p.title));
+      if (p.kind === "live" && p.live_at) txt.append(E4("span", fill(L.liveOn, { d: new Intl.DateTimeFormat(loc(lang2), { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(p.live_at)) }), "mkc-plive"));
+      else if (p.body) txt.append(E4("span", p.body.slice(0, 120), "mkc-pbody"));
+      card.append(media, txt);
+      card.onclick = () => {
+        if (!p.read) {
+          p.read = true;
+          card.classList.remove("is-new");
+          api2("/api/feed/read", { method: "POST", body: JSON.stringify({ ids: [p.id] }) }).then(onChange).catch(() => {
+          });
+        }
+        openPost(p, { lang: lang2, api: api2 });
+      };
+      feed.append(card);
+    }
+  })();
+  bk.focus();
+  return { close };
+}
+function openPost(p, { lang: lang2 = "en", api: api2 = null, onDelete = null } = {}) {
+  const L = tx(lang2);
+  const { o, close } = overlay("mkc-viewer", p.title);
+  o.lang = lang2;
+  const top = E4("header", void 0, "mkc-vtop");
+  const bk = ibtn("back", L.close, "mkc-glass");
+  bk.onclick = close;
+  const brand = E4("span", p.author || "MUK Talent", "mkc-vauthor");
+  top.append(bk, brand);
+  if (p.mine && api2) {
+    const del = ibtn("trash", L.remove, "mkc-glass");
+    del.onclick = async () => {
+      if (!confirm(L.remove + "?")) return;
+      try {
+        await api2("/api/feed/" + p.id, { method: "DELETE" });
+        close();
+        onDelete?.();
+      } catch (e) {
+        toast(e.message);
+      }
+    };
+    top.append(del);
+  } else top.append(E4("span"));
+  const stage = E4("div", void 0, "mkc-vcard");
+  let vid = null;
+  if (p.poster) {
+    const i = E4("img", void 0, "mkc-vposter");
+    i.src = p.poster;
+    i.alt = "";
+    i.referrerPolicy = "no-referrer";
+    i.onerror = () => i.remove();
+    stage.append(i);
+  } else stage.classList.add("no-poster");
+  const play = E4("button", void 0, "mkc-vbig");
+  play.type = "button";
+  play.setAttribute("aria-label", L.watch);
+  play.append(icon2(p.kind === "news" ? "news" : p.kind === "live" ? "live" : "play"));
+  stage.append(play);
+  const prog = E4("div", void 0, "mkc-vprog");
+  const cur = E4("span", "0:00", "mkc-tpill");
+  const wave = E4("span", void 0, "mkc-vwave");
+  let seed = 7;
+  for (let i = 0; i < 48; i++) {
+    seed = (seed * 53 + 17) % 97;
+    const s = E4("i");
+    s.style.height = 25 + seed % 75 + "%";
+    wave.append(s);
+  }
+  const dur = E4("span", "--:--", "mkc-tpill");
+  prog.append(cur, wave, dur);
+  if (p.url && p.play === "video") {
+    vid = E4("video", void 0, "mkc-vvideo");
+    vid.src = p.url;
+    vid.playsInline = true;
+    vid.preload = "metadata";
+    if (p.poster) vid.poster = p.poster;
+    vid.controls = false;
+    stage.prepend(vid);
+    vid.onloadedmetadata = () => {
+      if (isFinite(vid.duration)) dur.textContent = mmss(vid.duration * 1e3);
+    };
+    vid.ontimeupdate = () => {
+      const r = vid.duration ? vid.currentTime / vid.duration : 0;
+      cur.textContent = mmss(vid.currentTime * 1e3);
+      [...wave.children].forEach((s, i) => s.classList.toggle("on", i / 48 < r));
+    };
+    vid.onplay = () => {
+      stage.classList.add("is-playing");
+      play.replaceChildren(icon2("pause"));
+    };
+    vid.onpause = () => {
+      stage.classList.remove("is-playing");
+      play.replaceChildren(icon2("play"));
+    };
+    vid.onended = () => {
+      stage.classList.remove("is-playing");
+      play.replaceChildren(icon2("play"));
+    };
+    play.onclick = () => {
+      vid.paused ? vid.play().catch(() => {
+      }) : vid.pause();
+    };
+    stage.onclick = (e) => {
+      if (e.target === stage || e.target === vid) play.click();
+    };
+    wave.onclick = (e) => {
+      const r = wave.getBoundingClientRect();
+      if (vid.duration) vid.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * vid.duration;
+    };
+    const fs = ibtn("video", "Fullscreen", "mkc-glass mkc-vfs");
+    fs.onclick = (e) => {
+      e.stopPropagation();
+      (vid.requestFullscreen || vid.webkitEnterFullscreen)?.call(vid);
+    };
+    stage.append(fs);
+  } else if (p.url) {
+    play.onclick = () => window.open(p.url, "_blank", "noopener");
+    prog.hidden = true;
+  } else {
+    prog.hidden = true;
+    play.classList.add("is-static");
+    play.disabled = true;
+  }
+  const actions = E4("div", void 0, "mkc-vactions");
+  actions.append(E4("span", p.kind === "live" && p.live_at ? fill(L.liveOn, { d: new Intl.DateTimeFormat(loc(lang2), { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(p.live_at)) }) : since(p.at, lang2), "mkc-apill"));
+  const savedKey = "mkc-saved";
+  const saved = () => {
+    try {
+      return JSON.parse(localStorage.getItem(savedKey) || "[]");
+    } catch {
+      return [];
+    }
+  };
+  const sv = ibtn("bookmark", L.save, "mkc-round");
+  const paint2 = () => sv.classList.toggle("is-on", saved().includes(p.id));
+  paint2();
+  sv.onclick = () => {
+    const s = saved();
+    const i = s.indexOf(p.id);
+    i < 0 ? s.push(p.id) : s.splice(i, 1);
+    try {
+      localStorage.setItem(savedKey, JSON.stringify(s.slice(-100)));
+    } catch {
+    }
+    paint2();
+    toast(i < 0 ? L.saved : L.remove);
+  };
+  const sh = ibtn("share", L.share, "mkc-round");
+  sh.onclick = async () => {
+    const url = p.url && p.play !== "video" ? p.url : location.origin + "/portal";
+    try {
+      if (navigator.share) await navigator.share({ title: p.title, text: p.body || p.title, url });
+      else {
+        await navigator.clipboard.writeText(url);
+        toast(L.copied);
+      }
+    } catch {
+    }
+  };
+  actions.append(E4("span", void 0, "mkc-grow"), sv, sh);
+  const h = E4("h1", p.title, "mkc-vtitle");
+  const d = E4("p", p.body || "", "mkc-vdesc");
+  const scroll = E4("div", void 0, "mkc-vscroll");
+  scroll.append(stage, prog, actions, h, d);
+  if (p.url && p.play !== "video") {
+    const a = E4("a", L.openLink, "mkc-vlink");
+    a.href = p.url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.prepend(icon2("link"));
+    scroll.append(a);
+  }
+  o.append(top, scroll);
+  bk.focus();
+  return { close };
+}
+function openComposer({ api: api2, lang: lang2 = "en", preset = {}, onDone = () => {
+} }) {
+  const L = tx(lang2);
+  const { o, close } = overlay("mkc-compose", L.publish);
+  o.lang = lang2;
+  const f = E4("form", void 0, "mkc-cform");
+  const hd = E4("header", void 0, "mkc-bar");
+  const x = ibtn("close", L.close);
+  x.onclick = close;
+  hd.append(x, E4("h2", L.publish), E4("span"));
+  f.append(hd);
+  const v = { kind: preset.kind || "video", title: preset.title || "", body: "", media_url: preset.url || "", asset_id: preset.asset_id || null, media_id: preset.media_id || null, poster_url: preset.poster_url || "", live_at: "", audience: "all" };
+  const field2 = (label2, ctl) => {
+    const w = E4("label", void 0, "mkc-field");
+    w.append(E4("span", label2), ctl);
+    return w;
+  };
+  const seg = E4("div", void 0, "mkc-seg");
+  seg.setAttribute("role", "radiogroup");
+  seg.setAttribute("aria-label", L.kind);
+  for (const [k, lab, ic] of [["video", L.video, "video"], ["news", L.news, "news"], ["live", L.live, "live"]]) {
+    const b = E4("button", void 0, "");
+    b.type = "button";
+    b.setAttribute("role", "radio");
+    b.append(icon2(ic), E4("span", lab));
+    b.onclick = () => {
+      v.kind = k;
+      draw();
+    };
+    b.dataset.k = k;
+    seg.append(b);
+  }
+  const title = E4("input");
+  title.maxLength = 140;
+  title.required = true;
+  title.value = v.title;
+  title.oninput = () => v.title = title.value;
+  const desc = E4("textarea");
+  desc.rows = 3;
+  desc.maxLength = 2e3;
+  desc.oninput = () => v.body = desc.value;
+  const when = E4("input");
+  when.type = "datetime-local";
+  when.oninput = () => v.live_at = when.value;
+  const aud = E4("select");
+  aud.append(new Option(L.all, "all"), new Option(L.mine, "mine"));
+  aud.onchange = () => v.audience = aud.value;
+  const src = E4("div", void 0, "mkc-src");
+  const lib = E4("p", "", "mkc-libnote");
+  const url = E4("input");
+  url.type = "url";
+  url.placeholder = L.urlPh;
+  url.value = v.media_url;
+  url.oninput = () => {
+    v.media_url = url.value.trim();
+    v.media_id = null;
+    v.asset_id = null;
+    lib.hidden = true;
+  };
+  const up = E4("label", void 0, "mkc-upbtn");
+  up.append(icon2("upload"), E4("span", L.upload));
+  const file = E4("input");
+  file.type = "file";
+  file.accept = "video/*";
+  up.append(file);
+  const bar = E4("div", void 0, "mkc-upbar");
+  bar.hidden = true;
+  const fillEl = E4("i");
+  const pct = E4("small");
+  bar.append(fillEl, pct);
+  if (v.asset_id || v.media_id) {
+    lib.textContent = L.fromLib + ": " + (preset.title || "");
+  } else lib.hidden = true;
+  src.append(lib, up, bar, field2(L.paste, url));
+  file.onchange = async () => {
+    const fl = file.files?.[0];
+    if (!fl) return;
+    bar.hidden = false;
+    up.classList.add("is-busy");
+    try {
+      const s = (await api2("/api/media/cloudinary-sign", { method: "POST", body: "{}" })).data;
+      const res = await new Promise((resolve, reject) => {
+        const fd = new FormData();
+        fd.append("file", fl);
+        fd.append("api_key", s.api_key);
+        fd.append("timestamp", s.timestamp);
+        fd.append("folder", s.folder);
+        fd.append("signature", s.signature);
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", s.upload_url);
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const p = Math.round(e.loaded / e.total * 100);
+            fillEl.style.width = p + "%";
+            pct.textContent = fill(L.uploading, { p });
+          }
+        };
+        xhr.onload = () => {
+          let j = {};
+          try {
+            j = JSON.parse(xhr.responseText);
+          } catch {
+          }
+          xhr.status < 300 ? resolve(j) : reject(new Error(j.error?.message || "Cloudinary error"));
+        };
+        xhr.onerror = () => reject(new Error("Network error"));
+        xhr.send(fd);
+      });
+      const m = (await api2("/api/media", { method: "POST", body: JSON.stringify({ url: res.secure_url, title: (v.title || fl.name).slice(0, 140), bytes: res.bytes || fl.size, duration: res.duration || 0 }) })).data;
+      v.media_id = m.id;
+      v.media_url = "";
+      v.asset_id = null;
+      url.value = "";
+      lib.hidden = false;
+      lib.textContent = L.fromLib + ": " + m.title;
+      if (!v.title) {
+        v.title = fl.name.replace(/\.[^.]+$/, "").slice(0, 140);
+        title.value = v.title;
+      }
+      pct.textContent = "100%";
+    } catch (e) {
+      toast(e.message);
+      bar.hidden = true;
+    } finally {
+      up.classList.remove("is-busy");
+      file.value = "";
+    }
+  };
+  const wTitle = field2(L.title, title), wDesc = field2(L.description, desc), wWhen = field2(L.when, when), wAud = field2(L.audience, aud), wSrc = field2(L.videoSrc, src);
+  const msg = E4("p", "", "mkc-fmsg");
+  msg.setAttribute("role", "status");
+  const go = E4("button", void 0, "mkc-primary");
+  go.type = "submit";
+  go.append(icon2("send"), E4("span", L.publish));
+  const scroll = E4("div", void 0, "mkc-cscroll");
+  scroll.append(seg, wSrc, wTitle, wDesc, wWhen, wAud, msg, go);
+  f.append(scroll);
+  function draw() {
+    for (const b of seg.children) b.setAttribute("aria-checked", String(b.dataset.k === v.kind));
+    wSrc.hidden = v.kind === "news";
+    wWhen.hidden = v.kind !== "live";
+    when.required = v.kind === "live";
+  }
+  draw();
+  f.onsubmit = async (e) => {
+    e.preventDefault();
+    if (!f.reportValidity()) return;
+    go.disabled = true;
+    msg.textContent = "";
+    msg.className = "mkc-fmsg";
+    const payload = { kind: v.kind, title: v.title.trim(), body: v.body.trim() || null, audience: v.audience, media_url: v.kind === "news" ? v.media_url || null : v.media_id || v.asset_id ? null : v.media_url || null, asset_id: v.kind === "news" ? null : v.asset_id, media_id: v.kind === "news" ? null : v.media_id, poster_url: v.poster_url || null, live_at: v.live_at ? new Date(v.live_at).toISOString() : null };
+    try {
+      const r = await api2("/api/feed", { method: "POST", body: JSON.stringify(payload) });
+      toast(L.published);
+      close();
+      onDone(r.data);
+    } catch (err2) {
+      msg.textContent = err2.message;
+      msg.classList.add("error");
+      go.disabled = false;
+    }
+  };
+  o.append(f);
+  title.focus();
+  return { close };
+}
+async function listMedia(api2) {
+  try {
+    return (await api2("/api/media")).data || [];
+  } catch {
+    return [];
+  }
+}
+
 // admin-src/workspace-extras.js
-var E4 = (tag, text, cls) => {
+var E5 = (tag, text, cls) => {
   const n = document.createElement(tag);
   if (text !== void 0) n.textContent = String(text);
   if (cls) n.className = cls;
@@ -22065,9 +23101,9 @@ function err(host, text) {
   host.className = "ws-message ws-error";
 }
 async function editQualification({ lead, api: api2, readOnly, root }) {
-  const dialog2 = E4("dialog", void 0, "ws-dialog");
+  const dialog2 = E5("dialog", void 0, "ws-dialog");
   dialog2.lang = "en";
-  const form = E4("form"), title = E4("h2", `Qualification \xB7 ${lead.first_name} ${lead.last_name}`), status = E4("p", "Loading\u2026", "ws-message"), grid = E4("div", void 0, "ws-form-grid");
+  const form = E5("form"), title = E5("h2", `Qualification \xB7 ${lead.first_name} ${lead.last_name}`), status = E5("p", "Loading\u2026", "ws-message"), grid = E5("div", void 0, "ws-form-grid");
   form.append(title, status, grid);
   dialog2.append(form);
   root.append(dialog2);
@@ -22079,13 +23115,13 @@ async function editQualification({ lead, api: api2, readOnly, root }) {
     const r = await api2("/api/workspace/qualification/" + lead.id);
     status.textContent = "Record readiness without uploading passport or academic documents here.";
     for (const [key, label2, type] of defs) {
-      const wrap = E4("div", void 0, "ws-field"), caption = E4("label", label2);
+      const wrap = E5("div", void 0, "ws-field"), caption = E5("label", label2);
       let f;
       if (Array.isArray(type)) {
-        f = E4("select");
+        f = E5("select");
         for (const option of type) f.append(new Option(option, option));
       } else {
-        f = E4(type === "textarea" ? "textarea" : "input");
+        f = E5(type === "textarea" ? "textarea" : "input");
         if (type === "number") {
           f.type = "number";
           f.min = "0";
@@ -22101,10 +23137,10 @@ async function editQualification({ lead, api: api2, readOnly, root }) {
       wrap.append(caption, f);
       grid.append(wrap);
     }
-    const save = E4("button", "Save qualification", "ws-button ws-primary");
+    const save = E5("button", "Save qualification", "ws-button ws-primary");
     save.type = "submit";
     save.hidden = readOnly;
-    const close = E4("button", "Close", "ws-button");
+    const close = E5("button", "Close", "ws-button");
     close.type = "button";
     close.onclick = () => {
       if (!busy) dialog2.remove();
@@ -22133,25 +23169,25 @@ async function editQualification({ lead, api: api2, readOnly, root }) {
     };
   } catch (error) {
     err(status, error.message);
-    const close = E4("button", "Close", "ws-button");
+    const close = E5("button", "Close", "ws-button");
     close.type = "button";
     close.onclick = () => dialog2.remove();
     form.append(close);
   }
 }
 function manageAppointment({ a, api: api2, root, onSaved }) {
-  const d = E4("dialog", void 0, "ws-dialog");
+  const d = E5("dialog", void 0, "ws-dialog");
   d.lang = "en";
-  const f = E4("form"), status = E4("select"), reason = E4("textarea"), msg = E4("p", "", "ws-message");
-  f.append(E4("h2", "Update appointment"), E4("p", a.full_name));
+  const f = E5("form"), status = E5("select"), reason = E5("textarea"), msg = E5("p", "", "ws-message");
+  f.append(E5("h2", "Update appointment"), E5("p", a.full_name));
   for (const [value, label2] of [["completed", "Completed"], ["no_show", "No show"], ["cancelled", "Cancelled"]]) status.append(new Option(label2, value));
   status.setAttribute("aria-label", "Appointment outcome");
   reason.placeholder = "Cancellation reason (required when cancelling)";
   reason.setAttribute("aria-label", "Cancellation reason");
   reason.maxLength = 2e3;
-  const save = E4("button", "Save outcome", "ws-button ws-primary");
+  const save = E5("button", "Save outcome", "ws-button ws-primary");
   save.type = "submit";
-  const close = E4("button", "Close", "ws-button");
+  const close = E5("button", "Close", "ws-button");
   close.type = "button";
   let busy = false;
   close.onclick = () => {
@@ -22184,7 +23220,7 @@ function manageAppointment({ a, api: api2, root, onSaved }) {
 }
 
 // admin-src/card-studio.js
-var E5 = (t2, v, c) => {
+var E6 = (t2, v, c) => {
   const n = document.createElement(t2);
   if (v !== void 0 && v !== null) n.textContent = String(v);
   if (c) n.className = c;
@@ -22193,7 +23229,7 @@ var E5 = (t2, v, c) => {
 var editable = (v) => !v ? "" : /^[@+]/.test(v.value || "") ? v.value : v.url || v.value || "";
 var q = (owner) => owner ? "?owner=" + encodeURIComponent(owner) : "";
 function btn(text, fn, cls = "lx-button") {
-  const b = E5("button", text, cls);
+  const b = E6("button", text, cls);
   b.type = "button";
   b.onclick = fn;
   return b;
@@ -22202,7 +23238,7 @@ function cardData(d) {
   return { display_name: d.full_name, job_title: d.job_title, assigned_city: d.assigned_city, employee_code: d.employee_code, contact_phone: d.publish_contact ? d.contact_phone : "", contact_email: d.publish_contact ? d.contact_email : "", short_display: d.card?.handle ? d.card.display : null };
 }
 async function renderCardStudio({ host, api: api2, owner, readOnly, directory, openTab, onChanged }) {
-  const d = directory, layout = E5("div", void 0, "cs-layout cs-clean"), main = E5("section", void 0, "lx-panel cs-card-panel"), side = E5("div", void 0, "cs-side");
+  const d = directory, layout = E6("div", void 0, "cs-layout cs-clean"), main = E6("section", void 0, "lx-panel cs-card-panel"), side = E6("div", void 0, "cs-side");
   layout.append(main, side);
   host.append(layout);
   let qr = null;
@@ -22217,9 +23253,9 @@ async function renderCardStudio({ host, api: api2, owner, readOnly, directory, o
   const data = cardData(d);
   if (qr?.handle) data.short_display = qr.display;
   const socials = Array.isArray(d.socials) ? d.socials : [];
-  const head2 = E5("div", void 0, "cs-head"), ht = E5("div");
-  ht.append(E5("p", "BUSINESS CARD", "lx-overline"), E5("h2", "Your MUK Talent card"));
-  const live = E5("span", d.card?.published ? "Published" : "Preview", "cs-state" + (d.card?.published ? " is-live" : ""));
+  const head2 = E6("div", void 0, "cs-head"), ht = E6("div");
+  ht.append(E6("p", "BUSINESS CARD", "lx-overline"), E6("h2", "Your MUK Talent card"));
+  const live = E6("span", d.card?.published ? "Published" : "Preview", "cs-state" + (d.card?.published ? " is-live" : ""));
   head2.append(ht, live);
   main.append(head2);
   const card = visitCard({ d, data, qr });
@@ -22236,11 +23272,11 @@ async function renderCardStudio({ host, api: api2, owner, readOnly, directory, o
       editor?.focus();
       editor?.scrollIntoView({ block: "center", behavior: "smooth" });
     } }] });
-    const acts = E5("div", void 0, "cs-actions");
+    const acts = E6("div", void 0, "cs-actions");
     const act = (ic, label2, fn, primary) => {
-      const b = E5("button", void 0, "cs-action" + (primary ? " is-primary" : ""));
+      const b = E6("button", void 0, "cs-action" + (primary ? " is-primary" : ""));
       b.type = "button";
-      b.append(icon(ic), E5("span", label2));
+      b.append(icon(ic), E6("span", label2));
       b.onclick = fn;
       acts.append(b);
     };
@@ -22251,77 +23287,77 @@ async function renderCardStudio({ host, api: api2, owner, readOnly, directory, o
     act("open", "Open card", () => window.open(qr.url, "_blank", "noopener,noreferrer"));
     main.append(acts, menu);
     menu.classList.add("cs-menu");
-  } else main.append(E5("p", "Preview only. Your administrator publishes the card once your professional details are ready. You can already choose your domain.", "cs-note"));
-  main.append(E5("p", "Name, position, territory and ID are managed by MUK Talent. Your photo and work contact are in Profile.", "cs-note"));
+  } else main.append(E6("p", "Preview only. Your administrator publishes the card once your professional details are ready. You can already choose your domain.", "cs-note"));
+  main.append(E6("p", "Name, position, territory and ID are managed by MUK Talent. Your photo and work contact are in Profile.", "cs-note"));
   editor = await shortLinkPanel({ host: side, api: api2, owner, readOnly, onChanged });
   side.append(socialSummary({ socials, readOnly, openTab }));
 }
 function visitCard({ d, data, qr }) {
-  const scene = E5("div", void 0, "cs-visit"), inner = E5("div", void 0, "cs-visit-in");
+  const scene = E6("div", void 0, "cs-visit"), inner = E6("div", void 0, "cs-visit-in");
   scene.append(inner);
-  const front = E5("article", void 0, "cs-face cs-front");
+  const front = E6("article", void 0, "cs-face cs-front");
   front.setAttribute("aria-label", (d.full_name || "MUK Talent") + " business card");
-  const logo = E5("img", void 0, "cs-logo");
+  const logo = E6("img", void 0, "cs-logo");
   logo.src = "/assets/brand/logo-ivory.svg";
   logo.alt = "MUK Talent";
   logo.width = 374;
   logo.height = 72;
-  const id = E5("div", void 0, "cs-who");
-  id.append(E5("strong", d.full_name || "MUK Talent", "cs-name"), E5("span", d.job_title || "Team member", "cs-role"));
-  const list = E5("ul", void 0, "cs-lines");
+  const id = E6("div", void 0, "cs-who");
+  id.append(E6("strong", d.full_name || "MUK Talent", "cs-name"), E6("span", d.job_title || "Team member", "cs-role"));
+  const list = E6("ul", void 0, "cs-lines");
   const line = (ic, text) => {
     if (!text) return;
-    const li = E5("li");
-    li.append(icon(ic), E5("span", text));
+    const li = E6("li");
+    li.append(icon(ic), E6("span", text));
     list.append(li);
   };
   line("phone", data.contact_phone);
   line("mail", data.contact_email);
   line("link", data.short_display || "muktalent.com");
   if (data.assigned_city) line("pin", data.assigned_city);
-  const star = E5("span", void 0, "cs-star");
+  const star = E6("span", void 0, "cs-star");
   star.setAttribute("aria-hidden", "true");
   front.append(logo, star, id, list);
-  const back = E5("article", void 0, "cs-face cs-back");
+  const back = E6("article", void 0, "cs-face cs-back");
   back.setAttribute("aria-hidden", "true");
-  const mark = E5("img", void 0, "cs-mark");
+  const mark = E6("img", void 0, "cs-mark");
   mark.src = "/assets/brand/mark-noir.svg";
   mark.alt = "";
   mark.width = 64;
   mark.height = 64;
-  const code = E5("div", void 0, "cs-qr");
+  const code = E6("div", void 0, "cs-qr");
   if (qr?.image) {
-    const im = E5("img");
+    const im = E6("img");
     im.src = qr.image;
     im.alt = "QR code " + (qr.display || "");
     code.append(im);
-  } else code.append(E5("span", "QR after publishing", "cs-qr-empty"));
-  const bt = E5("div", void 0, "cs-back-text");
-  bt.append(mark, E5("strong", data.short_display || "muktalent.com"), E5("small", "MAGHREB \xB7 UK \xB7 TALENT"));
+  } else code.append(E6("span", "QR after publishing", "cs-qr-empty"));
+  const bt = E6("div", void 0, "cs-back-text");
+  bt.append(mark, E6("strong", data.short_display || "muktalent.com"), E6("small", "MAGHREB \xB7 UK \xB7 TALENT"));
   back.append(bt, code);
   inner.append(front, back);
   return scene;
 }
 async function shortLinkPanel({ host, api: api2, owner, readOnly, onChanged }) {
-  const panel = E5("section", void 0, "lx-panel cs-panel");
-  panel.append(E5("p", "YOUR CARD DOMAIN", "lx-overline"), E5("h2", "Choose your domain"), E5("p", "Your card lives at muktalent.com/your-name. Short, easy to say and printed on your QR code.", "lx-muted"));
+  const panel = E6("section", void 0, "lx-panel cs-panel");
+  panel.append(E6("p", "YOUR CARD DOMAIN", "lx-overline"), E6("h2", "Choose your domain"), E6("p", "Your card lives at muktalent.com/your-name. Short, easy to say and printed on your QR code.", "lx-muted"));
   host.append(panel);
   let info;
   try {
     info = (await api2("/api/workspace/card-link" + q(owner))).data;
   } catch (error) {
-    panel.append(E5("p", error.message.includes("Database") || error.message.includes("unavailable") ? "Short links are not active yet. Ask your administrator to run the latest database update." : error.message, "lx-muted"));
+    panel.append(E6("p", error.message.includes("Database") || error.message.includes("unavailable") ? "Short links are not active yet. Ask your administrator to run the latest database update." : error.message, "lx-muted"));
     return null;
   }
-  const current = E5("div", void 0, "cs-current");
-  const shown = E5("strong", info.handle ? info.host + "/" + info.handle : "Not set yet");
+  const current = E6("div", void 0, "cs-current");
+  const shown = E6("strong", info.handle ? info.host + "/" + info.handle : "Not set yet");
   current.append(icon("link"), shown);
   panel.append(current);
   if (readOnly) {
-    panel.append(E5("p", info.previous.length ? "Previous links still redirect: " + info.previous.map((h) => info.host + "/" + h).join(", ") : "Read-only preview.", "lx-muted"));
+    panel.append(E6("p", info.previous.length ? "Previous links still redirect: " + info.previous.map((h) => info.host + "/" + h).join(", ") : "Read-only preview.", "lx-muted"));
     return null;
   }
-  const form = E5("form", void 0, "cs-handle-form"), label2 = E5("label", "Your domain", "cs-label"), row = E5("div", void 0, "cs-handle-row"), prefix = E5("span", info.host + "/", "cs-prefix"), input = E5("input");
+  const form = E6("form", void 0, "cs-handle-form"), label2 = E6("label", "Your domain", "cs-label"), row = E6("div", void 0, "cs-handle-row"), prefix = E6("span", info.host + "/", "cs-prefix"), input = E6("input");
   input.id = "cs-handle";
   label2.htmlFor = input.id;
   input.autocomplete = "off";
@@ -22331,16 +23367,16 @@ async function shortLinkPanel({ host, api: api2, owner, readOnly, onChanged }) {
   input.placeholder = "laura";
   input.value = info.handle || "";
   input.setAttribute("aria-describedby", "cs-handle-hint");
-  const save = E5("button", "Save domain", "lx-button lx-primary");
+  const save = E6("button", "Save domain", "lx-button lx-primary");
   save.type = "submit";
   row.append(prefix, input);
-  const hint = E5("p", "3\u201330 characters: letters, numbers and single hyphens.", "cs-hint");
+  const hint = E6("p", "3\u201330 characters: letters, numbers and single hyphens.", "cs-hint");
   hint.id = "cs-handle-hint";
   hint.setAttribute("aria-live", "polite");
   form.append(label2, row, hint);
   if (info.suggestions?.length) {
-    const chips = E5("div", void 0, "cs-suggestions");
-    chips.append(E5("span", "Suggestions", "cs-suggest-label"));
+    const chips = E6("div", void 0, "cs-suggestions");
+    chips.append(E6("span", "Suggestions", "cs-suggest-label"));
     for (const s of info.suggestions) {
       const c = btn(s, () => {
         input.value = s;
@@ -22352,7 +23388,7 @@ async function shortLinkPanel({ host, api: api2, owner, readOnly, onChanged }) {
   }
   form.append(save);
   panel.append(form);
-  panel.append(E5("p", (info.previous.length ? "Previous links keep working and stay reserved for you: " + info.previous.map((h) => "/" + h).join(", ") + ". " : "Old QR codes and links keep working after a change. ") + info.remaining + " changes left.", "cs-note"));
+  panel.append(E6("p", (info.previous.length ? "Previous links keep working and stay reserved for you: " + info.previous.map((h) => "/" + h).join(", ") + ". " : "Old QR codes and links keep working after a change. ") + info.remaining + " changes left.", "cs-note"));
   let timer = 0, seq = 0, ok = false;
   const state2 = (text, kind) => {
     hint.textContent = text;
@@ -22411,34 +23447,34 @@ async function shortLinkPanel({ host, api: api2, owner, readOnly, onChanged }) {
   return input;
 }
 function socialSummary({ socials, readOnly, openTab }) {
-  const panel = E5("section", void 0, "lx-panel cs-panel");
-  panel.append(E5("p", "SOCIAL PROFILES", "lx-overline"), E5("h2", socials.length ? socials.length + " connected to your card" : "Connect your social profiles"));
+  const panel = E6("section", void 0, "lx-panel cs-panel");
+  panel.append(E6("p", "SOCIAL PROFILES", "lx-overline"), E6("h2", socials.length ? socials.length + " connected to your card" : "Connect your social profiles"));
   if (socials.length) {
-    const list = E5("div", void 0, "cs-social-mini");
+    const list = E6("div", void 0, "cs-social-mini");
     for (const s of socials) {
-      const chip = E5("span", void 0, "cs-social-chip");
-      chip.append(brandIcon(s.platform), E5("span", s.value || s.label));
+      const chip = E6("span", void 0, "cs-social-chip");
+      chip.append(brandIcon(s.platform), E6("span", s.value || s.label));
       list.append(chip);
     }
     panel.append(list);
-  } else panel.append(E5("p", "Clients can follow you in one tap from your public card. Add LinkedIn, Instagram, TikTok and more.", "lx-muted"));
+  } else panel.append(E6("p", "Clients can follow you in one tap from your public card. Add LinkedIn, Instagram, TikTok and more.", "lx-muted"));
   if (!readOnly) panel.append(btn(socials.length ? "Manage social links" : "Add social links", () => openTab("social"), "lx-button lx-primary"));
   return panel;
 }
 async function renderSocialEditor({ host, api: api2, owner, readOnly, onSaved }) {
-  const panel = E5("section", void 0, "lx-panel cs-panel cs-social-editor");
-  panel.append(E5("p", "SOCIAL PROFILES", "lx-overline"), E5("h2", "Your social links"), E5("p", "Paste your profile link or @username. Only official profile addresses are accepted, so your card always opens the right account.", "lx-muted"));
+  const panel = E6("section", void 0, "lx-panel cs-panel cs-social-editor");
+  panel.append(E6("p", "SOCIAL PROFILES", "lx-overline"), E6("h2", "Your social links"), E6("p", "Paste your profile link or @username. Only official profile addresses are accepted, so your card always opens the right account.", "lx-muted"));
   host.append(panel);
   let info;
   try {
     info = (await api2("/api/workspace/socials" + q(owner))).data;
   } catch (error) {
-    panel.append(E5("p", /unavailable|Database/.test(error.message) ? "Social links are not active yet. Ask your administrator to run the latest database update." : error.message, "lx-muted"));
+    panel.append(E6("p", /unavailable|Database/.test(error.message) ? "Social links are not active yet. Ask your administrator to run the latest database update." : error.message, "lx-muted"));
     return;
   }
-  const form = E5("form", void 0, "cs-social-form"), inputs = {}, preview = E5("div", void 0, "cs-social-preview");
+  const form = E6("form", void 0, "cs-social-form"), inputs = {}, preview = E6("div", void 0, "cs-social-preview");
   for (const p of info.platforms) {
-    const row = E5("div", void 0, "cs-social-row"), ic = E5("span", void 0, "cs-social-icon cs-" + p.id), label2 = E5("label", p.label, "cs-label"), input = E5("input");
+    const row = E6("div", void 0, "cs-social-row"), ic = E6("span", void 0, "cs-social-icon cs-" + p.id), label2 = E6("label", p.label, "cs-label"), input = E6("input");
     ic.append(brandIcon(p.id));
     input.id = "cs-social-" + p.id;
     label2.htmlFor = input.id;
@@ -22450,23 +23486,23 @@ async function renderSocialEditor({ host, api: api2, owner, readOnly, onSaved })
     input.value = editable(info.links?.[p.id]);
     input.readOnly = readOnly;
     input.type = p.id === "whatsapp" ? "tel" : "text";
-    const field2 = E5("div", void 0, "cs-social-field");
+    const field2 = E6("div", void 0, "cs-social-field");
     field2.append(label2, input);
     row.append(ic, field2);
     form.append(row);
     inputs[p.id] = input;
   }
-  const toggleRow = E5("label", void 0, "cs-toggle"), toggle = E5("input");
+  const toggleRow = E6("label", void 0, "cs-toggle"), toggle = E6("input");
   toggle.type = "checkbox";
   toggle.checked = info.show_on_card !== false;
   toggle.disabled = readOnly;
-  toggleRow.append(toggle, E5("span", "Show these icons on my public business card"));
+  toggleRow.append(toggle, E6("span", "Show these icons on my public business card"));
   form.append(toggleRow);
-  const message2 = E5("p", "", "lx-status");
+  const message2 = E6("p", "", "lx-status");
   message2.setAttribute("role", "status");
   message2.setAttribute("aria-live", "polite");
   if (!readOnly) {
-    const save = E5("button", "Save social links", "lx-button lx-primary");
+    const save = E6("button", "Save social links", "lx-button lx-primary");
     save.type = "submit";
     form.append(save, message2);
     form.onsubmit = async (e) => {
@@ -22492,26 +23528,26 @@ async function renderSocialEditor({ host, api: api2, owner, readOnly, onSaved })
         save.disabled = false;
       }
     };
-  } else form.append(E5("p", "Read-only preview.", "lx-muted"));
+  } else form.append(E6("p", "Read-only preview.", "lx-muted"));
   function paint2(links) {
-    preview.replaceChildren(E5("p", "PREVIEW", "lx-overline"), createSocialLinks(Object.entries(links || {}).map(([platform, v]) => ({ platform, label: platform, value: v.value, url: v.url }))));
+    preview.replaceChildren(E6("p", "PREVIEW", "lx-overline"), createSocialLinks(Object.entries(links || {}).map(([platform, v]) => ({ platform, label: platform, value: v.value, url: v.url }))));
   }
   paint2(info.links);
   panel.append(form, preview);
-  const note = E5("details", void 0, "cs-details");
-  note.append(E5("summary", "Why links and not a login with each network?"), E5("p", "Signing in with Instagram, TikTok or LinkedIn would give MUK Talent access to your private account data and requires approval from each platform. Linking your public profile gives clients the same one-tap access without sharing your passwords or permissions.", "lx-muted"));
+  const note = E6("details", void 0, "cs-details");
+  note.append(E6("summary", "Why links and not a login with each network?"), E6("p", "Signing in with Instagram, TikTok or LinkedIn would give MUK Talent access to your private account data and requires approval from each platform. Linking your public profile gives clients the same one-tap access without sharing your passwords or permissions.", "lx-muted"));
   panel.append(note);
 }
 
 // admin-src/gp-ui.js
-var SVG2 = "http://www.w3.org/2000/svg";
-var E6 = (t2, v, c) => {
+var SVG3 = "http://www.w3.org/2000/svg";
+var E7 = (t2, v, c) => {
   const n = document.createElement(t2);
   if (v !== void 0 && v !== null) n.textContent = String(v);
   if (c) n.className = c;
   return n;
 };
-var P = {
+var P2 = {
   globe: ["M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z", "M3 12h18", "M12 3c2.6 2.8 3.8 5.8 3.8 9s-1.2 6.2-3.8 9c-2.6-2.8-3.8-5.8-3.8-9S9.4 5.8 12 3Z"],
   cap: ["m2 9 10-5 10 5-10 5L2 9Z", "M6 11v5c3.5 2.6 8.5 2.6 12 0v-5", "M22 9v6"],
   book: ["M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5Z", "M19 19v2H6", "M9 7h6"],
@@ -22548,7 +23584,7 @@ var P = {
   home: ["M3 11 12 4l9 7", "M5 10v10h14V10"]
 };
 function gi(name, cls = "gp-i") {
-  const s = document.createElementNS(SVG2, "svg");
+  const s = document.createElementNS(SVG3, "svg");
   s.setAttribute("viewBox", "0 0 24 24");
   s.setAttribute("aria-hidden", "true");
   s.setAttribute("focusable", "false");
@@ -22558,28 +23594,28 @@ function gi(name, cls = "gp-i") {
   s.setAttribute("stroke-width", "1.7");
   s.setAttribute("stroke-linecap", "round");
   s.setAttribute("stroke-linejoin", "round");
-  for (const d of P[name] || []) {
-    const p = document.createElementNS(SVG2, "path");
+  for (const d of P2[name] || []) {
+    const p = document.createElementNS(SVG3, "path");
     p.setAttribute("d", d);
     s.append(p);
   }
   return s;
 }
 function btn2(label2, fn, cls = "gp-btn", ic) {
-  const b = E6("button", void 0, cls);
+  const b = E7("button", void 0, cls);
   b.type = "button";
   if (ic) b.append(gi(ic));
-  if (label2) b.append(E6("span", label2));
+  if (label2) b.append(E7("span", label2));
   if (fn) b.onclick = fn;
   return b;
 }
 function ring(pct, size = "md") {
-  const w = E6("div", void 0, "gp-ring gp-ring-" + size);
-  const s = document.createElementNS(SVG2, "svg");
+  const w = E7("div", void 0, "gp-ring gp-ring-" + size);
+  const s = document.createElementNS(SVG3, "svg");
   s.setAttribute("viewBox", "0 0 44 44");
   s.setAttribute("aria-hidden", "true");
   for (const [cls, dash] of [["bg", "100 100"], ["fg", Math.max(0, Math.min(100, pct)) + " 100"]]) {
-    const c = document.createElementNS(SVG2, "circle");
+    const c = document.createElementNS(SVG3, "circle");
     c.setAttribute("cx", "22");
     c.setAttribute("cy", "22");
     c.setAttribute("r", "18");
@@ -22588,22 +23624,22 @@ function ring(pct, size = "md") {
     c.setAttribute("class", "gp-ring-" + cls);
     s.append(c);
   }
-  const v = E6("strong", void 0);
-  v.append(document.createTextNode(String(pct)), E6("small", "%"));
+  const v = E7("strong", void 0);
+  v.append(document.createTextNode(String(pct)), E7("small", "%"));
   w.append(s, v);
   w.setAttribute("role", "img");
   w.setAttribute("aria-label", pct + "%");
   w.dataset.level = pct >= 75 ? "high" : pct >= 45 ? "mid" : "low";
   return w;
 }
-function initials(name) {
+function initials2(name) {
   return String(name || "GP").trim().split(/\s+/).slice(0, 2).map((v) => v[0] || "").join("").toUpperCase();
 }
-function avatar(name, url, cls = "gp-avatar") {
-  const a = E6("span", void 0, cls);
-  a.append(E6("b", initials(name)));
+function avatar2(name, url, cls = "gp-avatar") {
+  const a = E7("span", void 0, cls);
+  a.append(E7("b", initials2(name)));
   if (url) {
-    const i = E6("img");
+    const i = E7("img");
     i.alt = "";
     i.decoding = "async";
     i.referrerPolicy = "no-referrer";
@@ -22623,7 +23659,7 @@ function countryName(code, lang2 = "en") {
   }
 }
 function countrySelect(id, lang2, value, placeholder) {
-  const s = E6("select");
+  const s = E7("select");
   s.id = id;
   s.required = true;
   const ph = new Option(placeholder || "\u2014", "");
@@ -22636,7 +23672,7 @@ function countrySelect(id, lang2, value, placeholder) {
   return s;
 }
 function iso(code) {
-  const b = E6("span", code || "\u2014", "gp-iso");
+  const b = E7("span", code || "\u2014", "gp-iso");
   return b;
 }
 function fmtDate(v, lang2 = "en", opts = { day: "numeric", month: "short", year: "numeric" }) {
@@ -22658,7 +23694,7 @@ function daysUntil(day) {
 }
 function linkCss(id, href) {
   if (!document.getElementById(id)) {
-    const l = E6("link");
+    const l = E7("link");
     l.id = id;
     l.rel = "stylesheet";
     l.href = href;
@@ -22680,7 +23716,7 @@ var FILTERS = [["all", "All"], ["attention", "Needs attention"], ["review", "Doc
 async function renderControlCentre({ host, api: api2, admin = false, notice = () => {
 } }) {
   linkCss("gpCentreCss", "/admin/counsellor-centre.css");
-  const wrap = E6("div", void 0, "cc");
+  const wrap = E7("div", void 0, "cc");
   host.append(wrap);
   let list = null, filter = "all", query = "", scope = admin ? "all" : "mine", openId = null;
   async function load() {
@@ -22692,21 +23728,21 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
     }
   }
   function setupState(text) {
-    const s = E6("section", void 0, "cc-setup");
-    s.append(gi("shield", "gp-i cc-setup-i"), E6("h2", "Global Passport"), E6("p", text, "cc-muted"), btn2("Try again", load, "cc-btn cc-primary", "refresh"));
+    const s = E7("section", void 0, "cc-setup");
+    s.append(gi("shield", "gp-i cc-setup-i"), E7("h2", "Global Passport"), E7("p", text, "cc-muted"), btn2("Try again", load, "cc-btn cc-primary", "refresh"));
     return s;
   }
   function draw() {
     wrap.replaceChildren();
     const m = list.metrics, rows = list.data;
-    const hero = E6("section", void 0, "cc-hero");
-    const ht = E6("div", void 0, "cc-hero-text");
-    ht.append(E6("p", "COUNSELLOR CONTROL CENTRE", "cc-kicker"), E6("h2", scope === "all" ? "All Global Passport students" : "Your students, one command view"), E6("p", "Review files, validate documents, assign tasks and keep every student moving to the UK.", "cc-muted"));
-    const tools = E6("div", void 0, "cc-hero-tools");
+    const hero = E7("section", void 0, "cc-hero");
+    const ht = E7("div", void 0, "cc-hero-text");
+    ht.append(E7("p", "COUNSELLOR CONTROL CENTRE", "cc-kicker"), E7("h2", scope === "all" ? "All Global Passport students" : "Your students, one command view"), E7("p", "Review files, validate documents, assign tasks and keep every student moving to the UK.", "cc-muted"));
+    const tools = E7("div", void 0, "cc-hero-tools");
     if (admin) {
-      const seg = E6("div", void 0, "cc-seg");
+      const seg = E7("div", void 0, "cc-seg");
       for (const [id, label2] of [["mine", "Mine"], ["all", "All students"]]) {
-        const b = E6("button", label2);
+        const b = E7("button", label2);
         b.type = "button";
         b.setAttribute("aria-pressed", String(scope === id));
         b.onclick = () => {
@@ -22717,8 +23753,8 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
       }
       tools.append(seg);
     }
-    const avail = E6("label", void 0, "cc-switch");
-    const cb = E6("input");
+    const avail = E7("label", void 0, "cc-switch");
+    const cb = E7("input");
     cb.type = "checkbox";
     cb.checked = list.settings?.accepting !== false;
     cb.onchange = async () => {
@@ -22734,17 +23770,17 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
         cb.disabled = false;
       }
     };
-    avail.append(cb, E6("i"), E6("span", "Accepting new students"));
+    avail.append(cb, E7("i"), E7("span", "Accepting new students"));
     tools.append(avail, btn2("", load, "cc-icon", "refresh"));
     ht.append(tools);
     hero.append(ht);
-    const metrics = E6("div", void 0, "cc-metrics");
+    const metrics = E7("div", void 0, "cc-metrics");
     for (const [key, label2, ic, tone, f] of [["assigned", "Students assigned", "users", "", null], ["preparing", "Applications in preparation", "doc", "", "preparing"], ["documents_review", "Documents to review", "eye", "gold", "review"], ["awaiting", "Awaiting university response", "clock", "", "awaiting"], ["attention", "Need urgent attention", "alert", "red", "attention"]]) {
-      const c = E6("button", void 0, "cc-metric" + (tone ? " cc-" + tone : "") + (f && filter === f ? " is-on" : ""));
+      const c = E7("button", void 0, "cc-metric" + (tone ? " cc-" + tone : "") + (f && filter === f ? " is-on" : ""));
       c.type = "button";
-      const i = E6("span", void 0, "cc-metric-i");
+      const i = E7("span", void 0, "cc-metric-i");
       i.append(gi(ic));
-      c.append(i, E6("strong", m[key] ?? 0), E6("small", label2));
+      c.append(i, E7("strong", m[key] ?? 0), E7("small", label2));
       c.onclick = () => {
         filter = f && filter !== f ? f : "all";
         draw();
@@ -22753,18 +23789,18 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
     }
     hero.append(metrics);
     wrap.append(hero);
-    const board = E6("div", void 0, "cc-board");
-    const pipe = E6("section", void 0, "cc-panel cc-pipe");
-    pipe.append(E6("h3", "Journey pipeline"));
+    const board = E7("div", void 0, "cc-board");
+    const pipe = E7("section", void 0, "cc-panel cc-pipe");
+    pipe.append(E7("h3", "Journey pipeline"));
     const max = Math.max(1, ...STAGES.map(([k]) => rows.filter((r) => r.current_stage === k).length));
     for (const [k, label2] of STAGES) {
       const n = rows.filter((r2) => r2.current_stage === k).length;
-      const r = E6("div", void 0, "cc-pipe-row");
-      const bar2 = E6("span", void 0, "cc-pipe-bar");
-      const fill = E6("i");
-      fill.style.setProperty("--w", Math.round(n / max * 100) + "%");
-      bar2.append(fill);
-      r.append(E6("span", label2), bar2, E6("b", n));
+      const r = E7("div", void 0, "cc-pipe-row");
+      const bar2 = E7("span", void 0, "cc-pipe-bar");
+      const fill2 = E7("i");
+      fill2.style.setProperty("--w", Math.round(n / max * 100) + "%");
+      bar2.append(fill2);
+      r.append(E7("span", label2), bar2, E7("b", n));
       pipe.append(r);
     }
     const docs = rows.reduce((a, r) => {
@@ -22772,20 +23808,20 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
       a.missing += r.docs_missing;
       return a;
     }, { review: 0, missing: 0 });
-    const donut = E6("section", void 0, "cc-panel cc-donut");
-    donut.append(E6("h3", "Documents"));
+    const donut = E7("section", void 0, "cc-panel cc-donut");
+    donut.append(E7("h3", "Documents"));
     const total = Math.max(1, docs.review + docs.missing);
-    const d = E6("div", void 0, "cc-donut-ring");
+    const d = E7("div", void 0, "cc-donut-ring");
     d.style.setProperty("--a", Math.round(docs.review / total * 360) + "deg");
-    d.append(E6("strong", docs.review + docs.missing), E6("small", "open"));
-    const lg = E6("ul", void 0, "cc-legend");
+    d.append(E7("strong", docs.review + docs.missing), E7("small", "open"));
+    const lg = E7("ul", void 0, "cc-legend");
     lg.append(legend("gold", "To review", docs.review), legend("grey", "Missing / to fix", docs.missing));
     donut.append(d, lg);
     board.append(pipe, donut);
     wrap.append(board);
-    const listPanel = E6("section", void 0, "cc-panel cc-list");
-    const bar = E6("div", void 0, "cc-list-bar");
-    const search = E6("input");
+    const listPanel = E7("section", void 0, "cc-panel cc-list");
+    const bar = E7("div", void 0, "cc-list-bar");
+    const search = E7("input");
     search.type = "search";
     search.placeholder = "Search name, reference, university\u2026";
     search.value = query;
@@ -22794,11 +23830,11 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
       query = search.value;
       paint2();
     };
-    const sw = E6("div", void 0, "cc-search");
+    const sw = E7("div", void 0, "cc-search");
     sw.append(gi("search"), search);
-    const chips = E6("div", void 0, "cc-chips gp-hscroll");
+    const chips = E7("div", void 0, "cc-chips gp-hscroll");
     for (const [id, label2] of FILTERS) {
-      const c = E6("button", label2, "cc-chip");
+      const c = E7("button", label2, "cc-chip");
       c.type = "button";
       c.setAttribute("aria-pressed", String(filter === id));
       c.onclick = () => {
@@ -22809,7 +23845,7 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
     }
     bar.append(sw, chips);
     listPanel.append(bar);
-    const body = E6("div", void 0, "cc-rows");
+    const body = E7("div", void 0, "cc-rows");
     listPanel.append(body);
     wrap.append(listPanel);
     function paint2() {
@@ -22818,7 +23854,7 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
       const att = new Set(m.attention_ids || []);
       const shown = rows.filter((r) => filter === "all" || filter === "attention" && att.has(r.user_id) || filter === "review" && r.docs_to_review || filter === "preparing" && ["profile", "preparing"].includes(r.application_status) || filter === "awaiting" && ["submitted", "awaiting"].includes(r.application_status) || filter === "unread" && r.unread).filter((r) => !q2 || [r.full_name, r.reference, r.email, r.university, r.subject, countryName(r.country_residence)].join(" ").toLowerCase().includes(q2)).sort((a, b) => att.has(b.user_id) - att.has(a.user_id) || b.unread - a.unread || b.docs_to_review - a.docs_to_review);
       for (const r of shown) body.append(studentRow(r, att.has(r.user_id)));
-      if (!shown.length) body.append(E6("p", rows.length ? "No students match this view." : "No students yet. New Global Passport sign-ups are assigned to you automatically.", "cc-empty"));
+      if (!shown.length) body.append(E7("p", rows.length ? "No students match this view." : "No students yet. New Global Passport sign-ups are assigned to you automatically.", "cc-empty"));
     }
     paint2();
     if (openId) {
@@ -22828,29 +23864,29 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
     }
   }
   function legend(tone, label2, n) {
-    const li = E6("li");
-    li.append(E6("i", void 0, "cc-dot cc-dot-" + tone), E6("span", label2), E6("b", n));
+    const li = E7("li");
+    li.append(E7("i", void 0, "cc-dot cc-dot-" + tone), E7("span", label2), E7("b", n));
     return li;
   }
   function studentRow(r, attention) {
-    const row = E6("button", void 0, "cc-row" + (attention ? " is-attention" : ""));
+    const row = E7("button", void 0, "cc-row" + (attention ? " is-attention" : ""));
     row.type = "button";
-    const who = E6("div", void 0, "cc-who");
-    const txt = E6("div");
-    txt.append(E6("strong", r.full_name), E6("small", r.reference + " \xB7 " + (r.subject || "\u2014")));
-    who.append(avatar(r.full_name, null, "gp-avatar cc-av"), txt);
-    const geo = E6("div", void 0, "cc-geo");
-    geo.append(iso(r.country_residence), E6("span", "\u2192"), iso("UK"));
-    const stage = E6("div", void 0, "cc-stage");
-    stage.append(E6("small", STAGES.find((s) => s[0] === r.current_stage)?.[1] || "\u2014"), E6("span", STATUS[r.application_status] || r.application_status, "cc-status cc-st-" + r.application_status));
-    const ready = E6("div", void 0, "cc-ready");
-    const b = E6("span", void 0, "cc-ready-bar");
-    const f = E6("i");
+    const who = E7("div", void 0, "cc-who");
+    const txt = E7("div");
+    txt.append(E7("strong", r.full_name), E7("small", r.reference + " \xB7 " + (r.subject || "\u2014")));
+    who.append(avatar2(r.full_name, null, "gp-avatar cc-av"), txt);
+    const geo = E7("div", void 0, "cc-geo");
+    geo.append(iso(r.country_residence), E7("span", "\u2192"), iso("UK"));
+    const stage = E7("div", void 0, "cc-stage");
+    stage.append(E7("small", STAGES.find((s) => s[0] === r.current_stage)?.[1] || "\u2014"), E7("span", STATUS[r.application_status] || r.application_status, "cc-status cc-st-" + r.application_status));
+    const ready = E7("div", void 0, "cc-ready");
+    const b = E7("span", void 0, "cc-ready-bar");
+    const f = E7("i");
     f.style.setProperty("--w", r.readiness + "%");
     b.dataset.level = r.readiness >= 75 ? "high" : r.readiness >= 45 ? "mid" : "low";
     b.append(f);
-    ready.append(E6("b", r.readiness + "%"), b);
-    const flags = E6("div", void 0, "cc-flags");
+    ready.append(E7("b", r.readiness + "%"), b);
+    const flags = E7("div", void 0, "cc-flags");
     if (attention) flags.append(tag("Attention", "red", "alert"));
     if (r.docs_to_review) flags.append(tag(r.docs_to_review + " to review", "gold", "eye"));
     if (r.unread) flags.append(tag(r.unread + " new", "blue", "chat"));
@@ -22861,15 +23897,15 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
     return row;
   }
   function tag(text, tone, ic) {
-    const t2 = E6("span", void 0, "cc-tag cc-tag-" + tone);
-    t2.append(gi(ic), E6("span", text));
+    const t2 = E7("span", void 0, "cc-tag cc-tag-" + tone);
+    t2.append(gi(ic), E7("span", text));
     return t2;
   }
   async function openFile(id, tab = "overview") {
-    const d = E6("dialog", void 0, "cc-file");
+    const d = E7("dialog", void 0, "cc-file");
     d.setAttribute("aria-label", "Student file");
     document.body.append(d);
-    const panel = E6("div", void 0, "cc-file-in");
+    const panel = E7("div", void 0, "cc-file-in");
     d.append(panel);
     d.addEventListener("close", () => {
       d.remove();
@@ -22879,7 +23915,7 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
       if (e.target === d) d.close();
     });
     d.showModal();
-    panel.append(E6("p", "Loading file\u2026", "cc-muted cc-pad"));
+    panel.append(E7("p", "Loading file\u2026", "cc-muted cc-pad"));
     let f;
     const reload = async (keep = tab) => {
       try {
@@ -22887,7 +23923,7 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
         tab = keep;
         paintFile();
       } catch (e) {
-        panel.replaceChildren(E6("p", e.message, "cc-pad cc-bad"), btn2("Close", () => d.close(), "cc-btn"));
+        panel.replaceChildren(E7("p", e.message, "cc-pad cc-bad"), btn2("Close", () => d.close(), "cc-btn"));
       }
     };
     const act = async (fn, ok) => {
@@ -22902,38 +23938,38 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
     function paintFile() {
       const s = f.student;
       panel.replaceChildren();
-      const head2 = E6("header", void 0, "cc-file-head");
+      const head2 = E7("header", void 0, "cc-file-head");
       const close = btn2("", () => d.close(), "cc-icon cc-close", "x");
       close.setAttribute("aria-label", "Close file");
-      const idb = E6("div", void 0, "cc-file-id");
-      const t2 = E6("div");
-      t2.append(E6("p", s.reference + " \xB7 UNITED KINGDOM", "cc-kicker"), E6("h2", s.full_name), E6("p", [countryName(s.country_residence), "Nationality " + countryName(s.nationality), s.email].join(" \xB7 "), "cc-muted"));
-      idb.append(avatar(s.full_name, null, "gp-avatar cc-av-lg"), t2);
-      const right = E6("div", void 0, "cc-file-right");
+      const idb = E7("div", void 0, "cc-file-id");
+      const t2 = E7("div");
+      t2.append(E7("p", s.reference + " \xB7 UNITED KINGDOM", "cc-kicker"), E7("h2", s.full_name), E7("p", [countryName(s.country_residence), "Nationality " + countryName(s.nationality), s.email].join(" \xB7 "), "cc-muted"));
+      idb.append(avatar2(s.full_name, null, "gp-avatar cc-av-lg"), t2);
+      const right = E7("div", void 0, "cc-file-right");
       right.append(ring(f.readiness, "md"));
-      const status = E6("select");
+      const status = E7("select");
       status.setAttribute("aria-label", "Application status");
       for (const [k, v] of Object.entries(STATUS)) status.append(new Option(v, k));
       status.value = s.application_status;
       status.onchange = () => act(() => api2("/api/gp/students/" + id, { method: "PATCH", body: JSON.stringify({ application_status: status.value }) }), "Status updated \xB7 the student has been notified.");
-      const urgent = E6("label", void 0, "cc-switch cc-switch-red");
-      const u = E6("input");
+      const urgent = E7("label", void 0, "cc-switch cc-switch-red");
+      const u = E7("input");
       u.type = "checkbox";
       u.checked = s.urgent;
       u.onchange = () => act(() => api2("/api/gp/students/" + id, { method: "PATCH", body: JSON.stringify({ urgent: u.checked }) }));
-      urgent.append(u, E6("i"), E6("span", "Urgent"));
+      urgent.append(u, E7("i"), E7("span", "Urgent"));
       right.append(status, urgent);
       head2.append(close, idb, right);
       panel.append(head2);
-      const tabs = E6("div", void 0, "cc-tabs gp-hscroll");
+      const tabs = E7("div", void 0, "cc-tabs gp-hscroll");
       tabs.setAttribute("role", "tablist");
       const toReview = f.documents.filter((x) => x.status === "uploaded").length;
       for (const [k, label2, badge] of [["overview", "File"], ["journey", "Journey"], ["documents", "Documents", toReview], ["tasks", "Tasks & dates"], ["messages", "Messages"], ["notes", "Private notes"]]) {
-        const b = E6("button", label2, "cc-tab");
+        const b = E7("button", label2, "cc-tab");
         b.type = "button";
         b.setAttribute("role", "tab");
         b.setAttribute("aria-selected", String(tab === k));
-        if (badge) b.append(E6("i", badge, "cc-count"));
+        if (badge) b.append(E7("i", badge, "cc-count"));
         b.onclick = () => {
           tab = k;
           paintFile();
@@ -22941,21 +23977,21 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
         tabs.append(b);
       }
       panel.append(tabs);
-      const body = E6("div", void 0, "cc-file-body");
+      const body = E7("div", void 0, "cc-file-body");
       panel.append(body);
       ({ overview, journey, documents, tasks, messages, notes })[tab](body, s);
     }
     function overview(body, s) {
-      const form = E6("form", void 0, "cc-form");
+      const form = E7("form", void 0, "cc-form");
       const v = {};
-      const grid = E6("div", void 0, "cc-form-grid");
+      const grid = E7("div", void 0, "cc-form-grid");
       const text = (k, label2, max = 160) => {
-        const w = E6("label", void 0, "cc-field");
-        const i = E6("input");
+        const w = E7("label", void 0, "cc-field");
+        const i = E7("input");
         i.value = s[k] || "";
         i.maxLength = max;
         i.oninput = () => v[k] = i.value;
-        w.append(E6("span", label2), i);
+        w.append(E7("span", label2), i);
         grid.append(w);
       };
       text("university", "University");
@@ -22963,24 +23999,24 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
       text("intake", "Intake", 40);
       text("subject", "Subject area", 120);
       text("english_test", "English test / level", 80);
-      const lw = E6("label", void 0, "cc-field");
-      const lv = E6("select");
+      const lw = E7("label", void 0, "cc-field");
+      const lv = E7("select");
       for (const l of LEVELS) lv.append(new Option(l, l));
       lv.value = s.study_level || LEVELS[5];
       lv.onchange = () => v.study_level = lv.value;
-      lw.append(E6("span", "Study level"), lv);
+      lw.append(E7("span", "Study level"), lv);
       grid.append(lw);
       if (f.counsellors) {
-        const cw = E6("label", void 0, "cc-field");
-        const cs = E6("select");
+        const cw = E7("label", void 0, "cc-field");
+        const cs = E7("select");
         cs.append(new Option("Unassigned", ""));
         for (const c of f.counsellors) cs.append(new Option(c.full_name + (c.role === "admin" ? " \xB7 admin" : ""), c.user_id));
         cs.value = s.counsellor_id || "";
         cs.onchange = () => v.counsellor_id = cs.value || null;
-        cw.append(E6("span", "Counsellor (admin)"), cs);
+        cw.append(E7("span", "Counsellor (admin)"), cs);
         grid.append(cw);
       }
-      const save = E6("button", "Save file", "cc-btn cc-primary");
+      const save = E7("button", "Save file", "cc-btn cc-primary");
       save.type = "submit";
       form.append(grid, save);
       form.onsubmit = (e) => {
@@ -22988,25 +24024,25 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
         if (!Object.keys(v).length) return;
         act(() => api2("/api/gp/students/" + id, { method: "PATCH", body: JSON.stringify(v) }), "File saved.");
       };
-      const facts = E6("dl", void 0, "cc-facts");
+      const facts = E7("dl", void 0, "cc-facts");
       for (const [k, val] of [["Phone", s.phone || "\u2014"], ["Date of birth", fmtDate(s.date_of_birth)], ["Residence", countryName(s.country_residence)], ["Nationality", countryName(s.nationality)], ["Joined", fmtDate(s.created_at)], ["Counsellor", f.counsellor?.full_name || "Unassigned"]]) {
-        const it = E6("div", void 0, "cc-fact");
-        it.append(E6("dt", k), E6("dd", val));
+        const it = E7("div", void 0, "cc-fact");
+        it.append(E7("dt", k), E7("dd", val));
         facts.append(it);
       }
       body.append(facts, form);
     }
     function journey(body) {
-      const ol = E6("ol", void 0, "cc-journey");
+      const ol = E7("ol", void 0, "cc-journey");
       for (const st of f.stages) {
-        const li = E6("li", void 0, "cc-j is-" + st.status);
-        const n = E6("span", void 0, "cc-j-node");
+        const li = E7("li", void 0, "cc-j is-" + st.status);
+        const n = E7("span", void 0, "cc-j-node");
         n.append(gi(st.status === "done" ? "check" : "dot"));
-        const t2 = E6("div", void 0, "cc-j-txt");
-        t2.append(E6("strong", f.stage_titles[st.stage_key]), E6("small", st.updated_at ? "Updated " + ago(st.updated_at) : "Not started yet"));
-        const seg = E6("div", void 0, "cc-seg cc-seg-sm");
+        const t2 = E7("div", void 0, "cc-j-txt");
+        t2.append(E7("strong", f.stage_titles[st.stage_key]), E7("small", st.updated_at ? "Updated " + ago(st.updated_at) : "Not started yet"));
+        const seg = E7("div", void 0, "cc-seg cc-seg-sm");
         for (const [k, label2] of [["pending", "Pending"], ["in_progress", "In progress"], ["done", "Done"]]) {
-          const b = E6("button", label2);
+          const b = E7("button", label2);
           b.type = "button";
           b.setAttribute("aria-pressed", String(st.status === k));
           b.onclick = () => {
@@ -23017,15 +24053,15 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
         li.append(n, t2, seg);
         ol.append(li);
       }
-      body.append(E6("p", "Each change is shared with the student as a progress update.", "cc-muted"), ol);
+      body.append(E7("p", "Each change is shared with the student as a progress update.", "cc-muted"), ol);
     }
     function documents(body) {
       for (const doc of f.documents) {
-        const r = E6("div", void 0, "cc-doc is-" + doc.status);
-        const t2 = E6("div", void 0, "cc-doc-txt");
-        t2.append(E6("strong", doc.label), E6("small", DOC[doc.status] + " \xB7 " + (f.stage_titles[doc.stage_key] || "") + (doc.file_name ? " \xB7 " + doc.file_name : "")));
-        if (doc.review_note) t2.append(E6("small", doc.review_note, "cc-bad"));
-        const a = E6("div", void 0, "cc-doc-acts");
+        const r = E7("div", void 0, "cc-doc is-" + doc.status);
+        const t2 = E7("div", void 0, "cc-doc-txt");
+        t2.append(E7("strong", doc.label), E7("small", DOC[doc.status] + " \xB7 " + (f.stage_titles[doc.stage_key] || "") + (doc.file_name ? " \xB7 " + doc.file_name : "")));
+        if (doc.review_note) t2.append(E7("small", doc.review_note, "cc-bad"));
+        const a = E7("div", void 0, "cc-doc-acts");
         if (doc.file_name) a.append(btn2("View", async () => {
           try {
             window.open((await api2("/api/gp/documents/" + doc.id + "/url")).data.url, "_blank", "noopener");
@@ -23042,93 +24078,93 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
         r.append(gi(doc.status === "approved" ? "check" : doc.status === "rejected" ? "alert" : "doc", "gp-i cc-doc-i"), t2, a);
         body.append(r);
       }
-      const form = E6("form", void 0, "cc-inline");
-      const label2 = E6("input");
+      const form = E7("form", void 0, "cc-inline");
+      const label2 = E7("input");
       label2.placeholder = "Request a document, e.g. CAS letter";
       label2.required = true;
       label2.maxLength = 160;
       label2.setAttribute("aria-label", "Document to request");
-      const stage = E6("select");
+      const stage = E7("select");
       stage.setAttribute("aria-label", "Stage");
       for (const [k] of STAGES) stage.append(new Option(f.stage_titles[k], k));
       stage.value = "documents";
-      const msg = E6("input");
+      const msg = E7("input");
       msg.placeholder = "Message (optional)";
       msg.maxLength = 600;
       msg.setAttribute("aria-label", "Message");
-      const go = E6("button", "Send request", "cc-btn cc-primary");
+      const go = E7("button", "Send request", "cc-btn cc-primary");
       go.type = "submit";
       form.append(label2, stage, msg, go);
       form.onsubmit = (e) => {
         e.preventDefault();
         act(() => api2("/api/gp/students/" + id + "/documents", { method: "POST", body: JSON.stringify({ label: label2.value, stage_key: stage.value, message: msg.value || null, doc_type: "other" }) }), "Document requested \xB7 the student has been notified.");
       };
-      body.append(E6("h3", "Request documentation"), form);
+      body.append(E7("h3", "Request documentation"), form);
     }
     function tasks(body) {
       const open = f.tasks;
       for (const t2 of open) {
-        const r = E6("div", void 0, "cc-task" + (t2.status === "done" ? " is-done" : ""));
-        const cb = E6("input");
+        const r = E7("div", void 0, "cc-task" + (t2.status === "done" ? " is-done" : ""));
+        const cb = E7("input");
         cb.type = "checkbox";
         cb.checked = t2.status === "done";
         cb.setAttribute("aria-label", "Done");
         cb.onchange = () => act(() => api2("/api/gp/tasks/" + t2.id, { method: "PATCH", body: JSON.stringify({ status: cb.checked ? "done" : "open" }) }));
-        const tx = E6("div");
-        tx.append(E6("strong", t2.title), E6("small", (f.stage_titles[t2.stage_key] || "") + (t2.due_date ? " \xB7 due " + fmtDate(t2.due_date) : ""), t2.due_date && t2.status === "open" && daysUntil(t2.due_date) < 0 ? "cc-bad" : "cc-muted"));
+        const tx2 = E7("div");
+        tx2.append(E7("strong", t2.title), E7("small", (f.stage_titles[t2.stage_key] || "") + (t2.due_date ? " \xB7 due " + fmtDate(t2.due_date) : ""), t2.due_date && t2.status === "open" && daysUntil(t2.due_date) < 0 ? "cc-bad" : "cc-muted"));
         const del = btn2("", () => {
           if (confirm("Delete this task?")) act(() => api2("/api/gp/tasks/" + t2.id, { method: "PATCH", body: JSON.stringify({ remove: true }) }));
         }, "cc-icon", "trash");
         del.setAttribute("aria-label", "Delete task");
-        r.append(cb, tx, del);
+        r.append(cb, tx2, del);
         body.append(r);
       }
-      const form = E6("form", void 0, "cc-inline");
-      const title = E6("input");
+      const form = E7("form", void 0, "cc-inline");
+      const title = E7("input");
       title.placeholder = "Assign a task";
       title.required = true;
       title.maxLength = 160;
       title.setAttribute("aria-label", "Task");
-      const stage = E6("select");
+      const stage = E7("select");
       stage.setAttribute("aria-label", "Stage");
       for (const [k] of STAGES) stage.append(new Option(f.stage_titles[k], k));
       stage.value = f.stages.find((s) => s.status === "in_progress")?.stage_key || "documents";
-      const due = E6("input");
+      const due = E7("input");
       due.type = "date";
       due.setAttribute("aria-label", "Due date");
-      const go = E6("button", "Assign", "cc-btn cc-primary");
+      const go = E7("button", "Assign", "cc-btn cc-primary");
       go.type = "submit";
       form.append(title, stage, due, go);
       form.onsubmit = (e) => {
         e.preventDefault();
         act(() => api2("/api/gp/students/" + id + "/tasks", { method: "POST", body: JSON.stringify({ title: title.value, stage_key: stage.value, due_date: due.value || null, detail: null }) }), "Task assigned.");
       };
-      body.append(E6("h3", "Assign task"), form, E6("h3", "Important dates"));
+      body.append(E7("h3", "Assign task"), form, E7("h3", "Important dates"));
       for (const ev of f.events) {
-        const r = E6("div", void 0, "cc-task");
-        const tx = E6("div");
-        tx.append(E6("strong", ev.title), E6("small", fmtDate(ev.starts_on) + " \xB7 " + ev.kind, "cc-muted"));
+        const r = E7("div", void 0, "cc-task");
+        const tx2 = E7("div");
+        tx2.append(E7("strong", ev.title), E7("small", fmtDate(ev.starts_on) + " \xB7 " + ev.kind, "cc-muted"));
         const del = btn2("", () => {
           if (confirm("Remove this date?")) act(() => api2("/api/gp/events/" + ev.id, { method: "DELETE" }));
         }, "cc-icon", "trash");
         del.setAttribute("aria-label", "Remove date");
-        r.append(gi("calendar"), tx, del);
+        r.append(gi("calendar"), tx2, del);
         body.append(r);
       }
-      const ef = E6("form", void 0, "cc-inline");
-      const et = E6("input");
+      const ef = E7("form", void 0, "cc-inline");
+      const et = E7("input");
       et.placeholder = "e.g. UCAS deadline, visa appointment";
       et.required = true;
       et.maxLength = 160;
       et.setAttribute("aria-label", "Date title");
-      const ed = E6("input");
+      const ed = E7("input");
       ed.type = "date";
       ed.required = true;
       ed.setAttribute("aria-label", "Date");
-      const ek = E6("select");
+      const ek = E7("select");
       ek.setAttribute("aria-label", "Kind");
       for (const k of ["deadline", "meeting", "intake", "visa", "travel", "other"]) ek.append(new Option(k[0].toUpperCase() + k.slice(1), k));
-      const eg = E6("button", "Add date", "cc-btn cc-primary");
+      const eg = E7("button", "Add date", "cc-btn cc-primary");
       eg.type = "submit";
       ef.append(et, ed, ek, eg);
       ef.onsubmit = (e) => {
@@ -23138,27 +24174,27 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
       body.append(ef);
     }
     function messages(body) {
-      const th = E6("div", void 0, "cc-thread");
+      const th = E7("div", void 0, "cc-thread");
       for (const m of f.messages) {
-        const b = E6("div", void 0, "cc-msg cc-msg-" + m.sender_role + (m.kind === "update" ? " is-update" : ""));
-        b.append(E6("p", m.body), E6("small", (m.sender_role === "student" ? f.student.full_name.split(" ")[0] : m.sender_role === "system" ? "System" : "You / team") + " \xB7 " + ago(m.created_at) + (m.kind === "update" ? " \xB7 update" : "")));
+        const b = E7("div", void 0, "cc-msg cc-msg-" + m.sender_role + (m.kind === "update" ? " is-update" : ""));
+        b.append(E7("p", m.body), E7("small", (m.sender_role === "student" ? f.student.full_name.split(" ")[0] : m.sender_role === "system" ? "System" : "You / team") + " \xB7 " + ago(m.created_at) + (m.kind === "update" ? " \xB7 update" : "")));
         th.append(b);
       }
-      if (!f.messages.length) th.append(E6("p", "No messages yet.", "cc-muted"));
-      const form = E6("form", void 0, "cc-composer");
-      const ta = E6("textarea");
+      if (!f.messages.length) th.append(E7("p", "No messages yet.", "cc-muted"));
+      const form = E7("form", void 0, "cc-composer");
+      const ta = E7("textarea");
       ta.rows = 2;
       ta.maxLength = 2e3;
       ta.required = true;
       ta.placeholder = "Write to " + f.student.full_name.split(" ")[0] + "\u2026";
       ta.setAttribute("aria-label", "Message");
-      const kind = E6("label", void 0, "cc-check");
-      const k = E6("input");
+      const kind = E7("label", void 0, "cc-check");
+      const k = E7("input");
       k.type = "checkbox";
-      kind.append(k, E6("span", "Share as progress update"));
-      const go = E6("button", "Send", "cc-btn cc-primary");
+      kind.append(k, E7("span", "Share as progress update"));
+      const go = E7("button", "Send", "cc-btn cc-primary");
       go.type = "submit";
-      const row = E6("div", void 0, "cc-composer-row");
+      const row = E7("div", void 0, "cc-composer-row");
       row.append(kind, go);
       form.append(ta, row);
       form.onsubmit = (e) => {
@@ -23171,15 +24207,15 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
       });
     }
     function notes(body) {
-      body.append(E6("p", "Private: only the MUK Talent team can read these notes.", "cc-muted cc-private"));
-      const form = E6("form", void 0, "cc-composer");
-      const ta = E6("textarea");
+      body.append(E7("p", "Private: only the MUK Talent team can read these notes.", "cc-muted cc-private"));
+      const form = E7("form", void 0, "cc-composer");
+      const ta = E7("textarea");
       ta.rows = 3;
       ta.maxLength = 4e3;
       ta.required = true;
       ta.placeholder = "Add a private observation\u2026";
       ta.setAttribute("aria-label", "Private note");
-      const go = E6("button", "Save note", "cc-btn cc-primary");
+      const go = E7("button", "Save note", "cc-btn cc-primary");
       go.type = "submit";
       form.append(ta, go);
       form.onsubmit = (e) => {
@@ -23188,8 +24224,8 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
       };
       body.append(form);
       for (const n of f.notes) {
-        const c = E6("article", void 0, "cc-note");
-        c.append(E6("p", n.body), E6("small", ago(n.created_at), "cc-muted"));
+        const c = E7("article", void 0, "cc-note");
+        c.append(E7("p", n.body), E7("small", ago(n.created_at), "cc-muted"));
         body.append(c);
       }
     }
@@ -23200,7 +24236,7 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
 }
 
 // admin-src/employee.js
-var E7 = (t2, v, c) => {
+var E8 = (t2, v, c) => {
   const n = document.createElement(t2);
   if (v !== void 0) n.textContent = String(v);
   if (c) n.className = c;
@@ -23227,7 +24263,7 @@ function money2(v, c) {
 }
 function linkStyles() {
   for (const [id, href] of [["professionalStyles", "/admin/professional.css"], ["businessCardStyles", "/book/business-card.css"], ["luxuryWorkspaceStyles", "/admin/luxury-workspace.css"], ["mukSoftStyles", "/admin/muk-soft.css"], ["mukAppStyles", "/admin/muk-app.css"]]) if (!document.getElementById(id)) {
-    const l = E7("link");
+    const l = E8("link");
     l.id = id;
     l.rel = "stylesheet";
     l.href = href;
@@ -23239,22 +24275,26 @@ function linkStyles() {
 async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack = null }) {
   document.getElementById("employeeWorkspace")?.remove();
   linkStyles();
-  const readOnly = Boolean(owner), root = E7("div", void 0, "lux soft");
+  const readOnly = Boolean(owner), root = E8("div", void 0, "lux soft");
   root.id = "employeeWorkspace";
   root.lang = "en";
   softChrome();
-  const sidebar = E7("aside", void 0, "lx-sidebar"), brand = E7("a", "MUK TALENT", "lx-brand");
+  const sidebar = E8("aside", void 0, "lx-sidebar"), brand = E8("a", "MUK TALENT", "lx-brand");
   brand.href = "/";
-  const web = E7("a", "\u2190 Back to website", "muk-webback");
+  const web = E8("a", "\u2190 Back to website", "muk-webback");
   web.href = "/";
-  sidebar.append(brand, web, E7("p", "PRIVATE TEAM WORKSPACE", "lx-overline"));
-  const nav2 = E7("nav");
+  sidebar.append(brand, web, E8("p", "PRIVATE TEAM WORKSPACE", "lx-overline"));
+  const nav2 = E8("nav");
   nav2.setAttribute("aria-label", "Workspace");
   sidebar.append(nav2);
-  const footer = E7("div", void 0, "lx-sidebar-footer");
-  footer.append(E7("strong", staff.full_name), E7("small", readOnly ? "Administrator preview" : "MUK Talent team"));
+  const footer = E8("div", void 0, "lx-sidebar-footer");
+  footer.append(E8("strong", staff.full_name), E8("small", readOnly ? "Administrator preview" : "MUK Talent team"));
   const exit = button2(readOnly ? "Back to administration" : "Sign out", async () => {
     exit.disabled = true;
+    try {
+      watcher2?.stop();
+    } catch {
+    }
     try {
       if (onBack) {
         root.remove();
@@ -23271,23 +24311,34 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     if (changed) notice("Password changed.");
   }));
   sidebar.append(footer);
-  const main = E7("main", void 0, "lx-main"), header = E7("header", void 0, "lx-header"), intro = E7("div"), title = E7("h1"), subtitle = E7("p", void 0, "lx-muted");
-  intro.append(E7("p", "MUK TALENT / TEAM OPERATIONS", "lx-overline"), title, subtitle);
-  const actions = E7("div", void 0, "lx-actions"), refresh = button2("", () => load()), add = button2("Add record", () => {
+  const main = E8("main", void 0, "lx-main"), header = E8("header", void 0, "lx-header"), intro = E8("div"), title = E8("h1"), subtitle = E8("p", void 0, "lx-muted");
+  intro.append(E8("p", "MUK TALENT / TEAM OPERATIONS", "lx-overline"), title, subtitle);
+  const actions = E8("div", void 0, "lx-actions"), refresh = button2("", () => load()), add = button2("Add record", () => {
   });
   add.classList.add("lx-primary");
-  refresh.append(icon("refresh", "lx-btn-icon"), E7("span", "Refresh", "lx-btn-label"));
+  refresh.append(icon("refresh", "lx-btn-icon"), E8("span", "Refresh", "lx-btn-label"));
   refresh.setAttribute("aria-label", "Refresh");
   actions.append(refresh, add);
-  const mweb = E7("a", "\u2190 Website", "mobile-web lx-mweb");
+  linkChatCss();
+  let summary = null;
+  const openChat = () => openMessenger({ api: api2, lang: "en", onChange: () => watcher2?.refresh() });
+  const hHeart = heartButton("en", openChat);
+  hHeart.classList.add("lx-heart");
+  hHeart.setAttribute("aria-label", "Messages");
+  if (!readOnly) actions.append(hHeart);
+  const watcher2 = readOnly ? null : watchNotifications(api2, (x) => {
+    summary = x;
+    root.querySelectorAll(".mkc-heart").forEach((b) => setDot(b, { chat_unread: x.chat_unread }));
+  });
+  const mweb = E8("a", "\u2190 Website", "mobile-web lx-mweb");
   mweb.href = "/";
   mweb.setAttribute("aria-label", "Back to website");
   intro.prepend(mweb);
   header.append(intro, actions);
-  const status = E7("p", "", "lx-status");
+  const status = E8("p", "", "lx-status");
   status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
-  const body = E7("div", void 0, "lx-body");
+  const body = E8("div", void 0, "lx-body");
   main.append(header, status, body);
   root.append(sidebar, main);
   document.body.append(root);
@@ -23300,29 +24351,29 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   let group = "home";
   const navButtons = {}, dockButtons = {};
   for (const [id, label2, symbol] of groups) {
-    const b = E7("button", void 0, "lx-nav");
+    const b = E8("button", void 0, "lx-nav");
     b.type = "button";
-    b.append(icon(symbol, "lx-nav-icon"), E7("span", label2));
+    b.append(icon(symbol, "lx-nav-icon"), E8("span", label2));
     b.onclick = () => navigate2(tabs[id]);
     navButtons[id] = b;
     nav2.append(b);
   }
-  const dock = E7("nav", void 0, "lx-dock");
+  const dock = E8("nav", void 0, "lx-dock");
   dock.setAttribute("aria-label", "Workspace sections");
   for (const [id, label2, symbol] of groups) {
-    const b = E7("button");
+    const b = E8("button");
     b.type = "button";
-    b.append(icon(symbol, "lx-dock-icon"), E7("small", label2));
+    b.append(icon(symbol, "lx-dock-icon"), E8("small", label2));
     b.onclick = () => navigate2(tabs[id]);
     dockButtons[id] = b;
     dock.append(b);
   }
   root.append(dock);
-  const tabBar = E7("div", void 0, "lx-tabs");
+  const tabBar = E8("div", void 0, "lx-tabs");
   tabBar.setAttribute("role", "tablist");
   main.insertBefore(tabBar, status);
   function button2(text, fn) {
-    const b = E7("button", text, "lx-button");
+    const b = E8("button", text, "lx-button");
     b.type = "button";
     b.onclick = fn;
     return b;
@@ -23333,12 +24384,12 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     status.className = error ? "lx-status lx-error" : "lx-status";
   }
   function panel(text) {
-    const p = E7("section", void 0, "lx-panel");
-    if (text) p.append(E7("h2", text));
+    const p = E8("section", void 0, "lx-panel");
+    if (text) p.append(E8("h2", text));
     return p;
   }
   function empty(target, text) {
-    target.append(E7("p", text, "lx-empty"));
+    target.append(E8("p", text, "lx-empty"));
   }
   function records(kind) {
     return data.records.filter((r) => r.kind === kind);
@@ -23399,7 +24450,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     tabBar.hidden = g[3].length < 2;
     for (const [id, label2] of g[3]) {
       if (readOnly && id === "account") continue;
-      const t2 = E7("button", label2, "lx-tab");
+      const t2 = E8("button", label2, "lx-tab");
       t2.type = "button";
       t2.setAttribute("role", "tab");
       t2.setAttribute("aria-selected", String(id === section));
@@ -23433,11 +24484,11 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         render();
         notice(text);
       } });
-      else body.append(E7("p", "Loading your card\u2026", "lx-empty"));
+      else body.append(E8("p", "Loading your card\u2026", "lx-empty"));
     } else if (section === "social") renderSocialEditor({ ...ctx, onSaved: () => refreshDirectory() });
     else if (section === "account") account();
     else if (section === "students") {
-      if (readOnly) body.append(E7("p", "Open Global Passport \xB7 Control Centre from the administration to see every student.", "lx-empty"));
+      if (readOnly) body.append(E8("p", "Open Global Passport \xB7 Control Centre from the administration to see every student.", "lx-empty"));
       else renderControlCentre({ host: body, api: api2, admin: staff.role === "admin", notice }).then(() => {
         gpCache = null;
       });
@@ -23447,16 +24498,16 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   function passportWidget() {
     const p = panel();
     p.classList.add("lx-passport");
-    const head2 = E7("div", void 0, "lx-passport-head");
-    head2.append(E7("span", "GLOBAL PASSPORT", "lx-overline"), E7("span", "UK", "lx-passport-flag"));
-    p.append(head2, E7("h2", "Your students"));
-    const grid = E7("div", void 0, "lx-passport-grid");
+    const head2 = E8("div", void 0, "lx-passport-head");
+    head2.append(E8("span", "GLOBAL PASSPORT", "lx-overline"), E8("span", "UK", "lx-passport-flag"));
+    p.append(head2, E8("h2", "Your students"));
+    const grid = E8("div", void 0, "lx-passport-grid");
     p.append(grid);
     const paint2 = (m) => {
       grid.replaceChildren();
       for (const [k, l] of [["assigned", "Assigned"], ["documents_review", "Docs to review"], ["attention", "Need attention"]]) {
-        const c = E7("div", void 0, "lx-passport-stat" + (k === "attention" && m?.[k] ? " is-alert" : ""));
-        c.append(E7("strong", m ? String(m[k] ?? 0) : "\u2014"), E7("small", l));
+        const c = E8("div", void 0, "lx-passport-stat" + (k === "attention" && m?.[k] ? " is-alert" : ""));
+        c.append(E8("strong", m ? String(m[k] ?? 0) : "\u2014"), E8("small", l));
         grid.append(c);
       }
     };
@@ -23465,7 +24516,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       gpCache = r.metrics;
       if (p.isConnected) paint2(gpCache);
     }).catch(() => {
-      grid.replaceChildren(E7("p", "Global Passport is not active yet.", "lx-muted"));
+      grid.replaceChildren(E8("p", "Global Passport is not active yet.", "lx-muted"));
     });
     if (!readOnly) {
       const open = button2("Open Control Centre", () => navigate2("students"));
@@ -23475,49 +24526,49 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     return p;
   }
   function account() {
-    const wrap = E7("div", void 0, "lx-account"), sec = panel("Security");
-    sec.append(E7("p", "Protect access to your leads, appointments and documents.", "lx-muted"));
+    const wrap = E8("div", void 0, "lx-account"), sec = panel("Security");
+    sec.append(E8("p", "Protect access to your leads, appointments and documents.", "lx-muted"));
     const rows = [["lock", "Password", "Change it any time. Use at least 12 characters you do not use elsewhere.", button2("Change password", async () => {
       const changed = await requirePasswordChange({ api: api2, mandatory: false });
       if (changed) notice("Password changed.");
     })], ["refresh", "Automatic sign-out", "For your security you are signed out after 30 minutes without activity, with a warning first.", null], ["logout", "Sign out", "Ends your session on this device.", button2("Sign out", () => exit.click())]];
     for (const [ic, h, t2, b] of rows) {
-      const row = E7("div", void 0, "lx-account-row"), i = E7("span", void 0, "lx-account-icon"), txt = E7("div");
+      const row = E8("div", void 0, "lx-account-row"), i = E8("span", void 0, "lx-account-icon"), txt = E8("div");
       i.append(icon(ic));
-      txt.append(E7("h3", h), E7("p", t2, "lx-muted"));
+      txt.append(E8("h3", h), E8("p", t2, "lx-muted"));
       row.append(i, txt);
       if (b) row.append(b);
       sec.append(row);
     }
     wrap.append(sec);
     const tips = panel("Good habits");
-    for (const t2 of ["Never share your password or sign-in links, even with colleagues.", "Sign out on shared or public computers.", "MUK Talent will never ask for your password by email or WhatsApp.", "Report anything unusual to your administrator straight away."]) tips.append(E7("p", t2, "lx-tip"));
+    for (const t2 of ["Never share your password or sign-in links, even with colleagues.", "Sign out on shared or public computers.", "MUK Talent will never ask for your password by email or WhatsApp.", "Report anything unusual to your administrator straight away."]) tips.append(E8("p", t2, "lx-tip"));
     wrap.append(tips);
     body.append(wrap);
   }
   function metric(label2, value, detail) {
     const c = panel();
     c.classList.add("lx-metric");
-    c.append(E7("p", label2, "lx-muted"), E7("strong", value), E7("small", detail));
+    c.append(E8("p", label2, "lx-muted"), E8("strong", value), E8("small", detail));
     return c;
   }
   function overview() {
     body.append(homeHero());
-    const metrics = E7("div", void 0, "lx-metrics");
+    const metrics = E8("div", void 0, "lx-metrics");
     metrics.append(metric("Assigned leads", data.leads.length, "Loaded non-archived records"), metric("Ready for review", directory?.ready_count || 0, "Attributed leads \xB7 exact count"), metric("Open tasks", records("task").filter((t2) => t2.status !== "Done").length, "In your workspace"), metric("Content in production", records("content").filter((c) => c.status !== "Published").length, "Ideas and work in progress"));
     body.append(metrics);
-    const board = E7("div", void 0, "lx-board"), left = E7("div", void 0, "lx-board-left"), centre = E7("div", void 0, "lx-board-centre"), right = E7("div", void 0, "lx-board-right");
+    const board = E8("div", void 0, "lx-board"), left = E8("div", void 0, "lx-board-left"), centre = E8("div", void 0, "lx-board-centre"), right = E8("div", void 0, "lx-board-right");
     left.append(passportWidget());
     const impact = panel("Your pipeline potential");
     impact.classList.add("lx-impact");
-    impact.append(E7("strong", directory?.ready_count || 0, "lx-impact-number"), E7("p", "Attributed leads ready for review", "lx-muted"));
-    if (directory?.potential_commission != null) impact.append(E7("b", money2(directory.potential_commission, directory.commission_currency) + " potential"));
-    impact.append(E7("small", directory?.potential_commission != null ? "Estimate only. Subject to approval and commission terms." : "Your administrator has not configured a commission rate."));
+    impact.append(E8("strong", directory?.ready_count || 0, "lx-impact-number"), E8("p", "Attributed leads ready for review", "lx-muted"));
+    if (directory?.potential_commission != null) impact.append(E8("b", money2(directory.potential_commission, directory.commission_currency) + " potential"));
+    impact.append(E8("small", directory?.potential_commission != null ? "Estimate only. Subject to approval and commission terms." : "Your administrator has not configured a commission rate."));
     left.append(impact);
     const tasks = panel("Your priorities"), open = records("task").filter((t2) => t2.status !== "Done").sort((a, b) => (a.record_date || "9999").localeCompare(b.record_date || "9999")).slice(0, 4);
     for (const t2 of open) {
-      const row = E7("div", void 0, "lx-row");
-      row.append(E7("span", t2.payload.priority || "Medium", "lx-tag"), E7("h3", t2.title), E7("p", t2.record_date || "No due date", "lx-muted"));
+      const row = E8("div", void 0, "lx-row");
+      row.append(E8("span", t2.payload.priority || "Medium", "lx-tag"), E8("h3", t2.title), E8("p", t2.record_date || "No due date", "lx-muted"));
       if (!readOnly) row.append(button2("Open task", () => edit("task", t2)));
       tasks.append(row);
     }
@@ -23525,8 +24576,8 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     centre.append(tasks);
     const follow = panel("Follow-ups that need attention"), overdue = data.leads.filter((l) => l.status !== "closed" && l.next_action_at && new Date(l.next_action_at) < /* @__PURE__ */ new Date()).slice(0, 3);
     for (const lead of overdue) {
-      const row = E7("div", void 0, "lx-row");
-      row.append(E7("h3", lead.first_name + " " + lead.last_name), E7("p", lead.next_action || "Follow-up required", "lx-muted"));
+      const row = E8("div", void 0, "lx-row");
+      row.append(E8("h3", lead.first_name + " " + lead.last_name), E8("p", lead.next_action || "Follow-up required", "lx-muted"));
       if (!readOnly) row.append(button2("Open lead", () => edit("lead", lead)));
       follow.append(row);
     }
@@ -23536,7 +24587,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     miniCalendar(day, true);
     right.append(day);
     const todayReport = records("report").find((r) => r.record_date === dateKey()), checkin = panel("Daily check-in");
-    checkin.append(E7("p", todayReport ? "Today\u2019s report \xB7 " + todayReport.status : "Capture the progress behind the numbers.", "lx-muted"), button2("Open today", () => {
+    checkin.append(E8("p", todayReport ? "Today\u2019s report \xB7 " + todayReport.status : "Capture the progress behind the numbers.", "lx-muted"), button2("Open today", () => {
       selectedDay = dateKey();
       month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
       navigate2("calendar");
@@ -23545,13 +24596,13 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     right.prepend(strength2());
     right.append(streak());
     board.append(left, centre, right);
-    body.append(board, E7("p", "Operational view: up to 100 leads, 500 workspace records, 200 appointments and 100 recent activity events. Ready-lead potential uses a separate exact count.", "lx-footnote"));
+    body.append(board, E8("p", "Operational view: up to 100 leads, 500 workspace records, 200 appointments and 100 recent activity events. Ready-lead potential uses a separate exact count.", "lx-footnote"));
   }
   function strength2() {
     const d = directory || {}, items = [["Profile photo", Boolean(d.avatar_url), "profile"], ["Work contact details", Boolean(d.contact_phone || d.contact_email), "profile"], ["Short link", Boolean(d.card?.handle), "card"], ["Social links", Boolean(d.socials?.length), "social"], ["Card published", Boolean(d.card?.published), "card"]], done = items.filter((i) => i[1]).length, pct = Math.round(done / items.length * 100);
     const p = panel();
     p.classList.add("lx-strength");
-    const top = E7("div", void 0, "lx-strength-top"), svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const top = E8("div", void 0, "lx-strength-top"), svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("viewBox", "0 0 44 44");
     svg.setAttribute("class", "lx-ring");
     svg.setAttribute("aria-hidden", "true");
@@ -23565,24 +24616,24 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       c.setAttribute("class", cls);
       svg.append(c);
     }
-    const ring2 = E7("div", void 0, "lx-ring-wrap");
-    ring2.append(svg, E7("strong", pct + "%"));
-    const txt = E7("div");
-    txt.append(E7("h2", "Card strength"), E7("p", done === items.length ? "Complete. Your card is ready to impress." : items.length - done + " quick wins left.", "lx-muted"));
+    const ring2 = E8("div", void 0, "lx-ring-wrap");
+    ring2.append(svg, E8("strong", pct + "%"));
+    const txt = E8("div");
+    txt.append(E8("h2", "Card strength"), E8("p", done === items.length ? "Complete. Your card is ready to impress." : items.length - done + " quick wins left.", "lx-muted"));
     top.append(ring2, txt);
     p.append(top);
-    const list = E7("ul", void 0, "lx-checklist");
+    const list = E8("ul", void 0, "lx-checklist");
     for (const [label2, ok, target] of items) {
-      const li = E7("li", void 0, ok ? "done" : "");
-      const mark = E7("span", void 0, "lx-check");
+      const li = E8("li", void 0, ok ? "done" : "");
+      const mark = E8("span", void 0, "lx-check");
       if (ok) mark.append(icon("check"));
       li.append(mark);
       if (!ok && !readOnly && !(label2 === "Card published")) {
-        const b = E7("button", label2, "lx-check-link");
+        const b = E8("button", label2, "lx-check-link");
         b.type = "button";
         b.onclick = () => navigate2(target);
         li.append(b);
-      } else li.append(E7("span", label2 + (label2 === "Card published" && !ok ? " \xB7 by your administrator" : "")));
+      } else li.append(E8("span", label2 + (label2 === "Card published" && !ok ? " \xB7 by your administrator" : "")));
       list.append(li);
     }
     p.append(list);
@@ -23602,30 +24653,30 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       }
       day.setUTCDate(day.getUTCDate() - 1);
     }
-    const head2 = E7("div", void 0, "lx-streak-head");
-    head2.append(E7("strong", count, "lx-streak-number"), E7("span", count === 1 ? "working day in a row" : "working days in a row", "lx-muted"));
+    const head2 = E8("div", void 0, "lx-streak-head");
+    head2.append(E8("strong", count, "lx-streak-number"), E8("span", count === 1 ? "working day in a row" : "working days in a row", "lx-muted"));
     p.append(head2);
-    const week = E7("div", void 0, "lx-week"), today2 = /* @__PURE__ */ new Date(dateKey() + "T12:00:00Z"), monday = new Date(today2);
+    const week = E8("div", void 0, "lx-week"), today2 = /* @__PURE__ */ new Date(dateKey() + "T12:00:00Z"), monday = new Date(today2);
     monday.setUTCDate(today2.getUTCDate() - (today2.getUTCDay() + 6) % 7);
     for (let i = 0; i < 5; i++) {
       const d = new Date(monday);
       d.setUTCDate(monday.getUTCDate() + i);
-      const key = d.toISOString().slice(0, 10), cell = E7("span", ["M", "T", "W", "T", "F"][i], "lx-week-day");
+      const key = d.toISOString().slice(0, 10), cell = E8("span", ["M", "T", "W", "T", "F"][i], "lx-week-day");
       if (reports.has(key)) cell.classList.add("done");
       if (key === dateKey()) cell.classList.add("today");
       cell.setAttribute("aria-label", key + (reports.has(key) ? " \xB7 report sent" : " \xB7 no report"));
       week.append(cell);
     }
-    p.append(week, E7("small", count ? "Keep it going with today\u2019s report." : "Send today\u2019s report to start your streak.", "lx-footnote"));
+    p.append(week, E8("small", count ? "Keep it going with today\u2019s report." : "Send today\u2019s report to start your streak.", "lx-footnote"));
     return p;
   }
   function searchList(host, rows, draw) {
-    const input = E7("input");
+    const input = E8("input");
     input.type = "search";
     input.className = "lx-search";
     input.placeholder = "Search loaded records";
     input.setAttribute("aria-label", "Search loaded records");
-    const results = E7("div");
+    const results = E8("div");
     host.append(input, results);
     const paint2 = () => {
       results.replaceChildren();
@@ -23639,10 +24690,10 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   function leads() {
     const host = panel();
     searchList(host, data.leads, (target, l) => {
-      const row = E7("article", void 0, "lx-row"), top = E7("div", void 0, "lx-row-top");
-      top.append(E7("h3", l.first_name + " " + l.last_name), E7("span", leadStates[l.status] || l.status, "lx-tag"));
-      row.append(top, E7("p", l.reference + " \xB7 " + (l.subject_interest || "Study interest not set"), "lx-muted"), E7("p", l.next_action || "No next action recorded."), E7("small", "Follow-up: " + time(l.next_action_at)));
-      const controls = E7("div", void 0, "lx-actions");
+      const row = E8("article", void 0, "lx-row"), top = E8("div", void 0, "lx-row-top");
+      top.append(E8("h3", l.first_name + " " + l.last_name), E8("span", leadStates[l.status] || l.status, "lx-tag"));
+      row.append(top, E8("p", l.reference + " \xB7 " + (l.subject_interest || "Study interest not set"), "lx-muted"), E8("p", l.next_action || "No next action recorded."), E8("small", "Follow-up: " + time(l.next_action_at)));
+      const controls = E8("div", void 0, "lx-actions");
       if (!readOnly) controls.append(button2("Open lead", () => edit("lead", l)));
       controls.append(button2("Qualification", () => editQualification({ lead: l, api: api2, readOnly, root })));
       row.append(controls);
@@ -23653,42 +24704,42 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   function listRecords(kind) {
     const host = panel();
     searchList(host, records(kind), (target, r) => {
-      const row = E7("article", void 0, "lx-row");
-      row.append(E7("div", r.status, "lx-tag"), E7("h3", r.title), E7("p", kind === "partner" ? [r.payload.type, r.payload.contact, r.payload.city].filter(Boolean).join(" \xB7 ") : [r.payload.priority, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E7("p", r.payload.next_action || r.payload.notes || ""));
+      const row = E8("article", void 0, "lx-row");
+      row.append(E8("div", r.status, "lx-tag"), E8("h3", r.title), E8("p", kind === "partner" ? [r.payload.type, r.payload.contact, r.payload.city].filter(Boolean).join(" \xB7 ") : [r.payload.priority, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E8("p", r.payload.next_action || r.payload.notes || ""));
       if (!readOnly) row.append(button2("Open / edit", () => edit(kind, r)));
       target.append(row);
     });
     body.append(host);
   }
   function appointment(host, a) {
-    const row = E7("article", void 0, "lx-appointment");
-    row.append(E7("span", new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Casablanca", hour: "2-digit", minute: "2-digit" }).format(new Date(a.starts_at)), "lx-appointment-time"), E7("h3", a.full_name), E7("p", a.subject || "Student consultation"), E7("p", (a.institution || "") + (a.institution ? " \xB7 " : "") + (a.meeting_mode === "in_person" ? "In person \xB7 confirm location" : "Phone consultation"), "lx-muted"), E7("p", (a.whatsapp_phone_e164 || "No phone") + " \xB7 " + (a.email || "No email"), "lx-muted"), E7("small", "UK: " + time(a.starts_at, "Europe/London")), E7("span", a.status, "lx-tag"));
+    const row = E8("article", void 0, "lx-appointment");
+    row.append(E8("span", new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Casablanca", hour: "2-digit", minute: "2-digit" }).format(new Date(a.starts_at)), "lx-appointment-time"), E8("h3", a.full_name), E8("p", a.subject || "Student consultation"), E8("p", (a.institution || "") + (a.institution ? " \xB7 " : "") + (a.meeting_mode === "in_person" ? "In person \xB7 confirm location" : "Phone consultation"), "lx-muted"), E8("p", (a.whatsapp_phone_e164 || "No phone") + " \xB7 " + (a.email || "No email"), "lx-muted"), E8("small", "UK: " + time(a.starts_at, "Europe/London")), E8("span", a.status, "lx-tag"));
     if (!readOnly && a.status !== "cancelled") row.append(button2("Manage appointment", () => manageAppointment({ a, api: api2, root, onSaved: load })));
     host.append(row);
   }
   function miniCalendar(host, compact = false) {
-    const tools = E7("div", void 0, "lx-calendar-tools");
+    const tools = E8("div", void 0, "lx-calendar-tools");
     tools.append(button2("\u2039", () => {
       month = new Date(month.getFullYear(), month.getMonth() - 1, 1);
       render();
-    }), E7("strong", new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month)), button2("\u203A", () => {
+    }), E8("strong", new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month)), button2("\u203A", () => {
       month = new Date(month.getFullYear(), month.getMonth() + 1, 1);
       render();
     }));
     host.append(tools);
-    const grid = E7("div", void 0, "lx-calendar");
-    for (const day of ["M", "T", "W", "T", "F", "S", "S"]) grid.append(E7("span", day, "lx-weekday"));
-    for (let i = 0; i < (month.getDay() + 6) % 7; i++) grid.append(E7("span"));
+    const grid = E8("div", void 0, "lx-calendar");
+    for (const day of ["M", "T", "W", "T", "F", "S", "S"]) grid.append(E8("span", day, "lx-weekday"));
+    for (let i = 0; i < (month.getDay() + 6) % 7; i++) grid.append(E8("span"));
     for (let d = 1; d <= new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate(); d++) {
-      const key = month.getFullYear() + "-" + String(month.getMonth() + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"), cell = E7("button", void 0, "lx-date");
+      const key = month.getFullYear() + "-" + String(month.getMonth() + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"), cell = E8("button", void 0, "lx-date");
       cell.type = "button";
-      cell.append(E7("span", d, "lx-date-num"));
+      cell.append(E8("span", d, "lx-date-num"));
       const wd = new Date(month.getFullYear(), month.getMonth(), d).getDay();
       if (wd === 0 || wd === 6) cell.classList.add("lx-weekend");
       const pay = payroll[monthKey()]?.days?.find((x) => x.date === key);
       if (pay?.verified) {
         cell.classList.add("lx-verified");
-        cell.append(E7("span", "+" + pay.verified * (payroll[monthKey()].per_verified_lead || 2e3) / 1e3 + "k", "lx-date-chip"));
+        cell.append(E8("span", "+" + pay.verified * (payroll[monthKey()].per_verified_lead || 2e3) / 1e3 + "k", "lx-date-chip"));
       }
       cell.classList.toggle("today", key === dateKey());
       cell.classList.toggle("selected", key === selectedDay);
@@ -23707,15 +24758,15 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     if (compact) {
       const upcoming = data.appointments.filter((a) => a.status === "confirmed" && new Date(a.starts_at) > /* @__PURE__ */ new Date()).sort((a, b) => a.starts_at.localeCompare(b.starts_at)).slice(0, 2);
       for (const a of upcoming) {
-        const row = E7("div", void 0, "lx-row");
-        row.append(E7("strong", a.full_name), E7("p", time(a.starts_at), "lx-muted"));
+        const row = E8("div", void 0, "lx-row");
+        row.append(E8("strong", a.full_name), E8("p", time(a.starts_at), "lx-muted"));
         host.append(row);
       }
     }
   }
   function calendarPage() {
     body.append(payrollHeader());
-    const grid = E7("div", void 0, "lx-day-layout"), calendar = panel("Plan your day");
+    const grid = E8("div", void 0, "lx-day-layout"), calendar = panel("Plan your day");
     calendar.append(button2("Today", () => {
       selectedDay = dateKey();
       month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
@@ -23723,31 +24774,31 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     }));
     miniCalendar(calendar);
     const day = panel(new Intl.DateTimeFormat("en-GB", { dateStyle: "full", timeZone: "UTC" }).format(/* @__PURE__ */ new Date(selectedDay + "T12:00:00Z"))), report = records("report").find((r) => r.record_date === selectedDay);
-    day.append(E7("span", selectedDay === dateKey() ? "TODAY" : "SELECTED DAY", "lx-overline"), dayPay());
-    const checkin = E7("section", void 0, "lx-day-report");
-    checkin.append(E7("h3", "Daily report"), E7("p", report ? "Status: " + report.status : "No daily report recorded.", "lx-muted"));
+    day.append(E8("span", selectedDay === dateKey() ? "TODAY" : "SELECTED DAY", "lx-overline"), dayPay());
+    const checkin = E8("section", void 0, "lx-day-report");
+    checkin.append(E8("h3", "Daily report"), E8("p", report ? "Status: " + report.status : "No daily report recorded.", "lx-muted"));
     if (report) {
-      for (const [key, label2] of fields.report) if (report.payload[key]) checkin.append(E7("strong", label2), E7("p", report.payload[key]));
+      for (const [key, label2] of fields.report) if (report.payload[key]) checkin.append(E8("strong", label2), E8("p", report.payload[key]));
     }
     if (!readOnly) checkin.append(button2(report ? "Edit daily report" : "Write daily report", () => edit("report", report, selectedDay)));
-    day.append(checkin, E7("h3", "Appointments"));
+    day.append(checkin, E8("h3", "Appointments"));
     const appointments = data.appointments.filter((a) => dateKey(a.starts_at) === selectedDay).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
     for (const a of appointments) appointment(day, a);
     if (!appointments.length) empty(day, "No appointments on this day among loaded records.");
-    day.append(E7("h3", "Tasks for this day"));
+    day.append(E8("h3", "Tasks for this day"));
     const tasks = records("task").filter((t2) => t2.record_date === selectedDay);
     for (const t2 of tasks) {
-      const row = E7("div", void 0, "lx-row");
-      row.append(E7("strong", t2.title), E7("span", t2.status, "lx-tag"));
+      const row = E8("div", void 0, "lx-row");
+      row.append(E8("strong", t2.title), E8("span", t2.status, "lx-tag"));
       if (!readOnly) row.append(button2("Open task", () => edit("task", t2)));
       day.append(row);
     }
     if (!tasks.length) empty(day, "No dated tasks.");
-    day.append(E7("h3", "Recorded workspace activity"));
+    day.append(E8("h3", "Recorded workspace activity"));
     const history2 = data.activity.filter((a) => dateKey(a.created_at) === selectedDay);
     for (const a of history2) {
-      const row = E7("div", void 0, "lx-history-line");
-      row.append(E7("strong", a.title), E7("small", a.kind + " \xB7 " + a.action + " \xB7 " + time(a.created_at)));
+      const row = E8("div", void 0, "lx-history-line");
+      row.append(E8("strong", a.title), E8("small", a.kind + " \xB7 " + a.action + " \xB7 " + time(a.created_at)));
       day.append(row);
     }
     if (!history2.length) empty(day, "No recorded workspace changes for this day among loaded activity.");
@@ -23774,24 +24825,24 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     return null;
   }
   function legend() {
-    const l = E7("div", void 0, "lx-legend");
+    const l = E8("div", void 0, "lx-legend");
     for (const [cls, text] of [["today", "Today"], ["events", "Report / appointment"], ["verified", "Verified lead \xB7 +commission"], ["weekend", "Weekend"]]) {
-      const i = E7("span", void 0, "lx-legend-item");
-      i.append(E7("i", void 0, "lx-legend-" + cls), E7("span", text));
+      const i = E8("span", void 0, "lx-legend-item");
+      i.append(E8("i", void 0, "lx-legend-" + cls), E8("span", text));
       l.append(i);
     }
     return l;
   }
   function pill(label2, value, tone) {
-    const p = E7("div", void 0, "lx-pill lx-pill-" + tone);
-    p.append(E7("span", label2), E7("strong", value));
+    const p = E8("div", void 0, "lx-pill lx-pill-" + tone);
+    p.append(E8("span", label2), E8("strong", value));
     return p;
   }
   function homeHero() {
-    const d = directory || {}, p = getPayroll(monthKey(/* @__PURE__ */ new Date())), name = d.full_name || staff.full_name, hero = E7("section", void 0, "lx-hero");
-    const photo = E7("figure", void 0, "lx-hero-photo");
+    const d = directory || {}, p = getPayroll(monthKey(/* @__PURE__ */ new Date())), name = d.full_name || staff.full_name, hero = E8("section", void 0, "lx-hero");
+    const photo = E8("figure", void 0, "lx-hero-photo");
     if (d.avatar_url) {
-      const img = E7("img");
+      const img = E8("img");
       img.src = d.avatar_url;
       img.alt = "Photo of " + name;
       img.decoding = "async";
@@ -23802,76 +24853,89 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       };
       photo.append(img);
     } else photo.classList.add("lx-no-photo");
-    const initials2 = E7("span", name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase(), "lx-hero-initials");
-    initials2.setAttribute("aria-hidden", "true");
-    const cap = E7("figcaption");
-    cap.append(E7("h2", name), E7("p", d.job_title || "MUK Talent team"));
-    photo.append(initials2, cap);
-    const facts = E7("div", void 0, "lx-hero-facts");
-    const id = E7("article", void 0, "lx-fact lx-fact-gold");
-    id.append(E7("span", "Staff ID"), E7("strong", d.employee_code || "\u2014"), E7("small", d.assigned_city || "MUK Talent"));
-    const contact = E7("article", void 0, "lx-fact lx-fact-glass");
-    contact.append(E7("span", d.contact_phone ? "Phone number" : "Work email"), E7("strong", d.contact_phone || d.contact_email || "Add in Profile"));
+    const initials3 = E8("span", name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase(), "lx-hero-initials");
+    initials3.setAttribute("aria-hidden", "true");
+    const cap = E8("figcaption");
+    cap.append(E8("h2", name), E8("p", d.job_title || "MUK Talent team"));
+    photo.append(initials3, cap);
+    const hb = E8("a", void 0, "lx-hero-back");
+    hb.href = "/";
+    hb.setAttribute("aria-label", "Back to website");
+    hb.title = "Back to website";
+    hb.append(icon2("back"));
+    photo.append(hb);
+    if (!readOnly) {
+      const hh = heartButton("en", openChat);
+      hh.classList.add("lx-hero-heart");
+      hh.setAttribute("aria-label", "Messages");
+      setDot(hh, { chat_unread: summary?.chat_unread || 0 });
+      photo.append(hh);
+    }
+    const facts = E8("div", void 0, "lx-hero-facts");
+    const id = E8("article", void 0, "lx-fact lx-fact-gold");
+    id.append(E8("span", "Staff ID"), E8("strong", d.employee_code || "\u2014"), E8("small", d.assigned_city || "MUK Talent"));
+    const contact = E8("article", void 0, "lx-fact lx-fact-glass");
+    contact.append(E8("span", d.contact_phone ? "Phone number" : "Work email"), E8("strong", d.contact_phone || d.contact_email || "Add in Profile"));
     if (!d.contact_phone && !d.contact_email && !readOnly) {
       contact.classList.add("lx-clickable");
       contact.tabIndex = 0;
       contact.onclick = () => navigate2("profile");
     }
     facts.append(id, contact);
-    const chart = E7("article", void 0, "lx-chart");
-    const head2 = E7("div", void 0, "lx-chart-head");
-    head2.append(E7("span", "Verified leads"), E7("strong", p && !p.error ? String(p.verified_count) : "\u2014"));
+    const chart = E8("article", void 0, "lx-chart");
+    const head2 = E8("div", void 0, "lx-chart-head");
+    head2.append(E8("span", "Verified leads"), E8("strong", p && !p.error ? String(p.verified_count) : "\u2014"));
     chart.append(head2);
-    const bars = E7("div", void 0, "lx-bars");
+    const bars = E8("div", void 0, "lx-bars");
     const hist = p && !p.error ? p.history : Array.from({ length: 9 }, (_, i) => ({ month: monthKey(new Date((/* @__PURE__ */ new Date()).getFullYear(), (/* @__PURE__ */ new Date()).getMonth() - 8 + i, 1)), verified_count: 0, total: 0 }));
     const max = Math.max(1, ...hist.map((h) => h.total || 0));
     for (const h of hist) {
-      const b = E7("div", void 0, "lx-bar");
-      const fill = E7("i");
-      fill.style.setProperty("--h", Math.max(4, Math.round((h.total || 0) / max * 100)) + "%");
+      const b = E8("div", void 0, "lx-bar");
+      const fill2 = E8("i");
+      fill2.style.setProperty("--h", Math.max(4, Math.round((h.total || 0) / max * 100)) + "%");
       if (h.month === monthKey(/* @__PURE__ */ new Date())) b.classList.add("current");
       b.title = h.month + " \xB7 " + mad2(h.total) + " \xB7 " + h.verified_count + " verified";
-      b.append(fill, E7("small", new Intl.DateTimeFormat("en-GB", { month: "short" }).format(/* @__PURE__ */ new Date(h.month + "-15T12:00:00Z")).slice(0, 3)));
+      b.append(fill2, E8("small", new Intl.DateTimeFormat("en-GB", { month: "short" }).format(/* @__PURE__ */ new Date(h.month + "-15T12:00:00Z")).slice(0, 3)));
       bars.append(b);
     }
-    chart.append(bars, E7("p", "Monthly earnings \xB7 last 9 months", "lx-chart-note"));
-    const links = E7("div", void 0, "lx-hero-links"), cardBtn = button2("", () => navigate2("card")), rep = button2("", () => {
+    chart.append(bars, E8("p", "Monthly earnings \xB7 last 9 months", "lx-chart-note"));
+    const links = E8("div", void 0, "lx-hero-links"), cardBtn = button2("", () => navigate2("card")), rep = button2("", () => {
       selectedDay = dateKey();
       month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
       navigate2("calendar");
     });
-    cardBtn.append(icon("card", "lx-btn-icon"), E7("span", "My card"));
-    rep.append(icon("planner", "lx-btn-icon"), E7("span", "Daily report"));
+    cardBtn.append(icon("card", "lx-btn-icon"), E8("span", "My card"));
+    rep.append(icon("planner", "lx-btn-icon"), E8("span", "Daily report"));
     cardBtn.classList.add("lx-chip-btn");
     rep.classList.add("lx-chip-btn");
     links.append(cardBtn, rep);
-    const side = E7("div", void 0, "lx-hero-side");
+    const side = E8("div", void 0, "lx-hero-side");
     side.append(facts, chart, links);
-    const pay = E7("article", void 0, "lx-hero-pay");
-    pay.append(E7("span", "This month \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long" }).format(/* @__PURE__ */ new Date()), "lx-overline"));
+    const pay = E8("article", void 0, "lx-hero-pay");
+    pay.append(E8("span", "This month \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long" }).format(/* @__PURE__ */ new Date()), "lx-overline"));
     if (p && !p.error) {
-      pay.append(E7("strong", mad2(p.earned_to_date)), E7("p", "Earned to date \xB7 projected " + mad2(p.projected_total), "lx-muted"));
-      const pills = E7("div", void 0, "lx-pills");
+      pay.append(E8("strong", mad2(p.earned_to_date)), E8("p", "Earned to date \xB7 projected " + mad2(p.projected_total), "lx-muted"));
+      const pills = E8("div", void 0, "lx-pills");
       pills.append(pill("Base", mad2(p.base_monthly), "gold"), pill("Leads", p.verified_count + " \xD7 " + mad2(p.per_verified_lead).replace(" MAD", ""), "dark"), pill("Days left", p.remaining_days, "grey"));
       pay.append(pills);
       const go = button2("Open salary calendar", () => navigate2("calendar"));
       go.classList.add("lx-link-btn");
       pay.append(go);
-    } else pay.append(E7("strong", p?.error ? "\u2014" : "\u2026"), E7("p", p?.error ? "Salary view unavailable. Refresh later." : "Loading your salary\u2026", "lx-muted"));
+    } else pay.append(E8("strong", p?.error ? "\u2014" : "\u2026"), E8("p", p?.error ? "Salary view unavailable. Refresh later." : "Loading your salary\u2026", "lx-muted"));
     side.append(pay);
     hero.append(photo, side);
     return hero;
   }
   function payrollHeader() {
-    const key = monthKey(), p = getPayroll(key), wrap = E7("section", void 0, "lx-payroll");
-    const top = E7("div", void 0, "lx-payroll-top"), left = E7("div");
-    left.append(E7("span", "Salary \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month), "lx-overline"));
-    const big = E7("div", void 0, "lx-payroll-big");
+    const key = monthKey(), p = getPayroll(key), wrap = E8("section", void 0, "lx-payroll");
+    const top = E8("div", void 0, "lx-payroll-top"), left = E8("div");
+    left.append(E8("span", "Salary \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month), "lx-overline"));
+    const big = E8("div", void 0, "lx-payroll-big");
     if (p && !p.error) {
-      big.append(E7("strong", p.elapsed_days + "/" + p.working_days + " days"), E7("b", mad2(key < dateKey().slice(0, 7) ? p.projected_total : p.earned_to_date)));
-    } else big.append(E7("strong", p?.error ? "Salary unavailable" : "Loading\u2026"));
+      big.append(E8("strong", p.elapsed_days + "/" + p.working_days + " days"), E8("b", mad2(key < dateKey().slice(0, 7) ? p.projected_total : p.earned_to_date)));
+    } else big.append(E8("strong", p?.error ? "Salary unavailable" : "Loading\u2026"));
     left.append(big);
-    const pick = E7("select", void 0, "lx-month-select");
+    const pick = E8("select", void 0, "lx-month-select");
     pick.setAttribute("aria-label", "Month");
     const now = /* @__PURE__ */ new Date();
     for (let i = -11; i <= 1; i++) {
@@ -23888,22 +24952,22 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     top.append(left, pick);
     wrap.append(top);
     if (p && !p.error) {
-      const pills = E7("div", void 0, "lx-pills");
+      const pills = E8("div", void 0, "lx-pills");
       pills.append(pill("Work days \xB7 base", mad2(p.base_accrued) + " / " + mad2(p.base_monthly), "gold"), pill("Verified leads", p.verified_count + " \xB7 " + mad2(p.commission), "dark"), pill("Projected month", mad2(p.projected_total), "grey"));
-      wrap.append(pills, E7("p", "Base " + mad2(p.base_monthly) + " per month, Monday to Friday (" + mad2(p.daily_rate) + " per working day), plus " + mad2(p.per_verified_lead) + " for each lead attributed to you and verified by administration. " + p.notice, "lx-footnote"));
+      wrap.append(pills, E8("p", "Base " + mad2(p.base_monthly) + " per month, Monday to Friday (" + mad2(p.daily_rate) + " per working day), plus " + mad2(p.per_verified_lead) + " for each lead attributed to you and verified by administration. " + p.notice, "lx-footnote"));
     }
     return wrap;
   }
   function dayPay() {
-    const p = payroll[monthKey(/* @__PURE__ */ new Date(selectedDay + "T12:00:00"))], info = p?.days?.find((x) => x.date === selectedDay), card = E7("article", void 0, "lx-day-pay");
+    const p = payroll[monthKey(/* @__PURE__ */ new Date(selectedDay + "T12:00:00"))], info = p?.days?.find((x) => x.date === selectedDay), card = E8("article", void 0, "lx-day-pay");
     if (!p || p.error || !info) return card;
     const w = (/* @__PURE__ */ new Date(selectedDay + "T12:00:00Z")).getUTCDay(), weekend = w === 0 || w === 6;
-    const txt = E7("div");
-    txt.append(E7("span", weekend ? "Weekend" : "Working day", "lx-day-pay-label"), E7("strong", weekend ? "No base accrual" : "+" + mad2(p.daily_rate) + " base"), E7("small", info.verified ? info.verified + " verified lead" + (info.verified > 1 ? "s" : "") + " \xB7 +" + mad2(info.verified * p.per_verified_lead) : "No verified leads on this day"));
+    const txt = E8("div");
+    txt.append(E8("span", weekend ? "Weekend" : "Working day", "lx-day-pay-label"), E8("strong", weekend ? "No base accrual" : "+" + mad2(p.daily_rate) + " base"), E8("small", info.verified ? info.verified + " verified lead" + (info.verified > 1 ? "s" : "") + " \xB7 +" + mad2(info.verified * p.per_verified_lead) : "No verified leads on this day"));
     const leadsHere = (p.leads || []).filter((l) => l.verified_on === selectedDay);
-    if (leadsHere.length) txt.append(E7("small", leadsHere.map((l) => l.reference).join(" \xB7 ")));
-    const amount = E7("b", (info.verified ? "+" : "") + mad2((weekend ? 0 : p.daily_rate) + info.verified * p.per_verified_lead), "lx-day-pay-amount");
-    const doc = E7("span", void 0, "lx-day-pay-doc");
+    if (leadsHere.length) txt.append(E8("small", leadsHere.map((l) => l.reference).join(" \xB7 ")));
+    const amount = E8("b", (info.verified ? "+" : "") + mad2((weekend ? 0 : p.daily_rate) + info.verified * p.per_verified_lead), "lx-day-pay-amount");
+    const doc = E8("span", void 0, "lx-day-pay-doc");
     doc.append(icon(info.verified ? "check" : "calendar"));
     card.append(doc, txt, amount);
     return card;
@@ -23911,14 +24975,14 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   function softChrome() {
     let m = document.querySelector("meta[name=theme-color]");
     if (!m) {
-      m = E7("meta");
+      m = E8("meta");
       m.name = "theme-color";
       document.head.append(m);
     }
     m.dataset.previous = m.dataset.previous || m.content;
     m.content = "#efe8dc";
     for (const [n, c] of [["apple-mobile-web-app-capable", "yes"], ["mobile-web-app-capable", "yes"], ["apple-mobile-web-app-status-bar-style", "black-translucent"]]) if (!document.querySelector("meta[name=" + n + "]")) {
-      const x = E7("meta");
+      const x = E8("meta");
       x.name = n;
       x.content = c;
       document.head.append(x);
@@ -23934,14 +24998,14 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     return b >= 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB";
   }
   function studio() {
-    const gallery = E7("div", void 0, "lx-gallery lx-gallery-grid");
+    const gallery = E8("div", void 0, "lx-gallery lx-gallery-grid");
     body.append(gallery);
     if (section === "library") {
       const media = assets.filter((a) => a.category === "content");
       if (!readOnly) {
-        const drop = E7("button", void 0, "lx-tile lx-tile-add");
+        const drop = E8("button", void 0, "lx-tile lx-tile-add");
         drop.type = "button";
-        drop.append(E7("b", "+"), E7("strong", "Upload media"), E7("small", "Photos, videos (MP4, MOV, WebM) and PDFs"));
+        drop.append(E8("b", "+"), E8("strong", "Upload media"), E8("small", "Photos, videos (MP4, MOV, WebM) and PDFs"));
         drop.onclick = () => uploadDialog();
         drop.ondragover = (e) => {
           e.preventDefault();
@@ -23955,18 +25019,39 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
           if (f) uploadDialog(f);
         };
         gallery.append(drop);
+        const pub = E8("button", void 0, "lx-tile lx-tile-add lx-tile-pub");
+        pub.type = "button";
+        pub.append(icon2("send", "lx-tile-ic"), E8("strong", "Publish to students"), E8("small", "Large video (Cloudinary, up to 100 MB), video link, news or a scheduled live"));
+        pub.onclick = () => openComposer({ api: api2, lang: "en", onDone: () => render() });
+        gallery.append(pub);
+        const feedBtn = E8("button", void 0, "lx-tile lx-tile-add lx-tile-feed");
+        feedBtn.type = "button";
+        feedBtn.append(icon2("heart", "lx-tile-ic"), E8("strong", "Student notifications"), E8("small", "See what students receive. Open a post to delete it."));
+        feedBtn.onclick = () => openNotifications({ api: api2, lang: "en", onOpenChat: openChat, onChange: () => watcher2?.refresh() });
+        gallery.append(feedBtn);
       }
       media.forEach((a, i) => {
-        const c = E7("figure", void 0, "lx-tile lx-tile-" + kindOf(a)), open = E7("button", void 0, "lx-tile-open");
+        const c = E8("figure", void 0, "lx-tile lx-tile-" + kindOf(a)), open = E8("button", void 0, "lx-tile-open");
         open.type = "button";
         open.setAttribute("aria-label", "Open " + a.original_name);
         open.append(mediaCover(a));
         open.onclick = () => lightbox(media, i);
-        const cap = E7("figcaption");
-        cap.append(E7("strong", a.original_name), E7("small", [{ video: "Video", image: "Image", pdf: "PDF", file: "File" }[kindOf(a)], sizeText(a.bytes)].filter(Boolean).join(" \xB7 ")));
+        const cap = E8("figcaption");
+        cap.append(E8("strong", a.original_name), E8("small", [{ video: "Video", image: "Image", pdf: "PDF", file: "File" }[kindOf(a)], sizeText(a.bytes)].filter(Boolean).join(" \xB7 ")));
         c.append(open, cap);
+        if (!readOnly && kindOf(a) === "video") {
+          const pb = E8("button", void 0, "lx-tile-pubbtn");
+          pb.type = "button";
+          pb.append(icon2("send"), E8("span", "Publish"));
+          pb.setAttribute("aria-label", "Publish " + a.original_name + " to students");
+          pb.onclick = (ev) => {
+            ev.stopPropagation();
+            openComposer({ api: api2, lang: "en", preset: { kind: "video", asset_id: a.id, title: a.original_name.replace(/\.[^.]+$/, "") } });
+          };
+          c.append(pb);
+        }
         if (!readOnly) {
-          const del = E7("button", "\xD7", "lx-tile-del");
+          const del = E8("button", "\xD7", "lx-tile-del");
           del.type = "button";
           del.setAttribute("aria-label", "Delete " + a.original_name);
           del.onclick = async (ev) => {
@@ -23983,71 +25068,116 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         }
         gallery.append(c);
       });
+      if (!readOnly) listMedia(api2).then((list) => {
+        if (!gallery.isConnected) return;
+        for (const m of list) {
+          const c = E8("figure", void 0, "lx-tile lx-tile-video lx-tile-cloud"), open = E8("button", void 0, "lx-tile-open");
+          open.type = "button";
+          open.setAttribute("aria-label", "Open " + m.title);
+          const cv = E8("div", void 0, "lx-media-cover lx-cover-video");
+          if (m.poster_url) {
+            const im = E8("img");
+            im.src = m.poster_url;
+            im.alt = "";
+            im.loading = "lazy";
+            im.referrerPolicy = "no-referrer";
+            im.onerror = () => im.remove();
+            cv.append(im);
+          }
+          cv.append(E8("span", m.play === "video" ? "Cloudinary" : "Link", "lx-cover-tag"));
+          open.append(cv);
+          open.onclick = () => openPost({ id: m.id, kind: "video", title: m.title, url: m.url, poster: m.poster_url, play: m.play, at: m.created_at, author: "Library" }, { lang: "en" });
+          const cap = E8("figcaption");
+          cap.append(E8("strong", m.title), E8("small", (m.play === "video" ? "Cloudinary video" : "Video link") + (m.bytes ? " \xB7 " + sizeText(m.bytes) : "")));
+          const pb = E8("button", void 0, "lx-tile-pubbtn");
+          pb.type = "button";
+          pb.append(icon2("send"), E8("span", "Publish"));
+          pb.onclick = (ev) => {
+            ev.stopPropagation();
+            openComposer({ api: api2, lang: "en", preset: { kind: "video", media_id: m.id, title: m.title } });
+          };
+          const del = E8("button", "\xD7", "lx-tile-del");
+          del.type = "button";
+          del.setAttribute("aria-label", "Delete " + m.title);
+          del.onclick = async (ev) => {
+            ev.stopPropagation();
+            if (!confirm("Remove this video from your library? (The file stays in Cloudinary.)")) return;
+            try {
+              await api2("/api/media/" + m.id, { method: "DELETE" });
+              render();
+            } catch (error) {
+              notice(error.message, true);
+            }
+          };
+          c.append(open, cap, pb, del);
+          gallery.append(c);
+        }
+      });
       if (!media.length && readOnly) empty(gallery, "No media uploaded yet.");
       return;
     }
     const items = records("content");
     for (const r of items) {
-      const c = E7("article", void 0, "lx-media-card"), asset = assets.find((a) => a.id === r.payload.asset_id && a.category === "content");
+      const c = E8("article", void 0, "lx-media-card"), asset = assets.find((a) => a.id === r.payload.asset_id && a.category === "content");
       const cover = mediaCover(asset, r.payload.format);
       if (asset?.url) {
-        const ob = E7("button", void 0, "lx-tile-open");
+        const ob = E8("button", void 0, "lx-tile-open");
         ob.type = "button";
         ob.setAttribute("aria-label", "Open media");
         ob.append(cover);
         ob.onclick = () => lightbox([asset], 0);
         c.append(ob);
       } else c.append(cover);
-      c.append(E7("span", r.status, "lx-tag"), E7("h3", r.title), E7("p", [r.payload.platform, r.payload.format, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E7("p", (r.payload.caption || r.payload.notes || "").slice(0, 180), "lx-media-caption"));
+      c.append(E8("span", r.status, "lx-tag"), E8("h3", r.title), E8("p", [r.payload.platform, r.payload.format, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E8("p", (r.payload.caption || r.payload.notes || "").slice(0, 180), "lx-media-caption"));
       for (const [key, label2] of [["asset_url", "Open asset"], ["publication_url", "View publication"]]) if (/^https:\/\//i.test(r.payload[key] || "")) {
-        const a = E7("a", label2, "lx-link");
+        const a = E8("a", label2, "lx-link");
         a.href = r.payload[key];
         a.target = "_blank";
         a.rel = "noopener noreferrer";
         c.append(a);
       }
       if (!readOnly) c.append(button2("Open production", () => edit("content", r)));
-      else c.append(E7("p", r.payload.caption || "", "lx-muted"));
+      else c.append(E8("p", r.payload.caption || "", "lx-muted"));
       gallery.append(c);
     }
     if (!items.length) empty(gallery, "Create your first production. Attach a photo or video from your library.");
   }
   function mediaCover(asset, format = "Creative") {
-    const k = kindOf(asset), cover = E7("div", void 0, "lx-media-cover lx-cover-" + k);
+    const k = kindOf(asset), cover = E8("div", void 0, "lx-media-cover lx-cover-" + k);
     if (asset?.url && k === "image") {
-      const img = E7("img");
+      const img = E8("img");
       img.src = asset.url;
       img.alt = asset.original_name;
       img.loading = "lazy";
       img.decoding = "async";
       cover.append(img);
     } else if (asset?.url && k === "video") {
-      const v = E7("video");
+      const v = E8("video");
       v.src = asset.url + "#t=0.5";
       v.muted = true;
       v.playsInline = true;
       v.preload = "metadata";
       v.setAttribute("aria-hidden", "true");
-      cover.append(v, E7("span", "\u25B6", "lx-play"));
-    } else cover.append(E7("span", k === "pdf" ? "PDF" : asset ? format : format || "Creative"));
+      cover.append(v, E8("span", "\u25B6", "lx-play"));
+    } else cover.append(E8("span", k === "pdf" ? "PDF" : asset ? format : format || "Creative"));
     return cover;
   }
   function lightbox(list, start) {
     let i = start;
-    const d = E7("dialog", void 0, "lx-lightbox");
+    const d = E8("dialog", void 0, "lx-lightbox");
     d.lang = "en";
-    const stage = E7("div", void 0, "lx-lb-stage"), bar = E7("div", void 0, "lx-lb-bar"), title2 = E7("strong"), count = E7("small"), close = E7("button", "\xD7", "lx-lb-close");
+    const stage = E8("div", void 0, "lx-lb-stage"), bar = E8("div", void 0, "lx-lb-bar"), title2 = E8("strong"), count = E8("small"), close = E8("button", "\xD7", "lx-lb-close");
     close.type = "button";
     close.setAttribute("aria-label", "Close");
     close.onclick = () => d.close();
-    const prev = E7("button", "\u2039", "lx-lb-nav lx-lb-prev"), next = E7("button", "\u203A", "lx-lb-nav lx-lb-next");
+    const prev = E8("button", "\u2039", "lx-lb-nav lx-lb-prev"), next = E8("button", "\u203A", "lx-lb-nav lx-lb-next");
     prev.type = next.type = "button";
     prev.setAttribute("aria-label", "Previous");
     next.setAttribute("aria-label", "Next");
-    const dl = E7("a", "Download", "lx-lb-dl");
+    const dl = E8("a", "Download", "lx-lb-dl");
     dl.target = "_blank";
     dl.rel = "noopener noreferrer";
-    const info = E7("div");
+    const info = E8("div");
     info.append(title2, count);
     bar.append(info, dl, close);
     const show = () => {
@@ -24055,7 +25185,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       stage.querySelectorAll("video").forEach((v) => v.pause());
       stage.replaceChildren();
       if (k === "video") {
-        const v = E7("video");
+        const v = E8("video");
         v.src = a.url;
         v.controls = true;
         v.playsInline = true;
@@ -24063,14 +25193,14 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         v.preload = "auto";
         stage.append(v);
       } else if (k === "image") {
-        const im = E7("img");
+        const im = E8("img");
         im.src = a.url;
         im.alt = a.original_name;
         stage.append(im);
       } else {
-        const box = E7("div", void 0, "lx-lb-file");
-        box.append(E7("b", k === "pdf" ? "PDF" : "FILE"), E7("p", a.original_name));
-        const o = E7("a", "Open document", "lx-button lx-primary");
+        const box = E8("div", void 0, "lx-lb-file");
+        box.append(E8("b", k === "pdf" ? "PDF" : "FILE"), E8("p", a.original_name));
+        const o = E8("a", "Open document", "lx-button lx-primary");
         o.href = a.url;
         o.target = "_blank";
         o.rel = "noopener noreferrer";
@@ -24123,26 +25253,26 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     return { mp4: "video/mp4", m4v: "video/mp4", mov: "video/quicktime", webm: "video/webm", jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", pdf: "application/pdf" }[x] || "";
   }
   function uploadDialog(preset = null) {
-    const d = E7("dialog", void 0, "lx-dialog lx-upload");
+    const d = E8("dialog", void 0, "lx-dialog lx-upload");
     d.lang = "en";
-    const f = E7("form"), file = E7("input");
+    const f = E8("form"), file = E8("input");
     file.type = "file";
     file.accept = ACCEPT.join(",") + ",.mov,.mp4,.webm";
     file.id = "lxUploadFile";
     file.className = "lx-upload-input";
     file.setAttribute("aria-label", "Select media file");
-    const zone = E7("label", void 0, "lx-upload-zone");
+    const zone = E8("label", void 0, "lx-upload-zone");
     zone.htmlFor = "lxUploadFile";
-    zone.append(E7("b", "+"), E7("strong", "Choose from your phone or computer"), E7("small", "Photos (JPG, PNG, WebP) and PDFs up to 10 MB \xB7 Videos (MP4, MOV, WebM) up to 50 MB"));
-    const chosen = E7("p", "", "lx-upload-chosen"), bar = E7("div", void 0, "lx-progress"), fill = E7("i");
-    bar.append(fill);
+    zone.append(E8("b", "+"), E8("strong", "Choose from your phone or computer"), E8("small", "Photos (JPG, PNG, WebP) and PDFs up to 10 MB \xB7 Videos (MP4, MOV, WebM) up to 50 MB"));
+    const chosen = E8("p", "", "lx-upload-chosen"), bar = E8("div", void 0, "lx-progress"), fill2 = E8("i");
+    bar.append(fill2);
     bar.hidden = true;
-    const msg = E7("p", "", "lx-muted"), send = E7("button", "Upload to library", "lx-button lx-primary");
+    const msg = E8("p", "", "lx-muted"), send = E8("button", "Upload to library", "lx-button lx-primary");
     send.type = "submit";
     const close = button2("Close", () => {
       if (!dialogBusy) d.remove();
     });
-    f.append(E7("h2", "Upload media"), file, zone, chosen, bar, msg, send, close);
+    f.append(E8("h2", "Upload media"), file, zone, chosen, bar, msg, send, close);
     d.append(f);
     root.append(d);
     d.showModal();
@@ -24192,15 +25322,15 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       dialogBusy = true;
       send.disabled = close.disabled = true;
       bar.hidden = false;
-      fill.style.width = "4%";
+      fill2.style.width = "4%";
       msg.textContent = "Preparing upload\u2026";
       try {
         const started = await api2("/api/workspace/assets/start", { method: "POST", body: JSON.stringify({ category: "content", name: asset.name, mime, bytes: asset.size }) });
         msg.textContent = "Uploading\u2026";
         await putWithProgress(started.signedUrl || null, started, asset, mime, (p) => {
-          fill.style.width = Math.max(4, Math.round(p * 100)) + "%";
+          fill2.style.width = Math.max(4, Math.round(p * 100)) + "%";
         });
-        fill.style.width = "100%";
+        fill2.style.width = "100%";
         msg.textContent = "Checking file\u2026";
         await api2("/api/workspace/assets/finish", { method: "POST", body: JSON.stringify({ id: started.id }) });
         d.remove();
@@ -24242,27 +25372,27 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   }
   function edit(kind, record = null, day = null) {
     if (readOnly || dialogBusy) return;
-    const d = E7("dialog", void 0, "lx-dialog");
+    const d = E8("dialog", void 0, "lx-dialog");
     d.lang = "en";
-    const form = E7("form"), top = E7("div", void 0, "lx-row-top");
-    top.append(E7("h2", (record ? "Edit " : "New ") + (kind === "content" ? "production" : kind)));
+    const form = E8("form"), top = E8("div", void 0, "lx-row-top");
+    top.append(E8("h2", (record ? "Edit " : "New ") + (kind === "content" ? "production" : kind)));
     const close = button2("Close", () => dismiss());
     top.append(close);
     form.append(top);
-    const grid = E7("div", void 0, "lx-form-grid"), inputs = {};
+    const grid = E8("div", void 0, "lx-form-grid"), inputs = {};
     let definitions = kind === "lead" ? fields.lead : [["title", "Title"], ["status", "Status", states[kind]], ["record_date", kind === "report" ? "Report date" : "Date / next action", "date"], ...fields[kind]];
     if (kind === "content") definitions = [...definitions, ["asset_id", "Media library asset", "asset-select"]];
     for (const [key, label2, type] of definitions) {
-      const wrap = E7("div", void 0, type === "textarea" ? "lx-field lx-wide" : "lx-field"), caption = E7("label", label2);
+      const wrap = E8("div", void 0, type === "textarea" ? "lx-field lx-wide" : "lx-field"), caption = E8("label", label2);
       let input;
       if (Array.isArray(type) || type === "asset-select") {
-        input = E7("select");
+        input = E8("select");
         if (type === "asset-select") {
           input.append(new Option("No library asset", ""));
           for (const a of assets.filter((a2) => a2.category === "content")) input.append(new Option(a.original_name, a.id));
         } else for (const v of type) input.append(new Option(kind === "lead" && key === "status" ? leadStates[v] : v || "Not specified", v));
       } else {
-        input = E7(type === "textarea" ? "textarea" : "input");
+        input = E8(type === "textarea" ? "textarea" : "input");
         if (input.tagName === "INPUT") input.type = type || "text";
       }
       input.id = "lx-edit-" + key;
@@ -24287,9 +25417,9 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       inputs[key] = input;
     }
     form.append(grid);
-    const message2 = E7("p", "", "lx-status");
+    const message2 = E8("p", "", "lx-status");
     message2.setAttribute("role", "status");
-    const controls = E7("div", void 0, "lx-actions"), save = E7("button", "Save changes", "lx-button lx-primary");
+    const controls = E8("div", void 0, "lx-actions"), save = E8("button", "Save changes", "lx-button lx-primary");
     save.type = "submit";
     controls.append(save);
     let dirty = false;
@@ -24359,7 +25489,7 @@ function mountWorkspaceAdmin({ api: api2, getStaff }) {
   if (document.getElementById("workspaceAdminButton")) return;
   const host = document.querySelector("#appShell .page-header");
   if (!host) return;
-  const box = E7("div", void 0, "form-actions"), open = E7("button", "Employee workspaces", "secondary");
+  const box = E8("div", void 0, "form-actions"), open = E8("button", "Employee workspaces", "secondary");
   open.type = "button";
   open.id = "workspaceAdminButton";
   box.append(open);
@@ -24367,13 +25497,13 @@ function mountWorkspaceAdmin({ api: api2, getStaff }) {
   open.onclick = async () => {
     if (getStaff()?.role !== "admin") return;
     open.disabled = true;
-    const d = E7("dialog", void 0, "record-dialog"), body = E7("div", void 0, "dialog-body"), select = E7("select"), message2 = E7("p", "Loading team\u2026");
+    const d = E8("dialog", void 0, "record-dialog"), body = E8("div", void 0, "dialog-body"), select = E8("select"), message2 = E8("p", "Loading team\u2026");
     d.lang = "en";
     select.setAttribute("aria-label", "Team member");
-    const close = E7("button", "Close", "secondary");
+    const close = E8("button", "Close", "secondary");
     close.type = "button";
     close.onclick = () => d.remove();
-    const view = E7("button", "Open read-only workspace", "primary");
+    const view = E8("button", "Open read-only workspace", "primary");
     view.type = "button";
     view.disabled = true;
     let people = [];
@@ -24386,7 +25516,7 @@ function mountWorkspaceAdmin({ api: api2, getStaff }) {
         document.getElementById("appShell").hidden = false;
       } });
     };
-    body.append(E7("h2", "Employee workspaces"), select, message2, view, close);
+    body.append(E8("h2", "Employee workspaces"), select, message2, view, close);
     d.append(body);
     document.body.append(d);
     d.onclose = () => d.remove();
@@ -24726,8 +25856,26 @@ function initGateway({ getClient, onSignedIn }) {
 }
 
 // admin-src/student-portal.js
-var TX = {
+var TX2 = {
   en: {
+    photoAdd: "Add photo",
+    photoChange: "Change photo",
+    photoBusy: "Uploading\u2026",
+    photoHint: "JPG, PNG or WebP \xB7 max 5 MB",
+    ppType: "Type",
+    ppCode: "Code",
+    ppNo: "Passport No.",
+    surname: "Surname",
+    given: "Given names",
+    ppNat: "Nationality",
+    ppDob: "Date of birth",
+    ppDest: "Destination",
+    ppIssue: "Date of issue",
+    ppAuth: "Authority",
+    ppSign: "Holder\u2019s signature",
+    ppFile: "File",
+    language: "Language",
+    notifications: "Notifications",
     brand: "GLOBAL PASSPORT",
     journeyTitle: "My Global Journey",
     pages: { journey: "Journey", documents: "Documents", plan: "Plan", messages: "Messages", profile: "Profile" },
@@ -24815,6 +25963,24 @@ var TX = {
     }
   },
   fr: {
+    photoAdd: "Ajouter photo",
+    photoChange: "Changer la photo",
+    photoBusy: "Envoi\u2026",
+    photoHint: "JPG, PNG ou WebP \xB7 5 Mo max",
+    ppType: "Type",
+    ppCode: "Code",
+    ppNo: "N\xB0 de passeport",
+    surname: "Nom",
+    given: "Pr\xE9noms",
+    ppNat: "Nationalit\xE9",
+    ppDob: "Date de naissance",
+    ppDest: "Destination",
+    ppIssue: "Date de d\xE9livrance",
+    ppAuth: "Autorit\xE9",
+    ppSign: "Signature du titulaire",
+    ppFile: "Dossier",
+    language: "Langue",
+    notifications: "Notifications",
     brand: "GLOBAL PASSPORT",
     journeyTitle: "Mon parcours international",
     pages: { journey: "Parcours", documents: "Documents", plan: "Plan", messages: "Messages", profile: "Profil" },
@@ -24914,20 +26080,33 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
   let mainEl = null;
   document.getElementById("studentPortal")?.remove();
   let lang2 = gateLang();
-  const tx = () => TX[lang2] || TX.en;
-  const L = (k) => k.split(".").reduce((o, p) => o?.[p], tx()) ?? k.split(".").reduce((o, p) => o?.[p], TX.en) ?? k;
-  const fill = (s, v) => String(s).replace(/\{(\w+)\}/g, (_, k) => v[k] ?? "");
-  const root = E6("div", void 0, "gp-app");
+  const tx2 = () => TX2[lang2] || TX2.en;
+  const L = (k) => k.split(".").reduce((o, p) => o?.[p], tx2()) ?? k.split(".").reduce((o, p) => o?.[p], TX2.en) ?? k;
+  const fill2 = (s, v) => String(s).replace(/\{(\w+)\}/g, (_, k) => v[k] ?? "");
+  const root = E7("div", void 0, "gp-app");
   root.id = "studentPortal";
   root.lang = lang2;
   document.body.append(root);
   const theme = document.querySelector("meta[name=theme-color]");
   if (theme) theme.content = "#070a0f";
   const logout = async () => {
+    watcher2?.stop();
     root.remove();
     await onLogout();
   };
   idleLogout(root, logout);
+  linkChatCss();
+  let summary = null, watcher2 = null, dockEl = null;
+  const paintDots = () => {
+    root.querySelectorAll(".mkc-heart").forEach((b) => setDot(b, summary));
+    const n = summary?.chat_unread || 0;
+    root.querySelectorAll("[data-gp-msg]").forEach((b) => {
+      b.querySelector(".gp-badge")?.remove();
+      if (n) b.append(E7("i", n > 9 ? "9+" : n, "gp-badge"));
+    });
+  };
+  const openChat = () => openMessenger({ api: api2, lang: lang2, onChange: () => watcher2?.refresh() });
+  const openNotif = () => openNotifications({ api: api2, lang: lang2, summary, onOpenChat: openChat, onChange: () => watcher2?.refresh() });
   let data = null, page = "journey", openStage = null;
   const pages = () => ["journey", "documents", "plan", "messages", "profile"].map((id) => [id, L("pages." + id)]);
   const stageName = (k) => lang2 === "fr" ? STAGE_FR[k] : data?.stage_titles?.[k] || k;
@@ -24945,6 +26124,10 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     try {
       data = (await api2("/api/passport/me")).data;
       render();
+      if (!watcher2) watcher2 = watchNotifications(api2, (x) => {
+        summary = x;
+        paintDots();
+      });
     } catch (e) {
       if (!silent) {
         root.replaceChildren(errorView(e.message));
@@ -24952,41 +26135,41 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     }
   }
   function errorView(text) {
-    const w = E6("div", void 0, "gp-error");
-    w.append(gi("alert"), E6("h2", "Global Passport"), E6("p", text), btn2(L("refresh"), () => load(), "gp-btn gp-primary", "refresh"), btn2(L("signOut"), logout, "gp-btn gp-ghost", "logout"));
+    const w = E7("div", void 0, "gp-error");
+    w.append(gi("alert"), E7("h2", "Global Passport"), E7("p", text), btn2(L("refresh"), () => load(), "gp-btn gp-primary", "refresh"), btn2(L("signOut"), logout, "gp-btn gp-ghost", "logout"));
     return w;
   }
   function onboarding() {
     const v = { destination: "UK", full_name: who.name || "", country_residence: "", nationality: "", phone: "", study_level: "", subject: "", intake: "", english_test: "", consent: false };
     let step2 = 0;
-    const shell = E6("section", void 0, "gp-onboard");
+    const shell = E7("section", void 0, "gp-onboard");
     root.replaceChildren(shell);
     const draw = () => {
       shell.replaceChildren();
       const total = 4;
-      const top = E6("header", void 0, "gp-ob-top");
-      top.append(E6("span", L("brand"), "gp-brand"), langToggle(() => draw()));
-      const bar = E6("div", void 0, "gp-ob-progress");
+      const top = E7("header", void 0, "gp-ob-top");
+      top.append(E7("span", L("brand"), "gp-brand"), langToggle(() => draw()));
+      const bar = E7("div", void 0, "gp-ob-progress");
       for (let i = 0; i < total; i++) {
-        const s = E6("i");
+        const s = E7("i");
         if (i <= step2) s.className = "on";
         bar.append(s);
       }
-      const card = E6("form", void 0, "gp-ob-card");
+      const card = E7("form", void 0, "gp-ob-card");
       card.noValidate = false;
-      card.append(E6("p", fill(L("ob.step"), { a: step2 + 1, b: total }), "gp-kicker"));
-      const actions = E6("div", void 0, "gp-ob-actions");
+      card.append(E7("p", fill2(L("ob.step"), { a: step2 + 1, b: total }), "gp-kicker"));
+      const actions = E7("div", void 0, "gp-ob-actions");
       if (step2 === 0) {
-        card.append(E6("h1", L("ob.where")), E6("p", L("ob.whereText"), "gp-muted"));
-        const g = E6("div", void 0, "gp-dest-grid");
+        card.append(E7("h1", L("ob.where")), E7("p", L("ob.whereText"), "gp-muted"));
+        const g = E7("div", void 0, "gp-dest-grid");
         for (const [code, flagCls, on] of [["UK", "uk", true], ["CA", "ca", false], ["US", "us", false]]) {
-          const o = E6("button", void 0, "gp-dest" + (on ? "" : " is-soon") + (v.destination === code ? " is-on" : ""));
+          const o = E7("button", void 0, "gp-dest" + (on ? "" : " is-soon") + (v.destination === code ? " is-on" : ""));
           o.type = "button";
           o.disabled = !on;
           o.setAttribute("aria-pressed", String(v.destination === code));
-          const f = E6("span", void 0, "gp-flag gp-flag-" + flagCls);
+          const f = E7("span", void 0, "gp-flag gp-flag-" + flagCls);
           f.setAttribute("aria-hidden", "true");
-          o.append(f, E6("strong", destName(code)), E6("small", on ? L("active") : L("soon")));
+          o.append(f, E7("strong", destName(code)), E7("small", on ? L("active") : L("soon")));
           if (on) o.onclick = () => {
             v.destination = code;
             draw();
@@ -24996,7 +26179,7 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
         card.append(g);
       }
       if (step2 === 1) {
-        card.append(E6("h1", L("ob.from")), E6("p", L("ob.fromText"), "gp-muted"));
+        card.append(E7("h1", L("ob.from")), E7("p", L("ob.fromText"), "gp-muted"));
         card.append(field2(L("fullName"), input("obName", v.full_name, (x) => v.full_name = x, { autocomplete: "name", required: true, minLength: 2, maxLength: 120 })));
         const r = countrySelect("obRes", lang2, v.country_residence, L("ob.choose"));
         r.onchange = () => {
@@ -25015,8 +26198,8 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
         card.append(field2(L("phone"), input("obPhone", v.phone, (x) => v.phone = x, { type: "tel", autocomplete: "tel", placeholder: "+212 6 00 00 00 00", pattern: "\\+?[0-9 ().-]{6,24}" })));
       }
       if (step2 === 2) {
-        card.append(E6("h1", L("ob.plan")), E6("p", L("ob.planText"), "gp-muted"));
-        const lv = E6("select");
+        card.append(E7("h1", L("ob.plan")), E7("p", L("ob.planText"), "gp-muted"));
+        const lv = E7("select");
         lv.id = "obLevel";
         lv.required = true;
         lv.append(new Option(L("ob.chooseLevel"), ""));
@@ -25025,35 +26208,35 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
         lv.onchange = () => v.study_level = lv.value;
         card.append(field2(L("level"), lv));
         card.append(field2(L("subject"), input("obSubject", v.subject, (x) => v.subject = x, { required: true, minLength: 2, maxLength: 120, placeholder: L("ob.subjectPh") })));
-        const two = E6("div", void 0, "gp-two");
+        const two = E7("div", void 0, "gp-two");
         two.append(field2(L("intake"), input("obIntake", v.intake, (x) => v.intake = x, { maxLength: 40, placeholder: L("ob.intakePh") })), field2(L("english"), input("obEnglish", v.english_test, (x) => v.english_test = x, { maxLength: 80, placeholder: L("ob.englishPh") })));
         card.append(two);
       }
       if (step2 === 3) {
-        card.append(E6("h1", L("ob.confirm")), E6("p", L("ob.confirmText"), "gp-muted"));
-        const sum = E6("dl", void 0, "gp-summary");
+        card.append(E7("h1", L("ob.confirm")), E7("p", L("ob.confirmText"), "gp-muted"));
+        const sum = E7("dl", void 0, "gp-summary");
         for (const [k, val] of [[L("destination"), destName(v.destination)], [L("residence"), countryName(v.country_residence, lang2)], [L("nationality"), countryName(v.nationality, lang2)], [L("level"), levelLabel(v.study_level)], [L("subject"), v.subject], [L("intake"), v.intake || "\u2014"]]) {
-          sum.append(E6("dt", k), E6("dd", val));
+          sum.append(E7("dt", k), E7("dd", val));
         }
         card.append(sum);
-        const c = E6("label", void 0, "gp-check");
-        const cb = E6("input");
+        const c = E7("label", void 0, "gp-check");
+        const cb = E7("input");
         cb.type = "checkbox";
         cb.required = true;
         cb.checked = v.consent;
         cb.onchange = () => v.consent = cb.checked;
-        c.append(cb, E6("span", L("ob.consent")));
+        c.append(cb, E7("span", L("ob.consent")));
         card.append(c);
       }
-      const msg = E6("p", "", "gp-form-msg");
+      const msg = E7("p", "", "gp-form-msg");
       msg.setAttribute("role", "status");
       if (step2 > 0) actions.append(btn2(L("ob.back"), () => {
         step2--;
         draw();
       }, "gp-btn gp-ghost", "back"));
-      const next = E6("button", void 0, "gp-btn gp-primary");
+      const next = E7("button", void 0, "gp-btn gp-primary");
       next.type = "submit";
-      next.append(E6("span", step2 === 3 ? L("ob.create") : L("ob.next")), gi("chevron"));
+      next.append(E7("span", step2 === 3 ? L("ob.create") : L("ob.next")), gi("chevron"));
       actions.append(next);
       card.append(actions, msg);
       card.onsubmit = async (e) => {
@@ -25083,21 +26266,21 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     draw();
   }
   function celebrate() {
-    const s = E6("section", void 0, "gp-welcome");
+    const s = E7("section", void 0, "gp-welcome");
     const c = data.counsellor;
-    const card = E6("div", void 0, "gp-welcome-card");
-    card.append(ring(data.readiness, "lg"), E6("p", data.student.reference, "gp-kicker"), E6("h1", fill(L("ob.welcome"), { name: data.student.full_name.split(" ")[0] })));
+    const card = E7("div", void 0, "gp-welcome-card");
+    card.append(ring(data.readiness, "lg"), E7("p", data.student.reference, "gp-kicker"), E7("h1", fill2(L("ob.welcome"), { name: data.student.full_name.split(" ")[0] })));
     if (c) {
-      const who2 = E6("div", void 0, "gp-welcome-c");
-      who2.append(avatar(c.full_name, c.avatar_url, "gp-avatar gp-avatar-lg"), E6("small", L("ob.assigned")), E6("strong", c.full_name), E6("span", c.job_title, "gp-muted"));
+      const who2 = E7("div", void 0, "gp-welcome-c");
+      who2.append(avatar2(c.full_name, c.avatar_url, "gp-avatar gp-avatar-lg"), E7("small", L("ob.assigned")), E7("strong", c.full_name), E7("span", c.job_title, "gp-muted"));
       card.append(who2);
-    } else card.append(E6("p", L("noCounsellorText"), "gp-muted"));
+    } else card.append(E7("p", L("noCounsellorText"), "gp-muted"));
     card.append(btn2(L("journeyTitle"), () => render(), "gp-btn gp-primary", "chevron"));
     s.append(card);
     root.replaceChildren(s);
   }
   function input(id, value, set, attrs = {}) {
-    const i = E6("input");
+    const i = E7("input");
     i.id = id;
     i.value = value || "";
     for (const [k, val] of Object.entries(attrs)) i[k] = val;
@@ -25105,18 +26288,69 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     return i;
   }
   function field2(label2, control) {
-    const w = E6("div", void 0, "gp-field");
-    const l = E6("label", label2);
+    const w = E7("div", void 0, "gp-field");
+    const l = E7("label", label2);
     l.htmlFor = control.id;
     w.append(l, control);
     return w;
   }
+  function langMenu(after) {
+    const box = E7("div", void 0, "gp-langm");
+    const b = E7("button", void 0, "gp-langm-btn");
+    b.type = "button";
+    b.setAttribute("aria-haspopup", "true");
+    b.setAttribute("aria-expanded", "false");
+    b.setAttribute("aria-label", L("language") + " : " + (lang2 === "fr" ? "Fran\xE7ais" : "English"));
+    b.append(gi("globe"), E7("span", lang2.toUpperCase(), "gp-langm-code"));
+    const menu = E7("div", void 0, "gp-langm-menu");
+    menu.setAttribute("role", "menu");
+    menu.hidden = true;
+    for (const [code, name] of [["en", "English"], ["fr", "Fran\xE7ais"]]) {
+      const o = E7("button", void 0);
+      o.type = "button";
+      o.setAttribute("role", "menuitemradio");
+      o.setAttribute("aria-checked", String(lang2 === code));
+      o.lang = code;
+      o.append(E7("b", code.toUpperCase()), E7("span", name));
+      o.onclick = () => {
+        lang2 = code;
+        try {
+          localStorage.setItem("gp-lang", code);
+        } catch {
+        }
+        root.lang = code;
+        after();
+      };
+      menu.append(o);
+    }
+    const shut = (e) => {
+      if (!box.contains(e.target)) {
+        menu.hidden = true;
+        b.setAttribute("aria-expanded", "false");
+        document.removeEventListener("click", shut, true);
+      }
+    };
+    b.onclick = () => {
+      menu.hidden = !menu.hidden;
+      b.setAttribute("aria-expanded", String(!menu.hidden));
+      if (!menu.hidden) document.addEventListener("click", shut, true);
+    };
+    box.onkeydown = (e) => {
+      if (e.key === "Escape") {
+        menu.hidden = true;
+        b.setAttribute("aria-expanded", "false");
+        b.focus();
+      }
+    };
+    box.append(b, menu);
+    return box;
+  }
   function langToggle(after) {
-    const g = E6("div", void 0, "gp-lang");
+    const g = E7("div", void 0, "gp-lang");
     g.setAttribute("role", "group");
     g.setAttribute("aria-label", "Language");
     for (const code of ["en", "fr"]) {
-      const b = E6("button", code.toUpperCase());
+      const b = E7("button", code.toUpperCase());
       b.type = "button";
       b.setAttribute("aria-pressed", String(lang2 === code));
       b.onclick = () => {
@@ -25136,63 +26370,61 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     const s = data.student;
     root.replaceChildren();
     root.lang = lang2;
-    const top = E6("header", void 0, "gp-top");
-    const brand = E6("div", void 0, "gp-top-brand");
-    const wm = E6("img", void 0, "gp-logo");
+    const top = E7("header", void 0, "gp-top gp-top-ig");
+    const brand = E7("a", void 0, "gp-top-brand");
+    brand.href = "/";
+    brand.setAttribute("aria-label", L("website"));
+    const wm = E7("img", void 0, "gp-logo");
     wm.src = "/assets/brand/logo.svg";
     wm.alt = "MUK Talent";
     wm.width = 374;
     wm.height = 72;
-    brand.append(wm, E6("b", L("brand")));
-    const right = E6("div", void 0, "gp-top-right");
-    const webTop = E6("a", "\u2190", "gp-webtop");
-    webTop.href = "/";
-    webTop.setAttribute("aria-label", L("website"));
-    webTop.title = L("website");
-    const ref = E6("span", s.reference, "gp-ref");
-    right.append(webTop, ref, langToggle(() => render()), btn2("", () => load(), "gp-icon-btn", "refresh"));
-    const me = btn2("", null, "gp-me");
-    me.append(avatar(s.full_name));
-    me.setAttribute("aria-label", L("signOut"));
-    me.onclick = () => {
-      if (confirm(L("signOut") + "?")) logout();
-    };
-    right.append(me);
+    brand.append(wm);
+    const right = E7("div", void 0, "gp-top-right");
+    const heart = heartButton(lang2, openNotif);
+    heart.classList.add("gp-heart");
+    right.append(langMenu(() => render()), heart);
     top.append(brand, right);
-    const side = E6("nav", void 0, "gp-side");
+    hideOnScroll(top);
+    const side = E7("nav", void 0, "gp-side");
     side.setAttribute("aria-label", "Global Passport");
     for (const [id, label2] of pages()) {
       const b = btn2(label2, () => go(id), "gp-side-btn", { journey: "globe", documents: "doc", plan: "calendar", messages: "chat", profile: "user" }[id]);
       if (id === page) b.setAttribute("aria-current", "page");
-      if (id === "messages") {
-        const n = unreadCount();
-        if (n) b.append(E6("i", n, "gp-badge"));
-      }
+      if (id === "messages") b.dataset.gpMsg = "1";
       side.append(b);
     }
-    const webSide = E6("a", "\u2190 " + L("website"), "gp-side-btn gp-side-web");
+    const webSide = E7("a", "\u2190 " + L("website"), "gp-side-btn gp-side-web");
     webSide.href = "/";
     side.append(webSide);
     const out = btn2(L("signOut"), logout, "gp-side-btn gp-side-out", "logout");
     side.append(out);
-    mainEl = E6("main", void 0, "gp-main");
+    mainEl = E7("main", void 0, "gp-main");
     mainEl.dataset.page = page;
     if (dir && !reducedMotion()) mainEl.classList.add("enter-" + dir);
-    const head2 = E6("div", void 0, "gp-page-head");
-    head2.append(E6("p", page === "journey" ? L("brand") + " \xB7 " + destName(s.destination).toUpperCase() : L("journeyTitle").toUpperCase(), "gp-kicker"), E6("h1", page === "journey" ? L("journeyTitle") : L("pages." + page)));
+    const head2 = E7("div", void 0, "gp-page-head");
+    head2.append(E7("p", page === "journey" ? L("brand") + " \xB7 " + destName(s.destination).toUpperCase() : L("journeyTitle").toUpperCase(), "gp-kicker"), E7("h1", page === "journey" ? L("journeyTitle") : L("pages." + page)));
     mainEl.append(head2);
     ({ journey, documents, plan, messages, profile })[page]();
-    const dock = E6("nav", void 0, "gp-dock");
+    if (!dockEl) {
+      dockEl = E7("nav", void 0, "gp-dock gp-dock-ig");
+    }
+    const dock = dockEl;
+    dock.replaceChildren();
     dock.setAttribute("aria-label", "Global Passport");
     for (const [id, label2] of pages()) {
-      const b = E6("button", void 0);
+      const b = E7("button", void 0);
       b.type = "button";
-      b.append(gi({ journey: "globe", documents: "doc", plan: "calendar", messages: "chat", profile: "user" }[id]), E6("small", label2));
+      b.setAttribute("aria-label", label2);
+      b.title = label2;
+      b.append(gi({ journey: "globe", documents: "doc", plan: "calendar", messages: "chat", profile: "user" }[id]), E7("small", label2));
       if (id === page) b.setAttribute("aria-current", "page");
+      if (id === "messages") b.dataset.gpMsg = "1";
       b.onclick = () => go(id);
       dock.append(b);
     }
     root.append(top, side, mainEl, dock);
+    paintDots();
   }
   function step(d) {
     const ids = pages().map((p) => p[0]);
@@ -25201,6 +26433,10 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     go(ids[i], d > 0 ? "left" : "right");
   }
   function go(id, dir) {
+    if (id === "messages") {
+      openChat();
+      return;
+    }
     if (id === page) return;
     const ids = pages().map((p) => p[0]);
     dir = dir || (ids.indexOf(id) > ids.indexOf(page) ? "left" : "right");
@@ -25213,85 +26449,192 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     return 0;
   }
   function statusPill(st) {
-    const p = E6("span", L("st." + st), "gp-status gp-status-" + st);
-    p.prepend(E6("i"));
+    const p = E7("span", L("st." + st), "gp-status gp-status-" + st);
+    p.prepend(E7("i"));
     return p;
   }
   function journey() {
     const s = data.student, c = data.counsellor;
-    const hero = E6("section", void 0, "gp-hero");
-    const pass = E6("article", void 0, "gp-passport");
-    pass.setAttribute("aria-label", "Global Passport " + s.reference);
-    const ptop = E6("div", void 0, "gp-pp-top");
-    const f = E6("span", void 0, "gp-flag gp-flag-" + s.destination.toLowerCase());
-    f.setAttribute("aria-hidden", "true");
-    ptop.append(E6("span", "GLOBAL PASSPORT", "gp-pp-title"), f);
-    const pbody = E6("div", void 0, "gp-pp-body");
-    const photo = avatar(s.full_name, null, "gp-avatar gp-pp-photo");
-    const id = E6("dl", void 0, "gp-pp-id");
-    for (const [k, val] of [["Name / Nom", s.full_name], ["Nationality", countryName(s.nationality, lang2)], ["Destination", destName(s.destination)], ["File no.", s.reference]]) {
-      id.append(E6("dt", k), E6("dd", val));
-    }
-    pbody.append(photo, id);
-    const mrz = E6("p", mrzLine(s), "gp-mrz");
-    mrz.setAttribute("aria-hidden", "true");
-    pass.append(ptop, pbody, mrz, E6("span", void 0, "gp-pp-holo"));
-    const ready = E6("article", void 0, "gp-ready");
-    ready.append(E6("p", L("readiness"), "gp-kicker"), ring(data.readiness, "xl"));
+    const hero = E7("section", void 0, "gp-hero");
+    const pass = passportPage(s);
+    const ready = E7("article", void 0, "gp-ready");
+    ready.append(E7("p", L("readiness"), "gp-kicker"), ring(data.readiness, "xl"));
     const done = data.documents.filter((d) => d.required && d.status === "approved").length, req = data.documents.filter((d) => d.required).length;
-    ready.append(E6("p", fill(L("docsDone"), { a: done, b: req }), "gp-muted"), statusPill(s.application_status));
+    ready.append(E7("p", fill2(L("docsDone"), { a: done, b: req }), "gp-muted"), statusPill(s.application_status));
     hero.append(pass, ready);
     mainEl.append(hero);
-    const facts = E6("section", void 0, "gp-facts");
+    const facts = E7("section", void 0, "gp-facts");
     facts.append(fact("globe", L("destination"), destName(s.destination)), fact("cap", L("university"), s.university || L("toChoose"), !s.university), fact("book", L("programme"), s.programme || s.subject || L("toChoose"), !s.programme), fact("calendar", L("intake"), s.intake || "\u2014"));
     mainEl.append(facts);
-    const grid = E6("div", void 0, "gp-grid");
-    const cc = E6("section", void 0, "gp-panel gp-counsellor");
-    cc.append(E6("p", L("counsellor"), "gp-kicker"));
+    const grid = E7("div", void 0, "gp-grid");
+    const cc = E7("section", void 0, "gp-panel gp-counsellor");
+    cc.append(E7("p", L("counsellor"), "gp-kicker"));
     if (c) {
-      const row = E6("div", void 0, "gp-c-row");
-      const txt = E6("div");
-      txt.append(E6("strong", c.full_name), E6("span", c.job_title, "gp-muted"));
-      if (c.languages) txt.append(E6("small", [].concat(c.languages).join(" \xB7 "), "gp-muted"));
-      row.append(avatar(c.full_name, c.avatar_url, "gp-avatar gp-avatar-lg"), txt);
+      const row = E7("div", void 0, "gp-c-row");
+      const txt = E7("div");
+      txt.append(E7("strong", c.full_name), E7("span", c.job_title, "gp-muted"));
+      if (c.languages) txt.append(E7("small", [].concat(c.languages).join(" \xB7 "), "gp-muted"));
+      row.append(avatar2(c.full_name, c.avatar_url, "gp-avatar gp-avatar-lg"), txt);
       cc.append(row);
-      const acts = E6("div", void 0, "gp-actions");
+      const acts = E7("div", void 0, "gp-actions");
       acts.append(btn2(L("message"), () => go("messages"), "gp-btn gp-primary", "chat"));
       if (c.email) {
-        const a = E6("a", void 0, "gp-btn gp-ghost");
+        const a = E7("a", void 0, "gp-btn gp-ghost");
         a.href = "mailto:" + c.email;
-        a.append(gi("send"), E6("span", c.email));
+        a.append(gi("send"), E7("span", c.email));
         acts.append(a);
       }
       cc.append(acts);
     } else {
-      cc.append(E6("strong", L("noCounsellor")), E6("p", L("noCounsellorText"), "gp-muted"));
+      cc.append(E7("strong", L("noCounsellor")), E7("p", L("noCounsellorText"), "gp-muted"));
     }
     grid.append(cc);
-    const pend = E6("section", void 0, "gp-panel");
+    const pend = E7("section", void 0, "gp-panel");
     pend.append(panelHead(L("pendingDocs"), () => go("documents")));
     const pd = data.documents.filter((d) => ["requested", "rejected"].includes(d.status)).slice(0, 4);
     for (const d of pd) pend.append(docRow(d, true));
-    if (!pd.length) pend.append(E6("p", fill(L("docsDone"), { a: done, b: req }), "gp-muted"));
+    if (!pd.length) pend.append(E7("p", fill2(L("docsDone"), { a: done, b: req }), "gp-muted"));
     grid.append(pend);
-    const dates = E6("section", void 0, "gp-panel");
+    const dates = E7("section", void 0, "gp-panel");
     dates.append(panelHead(L("nextDates"), () => go("plan")));
     const upcoming = upcomingItems().slice(0, 4);
     for (const u of upcoming) dates.append(dateRow(u));
-    if (!upcoming.length) dates.append(E6("p", L("noDates"), "gp-muted"));
+    if (!upcoming.length) dates.append(E7("p", L("noDates"), "gp-muted"));
     grid.append(dates);
     mainEl.append(grid);
-    const map = E6("section", void 0, "gp-panel gp-map-panel");
-    map.append(E6("p", L("journeyTitle"), "gp-kicker"));
+    const map = E7("section", void 0, "gp-panel gp-map-panel");
+    map.append(E7("p", L("journeyTitle"), "gp-kicker"));
     map.append(journeyMap(false));
     mainEl.append(map);
     const last = data.messages.filter((m) => m.sender_role !== "student").slice(-1)[0];
     if (last) {
-      const l = E6("section", void 0, "gp-panel gp-latest");
-      l.append(E6("p", L("latest"), "gp-kicker"), E6("p", last.body, "gp-latest-body"), E6("small", ago(last.created_at, lang2), "gp-muted"));
+      const l = E7("section", void 0, "gp-panel gp-latest");
+      l.append(E7("p", L("latest"), "gp-kicker"), E7("p", last.body, "gp-latest-body"), E7("small", ago(last.created_at, lang2), "gp-muted"));
       l.onclick = () => go("messages");
       mainEl.append(l);
     }
+  }
+  function passportPage(s) {
+    const pass = E7("article", void 0, "gp-passport gp-pp2");
+    pass.setAttribute("aria-label", "Global Passport " + s.reference);
+    const band = E7("header", void 0, "gp-pp2-band");
+    const t2 = E7("div", void 0, "gp-pp2-issuer");
+    t2.append(E7("strong", "MUK TALENT"), E7("span", "GLOBAL PASSPORT \xB7 PASSEPORT"));
+    const f = E7("span", void 0, "gp-flag gp-flag-" + s.destination.toLowerCase());
+    f.setAttribute("aria-hidden", "true");
+    band.append(t2, f);
+    const grid = E7("div", void 0, "gp-pp2-grid");
+    const ph = E7("figure", void 0, "gp-pp2-photo");
+    if (data.photo_url) {
+      const img = E7("img");
+      img.src = data.photo_url;
+      img.alt = s.full_name;
+      img.decoding = "async";
+      img.onerror = () => {
+        img.remove();
+        ph.classList.add("is-empty");
+      };
+      ph.append(img);
+    } else ph.classList.add("is-empty");
+    const sil = E7("span", void 0, "gp-pp2-sil");
+    sil.setAttribute("aria-hidden", "true");
+    sil.append(gi("user"));
+    ph.append(sil);
+    const up = E7("label", void 0, "gp-pp2-up");
+    const fi = E7("input");
+    fi.type = "file";
+    fi.accept = "image/jpeg,image/png,image/webp";
+    fi.setAttribute("aria-label", data.photo_url ? L("photoChange") : L("photoAdd"));
+    const upTxt = E7("span", data.photo_url ? L("photoChange") : L("photoAdd"));
+    up.append(gi("upload"), upTxt, fi);
+    up.title = L("photoHint");
+    ph.append(up);
+    fi.onchange = async () => {
+      const file = fi.files?.[0];
+      if (!file) return;
+      const mime = file.type;
+      if (!["image/jpeg", "image/png", "image/webp"].includes(mime) || file.size > 5 * 1024 * 1024) {
+        alert(L("photoHint"));
+        fi.value = "";
+        return;
+      }
+      up.classList.add("is-busy");
+      upTxt.textContent = L("photoBusy");
+      try {
+        const st = (await api2("/api/passport/photo/start", { method: "POST", body: JSON.stringify({ mime, size: file.size }) })).data;
+        const r = await fetch(st.signed_url, { method: "PUT", headers: { "Content-Type": mime, "x-upsert": "false" }, body: file });
+        if (!r.ok) throw new Error(L("photoHint"));
+        const fin = (await api2("/api/passport/photo/finish", { method: "POST", body: JSON.stringify({ path: st.path, mime }) })).data;
+        data.photo_url = fin.photo_url;
+        render();
+      } catch (err2) {
+        alert(err2.message);
+        up.classList.remove("is-busy");
+        upTxt.textContent = data.photo_url ? L("photoChange") : L("photoAdd");
+      } finally {
+        fi.value = "";
+      }
+    };
+    const parts = String(s.full_name || "").trim().split(/\s+/);
+    const surname = (parts.length > 1 ? parts.slice(-1) : parts).join(" ").toUpperCase(), given = (parts.length > 1 ? parts.slice(0, -1).join(" ") : "").toUpperCase() || "\u2014";
+    const dfmt = (v) => {
+      if (!v) return "\u2014";
+      const d = new Date(String(v).length === 10 ? v + "T12:00:00Z" : v);
+      return Number.isNaN(d.getTime()) ? "\u2014" : new Intl.DateTimeFormat(lang2 === "fr" ? "fr-FR" : "en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }).format(d).toUpperCase().replace(/\./g, "");
+    };
+    const dl = E7("div", void 0, "gp-pp2-fields");
+    const cell = (k, v, cls = "") => {
+      const c = E7("div", void 0, "gp-pp2-f " + cls);
+      c.append(E7("small", k), E7("b", v));
+      dl.append(c);
+    };
+    cell(L("ppType") + " / Type", "P", "is-s");
+    cell(L("ppCode") + " / Code", "MUK", "is-s");
+    cell(L("ppNo") + " / No.", s.reference, "is-no");
+    cell(L("surname") + " / Surname", surname, "is-w");
+    cell(L("given") + " / Given names", given, "is-w");
+    cell(L("ppNat"), (countryName(s.nationality, lang2) || s.nationality || "\u2014").toUpperCase(), "is-w");
+    cell(L("ppDob"), dfmt(s.date_of_birth));
+    cell(L("ppDest"), (destName(s.destination) || "").toUpperCase());
+    cell(L("ppIssue"), dfmt(s.created_at));
+    cell(L("ppAuth"), "MUK TALENT UK");
+    const sig = E7("div", void 0, "gp-pp2-sign");
+    sig.append(E7("small", L("ppSign")), E7("span", s.full_name, "gp-pp2-sig"));
+    const info = E7("div", void 0, "gp-pp2-info");
+    info.append(dl, sig);
+    grid.append(ph, info);
+    const mrz = E7("div", void 0, "gp-pp2-mrz");
+    mrz.setAttribute("aria-hidden", "true");
+    for (const line of mrz2(s)) mrz.append(E7("span", line));
+    const seal = E7("span", void 0, "gp-pp2-seal");
+    seal.setAttribute("aria-hidden", "true");
+    const sm = E7("img");
+    sm.src = "/assets/brand/mark-gold.svg";
+    sm.alt = "";
+    seal.append(sm);
+    pass.append(band, grid, mrz, seal, E7("span", void 0, "gp-pp-holo"));
+    return pass;
+  }
+  function mrz2(s) {
+    const cl = (v) => String(v || "").normalize("NFKD").replace(/[^A-Za-z0-9 ]/g, "").toUpperCase().trim().replace(/\s+/g, "<");
+    const w = [7, 3, 1];
+    const val = (c) => c === "<" ? 0 : /\d/.test(c) ? +c : c.charCodeAt(0) - 55;
+    const chk = (v) => String([...v].reduce((a, c, i) => a + val(c) * w[i % 3], 0) % 10);
+    const n = cl(s.full_name).split("<").filter(Boolean);
+    const sur = n.length > 1 ? n.slice(-1)[0] : n[0] || "";
+    const giv = n.length > 1 ? n.slice(0, -1).join("<") : "";
+    const l1 = ("P<MUK" + sur + "<<" + giv).padEnd(44, "<").slice(0, 44);
+    const no = cl(s.reference).replace(/</g, "").padEnd(9, "<").slice(0, 9);
+    const nat = (cl(s.nationality) + "<").padEnd(3, "<").slice(0, 3);
+    const dob = s.date_of_birth ? s.date_of_birth.slice(2, 4) + s.date_of_birth.slice(5, 7) + s.date_of_birth.slice(8, 10) : "<<<<<<";
+    const exp = (() => {
+      const d = new Date(s.created_at || Date.now());
+      d.setUTCFullYear(d.getUTCFullYear() + 5);
+      return d.toISOString().slice(2, 4) + d.toISOString().slice(5, 7) + d.toISOString().slice(8, 10);
+    })();
+    const body = no + chk(no) + nat + dob + chk(dob) + "<" + exp + chk(exp);
+    const l2 = (body + "MUKTALENT").padEnd(42, "<").slice(0, 42);
+    return [l1, l2 + chk(l2.slice(0, 10) + l2.slice(13, 20) + l2.slice(21, 43)) + "<"];
   }
   function mrzLine(s) {
     const clean = (v) => String(v || "").normalize("NFKD").replace(/[^A-Za-z ]/g, "").toUpperCase().trim().replace(/\s+/g, "<");
@@ -25299,15 +26642,15 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     return ("P<" + (s.destination === "UK" ? "GBR" : s.destination) + (n.slice(-1)[0] || "") + "<<" + n.slice(0, -1).join("<")).padEnd(44, "<").slice(0, 44) + "\n" + (s.reference.replace(/-/g, "") + "<" + s.nationality + "<MUKTALENT").padEnd(44, "<").slice(0, 44);
   }
   function fact(ic, label2, value, muted) {
-    const a = E6("article", void 0, "gp-fact" + (muted ? " is-muted" : ""));
-    const i = E6("span", void 0, "gp-fact-i");
+    const a = E7("article", void 0, "gp-fact" + (muted ? " is-muted" : ""));
+    const i = E7("span", void 0, "gp-fact-i");
     i.append(gi(ic));
-    a.append(i, E6("small", label2), E6("strong", value));
+    a.append(i, E7("small", label2), E7("strong", value));
     return a;
   }
   function panelHead(title, more) {
-    const h = E6("div", void 0, "gp-panel-head");
-    h.append(E6("h2", title));
+    const h = E7("div", void 0, "gp-panel-head");
+    h.append(E7("h2", title));
     if (more) h.append(btn2("", more, "gp-icon-btn", "chevron"));
     return h;
   }
@@ -25316,34 +26659,34 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     return items.sort((a, b) => a.date.localeCompare(b.date)).filter((x) => daysUntil(x.date) >= -14);
   }
   function dateRow(u) {
-    const r = E6("div", void 0, "gp-date-row");
+    const r = E7("div", void 0, "gp-date-row");
     const d = /* @__PURE__ */ new Date(u.date + "T12:00:00Z");
-    const cal = E6("span", void 0, "gp-cal");
-    cal.append(E6("b", d.getUTCDate()), E6("small", new Intl.DateTimeFormat(lang2 === "fr" ? "fr-FR" : "en-GB", { month: "short", timeZone: "UTC" }).format(d)));
+    const cal = E7("span", void 0, "gp-cal");
+    cal.append(E7("b", d.getUTCDate()), E7("small", new Intl.DateTimeFormat(lang2 === "fr" ? "fr-FR" : "en-GB", { month: "short", timeZone: "UTC" }).format(d)));
     const n = daysUntil(u.date);
-    const when = n < 0 ? L("overdue") : n === 0 ? L("today") : fill(L("inDays"), { n });
-    const t2 = E6("div");
-    t2.append(E6("strong", u.title), E6("small", when, n < 0 ? "gp-bad" : "gp-muted"));
+    const when = n < 0 ? L("overdue") : n === 0 ? L("today") : fill2(L("inDays"), { n });
+    const t2 = E7("div");
+    t2.append(E7("strong", u.title), E7("small", when, n < 0 ? "gp-bad" : "gp-muted"));
     r.append(cal, t2);
     if (n < 0) r.classList.add("is-overdue");
     return r;
   }
   function journeyMap(detailed) {
-    const ol = E6("ol", void 0, "gp-journey" + (detailed ? " is-detailed" : ""));
+    const ol = E7("ol", void 0, "gp-journey" + (detailed ? " is-detailed" : ""));
     for (const st of data.stages) {
-      const li = E6("li", void 0, "gp-stage is-" + st.status);
-      const node = E6("span", void 0, "gp-node");
+      const li = E7("li", void 0, "gp-stage is-" + st.status);
+      const node = E7("span", void 0, "gp-node");
       node.append(gi(st.status === "done" ? "check" : STAGE_ICON[st.stage_key]));
-      const txt = E6("div", void 0, "gp-stage-txt");
-      txt.append(E6("strong", stageName(st.stage_key)), E6("small", L("stage." + st.status)));
+      const txt = E7("div", void 0, "gp-stage-txt");
+      txt.append(E7("strong", stageName(st.stage_key)), E7("small", L("stage." + st.status)));
       li.append(node, txt);
       if (detailed) {
         const tasks = data.tasks.filter((t2) => t2.stage_key === st.stage_key), docs = data.documents.filter((d) => d.stage_key === st.stage_key), ev = data.events.filter((e) => e.kind === { visa: "visa", travel: "travel", arrival: "travel", application: "deadline" }[st.stage_key]);
-        const count = E6("span", tasks.filter((t2) => t2.status === "done").length + "/" + tasks.length, "gp-stage-count");
+        const count = E7("span", tasks.filter((t2) => t2.status === "done").length + "/" + tasks.length, "gp-stage-count");
         if (tasks.length) txt.append(count);
         const open = openStage === st.stage_key || openStage === null && st.status === "in_progress";
         li.classList.toggle("is-open", open);
-        const tog = E6("button", void 0, "gp-stage-toggle");
+        const tog = E7("button", void 0, "gp-stage-toggle");
         tog.type = "button";
         tog.setAttribute("aria-expanded", String(open));
         tog.setAttribute("aria-label", stageName(st.stage_key));
@@ -25354,12 +26697,12 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
         };
         li.append(tog);
         if (open) {
-          const body = E6("div", void 0, "gp-stage-body");
-          body.append(E6("h3", L("tasks")));
+          const body = E7("div", void 0, "gp-stage-body");
+          body.append(E7("h3", L("tasks")));
           for (const t2 of tasks) body.append(taskRow(t2));
-          if (!tasks.length) body.append(E6("p", L("noTasks"), "gp-muted"));
+          if (!tasks.length) body.append(E7("p", L("noTasks"), "gp-muted"));
           if (docs.length) {
-            body.append(E6("h3", L("pages.documents")));
+            body.append(E7("h3", L("pages.documents")));
             for (const d of docs) body.append(docRow(d, true));
           }
           for (const e of ev) body.append(dateRow({ title: e.title, date: e.starts_on }));
@@ -25371,8 +26714,8 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     return ol;
   }
   function taskRow(t2) {
-    const r = E6("label", void 0, "gp-task" + (t2.status === "done" ? " is-done" : ""));
-    const cb = E6("input");
+    const r = E7("label", void 0, "gp-task" + (t2.status === "done" ? " is-done" : ""));
+    const cb = E7("input");
     cb.type = "checkbox";
     cb.checked = t2.status === "done";
     cb.onchange = async () => {
@@ -25389,48 +26732,48 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
         cb.disabled = false;
       }
     };
-    const box = E6("span", void 0, "gp-box");
+    const box = E7("span", void 0, "gp-box");
     box.append(gi("check"));
-    const txt = E6("span", void 0, "gp-task-txt");
-    txt.append(E6("strong", t2.title));
-    if (t2.detail) txt.append(E6("small", t2.detail, "gp-muted"));
+    const txt = E7("span", void 0, "gp-task-txt");
+    txt.append(E7("strong", t2.title));
+    if (t2.detail) txt.append(E7("small", t2.detail, "gp-muted"));
     if (t2.due_date && t2.status !== "done") {
       const n = daysUntil(t2.due_date);
-      txt.append(E6("small", L("due") + " \xB7 " + fmtDate(t2.due_date, lang2), n < 0 ? "gp-bad" : "gp-muted"));
+      txt.append(E7("small", L("due") + " \xB7 " + fmtDate(t2.due_date, lang2), n < 0 ? "gp-bad" : "gp-muted"));
     }
     r.append(cb, box, txt);
     return r;
   }
   function documents() {
     const done = data.documents.filter((d) => d.status === "approved").length;
-    const sum = E6("section", void 0, "gp-doc-summary");
-    const bar = E6("div", void 0, "gp-bar");
-    const fillEl = E6("i");
+    const sum = E7("section", void 0, "gp-doc-summary");
+    const bar = E7("div", void 0, "gp-bar");
+    const fillEl = E7("i");
     fillEl.style.setProperty("--w", (data.documents.length ? Math.round(done / data.documents.length * 100) : 0) + "%");
     bar.append(fillEl);
-    sum.append(E6("strong", fill(L("docsDone"), { a: done, b: data.documents.length })), bar, E6("small", L("fileRule"), "gp-muted"));
+    sum.append(E7("strong", fill2(L("docsDone"), { a: done, b: data.documents.length })), bar, E7("small", L("fileRule"), "gp-muted"));
     mainEl.append(sum);
     for (const st of data.stages) {
       const docs = data.documents.filter((d) => d.stage_key === st.stage_key);
       if (!docs.length) continue;
-      const p = E6("section", void 0, "gp-panel");
-      p.append(E6("h2", stageName(st.stage_key)));
+      const p = E7("section", void 0, "gp-panel");
+      p.append(E7("h2", stageName(st.stage_key)));
       for (const d of docs) p.append(docRow(d));
       mainEl.append(p);
     }
   }
   function docRow(d, compact) {
-    const r = E6("div", void 0, "gp-doc is-" + d.status);
-    const i = E6("span", void 0, "gp-doc-i");
+    const r = E7("div", void 0, "gp-doc is-" + d.status);
+    const i = E7("span", void 0, "gp-doc-i");
     i.append(gi(d.status === "approved" ? "check" : d.status === "rejected" ? "alert" : "doc"));
-    const txt = E6("div", void 0, "gp-doc-txt");
-    txt.append(E6("strong", d.label));
-    const meta = E6("small", L("doc." + d.status), "gp-doc-state");
+    const txt = E7("div", void 0, "gp-doc-txt");
+    txt.append(E7("strong", d.label));
+    const meta = E7("small", L("doc." + d.status), "gp-doc-state");
     txt.append(meta);
-    if (d.status === "rejected" && d.review_note) txt.append(E6("small", d.review_note, "gp-bad"));
-    if (!compact && d.file_name) txt.append(E6("small", d.file_name, "gp-muted"));
+    if (d.status === "rejected" && d.review_note) txt.append(E7("small", d.review_note, "gp-bad"));
+    if (!compact && d.file_name) txt.append(E7("small", d.file_name, "gp-muted"));
     r.append(i, txt);
-    const acts = E6("div", void 0, "gp-doc-acts");
+    const acts = E7("div", void 0, "gp-doc-acts");
     if (d.file_name && !compact) acts.append(btn2("", async () => {
       try {
         const u = (await api2("/api/passport/documents/" + d.id + "/url")).data.url;
@@ -25440,7 +26783,7 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
       }
     }, "gp-icon-btn", "eye"));
     if (d.status !== "approved" && (!compact || d.status !== "uploaded")) {
-      const f = E6("input");
+      const f = E7("input");
       f.type = "file";
       f.accept = MIMES.join(",");
       f.hidden = true;
@@ -25471,30 +26814,30 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     }
   }
   function plan() {
-    const p = E6("section", void 0, "gp-panel");
+    const p = E7("section", void 0, "gp-panel");
     p.append(journeyMap(true));
     mainEl.append(p);
-    const d = E6("section", void 0, "gp-panel");
-    d.append(E6("h2", L("nextDates")));
+    const d = E7("section", void 0, "gp-panel");
+    d.append(E7("h2", L("nextDates")));
     const u = upcomingItems();
     for (const x of u) d.append(dateRow(x));
-    if (!u.length) d.append(E6("p", L("noDates"), "gp-muted"));
+    if (!u.length) d.append(E7("p", L("noDates"), "gp-muted"));
     mainEl.append(d);
   }
   function messages() {
-    const wrap = E6("section", void 0, "gp-panel gp-thread-panel");
+    const wrap = E7("section", void 0, "gp-panel gp-thread-panel");
     const c = data.counsellor;
-    const head2 = E6("div", void 0, "gp-thread-head");
-    head2.append(avatar(c?.full_name || "MUK Talent", c?.avatar_url), E6("div"));
-    head2.lastChild.append(E6("strong", c?.full_name || L("noCounsellor")), E6("small", c?.job_title || "MUK Talent", "gp-muted"));
+    const head2 = E7("div", void 0, "gp-thread-head");
+    head2.append(avatar2(c?.full_name || "MUK Talent", c?.avatar_url), E7("div"));
+    head2.lastChild.append(E7("strong", c?.full_name || L("noCounsellor")), E7("small", c?.job_title || "MUK Talent", "gp-muted"));
     wrap.append(head2);
-    const list = E6("div", void 0, "gp-thread");
+    const list = E7("div", void 0, "gp-thread");
     list.setAttribute("aria-live", "polite");
     for (const m of data.messages) list.append(bubble(m));
-    if (!data.messages.length) list.append(E6("p", L("empty"), "gp-muted gp-empty"));
+    if (!data.messages.length) list.append(E7("p", L("empty"), "gp-muted gp-empty"));
     wrap.append(list);
-    const form = E6("form", void 0, "gp-composer");
-    const ta = E6("textarea");
+    const form = E7("form", void 0, "gp-composer");
+    const ta = E7("textarea");
     ta.rows = 1;
     ta.maxLength = 2e3;
     ta.placeholder = L("write");
@@ -25509,7 +26852,7 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
         form.requestSubmit();
       }
     };
-    const send = E6("button", void 0, "gp-send");
+    const send = E7("button", void 0, "gp-send");
     send.type = "submit";
     send.setAttribute("aria-label", L("send"));
     send.append(gi("send"));
@@ -25544,21 +26887,21 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     }, 3e4);
   }
   function bubble(m) {
-    const b = E6("div", void 0, "gp-msg gp-msg-" + m.sender_role + (m.kind === "update" ? " is-update" : ""));
+    const b = E7("div", void 0, "gp-msg gp-msg-" + m.sender_role + (m.kind === "update" ? " is-update" : ""));
     if (m.sender_role === "system" || m.kind === "update") {
-      const i = E6("span", void 0, "gp-msg-i");
+      const i = E7("span", void 0, "gp-msg-i");
       i.append(gi(m.sender_role === "system" ? "spark" : "flag"));
       b.append(i);
     }
-    const t2 = E6("div", void 0, "gp-msg-body");
-    t2.append(E6("p", m.body), E6("small", (m.sender_role === "student" ? L("you") : m.sender_role === "system" ? L("system") : data.counsellor?.full_name || "MUK Talent") + " \xB7 " + ago(m.created_at, lang2)));
+    const t2 = E7("div", void 0, "gp-msg-body");
+    t2.append(E7("p", m.body), E7("small", (m.sender_role === "student" ? L("you") : m.sender_role === "system" ? L("system") : data.counsellor?.full_name || "MUK Talent") + " \xB7 " + ago(m.created_at, lang2)));
     b.append(t2);
     return b;
   }
   function profile() {
     const s = data.student;
-    const f = E6("form", void 0, "gp-panel gp-profile");
-    f.append(E6("h2", L("profileTitle")));
+    const f = E7("form", void 0, "gp-panel gp-profile");
+    f.append(E7("h2", L("profileTitle")));
     const v = {};
     const add = (k, label2, control) => {
       f.append(field2(label2, control));
@@ -25569,7 +26912,7 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     };
     text("full_name", L("fullName"), { required: true, minLength: 2, maxLength: 120 });
     text("phone", L("phone"), { type: "tel", pattern: "\\+?[0-9 ().-]{6,24}" });
-    const two = E6("div", void 0, "gp-two");
+    const two = E7("div", void 0, "gp-two");
     const r = countrySelect("pf-res", lang2, s.country_residence);
     r.onchange = () => v.country_residence = r.value;
     const n = countrySelect("pf-nat", lang2, s.nationality);
@@ -25578,21 +26921,21 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     f.append(two);
     const dob = input("pf-dob", s.date_of_birth, (x) => v.date_of_birth = x, { type: "date" });
     add("dob", L("dob"), dob);
-    const lv = E6("select");
+    const lv = E7("select");
     lv.id = "pf-level";
     LEVEL_VALUES.forEach((x, i) => lv.append(new Option(LEVELS2[lang2][i], x)));
     lv.value = s.study_level || LEVEL_VALUES[5];
     lv.onchange = () => v.study_level = lv.value;
     add("level", L("level"), lv);
     text("subject", L("subject"), { required: true, minLength: 2, maxLength: 120 });
-    const t2 = E6("div", void 0, "gp-two");
+    const t2 = E7("div", void 0, "gp-two");
     t2.append(field2(L("intake"), input("pf-intake", s.intake, (x) => v.intake = x, { maxLength: 40 })), field2(L("english"), input("pf-eng", s.english_test, (x) => v.english_test = x, { maxLength: 80 })));
     f.append(t2);
     text("university", L("preferred"), { maxLength: 160 });
     text("programme", L("preferredProg"), { maxLength: 160 });
-    const msg = E6("p", "", "gp-form-msg");
+    const msg = E7("p", "", "gp-form-msg");
     msg.setAttribute("role", "status");
-    const save = E6("button", L("save"), "gp-btn gp-primary");
+    const save = E7("button", L("save"), "gp-btn gp-primary");
     save.type = "submit";
     f.append(save, msg);
     f.onsubmit = async (e) => {
@@ -25612,20 +26955,20 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
       }
     };
     mainEl.append(f);
-    const d = E6("section", void 0, "gp-panel");
-    d.append(E6("h2", L("destinations")));
-    const g = E6("div", void 0, "gp-dest-grid gp-dest-mini");
+    const d = E7("section", void 0, "gp-panel");
+    d.append(E7("h2", L("destinations")));
+    const g = E7("div", void 0, "gp-dest-grid gp-dest-mini");
     for (const [code, on] of [["UK", true], ["CA", false], ["US", false]]) {
-      const o = E6("div", void 0, "gp-dest" + (on ? " is-on" : " is-soon"));
-      const fl = E6("span", void 0, "gp-flag gp-flag-" + code.toLowerCase());
+      const o = E7("div", void 0, "gp-dest" + (on ? " is-on" : " is-soon"));
+      const fl = E7("span", void 0, "gp-flag gp-flag-" + code.toLowerCase());
       fl.setAttribute("aria-hidden", "true");
-      o.append(fl, E6("strong", destName(code)), E6("small", on ? L("active") : L("soon")));
+      o.append(fl, E7("strong", destName(code)), E7("small", on ? L("active") : L("soon")));
       g.append(o);
     }
     d.append(g);
     mainEl.append(d);
-    const acc = E6("section", void 0, "gp-panel gp-account");
-    acc.append(E6("h2", "Account"), E6("p", data.student.email, "gp-muted"), btn2(L("signOut"), logout, "gp-btn gp-ghost", "logout"));
+    const acc = E7("section", void 0, "gp-panel gp-account");
+    acc.append(E7("h2", "Account"), E7("p", data.student.email, "gp-muted"), btn2(L("signOut"), logout, "gp-btn gp-ghost", "logout"));
     mainEl.append(acc);
   }
 }
@@ -25762,7 +27105,7 @@ function stopWatch() {
 }
 
 // admin-src/admin-soft.js
-var E8 = (t2, v, c) => {
+var E9 = (t2, v, c) => {
   const n = document.createElement(t2);
   if (v !== void 0 && v !== null) n.textContent = String(v);
   if (c) n.className = c;
@@ -25773,13 +27116,13 @@ function chrome() {
   document.documentElement.classList.add("mt-soft");
   let m = document.querySelector("meta[name=theme-color]");
   if (!m) {
-    m = E8("meta");
+    m = E9("meta");
     m.name = "theme-color";
     document.head.append(m);
   }
   m.content = "#f6f4ef";
   for (const [n, c] of [["apple-mobile-web-app-capable", "yes"], ["mobile-web-app-capable", "yes"], ["apple-mobile-web-app-status-bar-style", "default"]]) if (!document.querySelector("meta[name=" + n + "]")) {
-    const x = E8("meta");
+    const x = E9("meta");
     x.name = n;
     x.content = c;
     document.head.append(x);
@@ -25798,7 +27141,7 @@ function mountAdminSoft({ api: api2, getState, navigate: navigate2 }) {
   function hero() {
     let h = document.getElementById("adminSoftHero");
     if (h) return h;
-    h = E8("section", void 0, "as-hero");
+    h = E9("section", void 0, "as-hero");
     h.id = "adminSoftHero";
     h.setAttribute("aria-label", "Resumen del d\xEDa");
     overview.prepend(h);
@@ -25811,45 +27154,45 @@ function mountAdminSoft({ api: api2, getState, navigate: navigate2 }) {
     busy = true;
     const h = hero();
     const first = String(s.staff.full_name || "").split(/\s+/)[0] || "equipo";
-    const greet = E8("article", void 0, "as-greet");
-    greet.append(E8("p", "MUK TALENT \xB7 ADMINISTRACI\xD3N", "as-overline"), E8("h2", "Hola, " + first), E8("p", new Intl.DateTimeFormat("es-ES", { timeZone: "Africa/Casablanca", weekday: "long", day: "numeric", month: "long" }).format(/* @__PURE__ */ new Date()) + " \xB7 Africa/Casablanca", "as-muted"));
-    const quick = E8("div", void 0, "as-quick");
+    const greet = E9("article", void 0, "as-greet");
+    greet.append(E9("p", "MUK TALENT \xB7 ADMINISTRACI\xD3N", "as-overline"), E9("h2", "Hola, " + first), E9("p", new Intl.DateTimeFormat("es-ES", { timeZone: "Africa/Casablanca", weekday: "long", day: "numeric", month: "long" }).format(/* @__PURE__ */ new Date()) + " \xB7 Africa/Casablanca", "as-muted"));
+    const quick = E9("div", void 0, "as-quick");
     for (const [label2, section] of [["Leads y casos", "candidates"], ["Pipeline e informes", "intelligence"], ["Equipo", "staff"], ["Citas", "appointments"]]) {
-      const b = E8("button", label2, "as-quick-btn");
+      const b = E9("button", label2, "as-quick-btn");
       b.type = "button";
       b.onclick = () => navigate2(section);
       quick.append(b);
     }
     greet.append(quick);
-    const pay = E8("article", void 0, "as-pay");
-    pay.append(E8("p", "N\xD3MINA DEL EQUIPO \xB7 " + new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(/* @__PURE__ */ new Date()).toUpperCase(), "as-overline"));
+    const pay = E9("article", void 0, "as-pay");
+    pay.append(E9("p", "N\xD3MINA DEL EQUIPO \xB7 " + new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(/* @__PURE__ */ new Date()).toUpperCase(), "as-overline"));
     h.replaceChildren(greet, pay);
     try {
       const r = await api2("/api/admin/payroll?month=" + monthKey());
       if (id !== stamp) return;
-      const tot = E8("div", void 0, "as-pay-total");
-      tot.append(E8("strong", mad(r.totals.projected_total)), E8("span", "previsto este mes"));
+      const tot = E9("div", void 0, "as-pay-total");
+      tot.append(E9("strong", mad(r.totals.projected_total)), E9("span", "previsto este mes"));
       pay.append(tot);
-      const pills = E8("div", void 0, "as-pills");
+      const pills = E9("div", void 0, "as-pills");
       for (const [label2, value, tone] of [["Base", mad(r.base_monthly) + " / persona", "gold"], ["Leads verificados", String(r.totals.verified_count), "dark"], ["Comisiones", mad(r.totals.commission), "grey"]]) {
-        const p = E8("span", void 0, "as-pill as-pill-" + tone);
-        p.append(E8("span", label2), E8("b", value));
+        const p = E9("span", void 0, "as-pill as-pill-" + tone);
+        p.append(E9("span", label2), E9("b", value));
         pills.append(p);
       }
       pay.append(pills);
-      const list = E8("div", void 0, "as-pay-list");
+      const list = E9("div", void 0, "as-pay-list");
       const max = Math.max(1, ...r.data.map((x) => x.projected_total));
       for (const row of r.data.slice(0, 6)) {
-        const line = E8("div", void 0, "as-pay-row"), bar = E8("i");
+        const line = E9("div", void 0, "as-pay-row"), bar = E9("i");
         bar.style.setProperty("--w", Math.round(row.projected_total / max * 100) + "%");
-        const name = E8("span", row.full_name, "as-pay-name");
-        line.append(name, E8("span", row.verified_count + " leads", "as-pay-leads"), E8("b", mad(row.projected_total)), bar);
+        const name = E9("span", row.full_name, "as-pay-name");
+        line.append(name, E9("span", row.verified_count + " leads", "as-pay-leads"), E9("b", mad(row.projected_total)), bar);
         list.append(line);
       }
-      if (!r.data.length) list.append(E8("p", "A\xFAn no hay colaboradores activos.", "as-muted"));
-      pay.append(list, E8("p", "Base " + mad(r.base_monthly) + " (lunes a viernes) + " + mad(r.per_verified_lead) + " por lead verificado. Un lead cuenta cuando administraci\xF3n lo acepta como caso.", "as-foot"));
+      if (!r.data.length) list.append(E9("p", "A\xFAn no hay colaboradores activos.", "as-muted"));
+      pay.append(list, E9("p", "Base " + mad(r.base_monthly) + " (lunes a viernes) + " + mad(r.per_verified_lead) + " por lead verificado. Un lead cuenta cuando administraci\xF3n lo acepta como caso.", "as-foot"));
     } catch (e) {
-      if (id === stamp) pay.append(E8("p", "N\xF3mina no disponible ahora mismo.", "as-muted"));
+      if (id === stamp) pay.append(E9("p", "N\xF3mina no disponible ahora mismo.", "as-muted"));
     } finally {
       busy = false;
     }
@@ -25963,6 +27306,7 @@ function navIcon(name) {
   }
   return s;
 }
+var adminWatch = null;
 function nav() {
   const nav2 = $2("navigation");
   nav2.replaceChildren();
@@ -25987,6 +27331,29 @@ function nav() {
     d.append(navIcon(ic), el2("small", label2));
     d.addEventListener("click", () => navigate(sections[0]));
     dock.append(d);
+  }
+  if (!document.getElementById("adminChatNav")) {
+    linkChatCss();
+    const open = () => openMessenger({ api, lang: "es", onChange: () => adminWatch?.refresh() });
+    const c = el2("button", void 0, "nav-button nav-chat");
+    c.id = "adminChatNav";
+    c.type = "button";
+    const ic = icon2("chat", "nav-icon");
+    c.append(ic, el2("span", "Mensajes"), el2("i", void 0, "nav-chat-badge"));
+    c.addEventListener("click", open);
+    nav2.after(c);
+    const h = heartButton("es", open);
+    h.id = "adminChatTop";
+    h.classList.add("admin-heart");
+    h.setAttribute("aria-label", "Mensajes");
+    h.title = "Mensajes";
+    document.querySelector("#appShell .page-header").append(h);
+    adminWatch = watchNotifications(api, (x) => {
+      setDot(h, { chat_unread: x.chat_unread });
+      const b = c.querySelector(".nav-chat-badge");
+      b.textContent = x.chat_unread ? String(x.chat_unread > 99 ? "99+" : x.chat_unread) : "";
+      b.hidden = !x.chat_unread;
+    });
   }
   if (!document.getElementById("mobileLogout")) {
     const o = el2("button", void 0, "mobile-logout");
@@ -26516,6 +27883,10 @@ async function enter(session) {
 $2("logout").addEventListener("click", async () => {
   if (state.busy) return;
   if (state.dirty && !window.confirm("\xBFDescartar los cambios y cerrar sesi\xF3n?")) return;
+  adminWatch?.stop();
+  adminWatch = null;
+  document.getElementById("adminChatNav")?.remove();
+  document.getElementById("adminChatTop")?.remove();
   resetLogin();
   await state.client.auth.signOut({ scope: "local" }).catch(() => {
   });

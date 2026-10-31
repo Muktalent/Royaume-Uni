@@ -30,7 +30,7 @@ function grant(){
   document.head.append(s);
   window.gtag('js', new Date());
   window.gtag('config', GA_ID, {anonymize_ip: true});
-  if (AW-18547915772) window.gtag('config', AW-18547915772);
+  if (ADS_ID) window.gtag('config', ADS_ID);
 }
 function deny(){
   window.gtag('consent', 'update', {ad_storage:'denied', ad_user_data:'denied', ad_personalization:'denied', analytics_storage:'denied'});

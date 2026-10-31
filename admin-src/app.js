@@ -5,6 +5,7 @@ import { mountStaffAccounts } from "./staff-accounts.js";
 import { mountEmployee, mountWorkspaceAdmin } from "./employee.js";
 import { initGateway, showLoginMessage, startMatrix, stopMatrix, showReset, t } from "./gateway.js";
 import { mountStudentPortal } from "./student-portal.js";
+import { openMessenger, heartButton, watchNotifications, setDot, linkChatCss, icon as mkIcon } from "./muk-chat.js";
 import { renderControlCentre } from "./counsellor.js";
 import { UI_PATHS } from "../book/card-icons.js";
 import { mountExportButtons } from "./exports.js";
@@ -54,6 +55,7 @@ function resource(){return state.config.resources[state.section];}
 const GROUPS=[["home","Inicio","home",["overview"]],["students","Estudiantes","users",["candidates","enquiries","passport"]],["agenda","Agenda","calendar",["appointments"]],["team","Equipo","card",["staff","documents"]],["reports","Informes","chart",["intelligence"]]];
 const groupOf=name=>GROUPS.find(g=>g[3].includes(name))||GROUPS[0];
 function navIcon(name){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("aria-hidden","true");s.setAttribute("class","nav-icon");s.setAttribute("fill","none");s.setAttribute("stroke","currentColor");s.setAttribute("stroke-width","1.7");s.setAttribute("stroke-linecap","round");s.setAttribute("stroke-linejoin","round");for(const d of UI_PATHS[name]||[]){const p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d",d);s.append(p);}return s;}
+let adminWatch=null;
 function nav(){
  const nav=$("navigation");nav.replaceChildren();
  let dock=document.getElementById("adminDock");if(!dock){dock=el("nav",undefined,"admin-dock");dock.id="adminDock";dock.setAttribute("aria-label","Secciones");$("appShell").append(dock);}dock.replaceChildren();
@@ -61,6 +63,9 @@ function nav(){
   const b=el("button",undefined,"nav-button");b.type="button";b.dataset.group=id;b.append(navIcon(ic),el("span",label));b.addEventListener("click",()=>navigate(sections[0]));nav.append(b);
   const d=el("button",undefined,"dock-button");d.type="button";d.dataset.group=id;d.append(navIcon(ic),el("small",label));d.addEventListener("click",()=>navigate(sections[0]));dock.append(d);
  }
+ {linkChatCss();const open=()=>openMessenger({api,lang:"es",onChange:()=>adminWatch?.refresh()});const c=el("button",undefined,"nav-button nav-chat");c.id="adminChatNav";c.type="button";c.append(mkIcon("chat","nav-icon"),el("span","Mensajes"),el("i",undefined,"nav-chat-badge"));c.addEventListener("click",open);nav.append(c);
+  if(!document.getElementById("adminChatTop")){const h=heartButton("es",open);h.id="adminChatTop";h.classList.add("admin-heart");h.setAttribute("aria-label","Mensajes");h.title="Mensajes";document.querySelector("#appShell .page-header").append(h);}
+  if(!adminWatch)adminWatch=watchNotifications(api,x=>{const h=document.getElementById("adminChatTop");if(h)setDot(h,{chat_unread:x.chat_unread});const b=document.querySelector("#adminChatNav .nav-chat-badge");if(b){b.textContent=x.chat_unread?String(x.chat_unread>99?"99+":x.chat_unread):"";b.hidden=!x.chat_unread;}});else adminWatch.refresh();}
  if(!document.getElementById("mobileLogout")){const o=el("button",undefined,"mobile-logout");o.id="mobileLogout";o.type="button";o.setAttribute("aria-label","Cerrar sesión");o.append(navIcon("logout"));o.addEventListener("click",()=>$("logout").click());document.querySelector("#appShell .page-header").append(o);}
  if(!document.getElementById("mobileWeb")){const w=el("a",undefined,"mobile-web");w.id="mobileWeb";w.href="/";w.setAttribute("aria-label","Volver a la web");w.textContent="\u2190";document.querySelector("#appShell .page-header").append(w);}
  if(!document.getElementById("adminTabs")){const t=el("div",undefined,"admin-tabs");t.id="adminTabs";t.setAttribute("role","tablist");$("globalMessage").before(t);}
@@ -317,7 +322,7 @@ async function enter(session){
   $("appShell").hidden = false;
   await navigate("overview");
 }
-$("logout").addEventListener("click",async()=>{if(state.busy)return;if(state.dirty&&!window.confirm("¿Descartar los cambios y cerrar sesión?"))return;resetLogin();await state.client.auth.signOut({scope:"local"}).catch(()=>{});});
+$("logout").addEventListener("click",async()=>{if(state.busy)return;if(state.dirty&&!window.confirm("¿Descartar los cambios y cerrar sesión?"))return;adminWatch?.stop();adminWatch=null;document.getElementById("adminChatNav")?.remove();document.getElementById("adminChatTop")?.remove();resetLogin();await state.client.auth.signOut({scope:"local"}).catch(()=>{});});
 $("filters").addEventListener("submit",event=>{event.preventDefault();state.page=1;loadList();});
 $("refresh").addEventListener("click",()=>loadList());
 $("previous").addEventListener("click",()=>{if(!state.loading&&state.page>1){state.page--;loadList();}});

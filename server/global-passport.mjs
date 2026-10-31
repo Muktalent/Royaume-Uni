@@ -187,6 +187,7 @@ export function mountGlobalPassport(app, { requireStaff, db = service }) {
       forStaff ? client.from("gp_notes").select("id,body,created_at,author_id").eq("student_id", id).order("created_at", { ascending: false }).limit(100) : Promise.resolve({ data: [] })
     ]);
     const out = { student, stages: ok(stages), tasks: ok(tasks), documents: ok(documents), events: ok(events), messages: ok(messages).reverse(), counsellor: await counsellorCard(client, student.counsellor_id) };
+    out.photo_url = student.photo_path ? ((await client.storage.from(BUCKET).createSignedUrl(student.photo_path, 3600)).data?.signedUrl || null) : null;
     out.readiness = readiness(out);
     out.stage_titles = Object.fromEntries(STAGES);
     out.destinations = DESTINATIONS;

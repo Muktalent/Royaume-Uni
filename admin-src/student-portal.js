@@ -1,9 +1,10 @@
 // student-portal-v1 · GLOBAL PASSPORT — MY GLOBAL JOURNEY (student side).
 import {E,gi,btn,ring,avatar,countrySelect,countryName,iso,fmtDate,ago,daysUntil,linkCss,idleLogout,reducedMotion} from './gp-ui.js';
 import {gateLang} from './gateway.js';
+import {openMessenger,openNotifications,heartButton,watchNotifications,setDot,hideOnScroll,linkChatCss} from './muk-chat.js';
 
 const TX={
- en:{brand:'GLOBAL PASSPORT',journeyTitle:'My Global Journey',pages:{journey:'Journey',documents:'Documents',plan:'Plan',messages:'Messages',profile:'Profile'},
+ en:{photoAdd:'Add photo',photoChange:'Change photo',photoBusy:'Uploading…',photoHint:'JPG, PNG or WebP · max 5 MB',ppType:'Type',ppCode:'Code',ppNo:'Passport No.',surname:'Surname',given:'Given names',ppNat:'Nationality',ppDob:'Date of birth',ppDest:'Destination',ppIssue:'Date of issue',ppAuth:'Authority',ppSign:'Holder’s signature',ppFile:'File',language:'Language',notifications:'Notifications',brand:'GLOBAL PASSPORT',journeyTitle:'My Global Journey',pages:{journey:'Journey',documents:'Documents',plan:'Plan',messages:'Messages',profile:'Profile'},
   destination:'Destination',university:'University',programme:'Programme',intake:'Intake',status:'Application status',readiness:'Application readiness',counsellor:'Your counsellor',noCounsellor:'Being assigned',noCounsellorText:'We are matching you with the right counsellor. You will hear from us within 2 working days.',
   toChoose:'To be selected with your counsellor',pendingDocs:'Pending documents',nextDates:'Upcoming dates',noDates:'No dates yet. Your counsellor will add deadlines here.',latest:'Latest from your counsellor',message:'Message',write:'Write a message…',send:'Send',
   stage:{done:'Completed',in_progress:'In progress',pending:'Pending'},doc:{requested:'To upload',uploaded:'In review',approved:'Approved',rejected:'Needs changes'},upload:'Upload',replace:'Replace',view:'View',uploading:'Uploading…',uploaded:'Uploaded. Your counsellor will review it.',fileRule:'PDF, JPG, PNG or WebP · max 10 MB',tooBig:'This file is larger than 10 MB.',badType:'Use PDF, JPG, PNG or WebP.',
@@ -13,7 +14,7 @@ const TX={
   destinations:'Destinations',active:'Active',soon:'Coming soon',signOut:'Sign out',website:'Back to website',refresh:'Refresh',swipe:'Swipe left or right to move between sections',updated:'Updated',you:'You',system:'Update',empty:'No messages yet. Say hello to your counsellor.',
   ob:{step:'Step {a} of {b}',where:'Where do you want to study?',whereText:'Global Passport opens with the United Kingdom. Canada and the USA are on the way.',from:'Where are you from?',fromText:'We are preparing MUK Talent for students from every country. This helps us assign the right counsellor and documents.',
    plan:'Your study plan',planText:'A first idea is enough. Your counsellor will refine it with you.',confirm:'Open my Global Passport',confirmText:'Your counsellor is assigned automatically as soon as your file is created.',consent:'I agree that MUK Talent stores my file to support my application, as described in the privacy policy.',next:'Continue',back:'Back',create:'Create my Global Passport',creating:'Creating your file…',assigned:'Your counsellor',welcome:'Welcome, {name}',chooseLevel:'Choose a level',intakePh:'e.g. September 2027',subjectPh:'e.g. Computer Science',englishPh:'e.g. IELTS 6.5 / not yet',choose:'Choose…'}},
- fr:{brand:'GLOBAL PASSPORT',journeyTitle:'Mon parcours international',pages:{journey:'Parcours',documents:'Documents',plan:'Plan',messages:'Messages',profile:'Profil'},
+ fr:{photoAdd:'Ajouter photo',photoChange:'Changer la photo',photoBusy:'Envoi…',photoHint:'JPG, PNG ou WebP · 5 Mo max',ppType:'Type',ppCode:'Code',ppNo:'N° de passeport',surname:'Nom',given:'Prénoms',ppNat:'Nationalité',ppDob:'Date de naissance',ppDest:'Destination',ppIssue:'Date de délivrance',ppAuth:'Autorité',ppSign:'Signature du titulaire',ppFile:'Dossier',language:'Langue',notifications:'Notifications',brand:'GLOBAL PASSPORT',journeyTitle:'Mon parcours international',pages:{journey:'Parcours',documents:'Documents',plan:'Plan',messages:'Messages',profile:'Profil'},
   destination:'Destination',university:'Université',programme:'Programme',intake:'Rentrée',status:'Statut de la candidature',readiness:'Préparation du dossier',counsellor:'Votre conseiller',noCounsellor:'Attribution en cours',noCounsellorText:'Nous vous attribuons le bon conseiller. Vous aurez de nos nouvelles sous 2 jours ouvrés.',
   toChoose:'À choisir avec votre conseiller',pendingDocs:'Documents en attente',nextDates:'Dates importantes',noDates:'Pas encore de dates. Votre conseiller ajoutera vos échéances ici.',latest:'Dernières nouvelles',message:'Message',write:'Écrire un message…',send:'Envoyer',
   stage:{done:'Terminé',in_progress:'En cours',pending:'En attente'},doc:{requested:'À envoyer',uploaded:'En vérification',approved:'Validé',rejected:'À corriger'},upload:'Envoyer',replace:'Remplacer',view:'Voir',uploading:'Envoi…',uploaded:'Envoyé. Votre conseiller va le vérifier.',fileRule:'PDF, JPG, PNG ou WebP · 10 Mo max',tooBig:'Le fichier dépasse 10 Mo.',badType:'Utilisez PDF, JPG, PNG ou WebP.',
@@ -38,8 +39,12 @@ export async function mountStudentPortal({api,client,who,onLogout}){
  let lang=gateLang();const tx=()=>TX[lang]||TX.en;const L=k=>k.split('.').reduce((o,p)=>o?.[p],tx())??k.split('.').reduce((o,p)=>o?.[p],TX.en)??k;const fill=(s,v)=>String(s).replace(/\{(\w+)\}/g,(_,k)=>v[k]??'');
  const root=E('div',undefined,'gp-app');root.id='studentPortal';root.lang=lang;document.body.append(root);
  const theme=document.querySelector('meta[name=theme-color]');if(theme)theme.content='#070a0f';
- const logout=async()=>{root.remove();await onLogout();};
- idleLogout(root,logout);
+ const logout=async()=>{watcher?.stop();root.remove();await onLogout();};
+ idleLogout(root,logout);linkChatCss();
+ let summary=null,watcher=null,dockEl=null;
+ const paintDots=()=>{root.querySelectorAll('.mkc-heart').forEach(b=>setDot(b,summary));const n=summary?.chat_unread||0;root.querySelectorAll('[data-gp-msg]').forEach(b=>{b.querySelector('.gp-badge')?.remove();if(n)b.append(E('i',n>9?'9+':n,'gp-badge'));});};
+ const openChat=()=>openMessenger({api,lang,onChange:()=>watcher?.refresh()});
+ const openNotif=()=>openNotifications({api,lang,summary,onOpenChat:openChat,onChange:()=>watcher?.refresh()});
  let data=null,page='journey',openStage=null;const pages=()=>['journey','documents','plan','messages','profile'].map(id=>[id,L('pages.'+id)]);
  const stageName=k=>lang==='fr'?STAGE_FR[k]:(data?.stage_titles?.[k]||k);
  const destName=k=>lang==='fr'?DEST_FR[k]:({UK:'United Kingdom',CA:'Canada',US:'United States'}[k]);
@@ -48,7 +53,7 @@ export async function mountStudentPortal({api,client,who,onLogout}){
  if(who.kind==='new'){onboarding();return;}
  await load();
 
- async function load(silent){try{data=(await api('/api/passport/me')).data;render();}catch(e){if(!silent){root.replaceChildren(errorView(e.message));}}}
+ async function load(silent){try{data=(await api('/api/passport/me')).data;render();if(!watcher)watcher=watchNotifications(api,x=>{summary=x;paintDots();});}catch(e){if(!silent){root.replaceChildren(errorView(e.message));}}}
  function errorView(text){const w=E('div',undefined,'gp-error');w.append(gi('alert'),E('h2','Global Passport'),E('p',text),btn(L('refresh'),()=>load(),'gp-btn gp-primary','refresh'),btn(L('signOut'),logout,'gp-btn gp-ghost','logout'));return w;}
 
  // ---------------- Onboarding ----------------
@@ -88,25 +93,27 @@ export async function mountStudentPortal({api,client,who,onLogout}){
   card.append(btn(L('journeyTitle'),()=>render(),'gp-btn gp-primary','chevron'));s.append(card);root.replaceChildren(s);}
  function input(id,value,set,attrs={}){const i=E('input');i.id=id;i.value=value||'';for(const [k,val]of Object.entries(attrs))i[k]=val;i.oninput=()=>set(i.value);return i;}
  function field(label,control){const w=E('div',undefined,'gp-field');const l=E('label',label);l.htmlFor=control.id;w.append(l,control);return w;}
+ function langMenu(after){const box=E('div',undefined,'gp-langm');const b=E('button',undefined,'gp-langm-btn');b.type='button';b.setAttribute('aria-haspopup','true');b.setAttribute('aria-expanded','false');b.setAttribute('aria-label',L('language')+' : '+(lang==='fr'?'Français':'English'));b.append(gi('globe'),E('span',lang.toUpperCase(),'gp-langm-code'));const menu=E('div',undefined,'gp-langm-menu');menu.setAttribute('role','menu');menu.hidden=true;
+  for(const [code,name] of [['en','English'],['fr','Français']]){const o=E('button',undefined);o.type='button';o.setAttribute('role','menuitemradio');o.setAttribute('aria-checked',String(lang===code));o.lang=code;o.append(E('b',code.toUpperCase()),E('span',name));o.onclick=()=>{lang=code;try{localStorage.setItem('gp-lang',code);}catch{}root.lang=code;after();};menu.append(o);}
+  const shut=e=>{if(!box.contains(e.target)){menu.hidden=true;b.setAttribute('aria-expanded','false');document.removeEventListener('click',shut,true);}};b.onclick=()=>{menu.hidden=!menu.hidden;b.setAttribute('aria-expanded',String(!menu.hidden));if(!menu.hidden)document.addEventListener('click',shut,true);};box.onkeydown=e=>{if(e.key==='Escape'){menu.hidden=true;b.setAttribute('aria-expanded','false');b.focus();}};box.append(b,menu);return box;}
  function langToggle(after){const g=E('div',undefined,'gp-lang');g.setAttribute('role','group');g.setAttribute('aria-label','Language');for(const code of ['en','fr']){const b=E('button',code.toUpperCase());b.type='button';b.setAttribute('aria-pressed',String(lang===code));b.onclick=()=>{lang=code;try{localStorage.setItem('gp-lang',code);}catch{}root.lang=code;after();};g.append(b);}return g;}
 
  // ---------------- Dashboard shell ----------------
  // mainEl declared at mount start
  function render(dir){
   const s=data.student;root.replaceChildren();root.lang=lang;
-  const top=E('header',undefined,'gp-top');const brand=E('div',undefined,'gp-top-brand');const wm=E('img',undefined,'gp-logo');wm.src='/assets/brand/logo.svg';wm.alt='MUK Talent';wm.width=374;wm.height=72;brand.append(wm,E('b',L('brand')));
-  const right=E('div',undefined,'gp-top-right');const webTop=E('a','\u2190','gp-webtop');webTop.href='/';webTop.setAttribute('aria-label',L('website'));webTop.title=L('website');const ref=E('span',s.reference,'gp-ref');right.append(webTop,ref,langToggle(()=>render()),btn('',()=>load(),'gp-icon-btn','refresh'));
-  const me=btn('',null,'gp-me');me.append(avatar(s.full_name));me.setAttribute('aria-label',L('signOut'));me.onclick=()=>{if(confirm(L('signOut')+'?'))logout();};right.append(me);top.append(brand,right);
-  const side=E('nav',undefined,'gp-side');side.setAttribute('aria-label','Global Passport');for(const [id,label]of pages()){const b=btn(label,()=>go(id),'gp-side-btn',{journey:'globe',documents:'doc',plan:'calendar',messages:'chat',profile:'user'}[id]);if(id===page)b.setAttribute('aria-current','page');if(id==='messages'){const n=unreadCount();if(n)b.append(E('i',n,'gp-badge'));}side.append(b);}
+  const top=E('header',undefined,'gp-top gp-top-ig');const brand=E('a',undefined,'gp-top-brand');brand.href='/';brand.setAttribute('aria-label',L('website'));const wm=E('img',undefined,'gp-logo');wm.src='/assets/brand/logo.svg';wm.alt='MUK Talent';wm.width=374;wm.height=72;brand.append(wm);
+  const right=E('div',undefined,'gp-top-right');const heart=heartButton(lang,openNotif);heart.classList.add('gp-heart');right.append(langMenu(()=>render()),heart);top.append(brand,right);hideOnScroll(top);
+  const side=E('nav',undefined,'gp-side');side.setAttribute('aria-label','Global Passport');for(const [id,label]of pages()){const b=btn(label,()=>go(id),'gp-side-btn',{journey:'globe',documents:'doc',plan:'calendar',messages:'chat',profile:'user'}[id]);if(id===page)b.setAttribute('aria-current','page');if(id==='messages')b.dataset.gpMsg='1';side.append(b);}
   const webSide=E('a','\u2190 '+L('website'),'gp-side-btn gp-side-web');webSide.href='/';side.append(webSide);const out=btn(L('signOut'),logout,'gp-side-btn gp-side-out','logout');side.append(out);
   mainEl=E('main',undefined,'gp-main');mainEl.dataset.page=page;if(dir&&!reducedMotion())mainEl.classList.add('enter-'+dir);
   const head=E('div',undefined,'gp-page-head');head.append(E('p',page==='journey'?L('brand')+' · '+destName(s.destination).toUpperCase():L('journeyTitle').toUpperCase(),'gp-kicker'),E('h1',page==='journey'?L('journeyTitle'):L('pages.'+page)));mainEl.append(head);
   ({journey,documents,plan,messages,profile})[page]();
-  const dock=E('nav',undefined,'gp-dock');dock.setAttribute('aria-label','Global Passport');for(const [id,label]of pages()){const b=E('button',undefined);b.type='button';b.append(gi({journey:'globe',documents:'doc',plan:'calendar',messages:'chat',profile:'user'}[id]),E('small',label));if(id===page)b.setAttribute('aria-current','page');b.onclick=()=>go(id);dock.append(b);}
-  root.append(top,side,mainEl,dock);
+  if(!dockEl){dockEl=E('nav',undefined,'gp-dock gp-dock-ig');}const dock=dockEl;dock.replaceChildren();dock.setAttribute('aria-label','Global Passport');for(const [id,label]of pages()){const b=E('button',undefined);b.type='button';b.setAttribute('aria-label',label);b.title=label;b.append(gi({journey:'globe',documents:'doc',plan:'calendar',messages:'chat',profile:'user'}[id]),E('small',label));if(id===page)b.setAttribute('aria-current','page');if(id==='messages')b.dataset.gpMsg='1';b.onclick=()=>go(id);dock.append(b);}
+  root.append(top,side,mainEl,dock);paintDots();
  }
  function step(d){const ids=pages().map(p=>p[0]);const i=ids.indexOf(page)+d;if(i<0||i>=ids.length)return;go(ids[i],d>0?'left':'right');}
- function go(id,dir){if(id===page)return;const ids=pages().map(p=>p[0]);dir=dir||(ids.indexOf(id)>ids.indexOf(page)?'left':'right');page=id;render(dir);window.scrollTo({top:0});if(id==='messages')load(true);}
+ function go(id,dir){if(id==='messages'){openChat();return;}if(id===page)return;const ids=pages().map(p=>p[0]);dir=dir||(ids.indexOf(id)>ids.indexOf(page)?'left':'right');page=id;render(dir);window.scrollTo({top:0});if(id==='messages')load(true);}
  function unreadCount(){return 0;}
  function statusPill(st){const p=E('span',L('st.'+st),'gp-status gp-status-'+st);p.prepend(E('i'));return p;}
 
@@ -114,11 +121,7 @@ export async function mountStudentPortal({api,client,who,onLogout}){
  function journey(){
   const s=data.student,c=data.counsellor;
   const hero=E('section',undefined,'gp-hero');
-  const pass=E('article',undefined,'gp-passport');pass.setAttribute('aria-label','Global Passport '+s.reference);
-  const ptop=E('div',undefined,'gp-pp-top');const f=E('span',undefined,'gp-flag gp-flag-'+s.destination.toLowerCase());f.setAttribute('aria-hidden','true');ptop.append(E('span','GLOBAL PASSPORT','gp-pp-title'),f);
-  const pbody=E('div',undefined,'gp-pp-body');const photo=avatar(s.full_name,null,'gp-avatar gp-pp-photo');const id=E('dl',undefined,'gp-pp-id');
-  for(const [k,val]of [['Name / Nom',s.full_name],['Nationality',countryName(s.nationality,lang)],['Destination',destName(s.destination)],['File no.',s.reference]]){id.append(E('dt',k),E('dd',val));}
-  pbody.append(photo,id);const mrz=E('p',mrzLine(s),'gp-mrz');mrz.setAttribute('aria-hidden','true');pass.append(ptop,pbody,mrz,E('span',undefined,'gp-pp-holo'));
+  const pass=passportPage(s);
   const ready=E('article',undefined,'gp-ready');ready.append(E('p',L('readiness'),'gp-kicker'),ring(data.readiness,'xl'));const done=data.documents.filter(d=>d.required&&d.status==='approved').length,req=data.documents.filter(d=>d.required).length;ready.append(E('p',fill(L('docsDone'),{a:done,b:req}),'gp-muted'),statusPill(s.application_status));
   hero.append(pass,ready);mainEl.append(hero);
   const facts=E('section',undefined,'gp-facts');
@@ -135,6 +138,32 @@ export async function mountStudentPortal({api,client,who,onLogout}){
   const map=E('section',undefined,'gp-panel gp-map-panel');map.append(E('p',L('journeyTitle'),'gp-kicker'));map.append(journeyMap(false));mainEl.append(map);
   const last=data.messages.filter(m=>m.sender_role!=='student').slice(-1)[0];if(last){const l=E('section',undefined,'gp-panel gp-latest');l.append(E('p',L('latest'),'gp-kicker'),E('p',last.body,'gp-latest-body'),E('small',ago(last.created_at,lang),'gp-muted'));l.onclick=()=>go('messages');mainEl.append(l);}
  }
+ function passportPage(s){
+  const pass=E('article',undefined,'gp-passport gp-pp2');pass.setAttribute('aria-label','Global Passport '+s.reference);
+  const band=E('header',undefined,'gp-pp2-band');const t=E('div',undefined,'gp-pp2-issuer');t.append(E('strong','MUK TALENT'),E('span','GLOBAL PASSPORT · PASSEPORT'));const f=E('span',undefined,'gp-flag gp-flag-'+s.destination.toLowerCase());f.setAttribute('aria-hidden','true');band.append(t,f);
+  const grid=E('div',undefined,'gp-pp2-grid');
+  const ph=E('figure',undefined,'gp-pp2-photo');if(data.photo_url){const img=E('img');img.src=data.photo_url;img.alt=s.full_name;img.decoding='async';img.onerror=()=>{img.remove();ph.classList.add('is-empty');};ph.append(img);}else ph.classList.add('is-empty');
+  const sil=E('span',undefined,'gp-pp2-sil');sil.setAttribute('aria-hidden','true');sil.append(gi('user'));ph.append(sil);
+  const up=E('label',undefined,'gp-pp2-up');const fi=E('input');fi.type='file';fi.accept='image/jpeg,image/png,image/webp';fi.setAttribute('aria-label',data.photo_url?L('photoChange'):L('photoAdd'));const upTxt=E('span',data.photo_url?L('photoChange'):L('photoAdd'));up.append(gi('upload'),upTxt,fi);up.title=L('photoHint');ph.append(up);
+  fi.onchange=async()=>{const file=fi.files?.[0];if(!file)return;const mime=file.type;if(!['image/jpeg','image/png','image/webp'].includes(mime)||file.size>5*1024*1024){alert(L('photoHint'));fi.value='';return;}up.classList.add('is-busy');upTxt.textContent=L('photoBusy');
+   try{const st=(await api('/api/passport/photo/start',{method:'POST',body:JSON.stringify({mime,size:file.size})})).data;const r=await fetch(st.signed_url,{method:'PUT',headers:{'Content-Type':mime,'x-upsert':'false'},body:file});if(!r.ok)throw new Error(L('photoHint'));const fin=(await api('/api/passport/photo/finish',{method:'POST',body:JSON.stringify({path:st.path,mime})})).data;data.photo_url=fin.photo_url;render();}
+   catch(err){alert(err.message);up.classList.remove('is-busy');upTxt.textContent=data.photo_url?L('photoChange'):L('photoAdd');}finally{fi.value='';}};
+  const parts=String(s.full_name||'').trim().split(/\s+/);const surname=(parts.length>1?parts.slice(-1):parts).join(' ').toUpperCase(),given=(parts.length>1?parts.slice(0,-1).join(' '):'').toUpperCase()||'—';
+  const dfmt=v=>{if(!v)return '—';const d=new Date(String(v).length===10?v+'T12:00:00Z':v);return Number.isNaN(d.getTime())?'—':new Intl.DateTimeFormat(lang==='fr'?'fr-FR':'en-GB',{day:'2-digit',month:'short',year:'numeric',timeZone:'UTC'}).format(d).toUpperCase().replace(/\./g,'');};
+  const dl=E('div',undefined,'gp-pp2-fields');const cell=(k,v,cls='')=>{const c=E('div',undefined,'gp-pp2-f '+cls);c.append(E('small',k),E('b',v));dl.append(c);};
+  cell(L('ppType')+' / Type','P','is-s');cell(L('ppCode')+' / Code','MUK','is-s');cell(L('ppNo')+' / No.',s.reference,'is-no');
+  cell(L('surname')+' / Surname',surname,'is-w');cell(L('given')+' / Given names',given,'is-w');
+  cell(L('ppNat'),(countryName(s.nationality,lang)||s.nationality||'—').toUpperCase(),'is-w');cell(L('ppDob'),dfmt(s.date_of_birth));cell(L('ppDest'),(destName(s.destination)||'').toUpperCase());
+  cell(L('ppIssue'),dfmt(s.created_at));cell(L('ppAuth'),'MUK TALENT UK');
+  const sig=E('div',undefined,'gp-pp2-sign');sig.append(E('small',L('ppSign')),E('span',s.full_name,'gp-pp2-sig'));
+  const info=E('div',undefined,'gp-pp2-info');info.append(dl,sig);grid.append(ph,info);
+  const mrz=E('div',undefined,'gp-pp2-mrz');mrz.setAttribute('aria-hidden','true');for(const line of mrz2(s))mrz.append(E('span',line));
+  const seal=E('span',undefined,'gp-pp2-seal');seal.setAttribute('aria-hidden','true');const sm=E('img');sm.src='/assets/brand/mark-gold.svg';sm.alt='';seal.append(sm);
+  pass.append(band,grid,mrz,seal,E('span',undefined,'gp-pp-holo'));return pass;}
+ function mrz2(s){const cl=v=>String(v||'').normalize('NFKD').replace(/[^A-Za-z0-9 ]/g,'').toUpperCase().trim().replace(/\s+/g,'<');const w=[7,3,1];const val=c=>c==='<'?0:/\d/.test(c)?+c:c.charCodeAt(0)-55;const chk=v=>String([...v].reduce((a,c,i)=>a+val(c)*w[i%3],0)%10);
+  const n=cl(s.full_name).split('<').filter(Boolean);const sur=n.length>1?n.slice(-1)[0]:n[0]||'';const giv=n.length>1?n.slice(0,-1).join('<'):'';const l1=('P<MUK'+sur+'<<'+giv).padEnd(44,'<').slice(0,44);
+  const no=cl(s.reference).replace(/</g,'').padEnd(9,'<').slice(0,9);const nat=(cl(s.nationality)+'<').padEnd(3,'<').slice(0,3);const dob=s.date_of_birth?s.date_of_birth.slice(2,4)+s.date_of_birth.slice(5,7)+s.date_of_birth.slice(8,10):'<<<<<<';const exp=(()=>{const d=new Date(s.created_at||Date.now());d.setUTCFullYear(d.getUTCFullYear()+5);return d.toISOString().slice(2,4)+d.toISOString().slice(5,7)+d.toISOString().slice(8,10);})();
+  const body=no+chk(no)+nat+dob+chk(dob)+'<'+exp+chk(exp);const l2=(body+'MUKTALENT').padEnd(42,'<').slice(0,42);return [l1,l2+chk(l2.slice(0,10)+l2.slice(13,20)+l2.slice(21,43))+'<'];}
  function mrzLine(s){const clean=v=>String(v||'').normalize('NFKD').replace(/[^A-Za-z ]/g,'').toUpperCase().trim().replace(/\s+/g,'<');const n=clean(s.full_name).split('<');return ('P<'+(s.destination==='UK'?'GBR':s.destination)+(n.slice(-1)[0]||'')+'<<'+n.slice(0,-1).join('<')).padEnd(44,'<').slice(0,44)+'\n'+(s.reference.replace(/-/g,'')+'<'+s.nationality+'<MUKTALENT').padEnd(44,'<').slice(0,44);}
  function fact(ic,label,value,muted){const a=E('article',undefined,'gp-fact'+(muted?' is-muted':''));const i=E('span',undefined,'gp-fact-i');i.append(gi(ic));a.append(i,E('small',label),E('strong',value));return a;}
  function panelHead(title,more){const h=E('div',undefined,'gp-panel-head');h.append(E('h2',title));if(more)h.append(btn('',more,'gp-icon-btn','chevron'));return h;}
