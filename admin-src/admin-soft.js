@@ -1,7 +1,7 @@
 // admin-soft-v1 · MUK Soft look for the administration panel: overview hero, team payroll and mobile dock.
 const E=(t,v,c)=>{const n=document.createElement(t);if(v!==undefined&&v!==null)n.textContent=String(v);if(c)n.className=c;return n;};
 const mad=v=>new Intl.NumberFormat('es-ES',{maximumFractionDigits:0,useGrouping:'always'}).format(Math.round(v||0))+' MAD';
-function chrome(){document.documentElement.classList.add('mt-soft');let m=document.querySelector('meta[name=theme-color]');if(!m){m=E('meta');m.name='theme-color';document.head.append(m);}m.content='#efe8dc';for(const [n,c]of [['apple-mobile-web-app-capable','yes'],['mobile-web-app-capable','yes'],['apple-mobile-web-app-status-bar-style','black-translucent']])if(!document.querySelector('meta[name='+n+']')){const x=E('meta');x.name=n;x.content=c;document.head.append(x);}}
+function chrome(){document.documentElement.classList.add('mt-soft');let m=document.querySelector('meta[name=theme-color]');if(!m){m=E('meta');m.name='theme-color';document.head.append(m);}m.content='#f6f4ef';for(const [n,c]of [['apple-mobile-web-app-capable','yes'],['mobile-web-app-capable','yes'],['apple-mobile-web-app-status-bar-style','default']])if(!document.querySelector('meta[name='+n+']')){const x=E('meta');x.name=n;x.content=c;document.head.append(x);}}
 export function mountAdminSoft({api,getState,navigate}){
  chrome();const shell=document.getElementById('appShell');shell.classList.add('admin-soft');
  const overview=document.getElementById('overview'),metrics=document.getElementById('metrics');let busy=false,stamp=0;
@@ -22,6 +22,4 @@ export function mountAdminSoft({api,getState,navigate}){
   finally{busy=false;}
  }
  new MutationObserver(()=>{if(!overview.hidden&&metrics.children.length)paint();}).observe(metrics,{childList:true});
- // Mobile: scroll the active section into view in the bottom dock.
- new MutationObserver(()=>{document.querySelector('#navigation .nav-button.active')?.scrollIntoView({inline:'center',block:'nearest'});}).observe(document.getElementById('navigation'),{subtree:true,attributes:true,attributeFilter:['class']});
 }

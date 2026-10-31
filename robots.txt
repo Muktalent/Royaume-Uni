@@ -1,4 +1,12 @@
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /portal/
+Disallow: /login/
+Disallow: /api/
+Disallow: /personal-admin/
+Disallow: /pipeline-share/
+Disallow: /certificates/
+Disallow: /portfolio/
 
-Sitemap: https://tusitio.com/sitemap.xml
+Sitemap: https://www.muktalent.com/sitemap.xml

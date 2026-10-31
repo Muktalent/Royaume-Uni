@@ -1,5 +1,5 @@
 // student-portal-v1 · GLOBAL PASSPORT — MY GLOBAL JOURNEY (student side).
-import {E,gi,btn,ring,avatar,countrySelect,countryName,iso,fmtDate,ago,daysUntil,linkCss,attachSwipe,pager,hintOnce,idleLogout,reducedMotion} from './gp-ui.js';
+import {E,gi,btn,ring,avatar,countrySelect,countryName,iso,fmtDate,ago,daysUntil,linkCss,idleLogout,reducedMotion} from './gp-ui.js';
 import {gateLang} from './gateway.js';
 
 const TX={
@@ -94,7 +94,7 @@ export async function mountStudentPortal({api,client,who,onLogout}){
  // mainEl declared at mount start
  function render(dir){
   const s=data.student;root.replaceChildren();root.lang=lang;
-  const top=E('header',undefined,'gp-top');const brand=E('div',undefined,'gp-top-brand');brand.append(E('span','MUK TALENT','gp-wm'),E('b',L('brand')));
+  const top=E('header',undefined,'gp-top');const brand=E('div',undefined,'gp-top-brand');const wm=E('img',undefined,'gp-logo');wm.src='/assets/brand/logo.svg';wm.alt='MUK Talent';wm.width=309;wm.height=72;brand.append(wm,E('b',L('brand')));
   const right=E('div',undefined,'gp-top-right');const ref=E('span',s.reference,'gp-ref');right.append(ref,langToggle(()=>render()),btn('',()=>load(),'gp-icon-btn','refresh'));
   const me=btn('',null,'gp-me');me.append(avatar(s.full_name));me.setAttribute('aria-label',L('signOut'));me.onclick=()=>{if(confirm(L('signOut')+'?'))logout();};right.append(me);top.append(brand,right);
   const side=E('nav',undefined,'gp-side');side.setAttribute('aria-label','Global Passport');for(const [id,label]of pages()){const b=btn(label,()=>go(id),'gp-side-btn',{journey:'globe',documents:'doc',plan:'calendar',messages:'chat',profile:'user'}[id]);if(id===page)b.setAttribute('aria-current','page');if(id==='messages'){const n=unreadCount();if(n)b.append(E('i',n,'gp-badge'));}side.append(b);}
@@ -102,9 +102,8 @@ export async function mountStudentPortal({api,client,who,onLogout}){
   mainEl=E('main',undefined,'gp-main');mainEl.dataset.page=page;if(dir&&!reducedMotion())mainEl.classList.add('enter-'+dir);
   const head=E('div',undefined,'gp-page-head');head.append(E('p',page==='journey'?L('brand')+' · '+destName(s.destination).toUpperCase():L('journeyTitle').toUpperCase(),'gp-kicker'),E('h1',page==='journey'?L('journeyTitle'):L('pages.'+page)));mainEl.append(head);
   ({journey,documents,plan,messages,profile})[page]();
-  root.append(top,side,mainEl,pager(pages(),page,go));
-  attachSwipe(mainEl,{onNext:()=>step(1),onPrev:()=>step(-1)});
-  if(matchMedia('(max-width: 820px)').matches)hintOnce('gp-swipe-hint',L('swipe'),root);
+  const dock=E('nav',undefined,'gp-dock');dock.setAttribute('aria-label','Global Passport');for(const [id,label]of pages()){const b=E('button',undefined);b.type='button';b.append(gi({journey:'globe',documents:'doc',plan:'calendar',messages:'chat',profile:'user'}[id]),E('small',label));if(id===page)b.setAttribute('aria-current','page');b.onclick=()=>go(id);dock.append(b);}
+  root.append(top,side,mainEl,dock);
  }
  function step(d){const ids=pages().map(p=>p[0]);const i=ids.indexOf(page)+d;if(i<0||i>=ids.length)return;go(ids[i],d>0?'left':'right');}
  function go(id,dir){if(id===page)return;const ids=pages().map(p=>p[0]);dir=dir||(ids.indexOf(id)>ids.indexOf(page)?'left':'right');page=id;render(dir);window.scrollTo({top:0});if(id==='messages')load(true);}

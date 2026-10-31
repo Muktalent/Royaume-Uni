@@ -12,9 +12,9 @@
 html[data-theme="dark"]{
   --v6-ink:#e9f0ec;--v6-text:#c9d6d1;--v6-muted:#9db0aa;--v6-paper:#0b1413;--v6-surface:#111d1b;--v6-surface-2:#16241f;
   --v6-line:#233632;--v6-accent:#7fd6bd;--v6-accent-strong:#a5e6d3;--v6-gold:#e2c07a;
-  --v6-grad:linear-gradient(115deg,#5cc9ab 0%,#8fdcc4 48%,#e2c07a 100%);
-  --v6-grad-soft:linear-gradient(115deg,#5cc9ab 0%,#e2c07a 100%);
-  --v6-grad-text:#06201b;--v6-glow:rgba(127,214,189,.14);--v6-dot:rgba(233,240,236,.075);
+  --v6-grad:linear-gradient(115deg,#d4b06a 0%,#e2c07a 50%,#c9a25a 100%);
+  --v6-grad-soft:linear-gradient(115deg,#7fd6bd 0%,#e2c07a 100%);
+  --v6-grad-text:#0d2224;--v6-glow:rgba(127,214,189,.14);--v6-dot:rgba(233,240,236,.075);
   --v6-header:rgba(11,20,19,.74);--v6-shadow:0 18px 50px rgba(0,0,0,.42);--v6-shadow-lg:0 30px 80px rgba(0,0,0,.55);
   color-scheme:dark;
 }
@@ -42,7 +42,7 @@ html[data-theme="dark"] .header.v6-header.v6-scrolled{box-shadow:0 12px 34px rgb
 html[data-theme="dark"] .header .dropdown-menu{background:rgba(17,29,27,.96)!important}
 .header .dropdown-menu a{border-radius:12px;transition:background-color .2s ease,color .2s ease,padding .25s var(--v6-ease)}
 .header .dropdown-menu a:hover{background:var(--v6-glow);padding-inline-start:22px}
-html[data-theme="dark"] .logo img,html[data-theme="dark"] .v6-footer-logo img,html[data-theme="dark"] header .brand img{content:url("/assets/logo-muk-talent-light.png")}
+html[data-theme="dark"] .logo img,html[data-theme="dark"] .v6-footer-logo img,html[data-theme="dark"] header .brand img{content:url("/assets/brand/logo-light.svg")}
 .header-right{gap:10px}
 .header .header-cta{transition:border-color .25s ease,color .25s ease,background-color .25s ease}
 .header .header-cta:hover{border-color:var(--v6-accent)!important;color:var(--v6-accent)!important;background:transparent!important}
@@ -236,7 +236,7 @@ footer.v6-footer::after{content:"";position:absolute;z-index:-1;width:720px;heig
 .v6-btn-ghost svg{width:17px;height:17px}
 .v6-footer-grid{display:grid;grid-template-columns:minmax(0,1.5fr) repeat(3,minmax(0,1fr));gap:40px;padding:clamp(48px,6vw,72px) 0 clamp(36px,5vw,56px)}
 .v6-footer-logo{display:inline-block}
-.v6-footer-logo img{display:block;width:auto;height:54px;content:url("/assets/logo-muk-talent-light.png")}
+.v6-footer-logo img{display:block;width:auto;height:54px;content:url("/assets/brand/logo-light.svg")}
 .v6-footer-badge{display:inline-flex;margin:20px 0 0;padding:6px 12px;border:1px solid rgba(226,192,122,.35);border-radius:999px;color:#e2c07a;font-size:11px;font-weight:600;letter-spacing:.06em}
 .v6-footer-brand p{max-width:380px;margin:16px 0 0;color:var(--f-muted);font-size:14px}
 .v6-footer-contact{display:grid;gap:10px;margin:22px 0 0;padding:0;list-style:none;font-size:14px}
@@ -434,3 +434,4 @@ html[data-theme="dark"] .v6a-send{background:linear-gradient(135deg,#5cc9ab,#8fd
   .v6a-form textarea{font-size:16px}
 }
 @media print{.v6a{display:none!important}}
+

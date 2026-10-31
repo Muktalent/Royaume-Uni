@@ -1,71 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <!-- HOME -->
-  
-
-  <!-- ABOUT -->
-  
-
-  <!-- STUDY IN UK -->
-  <url>
-    <loc>https://muktalent.com/study-in-uk/</loc>
-    <lastmod>2026-05-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- SERVICES MAIN -->
-  
-
-  <!-- UNIVERSITY APPLICATIONS -->
-  
-
-  <!-- STUDENT VISA -->
-  
-
-  <!-- ACCOMMODATION -->
-  
-
-  <!-- IELTS -->
-  
-
-  <!-- SCHOLARSHIPS -->
-  
-
-  <!-- UNIVERSITIES -->
-  <url>
-    <loc>https://muktalent.com/universities/</loc>
-    <lastmod>2026-05-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
-
-  <!-- GUIDES -->
-  <url>
-    <loc>https://muktalent.com/guides/</loc>
-    <lastmod>2026-05-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-
-  <!-- CONTACT -->
-  
-
-  <url><loc>https://muktalent.com/</loc></url>
-  <url><loc>https://muktalent.com/about-us/</loc></url>
-  <url><loc>https://muktalent.com/services/</loc></url>
-  <url><loc>https://muktalent.com/services/university-applications/</loc></url>
-  <url><loc>https://muktalent.com/services/student-visa-support/</loc></url>
-  <url><loc>https://muktalent.com/services/accommodation-support/</loc></url>
-  <url><loc>https://muktalent.com/contact/</loc></url>
-  <url><loc>https://muktalent.com/evaluation/</loc></url>
-<url><loc>https://muktalent.com/institutions/</loc></url>
-<url><loc>https://muktalent.com/services/document-translation/</loc></url>
-<url><loc>https://muktalent.com/legal/</loc></url>
-<url><loc>https://muktalent.com/privacy/</loc></url>
-<url><loc>https://muktalent.com/cookies/</loc></url>
-<url><loc>https://muktalent.com/terms/</loc></url>
-<url><loc>https://muktalent.com/complaints/</loc></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url><loc>https://www.muktalent.com/</loc><lastmod>2026-10-31</lastmod><changefreq>weekly</changefreq><priority>1.0</priority><image:image><image:loc>https://www.muktalent.com/assets/brand/og-image.jpg</image:loc></image:image></url>
+  <url><loc>https://www.muktalent.com/services/</loc><lastmod>2026-10-31</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.muktalent.com/services/university-applications/</loc><lastmod>2026-10-31</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.muktalent.com/services/student-visa-support/</loc><lastmod>2026-10-31</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://www.muktalent.com/services/accommodation-support/</loc><lastmod>2026-10-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.muktalent.com/services/document-translation/</loc><lastmod>2026-10-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.muktalent.com/evaluation/</loc><lastmod>2026-10-31</lastmod><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.muktalent.com/about-us/</loc><lastmod>2026-10-31</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.muktalent.com/contact/</loc><lastmod>2026-10-31</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://www.muktalent.com/institutions/</loc><lastmod>2026-10-31</lastmod><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://www.muktalent.com/privacy/</loc><lastmod>2026-10-31</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://www.muktalent.com/terms/</loc><lastmod>2026-10-31</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://www.muktalent.com/legal/</loc><lastmod>2026-10-31</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://www.muktalent.com/cookies/</loc><lastmod>2026-10-31</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://www.muktalent.com/complaints/</loc><lastmod>2026-10-31</lastmod><changefreq>yearly</changefreq><priority>0.2</priority></url>
 </urlset>

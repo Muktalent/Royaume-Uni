@@ -31,3 +31,47 @@ dialog.muk-nav-dialog::before{content:'';position:fixed;inset:-20%;z-index:-1;po
 @media(max-width:359px){.muk-nav-dialog .muk-nav-shell{padding-inline:20px}.muk-nav-dialog .muk-nav-label{font-size:32px}.muk-nav-dialog .muk-nav-line{gap:9px}}
 @media(max-height:620px){.muk-nav-dialog .muk-nav-top{margin-bottom:24px}.muk-nav-dialog .muk-nav-line{min-height:62px;padding:12px 0}}
 @media(prefers-reduced-motion:reduce){dialog.muk-nav-dialog::before,.muk-nav-dialog .muk-nav-item,.muk-nav-dialog.muk-nav-leaving{animation:none!important;transform:none!important}.muk-nav-dialog .muk-nav-arrow{transition:none!important}}
+
+/* v10 · Menu in the site palette (paper + ink + gold), same identity as the header */
+html dialog.muk-nav-dialog{background:#f6f4ef;color:#152e36}
+html dialog.muk-nav-dialog::backdrop{background:#f6f4ef}
+html dialog.muk-nav-dialog::before{background:radial-gradient(ellipse at 90% 0,rgba(212,176,106,.18) 0,transparent 55%),radial-gradient(ellipse at 0 100%,rgba(42,117,99,.10) 0,transparent 50%),#f6f4ef}
+html .muk-nav-dialog .muk-nav-brand{display:block;width:150px;height:35px;background:url(/assets/brand/logo.svg) left center/contain no-repeat;color:transparent;font-size:0;overflow:hidden}
+html .muk-nav-dialog .muk-nav-close{border-color:#dbe1da;background:#fff;color:#152e36}
+html .muk-nav-dialog .muk-nav-close:hover{border-color:#b48a43}
+html .muk-nav-dialog .muk-nav-eyebrow{color:#b48a43;font-weight:700}
+html .muk-nav-dialog .muk-nav-item{border-top-color:#dbe1da}
+html .muk-nav-dialog .muk-nav-line{color:#152e36}
+html .muk-nav-dialog .muk-nav-index{color:#b48a43;font-weight:600}
+html .muk-nav-dialog .muk-nav-arrow{color:#b48a43}
+html .muk-nav-dialog .muk-nav-sub a{color:#2c3f42}
+html .muk-nav-dialog .muk-nav-sub a:hover{color:#152e36}
+html .muk-nav-dialog a[aria-current="page"] .muk-nav-label,.muk-nav-dialog .muk-nav-sub a[aria-current="page"]{color:#2a7563}
+html .muk-nav-dialog .muk-nav-foot{border-top-color:#dbe1da;color:#5f6f6c}
+html .muk-nav-dialog :focus-visible{outline-color:#b48a43}
+html .muk-nav-dialog .v6-nav-tools{border-top-color:#dbe1da}
+html .muk-nav-dialog .v6-nav-tools-label{color:#5f6f6c}
+html .muk-nav-dialog .v6-nav-tools .v6-icon-btn{color:#152e36;border-color:#dbe1da;background:#fff}
+html .muk-nav-dialog .v6-nav-tools .v6-icon-btn:hover{color:#152e36;border-color:#b48a43;background:#f4ecdc}
+html .muk-nav-dialog .v6-cta,.muk-nav-dialog .v6-btn-grad{background:#152e36!important;color:#fff!important;box-shadow:0 14px 30px -16px rgba(13,34,36,.6)}
+html .muk-nav-dialog .v6-cta:hover,.muk-nav-dialog .v6-btn-grad:hover{background:#1f5f51!important}
+html .muk-nav-dialog .v6-btn:not(.v6-cta):not(.v6-btn-grad),.muk-nav-dialog a.v6-btn-ghost{background:#fff;color:#152e36;border-color:#dbe1da}
+html[data-theme="dark"] dialog.muk-nav-dialog{background:#0b1413;color:#eef1ec}
+html[data-theme="dark"] dialog.muk-nav-dialog::backdrop{background:#0b1413}
+html[data-theme="dark"] dialog.muk-nav-dialog::before{background:radial-gradient(ellipse at 90% 0,rgba(226,192,122,.12) 0,transparent 55%),#0b1413}
+html[data-theme="dark"] .muk-nav-dialog .muk-nav-brand{background-image:url(/assets/brand/logo-light.svg)}
+html[data-theme="dark"] .muk-nav-dialog .muk-nav-line,html[data-theme="dark"] .muk-nav-dialog .muk-nav-close,html[data-theme="dark"] .muk-nav-dialog .v6-nav-tools .v6-icon-btn{color:#eef1ec}
+html[data-theme="dark"] .muk-nav-dialog .muk-nav-close,html[data-theme="dark"] .muk-nav-dialog .v6-nav-tools .v6-icon-btn,html[data-theme="dark"] .muk-nav-dialog .v6-btn:not(.v6-cta):not(.v6-btn-grad){background:#111d1b;border-color:#233632;color:#eef1ec}
+html[data-theme="dark"] .muk-nav-dialog .muk-nav-item,html[data-theme="dark"] .muk-nav-dialog .muk-nav-foot,html[data-theme="dark"] .muk-nav-dialog .v6-nav-tools{border-color:#233632}
+html[data-theme="dark"] .muk-nav-dialog .muk-nav-sub a{color:#c4ccc6}
+html[data-theme="dark"] .muk-nav-dialog .muk-nav-index,html[data-theme="dark"] .muk-nav-dialog .muk-nav-arrow,html[data-theme="dark"] .muk-nav-dialog .muk-nav-eyebrow{color:#e2c07a}
+html[data-theme="dark"] .muk-nav-dialog a[aria-current="page"] .muk-nav-label{color:#7fd6bd}
+html[data-theme="dark"] .muk-nav-dialog .v6-cta,html[data-theme="dark"] .muk-nav-dialog .v6-btn-grad{background:#e2c07a!important;color:#0d2224!important}
+html .muk-nav-dialog .v6-nav-login{background:#fff;color:#152e36;border:1px solid #dbe1da}
+html .muk-nav-dialog .v6-nav-login:hover{border-color:#b48a43;background:#f4ecdc}
+html .muk-nav-dialog .v6-nav-eval{background:#152e36;color:#fff;border:0;box-shadow:0 14px 30px -16px rgba(13,34,36,.6)}
+html .muk-nav-dialog .v6-nav-eval:hover{background:#1f5f51}
+html .muk-nav-dialog .v6-nav-eval .v6-arrow{stroke:#d4b06a}
+html[data-theme="dark"] .muk-nav-dialog .v6-nav-login{background:#111d1b;color:#eef1ec;border-color:#233632}
+html[data-theme="dark"] .muk-nav-dialog .v6-nav-eval{background:#e2c07a;color:#0d2224}
+html[data-theme="dark"] .muk-nav-dialog .v6-nav-eval .v6-arrow{stroke:#0d2224}

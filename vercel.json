@@ -400,6 +400,17 @@
   ],
   "redirects": [
     {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "muktalent.com"
+        }
+      ],
+      "destination": "https://www.muktalent.com/:path*",
+      "permanent": true
+    },
+    {
       "source": "/services/ielts-guidance/:path*",
       "destination": "/services/#anglais",
       "permanent": true

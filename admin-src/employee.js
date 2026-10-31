@@ -4,7 +4,6 @@ import { editQualification, manageAppointment } from './workspace-extras.js';
 import { createClient } from '@supabase/supabase-js';
 import { renderCardStudio, renderSocialEditor } from './card-studio.js';
 import { renderControlCentre } from './counsellor.js';
-import { attachSwipe, pager, hintOnce } from './gp-ui.js';
 import { icon } from '../book/business-card.js';
 const E=(t,v,c)=>{const n=document.createElement(t);if(v!==undefined)n.textContent=String(v);if(c)n.className=c;return n;};
 const states={partner:['Identified','Contacted','Meeting planned','Negotiating','Active','Not interested'],task:['To do','In progress','Done'],content:['Idea','In progress','Pending review','Published'],report:['Draft','Submitted']};
@@ -13,7 +12,7 @@ const fields={partner:[['type','Type',['Language school','Lycee','Private teache
 function dateKey(value=new Date()){const parts=new Intl.DateTimeFormat('en-GB',{timeZone:'Africa/Casablanca',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(value)),get=k=>parts.find(p=>p.type===k).value;return get('year')+'-'+get('month')+'-'+get('day');}
 function time(value,zone='Africa/Casablanca'){if(!value)return 'Not scheduled';const d=new Date(value);return Number.isNaN(d.getTime())?'Invalid date':new Intl.DateTimeFormat('en-GB',{timeZone:zone,dateStyle:'medium',timeStyle:'short'}).format(d);}
 function money(v,c){try{return new Intl.NumberFormat('en-GB',{style:'currency',currency:c,maximumFractionDigits:0}).format(v);}catch{return v+' '+c;}}
-function linkStyles(){for(const [id,href]of [['professionalStyles','/admin/professional.css'],['businessCardStyles','/book/business-card.css'],['luxuryWorkspaceStyles','/admin/luxury-workspace.css'],['mukSoftStyles','/admin/muk-soft.css'],['mukAppStyles','/admin/muk-app.css']])if(!document.getElementById(id)){const l=E('link');l.id=id;l.rel='stylesheet';l.href=href;document.head.append(l);}}
+function linkStyles(){for(const [id,href]of [['professionalStyles','/admin/professional.css'],['businessCardStyles','/book/business-card.css'],['luxuryWorkspaceStyles','/admin/luxury-workspace.css'],['mukSoftStyles','/admin/muk-soft.css'],['mukAppStyles','/admin/muk-app.css']])if(!document.getElementById(id)){const l=E('link');l.id=id;l.rel='stylesheet';l.href=href;document.head.append(l);}const b=document.getElementById('mukBrandStyles');if(b)document.head.append(b);}
 export async function mountEmployee({staff,api,onLogout,owner=null,onBack=null}){
  document.getElementById('employeeWorkspace')?.remove();linkStyles();const readOnly=Boolean(owner),root=E('div',undefined,'lux soft');root.id='employeeWorkspace';root.lang='en';softChrome();
  const sidebar=E('aside',undefined,'lx-sidebar'),brand=E('a','MUK TALENT','lx-brand');brand.href='/';sidebar.append(brand,E('p','PRIVATE TEAM WORKSPACE','lx-overline'));const nav=E('nav');nav.setAttribute('aria-label','Workspace');sidebar.append(nav);
@@ -22,8 +21,6 @@ export async function mountEmployee({staff,api,onLogout,owner=null,onBack=null})
  if(!readOnly)footer.append(button('Change password',async()=>{const changed=await requirePasswordChange({api,mandatory:false});if(changed)notice('Password changed.');}));sidebar.append(footer);
  const main=E('main',undefined,'lx-main'),header=E('header',undefined,'lx-header'),intro=E('div'),title=E('h1'),subtitle=E('p',undefined,'lx-muted');intro.append(E('p','MUK TALENT / TEAM OPERATIONS','lx-overline'),title,subtitle);const actions=E('div',undefined,'lx-actions'),refresh=button('',()=>load()),add=button('Add record',()=>{});add.classList.add('lx-primary');refresh.append(icon('refresh','lx-btn-icon'),E('span','Refresh','lx-btn-label'));refresh.setAttribute('aria-label','Refresh');actions.append(refresh,add);header.append(intro,actions);
  const status=E('p','', 'lx-status');status.setAttribute('role','status');status.setAttribute('aria-live','polite');const body=E('div',undefined,'lx-body');main.append(header,status,body);root.append(sidebar,main);document.body.append(root);
- attachSwipe(main,{onNext:()=>swipeTo(1),onPrev:()=>swipeTo(-1),canSwipe:()=>!dialogBusy&&!document.querySelector('dialog[open]')&&matchMedia('(max-width: 700px)').matches});
- if(matchMedia('(max-width: 700px)').matches)setTimeout(()=>hintOnce('lx-swipe-hint','Swipe left or right to move between sections',root),900);
  let data={records:[],leads:[],appointments:[],activity:[]},directory=null,assets=[],section='overview',busy=false,dialogBusy=false,loadVersion=0;
  let payroll={},payrollBusy={};
  let selectedDay=dateKey(),month=new Date(Number(selectedDay.slice(0,4)),Number(selectedDay.slice(5,7))-1,1),studioTab='productions';
@@ -52,15 +49,9 @@ export async function mountEmployee({staff,api,onLogout,owner=null,onBack=null})
  else if(section==='social')renderSocialEditor({...ctx,onSaved:()=>refreshDirectory()});
  else if(section==='account')account();
  else if(section==='students'){if(readOnly)body.append(E('p','Open Global Passport · Control Centre from the administration to see every student.','lx-empty'));else renderControlCentre({host:body,api,admin:staff.role==='admin',notice}).then(()=>{gpCache=null;});}
- appChrome();
  }
 
- // ---- App mode (mobile): swipe between pages, slim page indicator instead of a navigation bar ----
- let gpCache=null,lastIndex=0;
- const flatPages=()=>pages.filter(p=>!(readOnly&&p[0]==='account'));
- function appChrome(){root.querySelector('.lx-pager')?.remove();const items=groups.map(g=>[g[0],g[1]]);const nav=pager(items,group,id=>navigate(tabs[id]),'gp-pager lx-pager');const label=nav.querySelector('.gp-pager-label');const pg=pages.find(p=>p[0]===section);const g=groups.find(x=>x[0]===group);if(label&&g&&g[3].length>1)label.textContent=g[1]+' · '+pg[1];root.append(nav);
-  const i=flatPages().findIndex(p=>p[0]===section);if(i!==lastIndex&&matchMedia('(max-width: 700px)').matches&&!matchMedia('(prefers-reduced-motion: reduce)').matches){body.classList.remove('lx-enter-left','lx-enter-right');void body.offsetWidth;body.classList.add(i>lastIndex?'lx-enter-left':'lx-enter-right');}lastIndex=i;}
- function swipeTo(d){const list=flatPages(),i=list.findIndex(p=>p[0]===section)+d;if(i<0||i>=list.length)return;navigate(list[i][0]);}
+ let gpCache=null;
  function passportWidget(){const p=panel();p.classList.add('lx-passport');const head=E('div',undefined,'lx-passport-head');head.append(E('span','GLOBAL PASSPORT','lx-overline'),E('span','UK','lx-passport-flag'));p.append(head,E('h2','Your students'));const grid=E('div',undefined,'lx-passport-grid');p.append(grid);
   const paint=m=>{grid.replaceChildren();for(const [k,l]of [['assigned','Assigned'],['documents_review','Docs to review'],['attention','Need attention']]){const c=E('div',undefined,'lx-passport-stat'+(k==='attention'&&m?.[k]?' is-alert':''));c.append(E('strong',m?String(m[k]??0):'—'),E('small',l));grid.append(c);}};
   paint(gpCache);if(!gpCache&&!readOnly)api('/api/gp/students').then(r=>{gpCache=r.metrics;if(p.isConnected)paint(gpCache);}).catch(()=>{grid.replaceChildren(E('p','Global Passport is not active yet.','lx-muted'));});

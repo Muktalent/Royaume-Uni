@@ -49,7 +49,7 @@ export function iso(code){const b=E('span',code||'—','gp-iso');return b;}
 export function fmtDate(v,lang='en',opts={day:'numeric',month:'short',year:'numeric'}){if(!v)return '—';const d=new Date(String(v).length===10?v+'T12:00:00Z':v);return Number.isNaN(d.getTime())?'—':new Intl.DateTimeFormat(lang==='fr'?'fr-FR':'en-GB',{timeZone:'UTC',...opts}).format(d);}
 export function ago(v,lang='en'){const s=(Date.now()-Date.parse(v))/1000;const rtf=new Intl.RelativeTimeFormat(lang,{numeric:'auto'});if(s<60)return rtf.format(0,'second');if(s<3600)return rtf.format(-Math.round(s/60),'minute');if(s<86400)return rtf.format(-Math.round(s/3600),'hour');if(s<86400*30)return rtf.format(-Math.round(s/86400),'day');return fmtDate(v,lang);}
 export function daysUntil(day){return Math.round((Date.parse(day+'T12:00:00Z')-Date.parse(new Date().toISOString().slice(0,10)+'T12:00:00Z'))/86400000);}
-export function linkCss(id,href){if(!document.getElementById(id)){const l=E('link');l.id=id;l.rel='stylesheet';l.href=href;document.head.append(l);}}
+export function linkCss(id,href){if(!document.getElementById(id)){const l=E('link');l.id=id;l.rel='stylesheet';l.href=href;document.head.append(l);}const b=document.getElementById('mukBrandStyles');if(b)document.head.append(b);}
 export const reducedMotion=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // Horizontal swipe between pages (touch only). Ignores form fields and horizontally scrollable areas.

@@ -11,38 +11,55 @@ export function cardData(d){return {display_name:d.full_name,job_title:d.job_tit
 export function miniBadge(d,photoUrl){const wrap=E('div',undefined,'cs-mini');wrap.append(createBusinessCard({data:cardData(d),photoUrl:photoUrl??d.avatar_url,link:{display:d.card?.handle?d.card.display:null}}));return wrap;}
 
 export async function renderCardStudio({host,api,owner,readOnly,directory,openTab,onChanged}){
- const d=directory,layout=E('div',undefined,'cs-layout cs-designer'),show=E('section',undefined,'cs-showroom'),ident=E('div',undefined,'cs-ident'),stage=E('section',undefined,'cs-stage'),side=E('div',undefined,'cs-side');
- show.append(E('span',undefined,'cs-grid-bg'),ident,stage);layout.append(show,side);host.append(layout);
+ const d=directory,layout=E('div',undefined,'cs-layout cs-clean'),main=E('section',undefined,'lx-panel cs-card-panel'),side=E('div',undefined,'cs-side');
+ layout.append(main,side);host.append(layout);
  let qr=null;
  if(d.card?.published){try{qr=await api('/api/workspace/card/qr'+q(owner));}catch{qr=null;}}
  if(!host.isConnected)return;
  const data=cardData(d);if(qr?.handle)data.short_display=qr.display;
  const socials=Array.isArray(d.socials)?d.socials:[];
- identity({host:ident,d,qr,socials,readOnly,openTab});
- let editor,menu=null;
- if(qr){const extras=readOnly?[]:[{icon:'edit',label:'Edit short link',hint:'Choose muktalent.com/your-name',onSelect:()=>{editor?.focus();editor?.scrollIntoView({block:'center',behavior:'smooth'});}},{icon:'users',label:'Edit social links',hint:'LinkedIn, Instagram, TikTok…',onSelect:()=>openTab('social')}];
-  menu=createCardMenu({url:qr.url,display:qr.display,qrImage:qr.image,name:d.full_name,data,slug:qr.slug,socials,showOpen:true,extras});}
- // ClickCard layout: Wallet / Share / QR tiles, the card (two styles), then the full actions menu.
- if(menu)stage.append(createActionTiles(menu,{onEdit:readOnly?null:()=>openTab('profile')}));
- stage.append(createCardFaces({data,photoUrl:d.avatar_url,link:{display:data.short_display,url:qr?.url},socials,onSaveContact:menu?()=>menu.saveContact():null}));
- if(socials.length){const list=createSocialLinks(socials,d.full_name);list.classList.add('cs-badge-socials');stage.append(list);}
- if(menu)stage.append(menu);
- else stage.append(E('p','Preview only. Your administrator will publish your card once your professional details are ready. You can already reserve your short link.','cs-note'));
- const wallet=E('section',undefined,'lx-panel cs-panel cs-wallet');wallet.append(E('p','WALLET PASS','lx-overline'),E('h2','How it looks in Wallet'),E('p','Clients save your card to Google Wallet or Apple Wallet. The pass keeps your photo, QR code, booking and contact links.','lx-muted'),createWalletPreview({data,photoUrl:d.avatar_url,qrImage:qr?.image,display:data.short_display}));
- if(menu){const b=btn('Add to Wallet',()=>menu.openWallet(),'lx-button lx-primary');b.prepend(icon('wallet','lx-btn-icon'));wallet.append(b);}
- side.append(wallet);
- stage.append(E('p','Name, position, territory and ID are managed by MUK Talent. Your photo and work contact are in Profile.','cs-note'));
+ const head=E('div',undefined,'cs-head'),ht=E('div');ht.append(E('p','BUSINESS CARD','lx-overline'),E('h2','Your MUK Talent card'));
+ const live=E('span',d.card?.published?'Published':'Preview','cs-state'+(d.card?.published?' is-live':''));head.append(ht,live);main.append(head);
+ const card=visitCard({d,data,qr});main.append(card);
+ const flip=btn('Show back',()=>{const back=card.classList.toggle('is-back');flip.textContent=back?'Show front':'Show back';},'cs-flip');flip.prepend(icon('refresh','lx-btn-icon'));main.append(flip);
+ let editor=null,menu=null;
+ if(qr){menu=createCardMenu({url:qr.url,display:qr.display,qrImage:qr.image,name:d.full_name,data,slug:qr.slug,socials,showOpen:true,extras:readOnly?[]:[{icon:'edit',label:'Edit your domain',hint:'muktalent.com/your-name',onSelect:()=>{editor?.focus();editor?.scrollIntoView({block:'center',behavior:'smooth'});}}]});
+  const acts=E('div',undefined,'cs-actions');
+  const act=(ic,label,fn,primary)=>{const b=E('button',undefined,'cs-action'+(primary?' is-primary':''));b.type='button';b.append(icon(ic),E('span',label));b.onclick=fn;acts.append(b);};
+  act('wallet','Add to Wallet',()=>menu.openWallet(),true);act('share','Share',()=>menu.share());if(menu.showQr)act('qr','QR code',()=>menu.showQr());act('contact','Save contact',()=>menu.saveContact());act('open','Open card',()=>window.open(qr.url,'_blank','noopener,noreferrer'));
+  main.append(acts,menu);menu.classList.add('cs-menu');}
+ else main.append(E('p','Preview only. Your administrator publishes the card once your professional details are ready. You can already choose your domain.','cs-note'));
+ main.append(E('p','Name, position, territory and ID are managed by MUK Talent. Your photo and work contact are in Profile.','cs-note'));
  editor=await shortLinkPanel({host:side,api,owner,readOnly,onChanged});
  side.append(socialSummary({socials,readOnly,openTab}));
 }
 
+// Clean 85 × 55 business card · front: identity and contacts · back: QR and domain.
+function visitCard({d,data,qr}){
+ const scene=E('div',undefined,'cs-visit'),inner=E('div',undefined,'cs-visit-in');scene.append(inner);
+ const front=E('article',undefined,'cs-face cs-front');front.setAttribute('aria-label',(d.full_name||'MUK Talent')+' business card');
+ const logo=E('img',undefined,'cs-logo');logo.src='/assets/brand/logo.svg';logo.alt='MUK Talent';logo.width=309;logo.height=72;
+ const id=E('div',undefined,'cs-who');id.append(E('strong',d.full_name||'MUK Talent','cs-name'),E('span',d.job_title||'Team member','cs-role'));
+ const list=E('ul',undefined,'cs-lines');
+ const line=(ic,text)=>{if(!text)return;const li=E('li');li.append(icon(ic),E('span',text));list.append(li);};
+ line('phone',data.contact_phone);line('mail',data.contact_email);line('link',data.short_display||'muktalent.com');if(data.assigned_city)line('pin',data.assigned_city);
+ const star=E('span',undefined,'cs-star');star.setAttribute('aria-hidden','true');
+ front.append(logo,star,id,list);
+ const back=E('article',undefined,'cs-face cs-back');back.setAttribute('aria-hidden','true');
+ const mark=E('img',undefined,'cs-mark');mark.src='/assets/brand/mark-light.svg';mark.alt='';mark.width=64;mark.height=64;
+ const code=E('div',undefined,'cs-qr');if(qr?.image){const im=E('img');im.src=qr.image;im.alt='QR code '+(qr.display||'');code.append(im);}else code.append(E('span','QR after publishing','cs-qr-empty'));
+ const bt=E('div',undefined,'cs-back-text');bt.append(mark,E('strong',data.short_display||'muktalent.com'),E('small','MAGHREB · UK · TALENT'));
+ back.append(bt,code);inner.append(front,back);
+ return scene;
+}
+
 async function shortLinkPanel({host,api,owner,readOnly,onChanged}){
- const panel=E('section',undefined,'lx-panel cs-panel');panel.append(E('p','YOUR SHORT LINK','lx-overline'),E('h2','Easy to say, easy to remember'));host.append(panel);
+ const panel=E('section',undefined,'lx-panel cs-panel');panel.append(E('p','YOUR CARD DOMAIN','lx-overline'),E('h2','Choose your domain'),E('p','Your card lives at muktalent.com/your-name. Short, easy to say and printed on your QR code.','lx-muted'));host.append(panel);
  let info;try{info=(await api('/api/workspace/card-link'+q(owner))).data;}catch(error){panel.append(E('p',error.message.includes('Database')||error.message.includes('unavailable')?'Short links are not active yet. Ask your administrator to run the latest database update.':error.message,'lx-muted'));return null;}
  const current=E('div',undefined,'cs-current');const shown=E('strong',info.handle?info.host+'/'+info.handle:'Not set yet');current.append(icon('link'),shown);panel.append(current);
  if(readOnly){panel.append(E('p',info.previous.length?'Previous links still redirect: '+info.previous.map(h=>info.host+'/'+h).join(', '):'Read-only preview.','lx-muted'));return null;}
- const form=E('form',undefined,'cs-handle-form'),label=E('label','Choose your link','cs-label'),row=E('div',undefined,'cs-handle-row'),prefix=E('span',info.host+'/','cs-prefix'),input=E('input');input.id='cs-handle';label.htmlFor=input.id;input.autocomplete='off';input.spellcheck=false;input.autocapitalize='none';input.maxLength=30;input.placeholder='laura';input.value=info.handle||'';input.setAttribute('aria-describedby','cs-handle-hint');
- const save=E('button','Save link','lx-button lx-primary');save.type='submit';row.append(prefix,input);
+ const form=E('form',undefined,'cs-handle-form'),label=E('label','Your domain','cs-label'),row=E('div',undefined,'cs-handle-row'),prefix=E('span',info.host+'/','cs-prefix'),input=E('input');input.id='cs-handle';label.htmlFor=input.id;input.autocomplete='off';input.spellcheck=false;input.autocapitalize='none';input.maxLength=30;input.placeholder='laura';input.value=info.handle||'';input.setAttribute('aria-describedby','cs-handle-hint');
+ const save=E('button','Save domain','lx-button lx-primary');save.type='submit';row.append(prefix,input);
  const hint=E('p','3–30 characters: letters, numbers and single hyphens.','cs-hint');hint.id='cs-handle-hint';hint.setAttribute('aria-live','polite');
  form.append(label,row,hint);
  if(info.suggestions?.length){const chips=E('div',undefined,'cs-suggestions');chips.append(E('span','Suggestions','cs-suggest-label'));for(const s of info.suggestions){const c=btn(s,()=>{input.value=s;check();},'cs-suggestion');chips.append(c);}form.append(chips);}
@@ -86,15 +103,3 @@ export async function renderSocialEditor({host,api,owner,readOnly,onSaved}){
  const note=E('details',undefined,'cs-details');note.append(E('summary','Why links and not a login with each network?'),E('p','Signing in with Instagram, TikTok or LinkedIn would give MUK Talent access to your private account data and requires approval from each platform. Linking your public profile gives clients the same one-tap access without sharing your passwords or permissions.','lx-muted'));panel.append(note);
 }
 
-// Designer identity column: editorial name, credentials, live short link and card health.
-function identity({host,d,qr,socials,readOnly,openTab}){
- const name=d.full_name||'MUK Talent',parts=name.trim().split(/\s+/),first=parts.shift()||name,rest=parts.join(' ');
- host.append(E('p','MY CARD · DIGITAL IDENTITY','cs-kicker'));
- const h=E('h2',undefined,'cs-name');h.append(E('span',first),E('em',rest||''));host.append(h,E('p',d.job_title||'MUK Talent team','cs-role'));
- const meta=E('ul',undefined,'cs-meta');for(const [ic,v]of [['card',d.employee_code?'ID '+d.employee_code:null],['home',d.assigned_city||null],['users',d.languages||null]])if(v){const li=E('li');li.append(icon(ic),E('span',v));meta.append(li);}host.append(meta);
- const display=qr?.display||(d.card?.handle?d.card.display:null);const link=E('div',undefined,'cs-live');const dot=E('i',undefined,d.card?.published?'on':'');link.append(dot,E('span',display||'Short link not set'));
- if(display&&qr?.url){const copy=btn('Copy',async()=>{try{await navigator.clipboard.writeText(qr.url);copy.textContent='Copied';setTimeout(()=>{copy.textContent='Copy';},1600);}catch{}},'cs-live-copy');link.append(copy);}host.append(link);
- const items=[Boolean(d.avatar_url),Boolean(d.contact_phone||d.contact_email),Boolean(d.card?.handle),Boolean(socials.length),Boolean(d.card?.published)],pct=Math.round(items.filter(Boolean).length/items.length*100);
- const stats=E('dl',undefined,'cs-stats');for(const [k,v]of [['Card strength',pct+'%'],['Socials',String(socials.length)],['Status',d.card?.published?'Live':'Preview']]){const w=E('div');w.append(E('dt',k),E('dd',v));stats.append(w);}host.append(stats);
- if(!readOnly){const row=E('div',undefined,'cs-ident-actions');row.append(btn('Edit profile',()=>openTab('profile'),'lx-button'),btn('Socials',()=>openTab('social'),'lx-button'));host.append(row);}
-}

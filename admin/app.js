@@ -219,7 +219,7 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
     paint2();
   }), button("Exportar selecci\xF3n (.xlsx)", () => exportRows()), button("Crear enlace para partner", () => share()), button("Enlaces compartidos", () => shares()));
   host.append(summary, selection, actions);
-  const warning = E("p", "", "admin-report-warning"), sheet = E("div", void 0, "admin-sheet-wrap"), pager2 = E("div", void 0, "pagination"), legend = E("div", void 0, "admin-legend"), demoBanner = E("p", "EJEMPLO \xB7 datos ficticios para presentaciones. No se pueden exportar ni compartir.", "admin-demo-banner");
+  const warning = E("p", "", "admin-report-warning"), sheet = E("div", void 0, "admin-sheet-wrap"), pager = E("div", void 0, "pagination"), legend = E("div", void 0, "admin-legend"), demoBanner = E("p", "EJEMPLO \xB7 datos ficticios para presentaciones. No se pueden exportar ni compartir.", "admin-demo-banner");
   demoBanner.hidden = true;
   let demo = false;
   const demoBtn = button("Ver hoja de ejemplo", () => {
@@ -228,7 +228,7 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
     paint2();
   });
   tabs.append(demoBtn);
-  host.append(warning, legend, demoBanner, sheet, pager2);
+  host.append(warning, legend, demoBanner, sheet, pager);
   function message2(text, error = false) {
     if (!host.isConnected) return;
     notice.textContent = text;
@@ -377,7 +377,7 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
       empty.append(E("strong", "Hoja lista \xB7 a\xFAn sin casos aceptados"), E("span", "Acepta un lead real, crea un caso manual o pulsa \xABVer hoja de ejemplo\xBB para ense\xF1ar la pipeline a una universidad."));
       sheet.append(empty);
     }
-    pager2.replaceChildren();
+    pager.replaceChildren();
     const prev = button("Anterior", () => {
       if (busy) return;
       page--;
@@ -389,7 +389,7 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
     });
     prev.disabled = page <= 1;
     next.disabled = page * 50 >= result.total;
-    pager2.append(E("span", "P\xE1gina " + page + " de " + Math.max(1, Math.ceil(result.total / 50))), prev, next);
+    pager.append(E("span", "P\xE1gina " + page + " de " + Math.max(1, Math.ceil(result.total / 50))), prev, next);
   }
   async function exportRows() {
     if (demo) {
@@ -19269,7 +19269,7 @@ var GoTrueClient = class _GoTrueClient {
    * const { error } = await supabase.auth.unlinkIdentity(googleIdentity)
    * ```
    */
-  async unlinkIdentity(identity2) {
+  async unlinkIdentity(identity) {
     try {
       return await this._useSession(async (result) => {
         var _a, _b;
@@ -19277,7 +19277,7 @@ var GoTrueClient = class _GoTrueClient {
         if (error) {
           throw error;
         }
-        return await _request(this.fetch, "DELETE", `${this.url}/user/identities/${identity2.identity_id}`, {
+        return await _request(this.fetch, "DELETE", `${this.url}/user/identities/${identity.identity_id}`, {
           headers: this.headers,
           jwt: (_b = (_a = data.session) === null || _a === void 0 ? void 0 : _a.access_token) !== null && _b !== void 0 ? _b : void 0
         });
@@ -21193,7 +21193,11 @@ Object.assign(UI_PATHS, {
   refresh: ["M20 11a8 8 0 0 0-14.5-4.5L4 8", "M4 4v4h4", "M4 13a8 8 0 0 0 14.5 4.5L20 16", "M20 20v-4h-4"],
   plus: ["M12 5v14", "M5 12h14"],
   lock: ["M6 11h12v9H6z", "M8.5 11V8a3.5 3.5 0 0 1 7 0v3"],
-  logout: ["M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3", "M10 16l-4-4 4-4", "M6 12h10"]
+  logout: ["M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3", "M10 16l-4-4 4-4", "M6 12h10"],
+  pin: ["M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z", "M12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"],
+  file: ["M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z", "M14 3v5h5", "M9 13h6", "M9 17h4"],
+  chart: ["M4 20h16", "M7 16v-5", "M12 16V7", "M17 16v-8"],
+  globe: ["M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z", "M3 12h18", "M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"]
 });
 
 // book/business-card.js
@@ -21234,8 +21238,6 @@ function brandIcon(platform, cls = "mk-brand-icon") {
   s.append(p);
   return s;
 }
-var initials = (name) => String(name || "MT").trim().split(/\s+/).slice(0, 2).map((v) => v[0] || "").join("").toUpperCase();
-var reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 var sameOrigin = (value) => {
   try {
     const u = new URL(value, location.origin);
@@ -21244,70 +21246,6 @@ var sameOrigin = (value) => {
     return null;
   }
 };
-function createBusinessCard({ data = {}, photoUrl, link } = {}) {
-  const name = data.display_name || data.full_name || "MUK Talent", title = (data.job_title || "Team member").toUpperCase();
-  const scene = E2("div", void 0, "biz-scene mk-scene"), badge = E2("article", void 0, "mk-badge");
-  badge.setAttribute("aria-label", name + ", " + (data.job_title || "MUK Talent") + " \xB7 MUK Talent business card");
-  const band = E2("div", void 0, "mk-band"), bandText = E2("span", title, "mk-band-title");
-  bandText.setAttribute("aria-hidden", "true");
-  band.append(bandText);
-  badge.style.setProperty("--title-len", String(Math.max(8, title.length)));
-  badge.style.setProperty("--name-len", String(Math.max(10, name.length)));
-  const panel = E2("div", void 0, "mk-panel"), logo = E2("img", void 0, "mk-logo");
-  logo.src = "/book/muk-badge-logo.png";
-  logo.alt = "MUK Talent";
-  logo.width = 500;
-  logo.height = 291;
-  logo.decoding = "async";
-  const photo = E2("div", void 0, "mk-photo");
-  photo.append(E2("span", initials(name), "mk-initials"));
-  if (photoUrl) {
-    const img = E2("img");
-    img.alt = "Photo of " + name;
-    img.decoding = "async";
-    img.referrerPolicy = "no-referrer";
-    img.onload = () => photo.classList.add("mk-has-photo");
-    img.onerror = () => img.remove();
-    img.src = photoUrl;
-    photo.append(img);
-  }
-  const id = E2("div", void 0, "mk-id"), heading = E2("h2", name, "mk-name");
-  if (name.length > 24) heading.classList.add("mk-name-long");
-  id.append(heading);
-  const lines = E2("ul", void 0, "mk-lines");
-  lines.append(E2("li", data.employee_code ? "ID " + data.employee_code : "MUK Talent team"));
-  if (data.assigned_city) lines.append(E2("li", data.assigned_city));
-  const shown = link?.display || data.short_display;
-  if (shown) lines.append(E2("li", shown, "mk-link-line"));
-  else lines.append(E2("li", "muktalent.com"));
-  id.append(lines);
-  const sheen = E2("span", void 0, "mk-sheen");
-  sheen.setAttribute("aria-hidden", "true");
-  panel.append(logo, photo, id);
-  badge.append(band, panel, sheen);
-  scene.append(badge);
-  if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
-    let frame = 0;
-    scene.addEventListener("pointermove", (e) => {
-      if (reduced()) return;
-      const r = badge.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        badge.style.setProperty("--ry", (x * 9).toFixed(2) + "deg");
-        badge.style.setProperty("--rx", (-y * 7).toFixed(2) + "deg");
-        badge.style.setProperty("--gx", ((x + 0.5) * 100).toFixed(1) + "%");
-        badge.classList.add("mk-tilting");
-      });
-    });
-    scene.addEventListener("pointerleave", () => {
-      cancelAnimationFrame(frame);
-      badge.style.setProperty("--rx", "0deg");
-      badge.style.setProperty("--ry", "0deg");
-      badge.classList.remove("mk-tilting");
-    });
-  }
-  return scene;
-}
 function createSocialLinks(socials = [], name = "") {
   const list = E2("ul", void 0, "mk-socials");
   list.setAttribute("aria-label", "Social profiles");
@@ -21616,178 +21554,6 @@ function createCardMenu({ url, display: display2, qrImage, name, data = {}, slug
   };
   return box;
 }
-var okPhone = (v) => {
-  const p = String(v || "").replace(/[^\d+]/g, "");
-  return /^\+?\d{6,16}$/.test(p) ? p : null;
-};
-var okMail = (v) => {
-  const m = String(v || "").trim();
-  return /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(m) ? m : null;
-};
-function createProfileCard({ data = {}, photoUrl, link, socials = [], onSaveContact } = {}) {
-  const name = data.display_name || data.full_name || "MUK Talent", title = data.job_title || "Team member";
-  const card = E2("article", void 0, "pc-card");
-  card.setAttribute("aria-label", name + ", " + title + " \xB7 MUK Talent digital business card");
-  const top = E2("div", void 0, "pc-top"), logo = E2("img", void 0, "pc-logo");
-  logo.src = "/book/muk-badge-logo.png";
-  logo.alt = "MUK Talent";
-  logo.width = 500;
-  logo.height = 291;
-  logo.decoding = "async";
-  const stripes = E2("div", void 0, "pc-stripes");
-  stripes.setAttribute("aria-hidden", "true");
-  for (let i = 0; i < 4; i++) stripes.append(E2("i"));
-  top.append(logo, stripes);
-  if (data.employee_code) top.append(E2("span", "ID " + data.employee_code, "pc-code"));
-  const photo = E2("div", void 0, "pc-photo");
-  photo.append(E2("span", initials(name), "pc-initials"));
-  if (photoUrl) {
-    const img = E2("img");
-    img.alt = "Photo of " + name;
-    img.decoding = "async";
-    img.referrerPolicy = "no-referrer";
-    img.onload = () => photo.classList.add("pc-has-photo");
-    img.onerror = () => img.remove();
-    img.src = photoUrl;
-    photo.append(img);
-  }
-  const side = E2("div", void 0, "pc-side-stripes");
-  side.setAttribute("aria-hidden", "true");
-  side.append(E2("i"), E2("i"));
-  photo.append(side);
-  if (onSaveContact) {
-    const add = E2("button", void 0, "pc-add");
-    add.type = "button";
-    add.setAttribute("aria-label", "Save " + name + " to contacts");
-    add.title = "Save contact";
-    add.append(icon("contact"));
-    add.onclick = onSaveContact;
-    photo.append(add);
-  }
-  const ribbon = E2("div", void 0, "pc-ribbon"), nameEl = E2("h2", name.toUpperCase(), "pc-name");
-  if (name.length > 18) nameEl.classList.add("pc-name-long");
-  ribbon.append(nameEl);
-  const band = E2("div", void 0, "pc-band");
-  band.append(E2("span", title, "pc-title"));
-  const rows = E2("dl", void 0, "pc-rows"), row = (label2, value, href, external) => {
-    if (!value) return;
-    const dt = E2("dt", label2), dd = E2("dd");
-    if (href) {
-      const a = E2("a", value);
-      a.href = href;
-      if (external) {
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-      }
-      dd.append(a);
-    } else dd.textContent = value;
-    rows.append(dt, dd);
-  };
-  const phone = okPhone(data.contact_phone), mail = okMail(data.contact_email), shown = link?.display || data.short_display;
-  row("Phone", phone ? data.contact_phone : null, phone ? "tel:" + phone : null);
-  row("Email", mail, mail ? "mailto:" + mail : null);
-  row("Card", shown || "muktalent.com", link?.url || null, true);
-  row("Based in", data.assigned_city || "United Kingdom");
-  const foot = E2("div", void 0, "pc-foot");
-  const list = createSocialLinks(socials, name);
-  list.classList.add("pc-socials");
-  if (list.children.length) foot.append(list);
-  else foot.append(E2("span", "muktalent.com", "pc-site"));
-  card.append(top, photo, ribbon, band, rows, foot);
-  return card;
-}
-function createCardFaces({ data = {}, photoUrl, link, socials = [], onSaveContact, initial = "profile" } = {}) {
-  const wrap = E2("div", void 0, "pc-faces"), sw = E2("div", void 0, "pc-switch");
-  sw.setAttribute("role", "tablist");
-  sw.setAttribute("aria-label", "Card style");
-  const faces = { profile: createProfileCard({ data, photoUrl, link, socials, onSaveContact }), badge: createBusinessCard({ data, photoUrl, link }) };
-  const stage = E2("div", void 0, "pc-face-stage");
-  const buttons = {};
-  const show = (key) => {
-    for (const [k, b] of Object.entries(buttons)) {
-      b.setAttribute("aria-selected", String(k === key));
-      b.tabIndex = k === key ? 0 : -1;
-    }
-    faces.profile.hidden = key !== "profile";
-    faces.badge.hidden = key !== "badge";
-    wrap.dataset.face = key;
-    try {
-      localStorage.setItem("mk-face", key);
-    } catch {
-    }
-  };
-  for (const [k, label2] of [["profile", "Card"], ["badge", "ID badge"]]) {
-    const b = E2("button", label2, "pc-switch-btn");
-    b.type = "button";
-    b.setAttribute("role", "tab");
-    b.onclick = () => show(k);
-    buttons[k] = b;
-    sw.append(b);
-  }
-  stage.append(faces.profile, faces.badge);
-  wrap.append(stage, sw);
-  let start = initial;
-  try {
-    start = localStorage.getItem("mk-face") || initial;
-  } catch {
-  }
-  show(start === "badge" ? "badge" : "profile");
-  return wrap;
-}
-function createActionTiles(menu, { onEdit } = {}) {
-  const row = E2("div", void 0, "pc-tiles"), tile = (ic, label2, fn) => {
-    const b = E2("button", void 0, "pc-tile");
-    b.type = "button";
-    b.append(icon(ic), E2("span", label2));
-    b.onclick = fn;
-    row.append(b);
-    return b;
-  };
-  tile("wallet", "Wallet", () => menu.openWallet?.());
-  tile("share", "Share", () => menu.share?.());
-  if (menu.showQr) tile("qr", "QR code", () => menu.showQr());
-  else tile("contact", "Save", () => menu.saveContact?.());
-  if (onEdit) tile("edit", "Edit", onEdit);
-  return row;
-}
-function createWalletPreview({ data = {}, photoUrl, qrImage, display: display2 } = {}) {
-  const name = data.display_name || data.full_name || "MUK Talent", pass = E2("figure", void 0, "pc-pass");
-  pass.setAttribute("aria-label", "Wallet pass preview");
-  const head2 = E2("div", void 0, "pc-pass-head"), av = E2("span", void 0, "pc-pass-avatar");
-  if (photoUrl) {
-    const i = E2("img");
-    i.alt = "";
-    i.src = photoUrl;
-    i.referrerPolicy = "no-referrer";
-    i.onerror = () => i.remove();
-    av.append(i);
-  } else av.append(E2("b", initials(name)));
-  head2.append(av, E2("span", name.split(/\s+/)[0] + " \xB7 MUK Talent"));
-  const body = E2("div", void 0, "pc-pass-body");
-  body.append(E2("small", data.job_title || "MUK Talent"), E2("strong", name));
-  const qr = E2("div", void 0, "pc-pass-qr");
-  if (qrImage) {
-    const q2 = E2("img");
-    q2.src = qrImage;
-    q2.alt = "QR code";
-    q2.width = q2.height = 150;
-    qr.append(q2);
-  } else qr.append(E2("span", "QR", "pc-pass-qr-empty"));
-  const row = E2("div", void 0, "pc-pass-row");
-  for (const [k, v] of [["Territory", data.assigned_city || "United Kingdom"], ["Staff ID", data.employee_code || "\u2014"]]) {
-    const c = E2("div");
-    c.append(E2("small", k), E2("b", v));
-    row.append(c);
-  }
-  const foot = E2("div", void 0, "pc-pass-foot"), logo = E2("img");
-  logo.src = "/book/muk-badge-logo.png";
-  logo.alt = "MUK Talent";
-  logo.width = 120;
-  logo.height = 70;
-  foot.append(logo, E2("span", "Your digital business card"));
-  pass.append(head2, body, row, qr, E2("p", display2 || "muktalent.com", "pc-pass-link"), foot);
-  return pass;
-}
 
 // admin-src/professional-workspace.js
 var E3 = (tag, text, cls) => {
@@ -21831,13 +21597,13 @@ async function mountProfessionalIdentity({ root, api: api2, owner, staff }) {
       img.alt = d.full_name;
       portrait.append(img);
     } else portrait.append(E3("span", d.full_name.split(" ").slice(0, 2).map((v) => v[0]).join("")));
-    const identity2 = E3("div", void 0, "ws-member-identity");
-    identity2.append(E3("p", "MUK TALENT \xB7 OUR PEOPLE", "ws-member-overline"), E3("h2", d.full_name), E3("p", d.job_title, "ws-member-role"), E3("p", d.assigned_city ? "Leading our presence in " + d.assigned_city : "Territory pending assignment", "ws-member-city"), E3("span", d.employee_code, "ws-member-code"));
+    const identity = E3("div", void 0, "ws-member-identity");
+    identity.append(E3("p", "MUK TALENT \xB7 OUR PEOPLE", "ws-member-overline"), E3("h2", d.full_name), E3("p", d.job_title, "ws-member-role"), E3("p", d.assigned_city ? "Leading our presence in " + d.assigned_city : "Territory pending assignment", "ws-member-city"), E3("span", d.employee_code, "ws-member-code"));
     const metric = E3("div", void 0, "ws-member-impact");
     metric.append(E3("span", "YOUR PIPELINE POTENTIAL"), E3("strong", d.ready_count), E3("p", "Attributed leads ready for review"));
     if (d.potential_commission !== null) metric.append(E3("b", money(d.potential_commission, d.commission_currency) + " potential"), E3("small", "Indicative only \xB7 subject to approval and commission terms"));
     else metric.append(E3("small", "Your administrator has not set a commission rate."));
-    hero.append(portrait, identity2, metric);
+    hero.append(portrait, identity, metric);
     root.querySelector(".ws-header").after(hero);
   } catch {
   }
@@ -22435,9 +22201,8 @@ function cardData(d) {
   return { display_name: d.full_name, job_title: d.job_title, assigned_city: d.assigned_city, employee_code: d.employee_code, contact_phone: d.publish_contact ? d.contact_phone : "", contact_email: d.publish_contact ? d.contact_email : "", short_display: d.card?.handle ? d.card.display : null };
 }
 async function renderCardStudio({ host, api: api2, owner, readOnly, directory, openTab, onChanged }) {
-  const d = directory, layout = E5("div", void 0, "cs-layout cs-designer"), show = E5("section", void 0, "cs-showroom"), ident = E5("div", void 0, "cs-ident"), stage = E5("section", void 0, "cs-stage"), side = E5("div", void 0, "cs-side");
-  show.append(E5("span", void 0, "cs-grid-bg"), ident, stage);
-  layout.append(show, side);
+  const d = directory, layout = E5("div", void 0, "cs-layout cs-clean"), main = E5("section", void 0, "lx-panel cs-card-panel"), side = E5("div", void 0, "cs-side");
+  layout.append(main, side);
   host.append(layout);
   let qr = null;
   if (d.card?.published) {
@@ -22451,39 +22216,94 @@ async function renderCardStudio({ host, api: api2, owner, readOnly, directory, o
   const data = cardData(d);
   if (qr?.handle) data.short_display = qr.display;
   const socials = Array.isArray(d.socials) ? d.socials : [];
-  identity({ host: ident, d, qr, socials, readOnly, openTab });
-  let editor, menu = null;
+  const head2 = E5("div", void 0, "cs-head"), ht = E5("div");
+  ht.append(E5("p", "BUSINESS CARD", "lx-overline"), E5("h2", "Your MUK Talent card"));
+  const live = E5("span", d.card?.published ? "Published" : "Preview", "cs-state" + (d.card?.published ? " is-live" : ""));
+  head2.append(ht, live);
+  main.append(head2);
+  const card = visitCard({ d, data, qr });
+  main.append(card);
+  const flip = btn("Show back", () => {
+    const back = card.classList.toggle("is-back");
+    flip.textContent = back ? "Show front" : "Show back";
+  }, "cs-flip");
+  flip.prepend(icon("refresh", "lx-btn-icon"));
+  main.append(flip);
+  let editor = null, menu = null;
   if (qr) {
-    const extras = readOnly ? [] : [{ icon: "edit", label: "Edit short link", hint: "Choose muktalent.com/your-name", onSelect: () => {
+    menu = createCardMenu({ url: qr.url, display: qr.display, qrImage: qr.image, name: d.full_name, data, slug: qr.slug, socials, showOpen: true, extras: readOnly ? [] : [{ icon: "edit", label: "Edit your domain", hint: "muktalent.com/your-name", onSelect: () => {
       editor?.focus();
       editor?.scrollIntoView({ block: "center", behavior: "smooth" });
-    } }, { icon: "users", label: "Edit social links", hint: "LinkedIn, Instagram, TikTok\u2026", onSelect: () => openTab("social") }];
-    menu = createCardMenu({ url: qr.url, display: qr.display, qrImage: qr.image, name: d.full_name, data, slug: qr.slug, socials, showOpen: true, extras });
-  }
-  if (menu) stage.append(createActionTiles(menu, { onEdit: readOnly ? null : () => openTab("profile") }));
-  stage.append(createCardFaces({ data, photoUrl: d.avatar_url, link: { display: data.short_display, url: qr?.url }, socials, onSaveContact: menu ? () => menu.saveContact() : null }));
-  if (socials.length) {
-    const list = createSocialLinks(socials, d.full_name);
-    list.classList.add("cs-badge-socials");
-    stage.append(list);
-  }
-  if (menu) stage.append(menu);
-  else stage.append(E5("p", "Preview only. Your administrator will publish your card once your professional details are ready. You can already reserve your short link.", "cs-note"));
-  const wallet = E5("section", void 0, "lx-panel cs-panel cs-wallet");
-  wallet.append(E5("p", "WALLET PASS", "lx-overline"), E5("h2", "How it looks in Wallet"), E5("p", "Clients save your card to Google Wallet or Apple Wallet. The pass keeps your photo, QR code, booking and contact links.", "lx-muted"), createWalletPreview({ data, photoUrl: d.avatar_url, qrImage: qr?.image, display: data.short_display }));
-  if (menu) {
-    const b = btn("Add to Wallet", () => menu.openWallet(), "lx-button lx-primary");
-    b.prepend(icon("wallet", "lx-btn-icon"));
-    wallet.append(b);
-  }
-  side.append(wallet);
-  stage.append(E5("p", "Name, position, territory and ID are managed by MUK Talent. Your photo and work contact are in Profile.", "cs-note"));
+    } }] });
+    const acts = E5("div", void 0, "cs-actions");
+    const act = (ic, label2, fn, primary) => {
+      const b = E5("button", void 0, "cs-action" + (primary ? " is-primary" : ""));
+      b.type = "button";
+      b.append(icon(ic), E5("span", label2));
+      b.onclick = fn;
+      acts.append(b);
+    };
+    act("wallet", "Add to Wallet", () => menu.openWallet(), true);
+    act("share", "Share", () => menu.share());
+    if (menu.showQr) act("qr", "QR code", () => menu.showQr());
+    act("contact", "Save contact", () => menu.saveContact());
+    act("open", "Open card", () => window.open(qr.url, "_blank", "noopener,noreferrer"));
+    main.append(acts, menu);
+    menu.classList.add("cs-menu");
+  } else main.append(E5("p", "Preview only. Your administrator publishes the card once your professional details are ready. You can already choose your domain.", "cs-note"));
+  main.append(E5("p", "Name, position, territory and ID are managed by MUK Talent. Your photo and work contact are in Profile.", "cs-note"));
   editor = await shortLinkPanel({ host: side, api: api2, owner, readOnly, onChanged });
   side.append(socialSummary({ socials, readOnly, openTab }));
 }
+function visitCard({ d, data, qr }) {
+  const scene = E5("div", void 0, "cs-visit"), inner = E5("div", void 0, "cs-visit-in");
+  scene.append(inner);
+  const front = E5("article", void 0, "cs-face cs-front");
+  front.setAttribute("aria-label", (d.full_name || "MUK Talent") + " business card");
+  const logo = E5("img", void 0, "cs-logo");
+  logo.src = "/assets/brand/logo.svg";
+  logo.alt = "MUK Talent";
+  logo.width = 309;
+  logo.height = 72;
+  const id = E5("div", void 0, "cs-who");
+  id.append(E5("strong", d.full_name || "MUK Talent", "cs-name"), E5("span", d.job_title || "Team member", "cs-role"));
+  const list = E5("ul", void 0, "cs-lines");
+  const line = (ic, text) => {
+    if (!text) return;
+    const li = E5("li");
+    li.append(icon(ic), E5("span", text));
+    list.append(li);
+  };
+  line("phone", data.contact_phone);
+  line("mail", data.contact_email);
+  line("link", data.short_display || "muktalent.com");
+  if (data.assigned_city) line("pin", data.assigned_city);
+  const star = E5("span", void 0, "cs-star");
+  star.setAttribute("aria-hidden", "true");
+  front.append(logo, star, id, list);
+  const back = E5("article", void 0, "cs-face cs-back");
+  back.setAttribute("aria-hidden", "true");
+  const mark = E5("img", void 0, "cs-mark");
+  mark.src = "/assets/brand/mark-light.svg";
+  mark.alt = "";
+  mark.width = 64;
+  mark.height = 64;
+  const code = E5("div", void 0, "cs-qr");
+  if (qr?.image) {
+    const im = E5("img");
+    im.src = qr.image;
+    im.alt = "QR code " + (qr.display || "");
+    code.append(im);
+  } else code.append(E5("span", "QR after publishing", "cs-qr-empty"));
+  const bt = E5("div", void 0, "cs-back-text");
+  bt.append(mark, E5("strong", data.short_display || "muktalent.com"), E5("small", "MAGHREB \xB7 UK \xB7 TALENT"));
+  back.append(bt, code);
+  inner.append(front, back);
+  return scene;
+}
 async function shortLinkPanel({ host, api: api2, owner, readOnly, onChanged }) {
   const panel = E5("section", void 0, "lx-panel cs-panel");
-  panel.append(E5("p", "YOUR SHORT LINK", "lx-overline"), E5("h2", "Easy to say, easy to remember"));
+  panel.append(E5("p", "YOUR CARD DOMAIN", "lx-overline"), E5("h2", "Choose your domain"), E5("p", "Your card lives at muktalent.com/your-name. Short, easy to say and printed on your QR code.", "lx-muted"));
   host.append(panel);
   let info;
   try {
@@ -22500,7 +22320,7 @@ async function shortLinkPanel({ host, api: api2, owner, readOnly, onChanged }) {
     panel.append(E5("p", info.previous.length ? "Previous links still redirect: " + info.previous.map((h) => info.host + "/" + h).join(", ") : "Read-only preview.", "lx-muted"));
     return null;
   }
-  const form = E5("form", void 0, "cs-handle-form"), label2 = E5("label", "Choose your link", "cs-label"), row = E5("div", void 0, "cs-handle-row"), prefix = E5("span", info.host + "/", "cs-prefix"), input = E5("input");
+  const form = E5("form", void 0, "cs-handle-form"), label2 = E5("label", "Your domain", "cs-label"), row = E5("div", void 0, "cs-handle-row"), prefix = E5("span", info.host + "/", "cs-prefix"), input = E5("input");
   input.id = "cs-handle";
   label2.htmlFor = input.id;
   input.autocomplete = "off";
@@ -22510,7 +22330,7 @@ async function shortLinkPanel({ host, api: api2, owner, readOnly, onChanged }) {
   input.placeholder = "laura";
   input.value = info.handle || "";
   input.setAttribute("aria-describedby", "cs-handle-hint");
-  const save = E5("button", "Save link", "lx-button lx-primary");
+  const save = E5("button", "Save domain", "lx-button lx-primary");
   save.type = "submit";
   row.append(prefix, input);
   const hint = E5("p", "3\u201330 characters: letters, numbers and single hyphens.", "cs-hint");
@@ -22681,51 +22501,6 @@ async function renderSocialEditor({ host, api: api2, owner, readOnly, onSaved })
   note.append(E5("summary", "Why links and not a login with each network?"), E5("p", "Signing in with Instagram, TikTok or LinkedIn would give MUK Talent access to your private account data and requires approval from each platform. Linking your public profile gives clients the same one-tap access without sharing your passwords or permissions.", "lx-muted"));
   panel.append(note);
 }
-function identity({ host, d, qr, socials, readOnly, openTab }) {
-  const name = d.full_name || "MUK Talent", parts = name.trim().split(/\s+/), first = parts.shift() || name, rest = parts.join(" ");
-  host.append(E5("p", "MY CARD \xB7 DIGITAL IDENTITY", "cs-kicker"));
-  const h = E5("h2", void 0, "cs-name");
-  h.append(E5("span", first), E5("em", rest || ""));
-  host.append(h, E5("p", d.job_title || "MUK Talent team", "cs-role"));
-  const meta = E5("ul", void 0, "cs-meta");
-  for (const [ic, v] of [["card", d.employee_code ? "ID " + d.employee_code : null], ["home", d.assigned_city || null], ["users", d.languages || null]]) if (v) {
-    const li = E5("li");
-    li.append(icon(ic), E5("span", v));
-    meta.append(li);
-  }
-  host.append(meta);
-  const display2 = qr?.display || (d.card?.handle ? d.card.display : null);
-  const link = E5("div", void 0, "cs-live");
-  const dot = E5("i", void 0, d.card?.published ? "on" : "");
-  link.append(dot, E5("span", display2 || "Short link not set"));
-  if (display2 && qr?.url) {
-    const copy = btn("Copy", async () => {
-      try {
-        await navigator.clipboard.writeText(qr.url);
-        copy.textContent = "Copied";
-        setTimeout(() => {
-          copy.textContent = "Copy";
-        }, 1600);
-      } catch {
-      }
-    }, "cs-live-copy");
-    link.append(copy);
-  }
-  host.append(link);
-  const items = [Boolean(d.avatar_url), Boolean(d.contact_phone || d.contact_email), Boolean(d.card?.handle), Boolean(socials.length), Boolean(d.card?.published)], pct = Math.round(items.filter(Boolean).length / items.length * 100);
-  const stats = E5("dl", void 0, "cs-stats");
-  for (const [k, v] of [["Card strength", pct + "%"], ["Socials", String(socials.length)], ["Status", d.card?.published ? "Live" : "Preview"]]) {
-    const w = E5("div");
-    w.append(E5("dt", k), E5("dd", v));
-    stats.append(w);
-  }
-  host.append(stats);
-  if (!readOnly) {
-    const row = E5("div", void 0, "cs-ident-actions");
-    row.append(btn("Edit profile", () => openTab("profile"), "lx-button"), btn("Socials", () => openTab("social"), "lx-button"));
-    host.append(row);
-  }
-}
 
 // admin-src/gp-ui.js
 var SVG2 = "http://www.w3.org/2000/svg";
@@ -22820,12 +22595,12 @@ function ring(pct, size = "md") {
   w.dataset.level = pct >= 75 ? "high" : pct >= 45 ? "mid" : "low";
   return w;
 }
-function initials2(name) {
+function initials(name) {
   return String(name || "GP").trim().split(/\s+/).slice(0, 2).map((v) => v[0] || "").join("").toUpperCase();
 }
 function avatar(name, url, cls = "gp-avatar") {
   const a = E6("span", void 0, cls);
-  a.append(E6("b", initials2(name)));
+  a.append(E6("b", initials(name)));
   if (url) {
     const i = E6("img");
     i.alt = "";
@@ -22888,87 +22663,10 @@ function linkCss(id, href) {
     l.href = href;
     document.head.append(l);
   }
+  const b = document.getElementById("mukBrandStyles");
+  if (b) document.head.append(b);
 }
 var reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
-function attachSwipe(el3, { onNext, onPrev, canSwipe = () => true }) {
-  let x0 = 0, y0 = 0, t0 = 0, active = false, locked = null, dx = 0;
-  const skip = (t2) => t2.closest("input,textarea,select,[contenteditable],dialog,[data-noswipe],.gp-hscroll,.lx-tabs,.lx-gallery,.lx-calendar,.cs-suggestions");
-  el3.addEventListener("touchstart", (e) => {
-    if (e.touches.length !== 1 || !canSwipe() || skip(e.target)) {
-      active = false;
-      return;
-    }
-    const p = e.touches[0];
-    x0 = p.clientX;
-    y0 = p.clientY;
-    t0 = Date.now();
-    active = true;
-    locked = null;
-    dx = 0;
-  }, { passive: true });
-  el3.addEventListener("touchmove", (e) => {
-    if (!active) return;
-    const p = e.touches[0], mx = p.clientX - x0, my = p.clientY - y0;
-    if (locked === null && (Math.abs(mx) > 10 || Math.abs(my) > 10)) locked = Math.abs(mx) > Math.abs(my) * 1.3 ? "x" : "y";
-    if (locked !== "x") return;
-    dx = mx;
-    if (!reducedMotion()) el3.style.setProperty("--swipe-x", (dx * 0.35).toFixed(1) + "px");
-    el3.classList.add("is-swiping");
-  }, { passive: true });
-  const end = () => {
-    if (!active) return;
-    active = false;
-    el3.classList.remove("is-swiping");
-    el3.style.removeProperty("--swipe-x");
-    if (locked !== "x") return;
-    const fast = Date.now() - t0 < 450;
-    if (Math.abs(dx) > (fast ? 45 : 90)) {
-      if (dx < 0) onNext?.();
-      else onPrev?.();
-    }
-  };
-  el3.addEventListener("touchend", end, { passive: true });
-  el3.addEventListener("touchcancel", () => {
-    active = false;
-    el3.classList.remove("is-swiping");
-    el3.style.removeProperty("--swipe-x");
-  }, { passive: true });
-}
-function pager(items, current, go, cls = "gp-pager") {
-  const nav2 = E6("nav", void 0, cls);
-  nav2.setAttribute("aria-label", "Sections");
-  const label2 = E6("span", void 0, "gp-pager-label");
-  const dots = E6("div", void 0, "gp-pager-dots");
-  items.forEach(([id, text], i) => {
-    const d = E6("button", void 0, "gp-pager-dot");
-    d.type = "button";
-    d.setAttribute("aria-label", text);
-    if (id === current) {
-      d.setAttribute("aria-current", "page");
-      label2.textContent = text;
-    }
-    d.onclick = () => go(id);
-    dots.append(d);
-  });
-  nav2.append(label2, dots);
-  return nav2;
-}
-function hintOnce(key, text, host = document.body) {
-  try {
-    if (localStorage.getItem(key)) return;
-    localStorage.setItem(key, "1");
-  } catch {
-    return;
-  }
-  const h = E6("div", void 0, "gp-swipe-hint");
-  h.setAttribute("role", "status");
-  const hand = E6("span", void 0, "gp-swipe-hand");
-  hand.append(gi("back"), gi("chevron"));
-  h.append(hand, E6("span", text));
-  host.append(h);
-  setTimeout(() => h.classList.add("out"), 3600);
-  setTimeout(() => h.remove(), 4300);
-}
 function idleLogout(root, onLogout, minutes = 30) {
   let last = Date.now();
   const bump = () => {
@@ -23514,39 +23212,6 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
   await load();
   return { reload: load };
 }
-function mountPassportAdmin({ api: api2, getStaff }) {
-  if (document.getElementById("passportAdminButton")) return;
-  const host = document.querySelector("#appShell .page-header");
-  if (!host) return;
-  const box = E6("div", void 0, "form-actions");
-  const b = E6("button", "Global Passport \xB7 Control Centre", "secondary");
-  b.type = "button";
-  b.id = "passportAdminButton";
-  box.append(b);
-  host.after(box);
-  b.onclick = async () => {
-    if (getStaff()?.role !== "admin") return;
-    document.getElementById("gpControlOverlay")?.remove();
-    const o = E6("div", void 0, "cc-overlay");
-    o.id = "gpControlOverlay";
-    o.lang = "en";
-    const top = E6("div", void 0, "cc-overlay-top");
-    top.append(E6("strong", "MUK TALENT \xB7 GLOBAL PASSPORT"), btn2("Back to administration", () => {
-      o.remove();
-      document.getElementById("appShell").hidden = false;
-    }, "cc-btn", "back"));
-    const body = E6("div", void 0, "cc-overlay-body");
-    o.append(top, body);
-    document.body.append(o);
-    document.getElementById("appShell").hidden = true;
-    const status = E6("p", "", "cc-toast");
-    top.after(status);
-    await renderControlCentre({ host: body, api: api2, admin: true, notice: (t2, err2) => {
-      status.textContent = t2;
-      status.classList.toggle("cc-bad", Boolean(err2));
-    } });
-  };
-}
 
 // admin-src/employee.js
 var E7 = (t2, v, c) => {
@@ -23582,6 +23247,8 @@ function linkStyles() {
     l.href = href;
     document.head.append(l);
   }
+  const b = document.getElementById("mukBrandStyles");
+  if (b) document.head.append(b);
 }
 async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack = null }) {
   document.getElementById("employeeWorkspace")?.remove();
@@ -23632,8 +23299,6 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   main.append(header, status, body);
   root.append(sidebar, main);
   document.body.append(root);
-  attachSwipe(main, { onNext: () => swipeTo(1), onPrev: () => swipeTo(-1), canSwipe: () => !dialogBusy && !document.querySelector("dialog[open]") && matchMedia("(max-width: 700px)").matches });
-  if (matchMedia("(max-width: 700px)").matches) setTimeout(() => hintOnce("lx-swipe-hint", "Swipe left or right to move between sections", root), 900);
   let data = { records: [], leads: [], appointments: [], activity: [] }, directory = null, assets = [], section = "overview", busy = false, dialogBusy = false, loadVersion = 0;
   let payroll = {}, payrollBusy = {};
   let selectedDay = dateKey(), month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1), studioTab = "productions";
@@ -23785,32 +23450,8 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         gpCache = null;
       });
     }
-    appChrome();
   }
-  let gpCache = null, lastIndex = 0;
-  const flatPages = () => pages.filter((p) => !(readOnly && p[0] === "account"));
-  function appChrome() {
-    root.querySelector(".lx-pager")?.remove();
-    const items = groups.map((g2) => [g2[0], g2[1]]);
-    const nav3 = pager(items, group, (id) => navigate2(tabs[id]), "gp-pager lx-pager");
-    const label2 = nav3.querySelector(".gp-pager-label");
-    const pg = pages.find((p) => p[0] === section);
-    const g = groups.find((x) => x[0] === group);
-    if (label2 && g && g[3].length > 1) label2.textContent = g[1] + " \xB7 " + pg[1];
-    root.append(nav3);
-    const i = flatPages().findIndex((p) => p[0] === section);
-    if (i !== lastIndex && matchMedia("(max-width: 700px)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      body.classList.remove("lx-enter-left", "lx-enter-right");
-      void body.offsetWidth;
-      body.classList.add(i > lastIndex ? "lx-enter-left" : "lx-enter-right");
-    }
-    lastIndex = i;
-  }
-  function swipeTo(d) {
-    const list = flatPages(), i = list.findIndex((p) => p[0] === section) + d;
-    if (i < 0 || i >= list.length) return;
-    navigate2(list[i][0]);
-  }
+  let gpCache = null;
   function passportWidget() {
     const p = panel();
     p.classList.add("lx-passport");
@@ -24169,11 +23810,11 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       };
       photo.append(img);
     } else photo.classList.add("lx-no-photo");
-    const initials3 = E7("span", name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase(), "lx-hero-initials");
-    initials3.setAttribute("aria-hidden", "true");
+    const initials2 = E7("span", name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase(), "lx-hero-initials");
+    initials2.setAttribute("aria-hidden", "true");
     const cap = E7("figcaption");
     cap.append(E7("h2", name), E7("p", d.job_title || "MUK Talent team"));
-    photo.append(initials3, cap);
+    photo.append(initials2, cap);
     const facts = E7("div", void 0, "lx-hero-facts");
     const id = E7("article", void 0, "lx-fact lx-fact-gold");
     id.append(E7("span", "Staff ID"), E7("strong", d.employee_code || "\u2014"), E7("small", d.assigned_city || "MUK Talent"));
@@ -24707,70 +24348,9 @@ function paint() {
   });
   v.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
 }
-var raf = 0;
-var running = false;
 function startMatrix() {
-  const c = $("gpMatrix");
-  if (!c || running) return;
-  const ctx = c.getContext("2d");
-  if (!ctx) return;
-  running = true;
-  const reduced2 = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const glyphs = "\u30A2\u30A4\u30A6\u30A8\u30AA\u30AB\u30AD\u30AF\u30B1\u30B3\u30B5\u30B7\u30B9\u30BB\u30BD\u30BF\u30C1\u30C4\u30C6\u30C8\u30CA\u30CB\u30CC\u30CD\u30CE\u30CF\u30D2\u30D5\u30D8\u30DB\u30DE\u30DF\u30E0\u30E1\u30E2\u30E4\u30E6\u30E8\u30E9\u30EA\u30EB\u30EC\u30ED\u30EF\u30F30123456789MUKTALENT\xA3\u20AC$\u25C7\u25C6+=<>/".split("");
-  let w = 0, h = 0, cols = 0, drops = [], speed = [], size = 16, dpr = 1, last = 0, hue = 42;
-  function resize() {
-    dpr = Math.min(1.5, window.devicePixelRatio || 1);
-    w = c.clientWidth;
-    h = c.clientHeight;
-    c.width = Math.round(w * dpr);
-    c.height = Math.round(h * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    size = w < 600 ? 14 : 16;
-    cols = Math.ceil(w / size);
-    drops = Array.from({ length: cols }, () => Math.random() * -h / size);
-    speed = Array.from({ length: cols }, () => 0.35 + Math.random() * 0.75);
-    ctx.fillStyle = "#05070a";
-    ctx.fillRect(0, 0, w, h);
-  }
-  function frame(now) {
-    if (!running) return;
-    raf = requestAnimationFrame(frame);
-    if (document.hidden || now - last < 48) return;
-    const dt = Math.min(3, (now - last) / 48 || 1);
-    last = now;
-    hue = (42 + now / 240) % 360;
-    document.documentElement.style.setProperty("--gp-hue", hue.toFixed(0));
-    ctx.fillStyle = "rgba(5,7,10,.12)";
-    ctx.fillRect(0, 0, w, h);
-    ctx.font = "600 " + size + 'px "SFMono-Regular",Consolas,monospace';
-    for (let i = 0; i < cols; i++) {
-      const y = drops[i] * size, x = i * size;
-      if (y > 0) {
-        const head2 = Math.random() > 0.975;
-        ctx.fillStyle = head2 ? "hsla(" + hue + ",100%,88%,.95)" : "hsla(" + (hue + i * 0.6) % 360 + ",85%," + (48 + Math.random() * 14) + "%,.78)";
-        ctx.fillText(glyphs[Math.random() * glyphs.length | 0], x, y);
-      }
-      drops[i] += speed[i] * dt;
-      if (y > h && Math.random() > 0.972) drops[i] = Math.random() * -20;
-    }
-  }
-  resize();
-  addEventListener("resize", resize, { passive: true });
-  if (reduced2) {
-    hue = 42;
-    ctx.font = "600 16px monospace";
-    for (let i = 0; i < cols; i++) for (let j = 0; j < h / size; j += 1 + (Math.random() * 4 | 0)) {
-      ctx.fillStyle = "hsla(42,70%,50%," + Math.random() * 0.25 + ")";
-      ctx.fillText(glyphs[Math.random() * glyphs.length | 0], i * size, j * size);
-    }
-    running = false;
-    return;
-  }
-  raf = requestAnimationFrame(frame);
 }
 function stopMatrix() {
-  running = false;
-  cancelAnimationFrame(raf);
 }
 function showLoginMessage(text = "", kind = "") {
   const m = $("loginMessage");
@@ -25312,7 +24892,12 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     root.lang = lang2;
     const top = E6("header", void 0, "gp-top");
     const brand = E6("div", void 0, "gp-top-brand");
-    brand.append(E6("span", "MUK TALENT", "gp-wm"), E6("b", L("brand")));
+    const wm = E6("img", void 0, "gp-logo");
+    wm.src = "/assets/brand/logo.svg";
+    wm.alt = "MUK Talent";
+    wm.width = 309;
+    wm.height = 72;
+    brand.append(wm, E6("b", L("brand")));
     const right = E6("div", void 0, "gp-top-right");
     const ref = E6("span", s.reference, "gp-ref");
     right.append(ref, langToggle(() => render()), btn2("", () => load(), "gp-icon-btn", "refresh"));
@@ -25344,9 +24929,17 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     head2.append(E6("p", page === "journey" ? L("brand") + " \xB7 " + destName(s.destination).toUpperCase() : L("journeyTitle").toUpperCase(), "gp-kicker"), E6("h1", page === "journey" ? L("journeyTitle") : L("pages." + page)));
     mainEl.append(head2);
     ({ journey, documents, plan, messages, profile })[page]();
-    root.append(top, side, mainEl, pager(pages(), page, go));
-    attachSwipe(mainEl, { onNext: () => step(1), onPrev: () => step(-1) });
-    if (matchMedia("(max-width: 820px)").matches) hintOnce("gp-swipe-hint", L("swipe"), root);
+    const dock = E6("nav", void 0, "gp-dock");
+    dock.setAttribute("aria-label", "Global Passport");
+    for (const [id, label2] of pages()) {
+      const b = E6("button", void 0);
+      b.type = "button";
+      b.append(gi({ journey: "globe", documents: "doc", plan: "calendar", messages: "chat", profile: "user" }[id]), E6("small", label2));
+      if (id === page) b.setAttribute("aria-current", "page");
+      b.onclick = () => go(id);
+      dock.append(b);
+    }
+    root.append(top, side, mainEl, dock);
   }
   function step(d) {
     const ids = pages().map((p) => p[0]);
@@ -25853,8 +25446,8 @@ function chrome() {
     m.name = "theme-color";
     document.head.append(m);
   }
-  m.content = "#efe8dc";
-  for (const [n, c] of [["apple-mobile-web-app-capable", "yes"], ["mobile-web-app-capable", "yes"], ["apple-mobile-web-app-status-bar-style", "black-translucent"]]) if (!document.querySelector("meta[name=" + n + "]")) {
+  m.content = "#f6f4ef";
+  for (const [n, c] of [["apple-mobile-web-app-capable", "yes"], ["mobile-web-app-capable", "yes"], ["apple-mobile-web-app-status-bar-style", "default"]]) if (!document.querySelector("meta[name=" + n + "]")) {
     const x = E8("meta");
     x.name = n;
     x.content = c;
@@ -25933,15 +25526,12 @@ function mountAdminSoft({ api: api2, getState, navigate: navigate2 }) {
   new MutationObserver(() => {
     if (!overview.hidden && metrics.children.length) paint2();
   }).observe(metrics, { childList: true });
-  new MutationObserver(() => {
-    document.querySelector("#navigation .nav-button.active")?.scrollIntoView({ inline: "center", block: "nearest" });
-  }).observe(document.getElementById("navigation"), { subtree: true, attributes: true, attributeFilter: ["class"] });
 }
 
 // admin-src/app.js
 var $2 = (id) => document.getElementById(id);
 var state = { client: null, session: null, staff: null, config: null, section: "overview", page: 1, total: 0, epoch: 0, listRequest: 0, detailRequest: 0, relatedRequest: 0, busy: false, loading: false, detail: null, dirty: false, related: "notes", relatedPage: 1, staffOptions: [] };
-var titles = { overview: "Resumen", candidates: "Leads y casos", enquiries: "Consultas", appointments: "Citas", staff: "Equipo", documents: "Documentos", intelligence: "Pipeline e informes" };
+var titles = { overview: "Resumen", passport: "Global Passport", candidates: "Leads y casos", enquiries: "Consultas", appointments: "Citas", staff: "Equipo", documents: "Documentos", intelligence: "Pipeline e informes" };
 var statusText = { new: "Nuevo", contacted: "Contactado", assessment_in_progress: "Evaluaci\xF3n en curso", documents_pending: "Documentos pendientes", ready_for_review: "Listo para revisi\xF3n", on_hold: "En espera", closed: "Cerrado", in_progress: "En curso", awaiting_reply: "Esperando respuesta", resolved: "Resuelto", archived: "Archivado", confirmed: "Confirmada", completed: "Completada", cancelled: "Cancelada", no_show: "No se present\xF3", pending: "Pendiente", accepted: "Aceptado", rejected: "Rechazado", clean: "Limpio", infected: "Infectado", failed: "Fallido", open: "Abierta", revoked: "Revocada", admin: "Administrador", collaborator: "Colaborador", fr: "Franc\xE9s", en: "Ingl\xE9s" };
 var descriptions = { overview: "Una vista global de la actividad y los pr\xF3ximos pasos.", candidates: "Leads y expedientes. Acepta como caso los leads que MUK Talent vaya a gestionar.", enquiries: "Revisa las consultas recibidas y organiza su seguimiento.", appointments: "Consulta las citas existentes y registra su resultado. Horas mostradas en Africa/Casablanca.", blocks: "Gestiona indisponibilidades de los asesores. No cancela citas existentes.", staff: "Cuentas, identidad profesional, territorios y acceso de los miembros del equipo.", settings: "Horario de apertura. Duraci\xF3n fija: 30 minutos y margen de 10 minutos.", documents: "Inventario de documentos existentes. No incluye descarga, subida ni an\xE1lisis antivirus.", "document-requests": "Consulta de solicitudes existentes. No genera enlaces privados." };
 function el2(tag, text, cls) {
@@ -26022,20 +25612,110 @@ async function api(url, options = {}) {
 function resource() {
   return state.config.resources[state.section];
 }
+var GROUPS = [["home", "Inicio", "home", ["overview"]], ["students", "Estudiantes", "users", ["candidates", "enquiries", "passport"]], ["agenda", "Agenda", "calendar", ["appointments"]], ["team", "Equipo", "card", ["staff", "documents"]], ["reports", "Informes", "chart", ["intelligence"]]];
+var groupOf = (name) => GROUPS.find((g) => g[3].includes(name)) || GROUPS[0];
+function navIcon(name) {
+  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  s.setAttribute("viewBox", "0 0 24 24");
+  s.setAttribute("aria-hidden", "true");
+  s.setAttribute("class", "nav-icon");
+  s.setAttribute("fill", "none");
+  s.setAttribute("stroke", "currentColor");
+  s.setAttribute("stroke-width", "1.7");
+  s.setAttribute("stroke-linecap", "round");
+  s.setAttribute("stroke-linejoin", "round");
+  for (const d of UI_PATHS[name] || []) {
+    const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    p.setAttribute("d", d);
+    s.append(p);
+  }
+  return s;
+}
 function nav() {
   const nav2 = $2("navigation");
   nav2.replaceChildren();
-  for (const [name, title] of Object.entries(titles)) {
-    const b = el2("button", title, "nav-button");
-    b.type = "button";
-    b.dataset.section = name;
-    b.addEventListener("click", () => navigate(name));
-    nav2.append(b);
+  let dock = document.getElementById("adminDock");
+  if (!dock) {
+    dock = el2("nav", void 0, "admin-dock");
+    dock.id = "adminDock";
+    dock.setAttribute("aria-label", "Secciones");
+    $2("appShell").append(dock);
   }
+  dock.replaceChildren();
+  for (const [id, label2, ic, sections] of GROUPS) {
+    const b = el2("button", void 0, "nav-button");
+    b.type = "button";
+    b.dataset.group = id;
+    b.append(navIcon(ic), el2("span", label2));
+    b.addEventListener("click", () => navigate(sections[0]));
+    nav2.append(b);
+    const d = el2("button", void 0, "dock-button");
+    d.type = "button";
+    d.dataset.group = id;
+    d.append(navIcon(ic), el2("small", label2));
+    d.addEventListener("click", () => navigate(sections[0]));
+    dock.append(d);
+  }
+  if (!document.getElementById("mobileLogout")) {
+    const o = el2("button", void 0, "mobile-logout");
+    o.id = "mobileLogout";
+    o.type = "button";
+    o.setAttribute("aria-label", "Cerrar sesi\xF3n");
+    o.append(navIcon("logout"));
+    o.addEventListener("click", () => $2("logout").click());
+    document.querySelector("#appShell .page-header").append(o);
+  }
+  if (!document.getElementById("adminTabs")) {
+    const t2 = el2("div", void 0, "admin-tabs");
+    t2.id = "adminTabs";
+    t2.setAttribute("role", "tablist");
+    $2("globalMessage").before(t2);
+  }
+}
+function markNav(name) {
+  const g = groupOf(name);
+  for (const b of document.querySelectorAll("#navigation .nav-button,#adminDock .dock-button")) {
+    const on = b.dataset.group === g[0];
+    b.classList.toggle("active", on);
+    if (on) b.setAttribute("aria-current", "page");
+    else b.removeAttribute("aria-current");
+  }
+  const t2 = $2("adminTabs");
+  t2.replaceChildren();
+  t2.hidden = g[3].length < 2;
+  for (const sec of g[3]) {
+    const b = el2("button", titles[sec], "admin-tab");
+    b.type = "button";
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(sec === name));
+    b.addEventListener("click", () => navigate(sec));
+    t2.append(b);
+  }
+  const ex = document.getElementById("crmExportControls");
+  if (ex) ex.hidden = !["candidates", "enquiries", "appointments", "intelligence"].includes(name);
 }
 async function navigate(name, overdue = false) {
   if (!state.session || !state.config) return;
   document.getElementById("adminPipelineView")?.remove();
+  document.getElementById("adminPassportView")?.remove();
+  if (name === "passport") {
+    state.section = name;
+    state.page = 1;
+    state.listRequest++;
+    state.loading = false;
+    $2("overview").hidden = true;
+    $2("listView").hidden = true;
+    $2("createRecord").hidden = true;
+    $2("pageTitle").textContent = "Global Passport";
+    $2("pageDescription").textContent = "Centro de control de estudiantes: expedientes, documentos, tareas y mensajes.";
+    message("globalMessage");
+    markNav(name);
+    const host = document.createElement("section");
+    host.id = "adminPassportView";
+    host.lang = "en";
+    $2("globalMessage").after(host);
+    return renderControlCentre({ host, api, admin: true, notice: (t2, err2) => message("globalMessage", t2, Boolean(err2)) });
+  }
   if (name === "intelligence") {
     state.section = name;
     state.page = 1;
@@ -26047,11 +25727,7 @@ async function navigate(name, overdue = false) {
     $2("pageTitle").textContent = "Pipeline e informes";
     $2("pageDescription").textContent = "Casos aceptados, hoja interna e informes de pipeline para universidades y partners.";
     message("globalMessage");
-    for (const b of $2("navigation").children) {
-      b.classList.toggle("active", b.dataset.section === name);
-      if (b.dataset.section === name) b.setAttribute("aria-current", "page");
-      else b.removeAttribute("aria-current");
-    }
+    markNav(name);
     const host = document.createElement("section");
     host.id = "adminPipelineView";
     $2("globalMessage").after(host);
@@ -26064,11 +25740,7 @@ async function navigate(name, overdue = false) {
   message("globalMessage");
   $2("pageTitle").textContent = titles[name];
   $2("pageDescription").textContent = descriptions[name] || "";
-  for (const b of $2("navigation").children) {
-    b.classList.toggle("active", b.dataset.section === name);
-    if (b.dataset.section === name) b.setAttribute("aria-current", "page");
-    else b.removeAttribute("aria-current");
-  }
+  markNav(name);
   $2("overview").hidden = name !== "overview";
   $2("listView").hidden = name === "overview";
   $2("createRecord").hidden = name === "overview" || !resource()?.create;
@@ -26612,7 +26284,6 @@ mountStaffAccounts({
   }
 });
 mountWorkspaceAdmin({ api, getStaff: () => state.staff });
-mountPassportAdmin({ api, getStaff: () => state.staff });
 mountProfessionalAdmin({ api, getStaff: () => state.staff });
 initialise();
 mountExportButtons(async () => {

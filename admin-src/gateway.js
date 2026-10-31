@@ -12,26 +12,9 @@ export function gateLang(){return lang;}
 export function t(key,vars={}){return String((GATE_TEXT[lang]||GATE_TEXT.en)[key]??GATE_TEXT.en[key]??key).replace(/\{(\w+)\}/g,(_,k)=>vars[k]??'');}
 function paint(){const v=$('loginView');if(!v)return;v.lang=lang;v.querySelectorAll('[data-i18n]').forEach(n=>{n.textContent=t(n.dataset.i18n);});v.querySelectorAll('[data-i18n-html]').forEach(n=>{n.innerHTML=t(n.dataset.i18nHtml);});v.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lang===lang)));}
 
-// ---- Matrix rain ----
-let raf=0,running=false;
-export function startMatrix(){
- const c=$('gpMatrix');if(!c||running)return;const ctx=c.getContext('2d');if(!ctx)return;running=true;
- const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
- const glyphs='アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワン0123456789MUKTALENT£€$◇◆+=<>/'.split('');
- let w=0,h=0,cols=0,drops=[],speed=[],size=16,dpr=1,last=0,hue=42;
- function resize(){dpr=Math.min(1.5,window.devicePixelRatio||1);w=c.clientWidth;h=c.clientHeight;c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);size=w<600?14:16;cols=Math.ceil(w/size);drops=Array.from({length:cols},()=>Math.random()*-h/size);speed=Array.from({length:cols},()=>.35+Math.random()*.75);ctx.fillStyle='#05070a';ctx.fillRect(0,0,w,h);}
- function frame(now){if(!running)return;raf=requestAnimationFrame(frame);if(document.hidden||now-last<48)return;const dt=Math.min(3,(now-last)/48||1);last=now;
-  hue=(42+now/240)%360; // gold → green → cyan → violet → rose → gold, ~86 s per cycle
-  document.documentElement.style.setProperty('--gp-hue',hue.toFixed(0));
-  ctx.fillStyle='rgba(5,7,10,.12)';ctx.fillRect(0,0,w,h);ctx.font='600 '+size+'px "SFMono-Regular",Consolas,monospace';
-  for(let i=0;i<cols;i++){const y=drops[i]*size,x=i*size;if(y>0){const head=Math.random()>.975;ctx.fillStyle=head?'hsla('+hue+',100%,88%,.95)':'hsla('+((hue+i*.6)%360)+',85%,'+(48+Math.random()*14)+'%,.78)';ctx.fillText(glyphs[(Math.random()*glyphs.length)|0],x,y);}
-   drops[i]+=speed[i]*dt;if(y>h&&Math.random()>.972)drops[i]=Math.random()*-20;}
- }
- resize();addEventListener('resize',resize,{passive:true});
- if(reduced){hue=42;ctx.font='600 16px monospace';for(let i=0;i<cols;i++)for(let j=0;j<h/size;j+=1+((Math.random()*4)|0)){ctx.fillStyle='hsla(42,70%,50%,'+(Math.random()*.25)+')';ctx.fillText(glyphs[(Math.random()*glyphs.length)|0],i*size,j*size);}running=false;return;}
- raf=requestAnimationFrame(frame);
-}
-export function stopMatrix(){running=false;cancelAnimationFrame(raf);}
+// Login background is a static CSS illustration (Moroccan circuit map). Kept as no-ops for callers.
+export function startMatrix(){}
+export function stopMatrix(){}
 
 export function showLoginMessage(text='',kind=''){const m=$('loginMessage');if(!m)return;m.textContent=text;m.classList.toggle('error',kind==='error');m.classList.toggle('ok',kind==='ok');}
 function strength(v){let s=0;if(v.length>=10)s++;if(v.length>=14)s++;if(/[A-Z]/.test(v)&&/[a-z]/.test(v))s++;if(/\d/.test(v))s++;if(/[^A-Za-z0-9]/.test(v)||/\s/.test(v))s++;return Math.min(4,s);}

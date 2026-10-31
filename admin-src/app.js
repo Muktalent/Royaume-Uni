@@ -5,13 +5,14 @@ import { mountStaffAccounts } from "./staff-accounts.js";
 import { mountEmployee, mountWorkspaceAdmin } from "./employee.js";
 import { initGateway, showLoginMessage, startMatrix, stopMatrix, showReset, t } from "./gateway.js";
 import { mountStudentPortal } from "./student-portal.js";
-import { mountPassportAdmin } from "./counsellor.js";
+import { renderControlCentre } from "./counsellor.js";
+import { UI_PATHS } from "../book/card-icons.js";
 import { mountExportButtons } from "./exports.js";
 import { createClient } from "@supabase/supabase-js";
 import { mountAdminSoft } from "./admin-soft.js";
 const $ = id => document.getElementById(id);
 const state = {client:null,session:null,staff:null,config:null,section:"overview",page:1,total:0,epoch:0,listRequest:0,detailRequest:0,relatedRequest:0,busy:false,loading:false,detail:null,dirty:false,related:"notes",relatedPage:1,staffOptions:[]};
-const titles={overview:"Resumen",candidates:"Leads y casos",enquiries:"Consultas",appointments:"Citas",staff:"Equipo",documents:"Documentos",intelligence:"Pipeline e informes"};
+const titles={overview:"Resumen",passport:"Global Passport",candidates:"Leads y casos",enquiries:"Consultas",appointments:"Citas",staff:"Equipo",documents:"Documentos",intelligence:"Pipeline e informes"};
 const statusText={new:"Nuevo",contacted:"Contactado",assessment_in_progress:"Evaluación en curso",documents_pending:"Documentos pendientes",ready_for_review:"Listo para revisión",on_hold:"En espera",closed:"Cerrado",in_progress:"En curso",awaiting_reply:"Esperando respuesta",resolved:"Resuelto",archived:"Archivado",confirmed:"Confirmada",completed:"Completada",cancelled:"Cancelada",no_show:"No se presentó",pending:"Pendiente",accepted:"Aceptado",rejected:"Rechazado",clean:"Limpio",infected:"Infectado",failed:"Fallido",open:"Abierta",revoked:"Revocada",admin:"Administrador",collaborator:"Colaborador",fr:"Francés",en:"Inglés"};
 const descriptions={overview:"Una vista global de la actividad y los próximos pasos.",candidates:"Leads y expedientes. Acepta como caso los leads que MUK Talent vaya a gestionar.",enquiries:"Revisa las consultas recibidas y organiza su seguimiento.",appointments:"Consulta las citas existentes y registra su resultado. Horas mostradas en Africa/Casablanca.",blocks:"Gestiona indisponibilidades de los asesores. No cancela citas existentes.",staff:"Cuentas, identidad profesional, territorios y acceso de los miembros del equipo.",settings:"Horario de apertura. Duración fija: 30 minutos y margen de 10 minutos.",documents:"Inventario de documentos existentes. No incluye descarga, subida ni análisis antivirus.","document-requests":"Consulta de solicitudes existentes. No genera enlaces privados."};
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text);if(cls)n.className=cls;return n;}
@@ -48,26 +49,48 @@ async function api(url,options={}){
  return result;
 }
 function resource(){return state.config.resources[state.section];}
+const GROUPS=[["home","Inicio","home",["overview"]],["students","Estudiantes","users",["candidates","enquiries","passport"]],["agenda","Agenda","calendar",["appointments"]],["team","Equipo","card",["staff","documents"]],["reports","Informes","chart",["intelligence"]]];
+const groupOf=name=>GROUPS.find(g=>g[3].includes(name))||GROUPS[0];
+function navIcon(name){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("aria-hidden","true");s.setAttribute("class","nav-icon");s.setAttribute("fill","none");s.setAttribute("stroke","currentColor");s.setAttribute("stroke-width","1.7");s.setAttribute("stroke-linecap","round");s.setAttribute("stroke-linejoin","round");for(const d of UI_PATHS[name]||[]){const p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d",d);s.append(p);}return s;}
 function nav(){
  const nav=$("navigation");nav.replaceChildren();
- for(const [name,title]of Object.entries(titles)){
-  const b=el("button",title,"nav-button");b.type="button";b.dataset.section=name;b.addEventListener("click",()=>navigate(name));nav.append(b);
+ let dock=document.getElementById("adminDock");if(!dock){dock=el("nav",undefined,"admin-dock");dock.id="adminDock";dock.setAttribute("aria-label","Secciones");$("appShell").append(dock);}dock.replaceChildren();
+ for(const [id,label,ic,sections]of GROUPS){
+  const b=el("button",undefined,"nav-button");b.type="button";b.dataset.group=id;b.append(navIcon(ic),el("span",label));b.addEventListener("click",()=>navigate(sections[0]));nav.append(b);
+  const d=el("button",undefined,"dock-button");d.type="button";d.dataset.group=id;d.append(navIcon(ic),el("small",label));d.addEventListener("click",()=>navigate(sections[0]));dock.append(d);
  }
+ if(!document.getElementById("mobileLogout")){const o=el("button",undefined,"mobile-logout");o.id="mobileLogout";o.type="button";o.setAttribute("aria-label","Cerrar sesión");o.append(navIcon("logout"));o.addEventListener("click",()=>$("logout").click());document.querySelector("#appShell .page-header").append(o);}
+ if(!document.getElementById("adminTabs")){const t=el("div",undefined,"admin-tabs");t.id="adminTabs";t.setAttribute("role","tablist");$("globalMessage").before(t);}
+}
+function markNav(name){
+ const g=groupOf(name);
+ for(const b of document.querySelectorAll("#navigation .nav-button,#adminDock .dock-button")){const on=b.dataset.group===g[0];b.classList.toggle("active",on);if(on)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");}
+ const t=$("adminTabs");t.replaceChildren();t.hidden=g[3].length<2;
+ for(const sec of g[3]){const b=el("button",titles[sec],"admin-tab");b.type="button";b.setAttribute("role","tab");b.setAttribute("aria-selected",String(sec===name));b.addEventListener("click",()=>navigate(sec));t.append(b);}
+ const ex=document.getElementById("crmExportControls");if(ex)ex.hidden=!["candidates","enquiries","appointments","intelligence"].includes(name);
 }
 async function navigate(name,overdue=false){
  if(!state.session||!state.config)return;
- document.getElementById("adminPipelineView")?.remove();
+ document.getElementById("adminPipelineView")?.remove();document.getElementById("adminPassportView")?.remove();
+ if(name==="passport"){
+  state.section=name;state.page=1;state.listRequest++;state.loading=false;
+  $("overview").hidden=true;$("listView").hidden=true;$("createRecord").hidden=true;
+  $("pageTitle").textContent="Global Passport";$("pageDescription").textContent="Centro de control de estudiantes: expedientes, documentos, tareas y mensajes.";message("globalMessage");
+  markNav(name);
+  const host=document.createElement("section");host.id="adminPassportView";host.lang="en";$("globalMessage").after(host);
+  return renderControlCentre({host,api,admin:true,notice:(t,err)=>message("globalMessage",t,Boolean(err))});
+ }
  if(name==="intelligence"){
   state.section=name;state.page=1;state.listRequest++;state.loading=false;
   $("overview").hidden=true;$("listView").hidden=true;$("createRecord").hidden=true;
   $("pageTitle").textContent="Pipeline e informes";$("pageDescription").textContent="Casos aceptados, hoja interna e informes de pipeline para universidades y partners.";message("globalMessage");
-  for(const b of $("navigation").children){b.classList.toggle("active",b.dataset.section===name);if(b.dataset.section===name)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");}
+  markNav(name);
   const host=document.createElement("section");host.id="adminPipelineView";$("globalMessage").after(host);
   return renderAdminPipeline({api,getState:()=>state,openRecord,host});
  }
  state.section=name;state.page=1;state.listRequest++;state.loading=false;message("globalMessage");
  $("pageTitle").textContent=titles[name];$("pageDescription").textContent=descriptions[name]||"";
- for(const b of $("navigation").children){b.classList.toggle("active",b.dataset.section===name);if(b.dataset.section===name)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");}
+ markNav(name);
  $("overview").hidden=name!=="overview";$("listView").hidden=name==="overview";
  $("createRecord").hidden=name==="overview"||!resource()?.create;
  if(name==="overview")return loadOverview();
@@ -329,7 +352,6 @@ mountStaffAccounts({
   }
 });
 mountWorkspaceAdmin({ api, getStaff: () => state.staff });
-mountPassportAdmin({ api, getStaff: () => state.staff });
 mountProfessionalAdmin({ api, getStaff: () => state.staff });
 initialise();
 
