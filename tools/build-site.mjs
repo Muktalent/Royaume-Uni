@@ -3,7 +3,7 @@ import {fileURLToPath} from "node:url";
 import path from "node:path";
 const root=fileURLToPath(new URL("../",import.meta.url)),out=path.join(root,"web-dist");
 const skip=new Set(["mt-personal-package","node_modules","admin-src","server","api","lib","tools","supabase","web-dist","dist","output","coverage"]);
-const allowed=/\.(html?|css|js|xml|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|otf|webmanifest|pdf)$/i;
+const allowed=/\.(html?|css|js|xml|ico|png|jpe?g|gif|svg|webp|avif|woff2?|ttf|otf|webmanifest|pdf|mp4|webm|m4v|vtt)$/i;
 await rm(out,{recursive:true,force:true});await mkdir(out,{recursive:true});let count=0;
 async function visit(dir,relative=""){
  for(const e of await readdir(dir,{withFileTypes:true})){
@@ -14,3 +14,5 @@ async function visit(dir,relative=""){
  }
 }
 await visit(root);console.log(`Public build: ${count} static files, including the protected admin interface. Server source, credentials and backups excluded.`);
+
+

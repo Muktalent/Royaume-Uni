@@ -42,7 +42,7 @@ function success(){
  const max=new Date();max.setUTCDate(max.getUTCDate()+60);$('booking-day').max=dayInMorocco(max);$('success-panel').focus();
 }
 function dayInMorocco(date){const parts=new Intl.DateTimeFormat('en',{timeZone:'Africa/Casablanca',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date);return ['year','month','day'].map(k=>parts.find(p=>p.type===k).value).join('-');}
-function timeText(iso,zone){return new Intl.DateTimeFormat('fr-FR',{timeZone:zone,dateStyle:'medium',timeStyle:'short'}).format(new Date(iso));}
+function timeText(iso,zone){const l=(document.documentElement.lang||'fr').slice(0,2);return new Intl.DateTimeFormat({en:'en-GB',es:'es-ES',ar:'ar-MA'}[l]||'fr-FR',{timeZone:zone,dateStyle:'medium',timeStyle:'short'}).format(new Date(iso));}
 $('next').addEventListener('click',()=>{if(!busy&&validateCurrent()){step++;showStep();steps[step].querySelector('input,select,textarea')?.focus();}});
 $('previous').addEventListener('click',()=>{if(!busy){step--;showStep();}});
 form.addEventListener('submit',async event=>{
@@ -104,11 +104,12 @@ if(token&&reference)success();else showStep();
   panel.append(wrapper);
 
   button.addEventListener('click', () => {
-    const confirmed = window.confirm(
+    const tr = (s) => (window.MUKSite && window.MUKSite.t ? window.MUKSite.t(s) : s);
+    const confirmed = window.confirm(tr(
       'Commencer une nouvelle \u00e9valuation ? ' +
       'La demande et le rendez-vous pr\u00e9c\u00e9dents resteront enregistr\u00e9s. ' +
       'Cette page ne permettra plus de reprendre la demande pr\u00e9c\u00e9dente.'
-    );
+    ));
 
     if (!confirmed) return;
 
@@ -116,9 +117,9 @@ if(token&&reference)success();else showStep();
       sessionStorage.removeItem('muk-eval-receipt');
       sessionStorage.removeItem('muk-eval-submission');
     } catch {
-      window.alert(
+      window.alert(tr(
         'Impossible de r\u00e9initialiser la session dans ce navigateur.'
-      );
+      ));
       return;
     }
 
