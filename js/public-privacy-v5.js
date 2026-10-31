@@ -34,6 +34,7 @@ function stop(){
 }
 const seen=new Set();
 window.MUKMarketing=Object.freeze({lead(id){
+ try{window.MUKAnalytics?.lead(id);}catch{}
  try{
   if(!allowed()){stop();return;}
   if(!initialized || typeof id!=='string')return;
@@ -52,7 +53,7 @@ function init(){
  document.head.append(style);
  function el(tag,text){const n=document.createElement(tag);if(text)n.textContent=text;return n;}
  function link(url,text){const a=el('a',text);a.href=url;return a;}
- const text=tr('Avec votre accord, Muktalent utilise le pixel Meta pour mesurer les visites et les demandes issues de ses publicités. Des informations de navigation et des identifiants peuvent être transmis à Meta pour la mesure publicitaire. Refuser ne bloque ni le formulaire ni la réservation.','With your consent, Muktalent uses the Meta pixel to measure visits and enquiries from advertising. Browsing information and identifiers may be shared with Meta for advertising measurement. Rejecting does not block forms or bookings.');
+ const text=tr('Avec votre accord, Muktalent utilise Google Analytics, Google Ads et le pixel Meta pour mesurer les visites et les demandes issues de ses publicités. Des informations de navigation et des identifiants peuvent être transmis à Google et à Meta pour la mesure d’audience et publicitaire. Refuser ne bloque ni le formulaire ni la réservation.','With your consent, Muktalent uses Google Analytics, Google Ads and the Meta pixel to measure visits and enquiries from advertising. Browsing information and identifiers may be shared with Google and Meta for analytics and advertising measurement. Rejecting does not block forms or bookings.');
  const banner=el('section');banner.className='muk-cookie-info';banner.setAttribute('aria-label',tr('Choix des cookies','Cookie choices'));
  banner.append(el('p',text));
  const links=el('p');links.append(link('/cookies/',tr('Cookies et durées','Cookies and retention')),document.createTextNode(' · '),link('/privacy/',tr('Confidentialité','Privacy')));banner.append(links);
@@ -63,7 +64,7 @@ function init(){
  function save(marketing){
   try{localStorage.setItem(KEY,JSON.stringify({version:2,updatedAt:Date.now(),marketing}));}
   catch{stop();window.alert(tr('Votre choix ne peut pas être enregistré. Le pixel reste désactivé.','Your choice cannot be saved. The pixel remains disabled.'));return;}
-  marketing?start():stop();banner.hidden=true;statusText();if(dialog.open)dialog.close();
+  marketing?start():stop();try{document.dispatchEvent(new CustomEvent('muk-consent',{detail:{marketing}}));}catch{}banner.hidden=true;statusText();if(dialog.open)dialog.close();
  }
  function buttons(parent){
   const actions=el('div');actions.className='muk-cookie-actions';

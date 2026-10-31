@@ -25,6 +25,16 @@ const booking=z.object({
  const {phone_country,...rest}=value;return {...rest,phone:parsed.number};
 });
 
+// Magic-byte checks for every accepted upload type (videos are checked from the first 32 bytes only).
+export function validSignature(mime,b){if(!b||b.length<4)return false;
+ if(mime==='image/png')return b.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]));
+ if(mime==='image/jpeg')return b[0]===255&&b[1]===216&&b[2]===255;
+ if(mime==='image/webp')return b.subarray(0,4).toString('latin1')==='RIFF'&&b.subarray(8,12).toString('latin1')==='WEBP';
+ if(mime==='application/pdf')return b.subarray(0,5).toString('latin1')==='%PDF-';
+ if(mime==='video/mp4'||mime==='video/quicktime'){const t=b.subarray(4,8).toString('latin1');return t==='ftyp'||(mime==='video/quicktime'&&['moov','mdat','wide','free','skip'].includes(t));}
+ if(mime==='video/webm')return b.subarray(0,4).equals(Buffer.from([0x1a,0x45,0xdf,0xa3]));
+ return false;}
+
 export function mountWorkspaceExtras(app,{requireStaff}){
  const wrap=fn=>async(req,res)=>{try{await fn(req,res);}catch(e){
  const fields=e instanceof z.ZodError?[...new Set(e.issues.map(issue=>issue.path.join('.')).filter(Boolean))]:[];
@@ -38,19 +48,28 @@ export function mountWorkspaceExtras(app,{requireStaff}){
  app.get('/api/workspace/card',requireStaff,wrap(async(req,res)=>{const db=admin(),owner=scope(req),data=checked(await db.from('mt_public_cards').select('*').eq('owner_id',owner).maybeSingle());res.json({data});}));
  app.post('/api/workspace/card',requireStaff,writeLimit,wrap(async(req,res)=>{const v=cardSchema.parse(req.body),db=admin();const data=checked(await db.from('mt_public_cards').upsert({owner_id:req.staff.user_id,...v,updated_at:new Date().toISOString()},{onConflict:'owner_id'}).select().single());res.json({data});}));
  app.get('/api/workspace/card/qr',requireStaff,wrap(async(req,res)=>{const db=admin(),owner=scope(req),card=checked(await db.from('mt_public_cards').select('slug,published').eq('owner_id',owner).maybeSingle());if(!card?.published)return res.status(400).json({error:'Publish your card first.'});const link=await cardLinkFor(db,owner,card.slug),url=link.url;res.json({url,display:link.display,handle:link.handle,slug:card.slug,image:await QRCode.toDataURL(url,{width:600,margin:2,errorCorrectionLevel:'M'})});}));
- app.get('/api/workspace/assets',requireStaff,wrap(async(req,res)=>{const db=admin(),rows=checked(await db.from('mt_employee_assets').select('id,category,original_name,mime,created_at,object_path').eq('owner_id',scope(req)).eq('state','uploaded').order('created_at',{ascending:false}).limit(100));const data=[];for(const row of rows){const s=await db.storage.from(bucket).createSignedUrl(row.object_path,60,{download:row.category!=='avatar'});data.push({...row,url:s.data?.signedUrl||null});}res.json({data});}));
+ app.get('/api/workspace/assets',requireStaff,wrap(async(req,res)=>{const db=admin(),rows=checked(await db.from('mt_employee_assets').select('id,category,original_name,mime,bytes,created_at,object_path').eq('owner_id',scope(req)).eq('state','uploaded').order('created_at',{ascending:false}).limit(100));const data=[];for(const row of rows){const s=await db.storage.from(bucket).createSignedUrl(row.object_path,row.category==='content'?3600:60,row.category==='identity'?{download:true}:undefined);data.push({...row,url:s.data?.signedUrl||null});}res.json({data});}));
  app.post('/api/workspace/assets/start',requireStaff,writeLimit,wrap(async(req,res)=>{
- const v=z.object({category:z.enum(['avatar','identity','content']),name:z.string().min(1).max(200),mime:z.enum(['image/jpeg','image/png','application/pdf']),bytes:z.number().int().min(1).max(10485760)}).strict().parse(req.body);
+ const v=z.object({category:z.enum(['avatar','identity','content']),name:z.string().min(1).max(200),mime:z.enum(['image/jpeg','image/png','image/webp','application/pdf','video/mp4','video/quicktime','video/webm']),bytes:z.number().int().min(1).max(52428800)}).strict().parse(req.body);
+ if(v.mime.startsWith('video/')&&v.category!=='content')return res.status(400).json({error:'Videos can only be uploaded to the media library.'});
+ if(!v.mime.startsWith('video/')&&v.bytes>10485760)return res.status(400).json({error:'Images and PDFs can be up to 10 MB.'});
+ if(v.category!=='content'&&v.mime==='image/webp')return res.status(400).json({error:'Use JPG or PNG for this file.'});
  if(v.category==='avatar'&&(v.mime==='application/pdf'||v.bytes>2097152))return res.status(400).json({error:'Profile photo must be JPG/PNG, maximum 2 MB.'});
- const db=admin(),id=randomUUID(),ext={'image/jpeg':'jpg','image/png':'png','application/pdf':'pdf'}[v.mime],path=`${req.staff.user_id}/${v.category}/${id}.${ext}`;
+ const db=admin(),id=randomUUID(),ext={'image/jpeg':'jpg','image/png':'png','image/webp':'webp','application/pdf':'pdf','video/mp4':'mp4','video/quicktime':'mov','video/webm':'webm'}[v.mime],path=`${req.staff.user_id}/${v.category}/${id}.${ext}`;
  checked(await db.from('mt_employee_assets').insert({id,owner_id:req.staff.user_id,category:v.category,original_name:v.name,mime:v.mime,bytes:v.bytes,object_path:path}));
  const signed=await db.storage.from(bucket).createSignedUploadUrl(path);if(signed.error)throw Error('Upload could not be started');res.json({id,path,token:signed.data.token});
  }));
  app.post('/api/workspace/assets/finish',requireStaff,writeLimit,wrap(async(req,res)=>{
  const id=z.string().uuid().parse(req.body?.id),db=admin(),row=checked(await db.from('mt_employee_assets').select('*').eq('id',id).eq('owner_id',req.staff.user_id).eq('state','pending').maybeSingle());if(!row)throw Error('Upload not pending');
- const file=await db.storage.from(bucket).download(row.object_path);if(file.error)throw Error('Upload missing');const bytes=Buffer.from(await file.data.arrayBuffer());
- const valid=row.mime==='image/png'?bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])):row.mime==='image/jpeg'?bytes[0]===255&&bytes[1]===216&&bytes[2]===255:bytes.subarray(0,5).toString()==='%PDF-';
- if(!valid||bytes.length!==row.bytes){await db.storage.from(bucket).remove([row.object_path]);await db.from('mt_employee_assets').update({state:'rejected'}).eq('id',id);return res.status(400).json({error:'File size or signature did not match the declared file.'});}
+ let head,size;
+ if(String(row.mime).startsWith('video/')){const {data:info,error}=await db.storage.from(bucket).info?await db.storage.from(bucket).info(row.object_path):{data:null,error:Error('no info')};
+  if(!error&&info)size=Number(info.size??info.metadata?.size);
+  if(!Number.isFinite(size)){const dir=row.object_path.split('/').slice(0,-1).join('/'),name=row.object_path.split('/').pop(),listed=await db.storage.from(bucket).list(dir,{search:name,limit:5});size=Number(listed.data?.find(o=>o.name===name)?.metadata?.size);}
+  const signed=await db.storage.from(bucket).createSignedUrl(row.object_path,60);if(signed.error)throw Error('Upload missing');
+  const r=await fetch(signed.data.signedUrl,{headers:{Range:'bytes=0-31'}});if(!r.ok)throw Error('Upload missing');head=Buffer.from(await r.arrayBuffer()).subarray(0,32);}
+ else{const file=await db.storage.from(bucket).download(row.object_path);if(file.error)throw Error('Upload missing');head=Buffer.from(await file.data.arrayBuffer());size=head.length;}
+ const valid=validSignature(row.mime,head);
+ if(!valid||size!==row.bytes){await db.storage.from(bucket).remove([row.object_path]);await db.from('mt_employee_assets').update({state:'rejected'}).eq('id',id);return res.status(400).json({error:'File size or signature did not match the declared file.'});}
  checked(await db.from('mt_employee_assets').update({state:'uploaded'}).eq('id',id));res.json({ok:true});
  }));
  app.delete('/api/workspace/assets/:id',requireStaff,writeLimit,wrap(async(req,res)=>{const id=z.string().uuid().parse(req.params.id),db=admin(),r=checked(await db.from('mt_employee_assets').select('object_path').eq('id',id).eq('owner_id',req.staff.user_id).maybeSingle());if(!r)return res.status(404).json({error:'File not found.'});const removed=await db.storage.from(bucket).remove([r.object_path]);if(removed.error)throw Error('Could not remove file');checked(await db.from('mt_employee_assets').delete().eq('id',id));res.json({ok:true});}));

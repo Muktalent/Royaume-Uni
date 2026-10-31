@@ -435,3 +435,10 @@ html[data-theme="dark"] .v6a-send{background:linear-gradient(135deg,#5cc9ab,#8fd
 }
 @media print{.v6a{display:none!important}}
 
+/* v11 · AQF compliance block */
+.v6-aqf{max-width:1240px;margin:0 auto 28px;display:flex;align-items:flex-start;gap:18px;padding:22px 24px;border:1px solid rgba(226,192,122,.28);border-radius:18px;background:linear-gradient(135deg,rgba(226,192,122,.08),rgba(255,255,255,.02))}
+.v6-aqf-seal{flex:none;color:#e2c07a;line-height:0}
+.v6-aqf-kicker{margin:0 0 4px!important;color:#e2c07a!important;font-size:10.5px!important;font-weight:700;letter-spacing:.18em}
+.v6-aqf h3{margin:0 0 6px;color:#f5f1e8;font-size:16px;font-weight:700;line-height:1.3;font-family:inherit}
+.v6-aqf p{margin:0;color:var(--f-muted);font-size:13.5px;line-height:1.6;max-width:900px}
+@media(max-width:640px){.v6-aqf{flex-direction:column;gap:10px;padding:18px}.v6-aqf-seal svg{width:38px;height:38px}}

@@ -184,3 +184,88 @@ body:has(#appShell:not([hidden])),body:has(#employeeWorkspace.lux),body:has(#stu
 /* My card: wallet options live in the hidden menu; the link bar is replaced by the action row */
 #employeeWorkspace.lux.soft .cs-menu .mk-bar{display:none}
 #employeeWorkspace.lux.soft .cs-menu .mk-menu{position:static;margin-top:4px}
+
+/* ---------- v11: back to website (admin, team, student) ---------- */
+.muk-webback{display:inline-flex;align-items:center;gap:6px;margin:4px 6px 0;padding:7px 10px;border:1px solid var(--b-line,#e2ddd2);border-radius:999px;color:var(--b-ink,#152e36)!important;font:600 12.5px/1 var(--b-font,system-ui)!important;text-decoration:none!important;background:#fff;width:max-content}
+.muk-webback:hover{border-color:#b48a43;color:#8a6a2f!important}
+.mobile-web{display:none}
+@media(max-width:700px){#appShell .mobile-web,#employeeWorkspace .mobile-web{display:inline-grid;place-items:center;position:absolute;right:62px;top:calc(14px + env(safe-area-inset-top));width:42px;height:42px;border:1px solid var(--b-line,#e2ddd2);border-radius:12px;background:#fff;color:var(--b-ink,#152e36)!important;font:600 18px/1 system-ui;text-decoration:none!important}
+ #appShell#appShell .page-header>div:first-child{padding-right:106px}
+ #employeeWorkspace.lux.soft .lx-header{position:sticky}#employeeWorkspace .mobile-web{right:14px}#employeeWorkspace.lux.soft .lx-header>div:first-child{padding-right:54px}}
+.gp-webtop{display:inline-grid;place-items:center;width:38px;height:38px;border:1px solid var(--b-line,#e2ddd2);border-radius:12px;background:#fff;color:var(--b-ink,#152e36)!important;text-decoration:none!important;font:600 17px/1 system-ui}
+.gp-side-web{text-decoration:none!important;margin-top:auto}
+.gp-side-web+.gp-side-out{margin-top:0!important}
+
+/* ---------- v11: My card · silk black, gold, ivory (both faces) ---------- */
+#employeeWorkspace.lux.soft .cs-visit{--silk:#121110;--silk-2:#1c1a17;--gold:#c9a45c;--gold-2:#e2c88f;--ivory:#f7f1e3}
+#employeeWorkspace.lux.soft .cs-front{background:radial-gradient(130% 90% at 18% 0%,rgba(255,255,255,.07),transparent 55%),linear-gradient(118deg,transparent 38%,rgba(255,244,220,.06) 48%,transparent 58%),linear-gradient(160deg,var(--silk-2),var(--silk) 70%);border:1px solid rgba(201,164,92,.35);color:var(--ivory)}
+#employeeWorkspace.lux.soft .cs-front::before{width:100%;height:2px;bottom:auto;background:linear-gradient(90deg,transparent,var(--gold) 20%,var(--gold-2) 50%,var(--gold) 80%,transparent)}
+#employeeWorkspace.lux.soft .cs-front::after{content:"";position:absolute;inset:6px;border:1px solid rgba(201,164,92,.18);border-radius:11px;pointer-events:none}
+#employeeWorkspace.lux.soft .cs-star{background-image:url(/assets/brand/mark-light.svg);opacity:.9;width:30px;height:30px}
+#employeeWorkspace.lux.soft .cs-front .cs-name{color:var(--ivory)}
+#employeeWorkspace.lux.soft .cs-front .cs-role{color:var(--gold)}
+#employeeWorkspace.lux.soft .cs-front .cs-lines{border-top-color:rgba(201,164,92,.35)}
+#employeeWorkspace.lux.soft .cs-front .cs-lines li{color:rgba(247,241,227,.88)}
+#employeeWorkspace.lux.soft .cs-front .cs-lines .mk-icon{color:var(--gold)}
+#employeeWorkspace.lux.soft .cs-back{background:radial-gradient(120% 120% at 100% 0,#fffaf0,var(--ivory) 65%);color:var(--silk);border:1px solid rgba(201,164,92,.45)}
+#employeeWorkspace.lux.soft .cs-back::after{content:"";position:absolute;inset:6px;border:1px solid rgba(201,164,92,.35);border-radius:11px;pointer-events:none}
+#employeeWorkspace.lux.soft .cs-back-text strong{color:var(--silk)}
+#employeeWorkspace.lux.soft .cs-back-text small{color:#9c7a3c}
+#employeeWorkspace.lux.soft .cs-qr{background:#fff;border:3px solid var(--silk);box-shadow:0 0 0 1px var(--gold)}
+
+/* ---------- v11: Studio gallery, lightbox and uploads ---------- */
+#employeeWorkspace.lux.soft .lx-gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+#employeeWorkspace.lux.soft .lx-tile{position:relative;margin:0;display:flex;flex-direction:column;border-radius:14px;overflow:hidden;background:#fff;border:1px solid var(--b-line);box-shadow:0 1px 2px rgba(13,34,36,.05);transition:transform .15s,box-shadow .15s}
+#employeeWorkspace.lux.soft .lx-tile:hover{transform:translateY(-2px);box-shadow:0 16px 30px -18px rgba(13,34,36,.45)}
+#employeeWorkspace.lux.soft .lx-tile-open{display:block;width:100%;padding:0;border:0;background:none;cursor:zoom-in}
+#employeeWorkspace.lux.soft .lx-tile .lx-media-cover,#employeeWorkspace.lux.soft .lx-media-card .lx-media-cover{position:relative;aspect-ratio:1;display:grid;place-items:center;overflow:hidden;background:#efece4;border-radius:0}
+#employeeWorkspace.lux.soft .lx-media-card .lx-media-cover{aspect-ratio:4/3;border-radius:12px}
+#employeeWorkspace.lux.soft .lx-media-cover img,#employeeWorkspace.lux.soft .lx-media-cover video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+#employeeWorkspace.lux.soft .lx-media-cover>span:not(.lx-play){font:700 12px/1 var(--b-font);letter-spacing:.16em;color:var(--b-muted)}
+#employeeWorkspace.lux.soft .lx-cover-pdf{background:linear-gradient(160deg,#f7f1e3,#efe4cc)}
+#employeeWorkspace.lux.soft .lx-cover-pdf>span{color:#8a6a2f!important;font-size:18px!important}
+#employeeWorkspace.lux.soft .lx-play{position:absolute;inset:auto;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;padding-left:3px;background:rgba(18,17,16,.62);color:#f7f1e3;font-size:16px;backdrop-filter:blur(4px);box-shadow:0 0 0 2px rgba(247,241,227,.5)}
+#employeeWorkspace.lux.soft .lx-tile figcaption{display:grid;gap:2px;padding:10px 12px 12px;min-width:0}
+#employeeWorkspace.lux.soft .lx-tile figcaption strong{font:600 13px/1.3 var(--b-font);color:var(--b-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#employeeWorkspace.lux.soft .lx-tile figcaption small{font-size:11.5px;color:var(--b-muted)}
+#employeeWorkspace.lux.soft .lx-tile-del{position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#9a3a26;font:600 18px/1 system-ui;cursor:pointer;opacity:0;transition:opacity .15s;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+#employeeWorkspace.lux.soft .lx-tile:hover .lx-tile-del,#employeeWorkspace.lux.soft .lx-tile-del:focus-visible{opacity:1}
+@media(hover:none){#employeeWorkspace.lux.soft .lx-tile-del{opacity:1}}
+#employeeWorkspace.lux.soft .lx-tile-add{align-items:center;justify-content:center;gap:6px;min-height:190px;aspect-ratio:auto;padding:18px;border:1.5px dashed #cdbf9f;background:#fbfaf6;color:var(--b-ink);cursor:pointer;text-align:center;font:inherit}
+#employeeWorkspace.lux.soft .lx-tile-add b{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--b-ink);color:#f7f1e3;font:400 26px/1 system-ui}
+#employeeWorkspace.lux.soft .lx-tile-add strong{font:700 14px/1.2 var(--b-font)}
+#employeeWorkspace.lux.soft .lx-tile-add small{font-size:12px;color:var(--b-muted);max-width:200px}
+#employeeWorkspace.lux.soft .lx-tile-add.is-over,#employeeWorkspace.lux.soft .lx-upload-zone.is-over{border-color:var(--b-gold);background:#f7f1e3}
+@media(max-width:700px){#employeeWorkspace.lux.soft .lx-gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#employeeWorkspace.lux.soft .lx-tile-add{min-height:0;aspect-ratio:1}}
+
+#employeeWorkspace .lx-lightbox{width:100vw;height:100vh;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:rgba(10,10,9,.94);color:#f7f1e3;display:grid;grid-template-rows:auto 1fr}
+#employeeWorkspace .lx-lightbox::backdrop{background:rgba(10,10,9,.9)}
+#employeeWorkspace .lx-lb-bar{display:flex;align-items:center;gap:12px;padding:calc(12px + env(safe-area-inset-top)) 16px 12px}
+#employeeWorkspace .lx-lb-bar>div{flex:1;min-width:0;display:grid}
+#employeeWorkspace .lx-lb-bar strong{font:600 14px/1.3 system-ui;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#employeeWorkspace .lx-lb-bar small{font-size:12px;color:#c9c2b2}
+#employeeWorkspace .lx-lb-dl{color:#e2c88f;font:600 13px/1 system-ui;text-decoration:none;padding:10px 12px;border:1px solid rgba(226,200,143,.4);border-radius:999px}
+#employeeWorkspace .lx-lb-close{width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font:400 26px/1 system-ui;cursor:pointer}
+#employeeWorkspace .lx-lb-stage{display:grid;place-items:center;min-height:0;padding:0 64px calc(20px + env(safe-area-inset-bottom))}
+#employeeWorkspace .lx-lb-stage img,#employeeWorkspace .lx-lb-stage video{max-width:100%;max-height:calc(100dvh - 110px);border-radius:8px;box-shadow:0 30px 60px rgba(0,0,0,.5);background:#000}
+#employeeWorkspace .lx-lb-file{display:grid;gap:12px;justify-items:center;padding:40px;border-radius:16px;background:#1c1a17;text-align:center}
+#employeeWorkspace .lx-lb-file b{font:700 28px/1 system-ui;letter-spacing:.16em;color:#c9a45c}
+#employeeWorkspace .lx-lb-nav{position:fixed;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#fff;font:400 30px/1 system-ui;cursor:pointer}
+#employeeWorkspace .lx-lb-prev{left:12px}#employeeWorkspace .lx-lb-next{right:12px}
+#employeeWorkspace .lx-lb-nav[hidden]{display:none}
+@media(max-width:700px){#employeeWorkspace .lx-lb-stage{padding:0 8px calc(16px + env(safe-area-inset-bottom))}#employeeWorkspace .lx-lb-nav{top:auto;bottom:calc(18px + env(safe-area-inset-bottom));transform:none}}
+
+#employeeWorkspace .lx-upload .lx-upload-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+#employeeWorkspace .lx-upload-zone{display:grid;justify-items:center;gap:6px;padding:26px 18px;margin:8px 0;border:1.5px dashed #cdbf9f;border-radius:14px;background:#fbfaf6;text-align:center;cursor:pointer}
+#employeeWorkspace .lx-upload-zone b{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:#152e36;color:#f7f1e3;font:400 26px/1 system-ui}
+#employeeWorkspace .lx-upload-zone strong{font:700 14px/1.3 var(--b-font,system-ui);color:#152e36}
+#employeeWorkspace .lx-upload-zone small{font-size:12px;color:#5f6f6c}
+#employeeWorkspace .lx-upload-chosen{margin:0;font:600 13px/1.3 var(--b-font,system-ui);color:#152e36;word-break:break-all}
+#employeeWorkspace .lx-progress{height:6px;border-radius:999px;background:#ece8de;overflow:hidden;margin:6px 0}
+#employeeWorkspace .lx-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#b48a43,#d4b06a);transition:width .2s}
+#employeeWorkspace .lx-progress[hidden]{display:none}
+#employeeWorkspace .lx-lightbox .lx-lb-bar strong{color:#f7f1e3!important}
+#employeeWorkspace .lx-lightbox .lx-lb-bar small{color:#c9c2b2!important}
+#employeeWorkspace .lx-lightbox{background:#0b0b0a!important}
+@media(max-width:700px){#employeeWorkspace .mobile-web.lx-mweb{position:static;display:inline-flex;width:auto;height:30px;padding:0 12px;margin:0 0 8px;border-radius:999px;font:600 12.5px/1 var(--b-font,system-ui)}#employeeWorkspace.lux.soft .lx-header>div:first-child{padding-right:0}}
+#employeeWorkspace .lx-upload-zone b,#employeeWorkspace.lux.soft .lx-tile-add b{color:#f7f1e3!important;font-size:26px!important;font-weight:400!important}

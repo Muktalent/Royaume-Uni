@@ -31,3 +31,5 @@ export function manageAppointment({a,api,root,onSaved}){
  f.append(E('h2','Update appointment'),E('p',a.full_name));for(const [value,label]of [['completed','Completed'],['no_show','No show'],['cancelled','Cancelled']])status.append(new Option(label,value));status.setAttribute('aria-label','Appointment outcome');reason.placeholder='Cancellation reason (required when cancelling)';reason.setAttribute('aria-label','Cancellation reason');reason.maxLength=2000;
  const save=E('button','Save outcome','ws-button ws-primary');save.type='submit';const close=E('button','Close','ws-button');close.type='button';let busy=false;close.onclick=()=>{if(!busy)d.remove();};f.append(status,reason,msg,save,close);d.append(f);root.append(d);d.showModal();d.oncancel=e=>{if(busy)e.preventDefault();};d.onclose=()=>d.remove();f.onsubmit=async e=>{e.preventDefault();if(busy)return;busy=true;save.disabled=true;try{await api('/api/workspace/appointments/'+a.id,{method:'POST',body:JSON.stringify({status:status.value,reason:reason.value.trim(),version:a.updated_at})});d.remove();await onSaved();}catch(error){err(msg,error.message);}finally{busy=false;save.disabled=false;}};
 }
+
+

@@ -9,6 +9,7 @@ import { renderControlCentre } from "./counsellor.js";
 import { UI_PATHS } from "../book/card-icons.js";
 import { mountExportButtons } from "./exports.js";
 import { createClient } from "@supabase/supabase-js";
+import { AUTH_OPTIONS, watchDayEnd, stopWatch, setRememberDevice } from "./session-store.js";
 import { mountAdminSoft } from "./admin-soft.js";
 const $ = id => document.getElementById(id);
 const state = {client:null,session:null,staff:null,config:null,section:"overview",page:1,total:0,epoch:0,listRequest:0,detailRequest:0,relatedRequest:0,busy:false,loading:false,detail:null,dirty:false,related:"notes",relatedPage:1,staffOptions:[]};
@@ -29,6 +30,7 @@ function valueText(key,value){
  return statusText[value]||String(value).replaceAll("_"," ");
 }
 function resetLogin(text=""){
+ stopWatch();
  document.getElementById("employeeWorkspace")?.remove();document.getElementById("studentPortal")?.remove();document.getElementById("gpControlOverlay")?.remove();
  state.epoch++;state.session=null;state.staff=null;state.config=null;state.staffOptions=[];state.detail=null;state.dirty=false;state.busy=false;state.loading=false;
  if($("recordDialog").open)$("recordDialog").close();
@@ -60,6 +62,7 @@ function nav(){
   const d=el("button",undefined,"dock-button");d.type="button";d.dataset.group=id;d.append(navIcon(ic),el("small",label));d.addEventListener("click",()=>navigate(sections[0]));dock.append(d);
  }
  if(!document.getElementById("mobileLogout")){const o=el("button",undefined,"mobile-logout");o.id="mobileLogout";o.type="button";o.setAttribute("aria-label","Cerrar sesión");o.append(navIcon("logout"));o.addEventListener("click",()=>$("logout").click());document.querySelector("#appShell .page-header").append(o);}
+ if(!document.getElementById("mobileWeb")){const w=el("a",undefined,"mobile-web");w.id="mobileWeb";w.href="/";w.setAttribute("aria-label","Volver a la web");w.textContent="\u2190";document.querySelector("#appShell .page-header").append(w);}
  if(!document.getElementById("adminTabs")){const t=el("div",undefined,"admin-tabs");t.id="adminTabs";t.setAttribute("role","tablist");$("globalMessage").before(t);}
 }
 function markNav(name){
@@ -249,6 +252,7 @@ $("loginForm").addEventListener("submit", async event => {
   if (!state.client || $("loginSubmit").disabled) return;
   $("loginSubmit").disabled = true;
   showLoginMessage(t("signingIn"));
+  setRememberDevice($("rememberDevice")?.checked !== false);
   try {
     const { data, error } = await state.client.auth.signInWithPassword({
       email: $("email").value.trim(),
@@ -268,6 +272,7 @@ $("loginForm").addEventListener("submit", async event => {
 // One door for everyone: whoami decides between the team workspace and the student Global Passport.
 async function enter(session){
   state.session = session;
+  watchDayEnd(async()=>{await state.client.auth.signOut({scope:"local"}).catch(()=>{});resetLogin(t("dayEnded"));});
   state.epoch++;
   const who = await api("/api/whoami");
   if (who.kind === "inactive") throw new Error("Esta cuenta del equipo no está activa.");
@@ -333,7 +338,7 @@ async function initialise(){
   const response=await fetch("/api/public-config",{cache:"no-store"});if(!response.ok)throw new Error("Configuration unavailable.");const cfg=await response.json();if(!cfg.supabaseUrl||!cfg.supabasePublicKey)throw new Error("Incomplete configuration.");
   const fromLink=/(access_token|error_description|type=recovery|type=signup)/.test(location.hash)||/[?&]code=/.test(location.search);
   const linkError=/error_description=([^&]+)/.exec(location.hash);
-  state.client=createClient(cfg.supabaseUrl,cfg.supabasePublicKey,{auth:{persistSession:false,autoRefreshToken:true,detectSessionInUrl:fromLink}});
+  state.client=createClient(cfg.supabaseUrl,cfg.supabasePublicKey,{auth:{...AUTH_OPTIONS,detectSessionInUrl:fromLink}});
   let recovery=/type=recovery/.test(location.hash);
   state.client.auth.onAuthStateChange((event,session)=>{state.session=session;if(event==="PASSWORD_RECOVERY"){recovery=true;showReset();}if(event==="SIGNED_OUT"&&(state.staff||document.getElementById("studentPortal")))resetLogin("Session ended.");});
   showLoginMessage();$("loginSubmit").disabled=false;$("signupSubmit").disabled=false;
@@ -341,6 +346,7 @@ async function initialise(){
   else if(fromLink){const {data}=await state.client.auth.getSession();history.replaceState(null,"",location.pathname);
    if(data.session&&recovery)showReset();
    else if(data.session){showLoginMessage(t("confirmed"),"ok");try{await enter(data.session);}catch(e){resetLogin(e.message);}}}
+  else{const {data}=await state.client.auth.getSession();if(data.session){showLoginMessage(t("restoring"));try{await enter(data.session);}catch(e){resetLogin(e.message);await state.client.auth.signOut({scope:"local"}).catch(()=>{});}}}
  }catch(e){showLoginMessage(`Unable to connect. ${e.message}`,"error");}
 }
 mountStaffAccounts({

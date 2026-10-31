@@ -21271,13 +21271,13 @@ function createSocialLinks(socials = [], name = "") {
   return list;
 }
 function vcard({ name, data, url, socials }) {
-  const safe = (v) => String(v || "").replace(/\\/g, "\\\\").replace(/[\r\n]+/g, "\\n").replace(/;/g, "\\;").replace(/,/g, "\\,");
+  const safe2 = (v) => String(v || "").replace(/\\/g, "\\\\").replace(/[\r\n]+/g, "\\n").replace(/;/g, "\\;").replace(/,/g, "\\,");
   const parts = String(name || "").trim().split(/\s+/), last = parts.length > 1 ? parts.pop() : "", first = parts.join(" ");
-  const lines = ["BEGIN:VCARD", "VERSION:3.0", "N:" + safe(last) + ";" + safe(first) + ";;;", "FN:" + safe(name), "ORG:MUK Talent", "TITLE:" + safe(data.job_title), "URL;TYPE=WORK:" + url];
-  if (data.contact_phone) lines.push("TEL;TYPE=WORK,VOICE:" + safe(data.contact_phone));
-  if (data.contact_email) lines.push("EMAIL;TYPE=WORK:" + safe(data.contact_email));
-  if (data.assigned_city) lines.push("ADR;TYPE=WORK:;;;" + safe(data.assigned_city) + ";;;");
-  for (const s of socials || []) lines.push("X-SOCIALPROFILE;TYPE=" + safe(s.platform) + ":" + s.url, "URL;TYPE=" + safe(s.label) + ":" + s.url);
+  const lines = ["BEGIN:VCARD", "VERSION:3.0", "N:" + safe2(last) + ";" + safe2(first) + ";;;", "FN:" + safe2(name), "ORG:MUK Talent", "TITLE:" + safe2(data.job_title), "URL;TYPE=WORK:" + url];
+  if (data.contact_phone) lines.push("TEL;TYPE=WORK,VOICE:" + safe2(data.contact_phone));
+  if (data.contact_email) lines.push("EMAIL;TYPE=WORK:" + safe2(data.contact_email));
+  if (data.assigned_city) lines.push("ADR;TYPE=WORK:;;;" + safe2(data.assigned_city) + ";;;");
+  for (const s of socials || []) lines.push("X-SOCIALPROFILE;TYPE=" + safe2(s.platform) + ":" + s.url, "URL;TYPE=" + safe2(s.label) + ":" + s.url);
   lines.push("END:VCARD");
   return lines.join("\r\n");
 }
@@ -22261,9 +22261,9 @@ function visitCard({ d, data, qr }) {
   const front = E5("article", void 0, "cs-face cs-front");
   front.setAttribute("aria-label", (d.full_name || "MUK Talent") + " business card");
   const logo = E5("img", void 0, "cs-logo");
-  logo.src = "/assets/brand/logo.svg";
+  logo.src = "/assets/brand/logo-ivory.svg";
   logo.alt = "MUK Talent";
-  logo.width = 309;
+  logo.width = 374;
   logo.height = 72;
   const id = E5("div", void 0, "cs-who");
   id.append(E5("strong", d.full_name || "MUK Talent", "cs-name"), E5("span", d.job_title || "Team member", "cs-role"));
@@ -22284,7 +22284,7 @@ function visitCard({ d, data, qr }) {
   const back = E5("article", void 0, "cs-face cs-back");
   back.setAttribute("aria-hidden", "true");
   const mark = E5("img", void 0, "cs-mark");
-  mark.src = "/assets/brand/mark-light.svg";
+  mark.src = "/assets/brand/mark-noir.svg";
   mark.alt = "";
   mark.width = 64;
   mark.height = 64;
@@ -22667,22 +22667,7 @@ function linkCss(id, href) {
   if (b) document.head.append(b);
 }
 var reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
-function idleLogout(root, onLogout, minutes = 30) {
-  let last = Date.now();
-  const bump = () => {
-    last = Date.now();
-  };
-  for (const ev of ["pointerdown", "keydown", "touchstart", "scroll"]) addEventListener(ev, bump, { passive: true });
-  const timer = setInterval(() => {
-    if (!root.isConnected) {
-      clearInterval(timer);
-      return;
-    }
-    if (Date.now() - last > minutes * 6e4) {
-      clearInterval(timer);
-      onLogout();
-    }
-  }, 3e4);
+function idleLogout() {
 }
 
 // admin-src/counsellor.js
@@ -23259,7 +23244,9 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   softChrome();
   const sidebar = E7("aside", void 0, "lx-sidebar"), brand = E7("a", "MUK TALENT", "lx-brand");
   brand.href = "/";
-  sidebar.append(brand, E7("p", "PRIVATE TEAM WORKSPACE", "lx-overline"));
+  const web = E7("a", "\u2190 Back to website", "muk-webback");
+  web.href = "/";
+  sidebar.append(brand, web, E7("p", "PRIVATE TEAM WORKSPACE", "lx-overline"));
   const nav2 = E7("nav");
   nav2.setAttribute("aria-label", "Workspace");
   sidebar.append(nav2);
@@ -23291,6 +23278,10 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   refresh.append(icon("refresh", "lx-btn-icon"), E7("span", "Refresh", "lx-btn-label"));
   refresh.setAttribute("aria-label", "Refresh");
   actions.append(refresh, add);
+  const mweb = E7("a", "\u2190 Website", "mobile-web lx-mweb");
+  mweb.href = "/";
+  mweb.setAttribute("aria-label", "Back to website");
+  intro.prepend(mweb);
   header.append(intro, actions);
   const status = E7("p", "", "lx-status");
   status.setAttribute("role", "status");
@@ -23613,8 +23604,8 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     const head2 = E7("div", void 0, "lx-streak-head");
     head2.append(E7("strong", count, "lx-streak-number"), E7("span", count === 1 ? "working day in a row" : "working days in a row", "lx-muted"));
     p.append(head2);
-    const week = E7("div", void 0, "lx-week"), today = /* @__PURE__ */ new Date(dateKey() + "T12:00:00Z"), monday = new Date(today);
-    monday.setUTCDate(today.getUTCDate() - (today.getUTCDay() + 6) % 7);
+    const week = E7("div", void 0, "lx-week"), today2 = /* @__PURE__ */ new Date(dateKey() + "T12:00:00Z"), monday = new Date(today2);
+    monday.setUTCDate(today2.getUTCDate() - (today2.getUTCDay() + 6) % 7);
     for (let i = 0; i < 5; i++) {
       const d = new Date(monday);
       d.setUTCDate(monday.getUTCDate() + i);
@@ -23933,39 +23924,80 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     }
     document.documentElement.classList.add("mt-soft");
   }
+  function kindOf(a) {
+    const m = a?.mime || "";
+    return m.startsWith("video/") ? "video" : m.startsWith("image/") ? "image" : m === "application/pdf" ? "pdf" : "file";
+  }
+  function sizeText(b) {
+    if (!b) return "";
+    return b >= 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB";
+  }
   function studio() {
-    const gallery = E7("div", void 0, "lx-gallery");
+    const gallery = E7("div", void 0, "lx-gallery lx-gallery-grid");
     body.append(gallery);
     if (section === "library") {
       const media = assets.filter((a) => a.category === "content");
-      for (const a of media) {
-        const c = E7("article", void 0, "lx-media-card"), cover = mediaCover(a);
-        c.append(cover, E7("h3", a.original_name), E7("p", a.mime === "application/pdf" ? "PDF asset" : "Image asset", "lx-muted"));
-        if (a.url) {
-          const link = E7("a", "Download", "lx-link");
-          link.href = a.url;
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-          c.append(link);
-        }
-        if (!readOnly) c.append(button2("Delete", async () => {
-          if (!confirm("Delete this media file?")) return;
-          try {
-            await api2("/api/workspace/assets/" + a.id, { method: "DELETE" });
-            await load();
-          } catch (error) {
-            notice(error.message, true);
-          }
-        }));
-        gallery.append(c);
+      if (!readOnly) {
+        const drop = E7("button", void 0, "lx-tile lx-tile-add");
+        drop.type = "button";
+        drop.append(E7("b", "+"), E7("strong", "Upload media"), E7("small", "Photos, videos (MP4, MOV, WebM) and PDFs"));
+        drop.onclick = () => uploadDialog();
+        drop.ondragover = (e) => {
+          e.preventDefault();
+          drop.classList.add("is-over");
+        };
+        drop.ondragleave = () => drop.classList.remove("is-over");
+        drop.ondrop = (e) => {
+          e.preventDefault();
+          drop.classList.remove("is-over");
+          const f = e.dataTransfer?.files?.[0];
+          if (f) uploadDialog(f);
+        };
+        gallery.append(drop);
       }
-      if (!media.length) empty(gallery, "Your media library is ready. Upload your first image or PDF.");
+      media.forEach((a, i) => {
+        const c = E7("figure", void 0, "lx-tile lx-tile-" + kindOf(a)), open = E7("button", void 0, "lx-tile-open");
+        open.type = "button";
+        open.setAttribute("aria-label", "Open " + a.original_name);
+        open.append(mediaCover(a));
+        open.onclick = () => lightbox(media, i);
+        const cap = E7("figcaption");
+        cap.append(E7("strong", a.original_name), E7("small", [{ video: "Video", image: "Image", pdf: "PDF", file: "File" }[kindOf(a)], sizeText(a.bytes)].filter(Boolean).join(" \xB7 ")));
+        c.append(open, cap);
+        if (!readOnly) {
+          const del = E7("button", "\xD7", "lx-tile-del");
+          del.type = "button";
+          del.setAttribute("aria-label", "Delete " + a.original_name);
+          del.onclick = async (ev) => {
+            ev.stopPropagation();
+            if (!confirm("Delete this media file?")) return;
+            try {
+              await api2("/api/workspace/assets/" + a.id, { method: "DELETE" });
+              await load();
+            } catch (error) {
+              notice(error.message, true);
+            }
+          };
+          c.append(del);
+        }
+        gallery.append(c);
+      });
+      if (!media.length && readOnly) empty(gallery, "No media uploaded yet.");
       return;
     }
     const items = records("content");
     for (const r of items) {
       const c = E7("article", void 0, "lx-media-card"), asset = assets.find((a) => a.id === r.payload.asset_id && a.category === "content");
-      c.append(mediaCover(asset, r.payload.format), E7("span", r.status, "lx-tag"), E7("h3", r.title), E7("p", [r.payload.platform, r.payload.format, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E7("p", (r.payload.caption || r.payload.notes || "").slice(0, 180), "lx-media-caption"));
+      const cover = mediaCover(asset, r.payload.format);
+      if (asset?.url) {
+        const ob = E7("button", void 0, "lx-tile-open");
+        ob.type = "button";
+        ob.setAttribute("aria-label", "Open media");
+        ob.append(cover);
+        ob.onclick = () => lightbox([asset], 0);
+        c.append(ob);
+      } else c.append(cover);
+      c.append(E7("span", r.status, "lx-tag"), E7("h3", r.title), E7("p", [r.payload.platform, r.payload.format, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E7("p", (r.payload.caption || r.payload.notes || "").slice(0, 180), "lx-media-caption"));
       for (const [key, label2] of [["asset_url", "Open asset"], ["publication_url", "View publication"]]) if (/^https:\/\//i.test(r.payload[key] || "")) {
         const a = E7("a", label2, "lx-link");
         a.href = r.payload[key];
@@ -23977,32 +24009,139 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       else c.append(E7("p", r.payload.caption || "", "lx-muted"));
       gallery.append(c);
     }
-    if (!items.length) empty(gallery, "Create your first production. Attach a library image or use an external video link.");
+    if (!items.length) empty(gallery, "Create your first production. Attach a photo or video from your library.");
   }
   function mediaCover(asset, format = "Creative") {
-    const cover = E7("div", void 0, "lx-media-cover");
-    if (asset?.url && asset.mime.startsWith("image/")) {
+    const k = kindOf(asset), cover = E7("div", void 0, "lx-media-cover lx-cover-" + k);
+    if (asset?.url && k === "image") {
       const img = E7("img");
       img.src = asset.url;
       img.alt = asset.original_name;
       img.loading = "lazy";
+      img.decoding = "async";
       cover.append(img);
-    } else cover.append(E7("span", asset?.mime === "application/pdf" ? "PDF" : format));
+    } else if (asset?.url && k === "video") {
+      const v = E7("video");
+      v.src = asset.url + "#t=0.5";
+      v.muted = true;
+      v.playsInline = true;
+      v.preload = "metadata";
+      v.setAttribute("aria-hidden", "true");
+      cover.append(v, E7("span", "\u25B6", "lx-play"));
+    } else cover.append(E7("span", k === "pdf" ? "PDF" : asset ? format : format || "Creative"));
     return cover;
   }
-  function uploadDialog() {
-    const d = E7("dialog", void 0, "lx-dialog");
+  function lightbox(list, start) {
+    let i = start;
+    const d = E7("dialog", void 0, "lx-lightbox");
+    d.lang = "en";
+    const stage = E7("div", void 0, "lx-lb-stage"), bar = E7("div", void 0, "lx-lb-bar"), title2 = E7("strong"), count = E7("small"), close = E7("button", "\xD7", "lx-lb-close");
+    close.type = "button";
+    close.setAttribute("aria-label", "Close");
+    close.onclick = () => d.close();
+    const prev = E7("button", "\u2039", "lx-lb-nav lx-lb-prev"), next = E7("button", "\u203A", "lx-lb-nav lx-lb-next");
+    prev.type = next.type = "button";
+    prev.setAttribute("aria-label", "Previous");
+    next.setAttribute("aria-label", "Next");
+    const dl = E7("a", "Download", "lx-lb-dl");
+    dl.target = "_blank";
+    dl.rel = "noopener noreferrer";
+    const info = E7("div");
+    info.append(title2, count);
+    bar.append(info, dl, close);
+    const show = () => {
+      const a = list[i], k = kindOf(a);
+      stage.querySelectorAll("video").forEach((v) => v.pause());
+      stage.replaceChildren();
+      if (k === "video") {
+        const v = E7("video");
+        v.src = a.url;
+        v.controls = true;
+        v.playsInline = true;
+        v.autoplay = true;
+        v.preload = "auto";
+        stage.append(v);
+      } else if (k === "image") {
+        const im = E7("img");
+        im.src = a.url;
+        im.alt = a.original_name;
+        stage.append(im);
+      } else {
+        const box = E7("div", void 0, "lx-lb-file");
+        box.append(E7("b", k === "pdf" ? "PDF" : "FILE"), E7("p", a.original_name));
+        const o = E7("a", "Open document", "lx-button lx-primary");
+        o.href = a.url;
+        o.target = "_blank";
+        o.rel = "noopener noreferrer";
+        box.append(o);
+        stage.append(box);
+      }
+      title2.textContent = a.original_name;
+      count.textContent = list.length > 1 ? i + 1 + " / " + list.length : sizeText(a.bytes);
+      dl.href = a.url;
+      prev.hidden = next.hidden = list.length < 2;
+    };
+    prev.onclick = () => {
+      i = (i - 1 + list.length) % list.length;
+      show();
+    };
+    next.onclick = () => {
+      i = (i + 1) % list.length;
+      show();
+    };
+    d.onkeydown = (e) => {
+      if (e.key === "ArrowLeft") prev.click();
+      if (e.key === "ArrowRight") next.click();
+    };
+    let sx = null;
+    stage.ontouchstart = (e) => {
+      sx = e.touches[0].clientX;
+    };
+    stage.ontouchend = (e) => {
+      if (sx === null) return;
+      const dx = e.changedTouches[0].clientX - sx;
+      sx = null;
+      if (Math.abs(dx) > 50) (dx > 0 ? prev : next).click();
+    };
+    d.onclick = (e) => {
+      if (e.target === d || e.target === stage) d.close();
+    };
+    d.onclose = () => {
+      d.querySelectorAll("video").forEach((v) => v.pause());
+      d.remove();
+    };
+    d.append(bar, stage, prev, next);
+    root.append(d);
+    show();
+    d.showModal();
+  }
+  const VIDEO_MAX = 50 * 1024 * 1024, FILE_MAX = 10 * 1024 * 1024, ACCEPT = ["image/jpeg", "image/png", "image/webp", "application/pdf", "video/mp4", "video/quicktime", "video/webm"];
+  function fileMime(f) {
+    if (f.type) return f.type;
+    const x = (f.name.split(".").pop() || "").toLowerCase();
+    return { mp4: "video/mp4", m4v: "video/mp4", mov: "video/quicktime", webm: "video/webm", jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", pdf: "application/pdf" }[x] || "";
+  }
+  function uploadDialog(preset = null) {
+    const d = E7("dialog", void 0, "lx-dialog lx-upload");
     d.lang = "en";
     const f = E7("form"), file = E7("input");
     file.type = "file";
-    file.accept = "image/jpeg,image/png,application/pdf";
+    file.accept = ACCEPT.join(",") + ",.mov,.mp4,.webm";
+    file.id = "lxUploadFile";
+    file.className = "lx-upload-input";
     file.setAttribute("aria-label", "Select media file");
-    const msg = E7("p", "Images and PDFs up to 10 MB. Large videos use an HTTPS link.", "lx-muted"), send = E7("button", "Upload to library", "lx-button lx-primary");
+    const zone = E7("label", void 0, "lx-upload-zone");
+    zone.htmlFor = "lxUploadFile";
+    zone.append(E7("b", "+"), E7("strong", "Choose from your phone or computer"), E7("small", "Photos (JPG, PNG, WebP) and PDFs up to 10 MB \xB7 Videos (MP4, MOV, WebM) up to 50 MB"));
+    const chosen = E7("p", "", "lx-upload-chosen"), bar = E7("div", void 0, "lx-progress"), fill = E7("i");
+    bar.append(fill);
+    bar.hidden = true;
+    const msg = E7("p", "", "lx-muted"), send = E7("button", "Upload to library", "lx-button lx-primary");
     send.type = "submit";
     const close = button2("Close", () => {
       if (!dialogBusy) d.remove();
     });
-    f.append(E7("h2", "Upload media"), msg, file, send, close);
+    f.append(E7("h2", "Upload media"), file, zone, chosen, bar, msg, send, close);
     d.append(f);
     root.append(d);
     d.showModal();
@@ -24010,32 +24149,95 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       if (dialogBusy) e.preventDefault();
     };
     d.onclose = () => d.remove();
+    let picked = preset;
+    const describe = () => {
+      chosen.textContent = picked ? picked.name + " \xB7 " + sizeText(picked.size) : "";
+      msg.textContent = "";
+    };
+    describe();
+    file.onchange = () => {
+      picked = file.files[0] || null;
+      describe();
+    };
+    zone.ondragover = (e) => {
+      e.preventDefault();
+      zone.classList.add("is-over");
+    };
+    zone.ondragleave = () => zone.classList.remove("is-over");
+    zone.ondrop = (e) => {
+      e.preventDefault();
+      zone.classList.remove("is-over");
+      picked = e.dataTransfer?.files?.[0] || null;
+      describe();
+    };
     f.onsubmit = async (e) => {
       e.preventDefault();
       if (dialogBusy) return;
-      const asset = file.files[0];
+      const asset = picked;
       if (!asset) {
         msg.textContent = "Choose a file.";
         return;
       }
+      const mime = fileMime(asset);
+      if (!ACCEPT.includes(mime)) {
+        msg.textContent = "This format is not supported. Use JPG, PNG, WebP, PDF, MP4, MOV or WebM.";
+        return;
+      }
+      const max = mime.startsWith("video/") ? VIDEO_MAX : FILE_MAX;
+      if (asset.size > max) {
+        msg.textContent = mime.startsWith("video/") ? 'Videos can be up to 50 MB. On iPhone, choose "Most compatible" or shorten the clip.' : "Files can be up to 10 MB.";
+        return;
+      }
       dialogBusy = true;
       send.disabled = close.disabled = true;
+      bar.hidden = false;
+      fill.style.width = "4%";
+      msg.textContent = "Preparing upload\u2026";
       try {
-        const started = await api2("/api/workspace/assets/start", { method: "POST", body: JSON.stringify({ category: "content", name: asset.name, mime: asset.type, bytes: asset.size }) }), r = await fetch("/api/public-config", { cache: "no-store" }), cfg = await r.json(), client = createClient(cfg.supabaseUrl, cfg.supabasePublicKey, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
-        const uploaded = await client.storage.from("mt-employee-private").uploadToSignedUrl(started.path, started.token, asset, { contentType: asset.type });
-        if (uploaded.error) throw Error("Upload interrupted.");
+        const started = await api2("/api/workspace/assets/start", { method: "POST", body: JSON.stringify({ category: "content", name: asset.name, mime, bytes: asset.size }) });
+        msg.textContent = "Uploading\u2026";
+        await putWithProgress(started.signedUrl || null, started, asset, mime, (p) => {
+          fill.style.width = Math.max(4, Math.round(p * 100)) + "%";
+        });
+        fill.style.width = "100%";
+        msg.textContent = "Checking file\u2026";
         await api2("/api/workspace/assets/finish", { method: "POST", body: JSON.stringify({ id: started.id }) });
         d.remove();
         section = "library";
         tabs.studio = "library";
         await load();
+        notice("Uploaded to your library.");
       } catch (error) {
-        msg.textContent = error.message;
+        msg.textContent = error.message || "Upload interrupted.";
+        bar.hidden = true;
       } finally {
         dialogBusy = false;
         send.disabled = close.disabled = false;
       }
     };
+  }
+  async function putWithProgress(_unused, started, asset, mime, onProgress) {
+    const r = await fetch("/api/public-config", { cache: "no-store" }), cfg = await r.json();
+    const url = cfg.supabaseUrl.replace(/\/$/, "") + "/storage/v1/object/upload/sign/mt-employee-private/" + String(started.path).split("/").map(encodeURIComponent).join("/") + "?token=" + encodeURIComponent(started.token);
+    await new Promise((resolve, reject) => {
+      const x = new XMLHttpRequest();
+      x.open("PUT", url);
+      x.setRequestHeader("x-upsert", "false");
+      x.setRequestHeader("apikey", cfg.supabasePublicKey);
+      x.setRequestHeader("authorization", "Bearer " + cfg.supabasePublicKey);
+      x.upload.onprogress = (e) => {
+        if (e.lengthComputable) onProgress(e.loaded / e.total);
+      };
+      x.onload = () => {
+        if (x.status >= 200 && x.status < 300) resolve();
+        else reject(Error(x.status === 413 ? "The file is larger than the storage limit. Run the studio-video SQL in Supabase." : "Upload interrupted (" + x.status + ")."));
+      };
+      x.onerror = () => reject(Error("Network error. Check your connection and try again."));
+      const fd = new FormData();
+      fd.append("cacheControl", "3600");
+      fd.append("", asset.type === mime ? asset : new Blob([asset], { type: mime }), asset.name);
+      x.send(fd);
+    });
   }
   function edit(kind, record = null, day = null) {
     if (readOnly || dialogBusy) return;
@@ -24149,46 +24351,6 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       }
     };
   }
-  if (!readOnly) {
-    let tick = function() {
-      if (!root.isConnected) {
-        stop();
-        return;
-      }
-      const idle = Date.now() - last;
-      if (idle >= IDLE) {
-        stop();
-        onLogout?.().catch(() => {
-        });
-        return;
-      }
-      if (idle >= IDLE - WARN && !warning) {
-        warning = E7("div", void 0, "lx-idle");
-        warning.setAttribute("role", "alertdialog");
-        warning.setAttribute("aria-label", "Session timeout");
-        warning.append(E7("strong", "Still there?"), E7("p", "For your security you will be signed out in 2 minutes."), button2("Stay signed in", bump));
-        root.append(warning);
-        warning.querySelector("button").focus();
-      }
-    };
-    const IDLE = 30 * 60 * 1e3, WARN = 2 * 60 * 1e3, events = ["pointerdown", "keydown", "wheel", "touchstart"];
-    let last = Date.now(), warning = null;
-    const bump = () => {
-      last = Date.now();
-      if (warning) {
-        warning.remove();
-        warning = null;
-      }
-    };
-    for (const ev of events) window.addEventListener(ev, bump, { passive: true });
-    const stop = () => {
-      clearInterval(watch);
-      for (const ev of events) window.removeEventListener(ev, bump);
-      document.removeEventListener("visibilitychange", tick);
-    };
-    const watch = setInterval(tick, 15e3);
-    document.addEventListener("visibilitychange", tick);
-  }
   render();
   await load();
 }
@@ -24246,6 +24408,25 @@ function mountWorkspaceAdmin({ api: api2, getStaff }) {
 var $ = (id) => document.getElementById(id);
 var GATE_TEXT = {
   en: {
+    back: "Back to website",
+    chooseRole: "Who is signing in?",
+    roleStudent: "Student",
+    roleStudentSub: "Global Passport",
+    roleTeam: "Team",
+    roleTeamSub: "MUK Talent staff",
+    welcomeStudent: "Welcome to your Global Passport",
+    welcomeStudentText: "Track your application, documents and counsellor messages in one place.",
+    welcomeTeam: "MUK Talent team access",
+    welcomeTeamText: "Private workspace for MUK Talent staff. Use the email given by the administration.",
+    remember: "Keep me signed in on this device today",
+    noAccount: "New student?",
+    createFree: "Create your free account",
+    haveAccount: "Already have an account?",
+    privacy: "Privacy",
+    terms: "Terms",
+    help: "Help",
+    restoring: "Restoring your session\u2026",
+    dayEnded: "Your session ended for today. Please sign in again.",
     kicker: "GLOBAL PASSPORT \xB7 UNITED KINGDOM",
     headline: "The smart passport of the international student.",
     lede: "One secure file from your first university search to your first day on campus \u2014 with your counsellor beside you at every step.",
@@ -24253,13 +24434,13 @@ var GATE_TEXT = {
     soon: "Coming soon",
     secure: "Secure access",
     tabSignin: "Sign in",
-    tabSignup: "Create student account",
+    tabSignup: "Create account",
     welcome: "Welcome back",
     welcomeText: "Students and MUK Talent team use the same door. We open the right space for you.",
     email: "Email address",
     password: "Password",
     signin: "Sign in",
-    forgot: "Forgot your password?",
+    forgot: "Forgot password?",
     start: "Start your Global Passport",
     startText: "Free for students. Your counsellor is assigned automatically.",
     fullName: "Full name (as in your passport)",
@@ -24269,7 +24450,7 @@ var GATE_TEXT = {
     create: "Create my account",
     newPassTitle: "Choose a new password",
     savePass: "Save password",
-    encrypted: "Encrypted session \xB7 auto sign-out after 30 min idle",
+    encrypted: "Encrypted session \xB7 stays open on this device until midnight",
     signingIn: "Signing in\u2026",
     creating: "Creating your account\u2026",
     checkInbox: "Almost there. We sent a confirmation link to {email}. Open it on this device to activate your Global Passport.",
@@ -24284,6 +24465,25 @@ var GATE_TEXT = {
     linkError: "This link has expired or was already used. Sign in or request a new one."
   },
   fr: {
+    back: "Retour au site",
+    chooseRole: "Qui se connecte ?",
+    roleStudent: "\xC9tudiant",
+    roleStudentSub: "Global Passport",
+    roleTeam: "\xC9quipe",
+    roleTeamSub: "Personnel MUK",
+    welcomeStudent: "Bienvenue dans votre Global Passport",
+    welcomeStudentText: "Suivez votre candidature, vos documents et les messages de votre conseiller au m\xEAme endroit.",
+    welcomeTeam: "Acc\xE8s \xE9quipe MUK Talent",
+    welcomeTeamText: "Espace priv\xE9 du personnel MUK Talent. Utilisez l\u2019e-mail fourni par l\u2019administration.",
+    remember: "Rester connect\xE9 sur cet appareil aujourd\u2019hui",
+    noAccount: "Nouvel \xE9tudiant ?",
+    createFree: "Cr\xE9ez votre compte gratuit",
+    haveAccount: "Vous avez d\xE9j\xE0 un compte ?",
+    privacy: "Confidentialit\xE9",
+    terms: "Conditions",
+    help: "Aide",
+    restoring: "Restauration de la session\u2026",
+    dayEnded: "Votre session est termin\xE9e pour aujourd\u2019hui. Reconnectez-vous.",
     kicker: "GLOBAL PASSPORT \xB7 ROYAUME-UNI",
     headline: "Le passeport intelligent de l\u2019\xE9tudiant international.",
     lede: "Un dossier s\xE9curis\xE9, de la recherche d\u2019universit\xE9 jusqu\u2019\xE0 votre premier jour sur le campus \u2014 avec votre conseiller \xE0 chaque \xE9tape.",
@@ -24291,7 +24491,7 @@ var GATE_TEXT = {
     soon: "Bient\xF4t",
     secure: "Acc\xE8s s\xE9curis\xE9",
     tabSignin: "Connexion",
-    tabSignup: "Cr\xE9er un compte \xE9tudiant",
+    tabSignup: "Cr\xE9er un compte",
     welcome: "Bon retour",
     welcomeText: "\xC9tudiants et \xE9quipe MUK Talent utilisent la m\xEAme porte. Nous ouvrons le bon espace pour vous.",
     email: "Adresse e-mail",
@@ -24307,7 +24507,7 @@ var GATE_TEXT = {
     create: "Cr\xE9er mon compte",
     newPassTitle: "Choisissez un nouveau mot de passe",
     savePass: "Enregistrer",
-    encrypted: "Session chiffr\xE9e \xB7 d\xE9connexion apr\xE8s 30 min d\u2019inactivit\xE9",
+    encrypted: "Session chiffr\xE9e \xB7 reste ouverte sur cet appareil jusqu\u2019\xE0 minuit",
     signingIn: "Connexion\u2026",
     creating: "Cr\xE9ation du compte\u2026",
     checkInbox: "Presque fini. Nous avons envoy\xE9 un lien de confirmation \xE0 {email}. Ouvrez-le sur cet appareil pour activer votre Global Passport.",
@@ -24347,6 +24547,39 @@ function paint() {
     n.innerHTML = t(n.dataset.i18nHtml);
   });
   v.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+}
+var role = (() => {
+  let r = null;
+  try {
+    r = localStorage.getItem("muk-login-role");
+  } catch {
+  }
+  if (r === "team" || r === "student") return r;
+  return /^\/admin/.test(location.pathname) ? "team" : "student";
+})();
+function applyRole() {
+  const v = $("loginView");
+  if (!v) return;
+  v.dataset.role = role;
+  for (const b of v.querySelectorAll(".gp-role")) b.setAttribute("aria-checked", String(b.dataset.role === role));
+  const h = v.querySelector("#loginForm .gp-title"), p = v.querySelector("#loginForm .gp-lede-role");
+  if (h) {
+    h.dataset.i18n = role === "team" ? "welcomeTeam" : "welcomeStudent";
+    h.textContent = t(h.dataset.i18n);
+  }
+  if (p) {
+    p.dataset.i18n = role === "team" ? "welcomeTeamText" : "welcomeStudentText";
+    p.textContent = t(p.dataset.i18n);
+  }
+  if (role === "team" && $("gpCard").dataset.tab === "signup") showTab("signin");
+}
+function setRole(r) {
+  role = r === "team" ? "team" : "student";
+  try {
+    localStorage.setItem("muk-login-role", role);
+  } catch {
+  }
+  applyRole();
 }
 function startMatrix() {
 }
@@ -24389,6 +24622,12 @@ function showReset() {
 function initGateway({ getClient, onSignedIn }) {
   paint();
   startMatrix();
+  applyRole();
+  document.querySelectorAll("#loginView .gp-role").forEach((b) => b.addEventListener("click", () => {
+    setRole(b.dataset.role);
+    $("email").focus();
+  }));
+  document.querySelectorAll("#loginView [data-go]").forEach((b) => b.addEventListener("click", () => showTab(b.dataset.go)));
   document.querySelectorAll("#loginView [data-lang]").forEach((b) => b.addEventListener("click", () => {
     lang = b.dataset.lang;
     try {
@@ -24418,7 +24657,11 @@ function initGateway({ getClient, onSignedIn }) {
   $("suPassword").addEventListener("input", (e) => {
     meter.dataset.level = String(strength(e.target.value));
   });
-  if (/^#?(signup|register)/.test(location.hash.replace("#", "")) || /[?&]signup\b/.test(location.search)) showTab("signup");
+  if (/[?&]team\b/.test(location.search)) setRole("team");
+  if (/^#?(signup|register)/.test(location.hash.replace("#", "")) || /[?&]signup\b/.test(location.search)) {
+    setRole("student");
+    showTab("signup");
+  }
   $("signupForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const client = getClient();
@@ -24539,6 +24782,7 @@ var TX = {
     active: "Active",
     soon: "Coming soon",
     signOut: "Sign out",
+    website: "Back to website",
     refresh: "Refresh",
     swipe: "Swipe left or right to move between sections",
     updated: "Updated",
@@ -24625,6 +24869,7 @@ var TX = {
     active: "Actif",
     soon: "Bient\xF4t",
     signOut: "Se d\xE9connecter",
+    website: "Retour au site",
     refresh: "Actualiser",
     swipe: "Glissez \xE0 gauche ou \xE0 droite pour changer de section",
     updated: "Mis \xE0 jour",
@@ -24895,12 +25140,16 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     const wm = E6("img", void 0, "gp-logo");
     wm.src = "/assets/brand/logo.svg";
     wm.alt = "MUK Talent";
-    wm.width = 309;
+    wm.width = 374;
     wm.height = 72;
     brand.append(wm, E6("b", L("brand")));
     const right = E6("div", void 0, "gp-top-right");
+    const webTop = E6("a", "\u2190", "gp-webtop");
+    webTop.href = "/";
+    webTop.setAttribute("aria-label", L("website"));
+    webTop.title = L("website");
     const ref = E6("span", s.reference, "gp-ref");
-    right.append(ref, langToggle(() => render()), btn2("", () => load(), "gp-icon-btn", "refresh"));
+    right.append(webTop, ref, langToggle(() => render()), btn2("", () => load(), "gp-icon-btn", "refresh"));
     const me = btn2("", null, "gp-me");
     me.append(avatar(s.full_name));
     me.setAttribute("aria-label", L("signOut"));
@@ -24920,6 +25169,9 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
       }
       side.append(b);
     }
+    const webSide = E6("a", "\u2190 " + L("website"), "gp-side-btn gp-side-web");
+    webSide.href = "/";
+    side.append(webSide);
     const out = btn2(L("signOut"), logout, "gp-side-btn gp-side-out", "logout");
     side.append(out);
     mainEl = E6("main", void 0, "gp-main");
@@ -25430,6 +25682,84 @@ function mountExportButtons(getSession) {
   host.after(box, msg);
 }
 
+// admin-src/session-store.js
+var DAY = "muk-auth-day";
+var REMEMBER = "muk-auth-remember";
+var KEY = "muk-auth";
+var safe = (fn) => {
+  try {
+    return fn();
+  } catch {
+    return null;
+  }
+};
+function today() {
+  const d = /* @__PURE__ */ new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function rememberDevice() {
+  return safe(() => localStorage.getItem(REMEMBER)) !== "0";
+}
+function setRememberDevice(on) {
+  safe(() => localStorage.setItem(REMEMBER, on ? "1" : "0"));
+}
+function purge() {
+  for (const s of [localStorage, sessionStorage]) safe(() => {
+    for (const k of Object.keys(s)) if (k === DAY || k.startsWith(KEY)) s.removeItem(k);
+  });
+}
+function sessionExpired() {
+  const d = safe(() => localStorage.getItem(DAY));
+  return !!d && d !== today();
+}
+var deviceStorage = {
+  getItem(k) {
+    if (sessionExpired()) {
+      purge();
+      return null;
+    }
+    return safe(() => localStorage.getItem(k)) ?? safe(() => sessionStorage.getItem(k));
+  },
+  setItem(k, v) {
+    const keep = rememberDevice();
+    safe(() => (keep ? localStorage : sessionStorage).setItem(k, v));
+    safe(() => (keep ? sessionStorage : localStorage).removeItem(k));
+    if (!safe(() => localStorage.getItem(DAY))) safe(() => localStorage.setItem(DAY, today()));
+  },
+  removeItem(k) {
+    safe(() => localStorage.removeItem(k));
+    safe(() => sessionStorage.removeItem(k));
+    if (k === KEY) safe(() => localStorage.removeItem(DAY));
+  }
+};
+var AUTH_OPTIONS = { persistSession: true, storage: deviceStorage, storageKey: KEY, autoRefreshToken: true };
+var watcher = null;
+function watchDayEnd(onEnd) {
+  if (watcher) {
+    clearInterval(watcher.t);
+    document.removeEventListener("visibilitychange", watcher.v);
+  }
+  const check = () => {
+    if (sessionExpired()) {
+      stopWatch();
+      purge();
+      Promise.resolve(onEnd?.()).catch(() => {
+      });
+    }
+  };
+  watcher = { t: setInterval(check, 6e4), v: () => {
+    if (document.visibilityState === "visible") check();
+  } };
+  document.addEventListener("visibilitychange", watcher.v);
+}
+function stopWatch() {
+  if (watcher) {
+    clearInterval(watcher.t);
+    document.removeEventListener("visibilitychange", watcher.v);
+    watcher = null;
+  }
+}
+
 // admin-src/admin-soft.js
 var E8 = (t2, v, c) => {
   const n = document.createElement(t2);
@@ -25559,6 +25889,7 @@ function valueText(key, value) {
   return statusText[value] || String(value).replaceAll("_", " ");
 }
 function resetLogin(text = "") {
+  stopWatch();
   document.getElementById("employeeWorkspace")?.remove();
   document.getElementById("studentPortal")?.remove();
   document.getElementById("gpControlOverlay")?.remove();
@@ -25664,6 +25995,14 @@ function nav() {
     o.append(navIcon("logout"));
     o.addEventListener("click", () => $2("logout").click());
     document.querySelector("#appShell .page-header").append(o);
+  }
+  if (!document.getElementById("mobileWeb")) {
+    const w = el2("a", void 0, "mobile-web");
+    w.id = "mobileWeb";
+    w.href = "/";
+    w.setAttribute("aria-label", "Volver a la web");
+    w.textContent = "\u2190";
+    document.querySelector("#appShell .page-header").append(w);
   }
   if (!document.getElementById("adminTabs")) {
     const t2 = el2("div", void 0, "admin-tabs");
@@ -26100,6 +26439,7 @@ $2("loginForm").addEventListener("submit", async (event) => {
   if (!state.client || $2("loginSubmit").disabled) return;
   $2("loginSubmit").disabled = true;
   showLoginMessage(t("signingIn"));
+  setRememberDevice($2("rememberDevice")?.checked !== false);
   try {
     const { data, error } = await state.client.auth.signInWithPassword({
       email: $2("email").value.trim(),
@@ -26119,6 +26459,11 @@ $2("loginForm").addEventListener("submit", async (event) => {
 });
 async function enter(session) {
   state.session = session;
+  watchDayEnd(async () => {
+    await state.client.auth.signOut({ scope: "local" }).catch(() => {
+    });
+    resetLogin(t("dayEnded"));
+  });
   state.epoch++;
   const who = await api("/api/whoami");
   if (who.kind === "inactive") throw new Error("Esta cuenta del equipo no est\xE1 activa.");
@@ -26242,7 +26587,7 @@ async function initialise() {
     if (!cfg.supabaseUrl || !cfg.supabasePublicKey) throw new Error("Incomplete configuration.");
     const fromLink = /(access_token|error_description|type=recovery|type=signup)/.test(location.hash) || /[?&]code=/.test(location.search);
     const linkError = /error_description=([^&]+)/.exec(location.hash);
-    state.client = createClient(cfg.supabaseUrl, cfg.supabasePublicKey, { auth: { persistSession: false, autoRefreshToken: true, detectSessionInUrl: fromLink } });
+    state.client = createClient(cfg.supabaseUrl, cfg.supabasePublicKey, { auth: { ...AUTH_OPTIONS, detectSessionInUrl: fromLink } });
     let recovery = /type=recovery/.test(location.hash);
     state.client.auth.onAuthStateChange((event, session) => {
       state.session = session;
@@ -26268,6 +26613,18 @@ async function initialise() {
           await enter(data.session);
         } catch (e) {
           resetLogin(e.message);
+        }
+      }
+    } else {
+      const { data } = await state.client.auth.getSession();
+      if (data.session) {
+        showLoginMessage(t("restoring"));
+        try {
+          await enter(data.session);
+        } catch (e) {
+          resetLogin(e.message);
+          await state.client.auth.signOut({ scope: "local" }).catch(() => {
+          });
         }
       }
     }

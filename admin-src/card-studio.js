@@ -38,7 +38,7 @@ export async function renderCardStudio({host,api,owner,readOnly,directory,openTa
 function visitCard({d,data,qr}){
  const scene=E('div',undefined,'cs-visit'),inner=E('div',undefined,'cs-visit-in');scene.append(inner);
  const front=E('article',undefined,'cs-face cs-front');front.setAttribute('aria-label',(d.full_name||'MUK Talent')+' business card');
- const logo=E('img',undefined,'cs-logo');logo.src='/assets/brand/logo.svg';logo.alt='MUK Talent';logo.width=309;logo.height=72;
+ const logo=E('img',undefined,'cs-logo');logo.src='/assets/brand/logo-ivory.svg';logo.alt='MUK Talent';logo.width=374;logo.height=72;
  const id=E('div',undefined,'cs-who');id.append(E('strong',d.full_name||'MUK Talent','cs-name'),E('span',d.job_title||'Team member','cs-role'));
  const list=E('ul',undefined,'cs-lines');
  const line=(ic,text)=>{if(!text)return;const li=E('li');li.append(icon(ic),E('span',text));list.append(li);};
@@ -46,7 +46,7 @@ function visitCard({d,data,qr}){
  const star=E('span',undefined,'cs-star');star.setAttribute('aria-hidden','true');
  front.append(logo,star,id,list);
  const back=E('article',undefined,'cs-face cs-back');back.setAttribute('aria-hidden','true');
- const mark=E('img',undefined,'cs-mark');mark.src='/assets/brand/mark-light.svg';mark.alt='';mark.width=64;mark.height=64;
+ const mark=E('img',undefined,'cs-mark');mark.src='/assets/brand/mark-noir.svg';mark.alt='';mark.width=64;mark.height=64;
  const code=E('div',undefined,'cs-qr');if(qr?.image){const im=E('img');im.src=qr.image;im.alt='QR code '+(qr.display||'');code.append(im);}else code.append(E('span','QR after publishing','cs-qr-empty'));
  const bt=E('div',undefined,'cs-back-text');bt.append(mark,E('strong',data.short_display||'muktalent.com'),E('small','MAGHREB · UK · TALENT'));
  back.append(bt,code);inner.append(front,back);

@@ -39,7 +39,7 @@ if (!origin.startsWith("https://")) throw new Error("SUPABASE_URL debe usar HTTP
 const root = fileURLToPath(new URL("../", import.meta.url));
 const app = express();
 app.disable("x-powered-by");
-app.use(helmet({contentSecurityPolicy:{directives:{connectSrc:["'self'",origin],imgSrc:["'self'","data:",origin]}}}));
+app.use(helmet({contentSecurityPolicy:{directives:{connectSrc:["'self'",origin],imgSrc:["'self'","data:",origin],mediaSrc:["'self'","blob:",origin]}}}));
 app.use((req,res,next)=>{req.requestId=randomUUID();res.set("X-Request-Id",req.requestId);res.set("Cache-Control","no-store");res.set("Permissions-Policy","camera=(), microphone=(), geolocation=(), payment=()");next();});
 app.use("/api",rateLimit({keyGenerator:(req)=>ipKeyGenerator((process.env.VERCEL?String(req.headers["x-vercel-forwarded-for"]||req.headers["x-forwarded-for"]||"").split(",")[0].trim():req.ip)||"127.0.0.1"),validate:{xForwardedForHeader:false},windowMs:60000,limit:240,standardHeaders:"draft-7",legacyHeaders:false,message:{error:"Demasiadas peticiones. Espera un minuto."}}));
 app.use(express.json({limit:"64kb",strict:true}));

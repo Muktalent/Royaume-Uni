@@ -59,3 +59,5 @@ export function mountProfessionalAdmin({api,getStaff}){
  try{const result=await api('/api/staff?page=1&page_size=100');for(const s of result.data)select.append(new Option(s.full_name,s.user_id));select.onchange=load;if(result.data.length)await load();else message.textContent='No team members available.';}catch(error){message.textContent=error.message;}finally{open.disabled=false;}
  };
 }
+
+
