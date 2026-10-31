@@ -10,7 +10,7 @@ const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 const sameOrigin=value=>{try{const u=new URL(value,location.origin);return u.protocol==='https:'||u.origin===location.origin?u.href:null;}catch{return null;}};
 
 // The card face. `link` = {display} short link text shown on the badge.
-export function createBusinessCard({data={},photoUrl,link}={}){
+export function createBusinessCard({data={},photoUrl,link,showPhone=false}={}){
  const name=data.display_name||data.full_name||'MUK Talent',title=(data.job_title||'Team member').toUpperCase();
  const scene=E('div',undefined,'biz-scene mk-scene'),badge=E('article',undefined,'mk-badge');badge.setAttribute('aria-label',name+', '+(data.job_title||'MUK Talent')+' · MUK Talent business card');
  const band=E('div',undefined,'mk-band'),bandText=E('span',title,'mk-band-title');bandText.setAttribute('aria-hidden','true');band.append(bandText);
@@ -19,7 +19,7 @@ export function createBusinessCard({data={},photoUrl,link}={}){
  const photo=E('div',undefined,'mk-photo');photo.append(E('span',initials(name),'mk-initials'));
  if(photoUrl){const img=E('img');img.alt='Photo of '+name;img.decoding='async';img.referrerPolicy='no-referrer';img.onload=()=>photo.classList.add('mk-has-photo');img.onerror=()=>img.remove();img.src=photoUrl;photo.append(img);}
  const id=E('div',undefined,'mk-id'),heading=E('h2',name,'mk-name');if(name.length>24)heading.classList.add('mk-name-long');id.append(heading);
- const lines=E('ul',undefined,'mk-lines');lines.append(E('li',data.employee_code?'ID '+data.employee_code:'MUK Talent team'));if(data.assigned_city)lines.append(E('li',data.assigned_city));const shown=link?.display||data.short_display;if(shown)lines.append(E('li',shown,'mk-link-line'));else lines.append(E('li','muktalent.com'));id.append(lines);
+ const lines=E('ul',undefined,'mk-lines');lines.append(E('li',data.employee_code?'ID '+data.employee_code:'MUK Talent team'));if(data.assigned_city)lines.append(E('li',data.assigned_city));if(showPhone&&data.contact_phone){const li=E('li',undefined,'mk-phone-line'),a=E('a',data.contact_phone);a.href='tel:'+String(data.contact_phone).replace(/[^+\d]/g,'');a.setAttribute('aria-label','Call '+name+' '+data.contact_phone);li.append(a);lines.append(li);}const shown=link?.display||data.short_display;if(shown)lines.append(E('li',shown,'mk-link-line'));else lines.append(E('li','muktalent.com'));id.append(lines);
  const sheen=E('span',undefined,'mk-sheen');sheen.setAttribute('aria-hidden','true');
  panel.append(logo,photo,id);badge.append(band,panel,sheen);scene.append(badge);
  // Subtle 3D tilt on precise pointers only.
@@ -72,7 +72,7 @@ function qrDialog({qrImage,display,name}){
  * Hamburger ("sandwich") menu with every card action.
  * {url, display, qrImage, name, data, slug, socials, showOpen, extras:[{icon,label,hint,onSelect}]}
  */
-export function createCardMenu({url,display,qrImage,name,data={},slug,socials=[],showOpen=false,extras=[]}){
+export function createCardMenu({url,display,qrImage,name,data={},slug,socials=[],showOpen=false,extras=[],walletOnly=false}){
  const safeUrl=sameOrigin(url)||location.href,shown=display||safeUrl.replace(/^https?:\/\//,'');
  const box=E('div',undefined,'mk-actions'),bar=E('div',undefined,'mk-bar'),message=E('p','','mk-status');message.setAttribute('role','status');message.setAttribute('aria-live','polite');
  let clear=0;const say=t=>{message.textContent=t;clearTimeout(clear);clear=setTimeout(()=>{message.textContent='';},4000);};
@@ -80,7 +80,7 @@ export function createCardMenu({url,display,qrImage,name,data={},slug,socials=[]
  const linkButton=E('button',undefined,'mk-linkpill');linkButton.type='button';linkButton.setAttribute('aria-label','Copy card link '+shown);linkButton.append(icon('link'),E('span',shown,'mk-linkpill-text'),E('span','Copy','mk-linkpill-cta'));linkButton.onclick=copyNow;
  const toggle=E('button',undefined,'mk-burger');toggle.type='button';toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Card actions');toggle.title='Card actions';const lines=E('span',undefined,'mk-burger-lines');lines.setAttribute('aria-hidden','true');lines.append(E('i'),E('i'),E('i'));toggle.append(lines);
  const menuId='mk-menu-'+Math.random().toString(36).slice(2,9);const menu=E('div',undefined,'mk-menu');menu.id=menuId;menu.hidden=true;toggle.setAttribute('aria-controls',menuId);
- bar.append(linkButton,toggle);box.append(bar,menu,message);
+ bar.append(linkButton,toggle);box.append(bar,menu,message);if(walletOnly)box.classList.add('mk-wallet-only');
  const item=(ic,label,hint,onSelect,cls='')=>{const b=E('button',undefined,'mk-item '+cls);b.type='button';const t=E('span',undefined,'mk-item-text');t.append(E('strong',label));if(hint)t.append(E('small',hint));const i=E('span',undefined,'mk-item-icon');i.append(typeof ic==='string'?icon(ic):ic);b.append(i,t);b.onclick=async()=>{await onSelect(b);};menu.append(b);return b;};
  const group=label=>menu.append(E('p',label,'mk-menu-label'));
  group('Share');

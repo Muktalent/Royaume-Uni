@@ -21318,7 +21318,7 @@ function qrDialog({ qrImage, display: display2, name }) {
   dialog2.showModal();
   close.focus();
 }
-function createCardMenu({ url, display: display2, qrImage, name, data = {}, slug, socials = [], showOpen = false, extras = [] }) {
+function createCardMenu({ url, display: display2, qrImage, name, data = {}, slug, socials = [], showOpen = false, extras = [], walletOnly = false }) {
   const safeUrl = sameOrigin(url) || location.href, shown = display2 || safeUrl.replace(/^https?:\/\//, "");
   const box = E2("div", void 0, "mk-actions"), bar = E2("div", void 0, "mk-bar"), message2 = E2("p", "", "mk-status");
   message2.setAttribute("role", "status");
@@ -21362,6 +21362,7 @@ function createCardMenu({ url, display: display2, qrImage, name, data = {}, slug
   toggle.setAttribute("aria-controls", menuId);
   bar.append(linkButton, toggle);
   box.append(bar, menu, message2);
+  if (walletOnly) box.classList.add("mk-wallet-only");
   const item = (ic, label2, hint, onSelect, cls = "") => {
     const b = E2("button", void 0, "mk-item " + cls);
     b.type = "button";
