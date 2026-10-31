@@ -18,7 +18,7 @@ export const RESERVED_HANDLES = new Set([
   "status","health","robots","sitemap","favicon","manifest","security","well-known","muktalent","muk-talent","muk",
   "official","owner","root","system","null","undefined","test","demo","partners","partner","universities","students",
   "student","apply","evaluation","evaluate","pricing","fr","en","es","ar","uk","ma","new","edit","settings","profile",
-  "me","you","agents","agent","info","hello","noreply","no-reply","billing","payments","pay","wallet","qr","share","link","links"
+  "me","you","agents","agent","info","hello","noreply","no-reply","billing","payments","pay","wallet","qr","share","link","links","portal","passport","global-passport","journey"
 ]);
 
 export function siteOrigin() {

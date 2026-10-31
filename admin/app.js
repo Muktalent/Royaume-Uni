@@ -1,6 +1,6 @@
 // admin-src/admin-experience.js
-var E = (t, v, c) => {
-  const n = document.createElement(t);
+var E = (t2, v, c) => {
+  const n = document.createElement(t2);
   if (v !== void 0) n.textContent = String(v);
   if (c) n.className = c;
   return n;
@@ -62,7 +62,7 @@ function dialog(title) {
 function field(form, name, label2, type = "text", options = null, value = "") {
   const wrap = E("div", void 0, "field"), caption = E("label", label2), f = E(options ? "select" : type === "textarea" ? "textarea" : "input");
   if (!options && f.tagName === "INPUT") f.type = type;
-  if (options) for (const [v, t] of options) f.append(new Option(t, v));
+  if (options) for (const [v, t2] of options) f.append(new Option(t2, v));
   f.name = name;
   f.id = "report-field-" + name;
   caption.htmlFor = f.id;
@@ -197,10 +197,10 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
   host.append(filters);
   const tabs = E("div", void 0, "admin-report-tabs"), internal = button("Hoja interna", () => {
     mode = "internal";
-    paint();
+    paint2();
   }), external = button("Vista para universidades / partners", () => {
     mode = "partners";
-    paint();
+    paint2();
   });
   tabs.append(internal, external);
   host.append(tabs);
@@ -213,22 +213,22 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
       if (selected.size >= 300) break;
       selected.add(r.candidate_id);
     }
-    paint();
+    paint2();
   }), button("Limpiar selecci\xF3n", () => {
     selected.clear();
-    paint();
+    paint2();
   }), button("Exportar selecci\xF3n (.xlsx)", () => exportRows()), button("Crear enlace para partner", () => share()), button("Enlaces compartidos", () => shares()));
   host.append(summary, selection, actions);
-  const warning = E("p", "", "admin-report-warning"), sheet = E("div", void 0, "admin-sheet-wrap"), pager = E("div", void 0, "pagination"), legend = E("div", void 0, "admin-legend"), demoBanner = E("p", "EJEMPLO \xB7 datos ficticios para presentaciones. No se pueden exportar ni compartir.", "admin-demo-banner");
+  const warning = E("p", "", "admin-report-warning"), sheet = E("div", void 0, "admin-sheet-wrap"), pager2 = E("div", void 0, "pagination"), legend = E("div", void 0, "admin-legend"), demoBanner = E("p", "EJEMPLO \xB7 datos ficticios para presentaciones. No se pueden exportar ni compartir.", "admin-demo-banner");
   demoBanner.hidden = true;
   let demo = false;
   const demoBtn = button("Ver hoja de ejemplo", () => {
     demo = !demo;
     if (demo) selected.clear();
-    paint();
+    paint2();
   });
   tabs.append(demoBtn);
-  host.append(warning, legend, demoBanner, sheet, pager);
+  host.append(warning, legend, demoBanner, sheet, pager2);
   function message2(text, error = false) {
     if (!host.isConnected) return;
     notice.textContent = text;
@@ -248,7 +248,7 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
       if (epoch !== loadEpoch || !host.isConnected) return;
       result = response;
       if (status.options.length === 1) for (const s of result.stages) status.append(new Option(s, s));
-      paint();
+      paint2();
       message2("Actualizado: " + new Date(result.as_of).toLocaleString("es-ES") + " \xB7 La exportaci\xF3n es una instant\xE1nea de los casos seleccionados.");
     } catch (error) {
       message2(error.message, true);
@@ -257,7 +257,7 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
       filter.disabled = false;
     }
   }
-  function paint() {
+  function paint2() {
     if (!result || !host.isConnected) return;
     internal.classList.toggle("primary", mode === "internal");
     external.classList.toggle("primary", mode === "partners");
@@ -337,7 +337,7 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
         }
         if (check.checked) selected.add(row.candidate_id);
         else selected.delete(row.candidate_id);
-        paint();
+        paint2();
       };
       cell.append(check);
       line.append(cell);
@@ -377,7 +377,7 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
       empty.append(E("strong", "Hoja lista \xB7 a\xFAn sin casos aceptados"), E("span", "Acepta un lead real, crea un caso manual o pulsa \xABVer hoja de ejemplo\xBB para ense\xF1ar la pipeline a una universidad."));
       sheet.append(empty);
     }
-    pager.replaceChildren();
+    pager2.replaceChildren();
     const prev = button("Anterior", () => {
       if (busy) return;
       page--;
@@ -389,7 +389,7 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
     });
     prev.disabled = page <= 1;
     next.disabled = page * 50 >= result.total;
-    pager.append(E("span", "P\xE1gina " + page + " de " + Math.max(1, Math.ceil(result.total / 50))), prev, next);
+    pager2.append(E("span", "P\xE1gina " + page + " de " + Math.max(1, Math.ceil(result.total / 50))), prev, next);
   }
   async function exportRows() {
     if (demo) {
@@ -597,23 +597,23 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
 
 // node_modules/tslib/tslib.es6.mjs
 function __rest(s, e) {
-  var t = {};
+  var t2 = {};
   for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-    t[p] = s[p];
+    t2[p] = s[p];
   if (s != null && typeof Object.getOwnPropertySymbols === "function")
     for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
       if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-        t[p[i]] = s[p[i]];
+        t2[p[i]] = s[p[i]];
     }
-  return t;
+  return t2;
 }
-function __awaiter(thisArg, _arguments, P, generator) {
+function __awaiter(thisArg, _arguments, P2, generator) {
   function adopt(value) {
-    return value instanceof P ? value : new P(function(resolve) {
+    return value instanceof P2 ? value : new P2(function(resolve) {
       resolve(value);
     });
   }
-  return new (P || (P = Promise))(function(resolve, reject) {
+  return new (P2 || (P2 = Promise))(function(resolve, reject) {
     function fulfilled(value) {
       try {
         step(generator.next(value));
@@ -5545,45 +5545,45 @@ function _typeof(o) {
     return o$1 && "function" == typeof Symbol && o$1.constructor === Symbol && o$1 !== Symbol.prototype ? "symbol" : typeof o$1;
   }, _typeof(o);
 }
-function toPrimitive(t, r) {
-  if ("object" != _typeof(t) || !t) return t;
-  var e = t[Symbol.toPrimitive];
+function toPrimitive(t2, r) {
+  if ("object" != _typeof(t2) || !t2) return t2;
+  var e = t2[Symbol.toPrimitive];
   if (void 0 !== e) {
-    var i = e.call(t, r || "default");
+    var i = e.call(t2, r || "default");
     if ("object" != _typeof(i)) return i;
     throw new TypeError("@@toPrimitive must return a primitive value.");
   }
-  return ("string" === r ? String : Number)(t);
+  return ("string" === r ? String : Number)(t2);
 }
-function toPropertyKey(t) {
-  var i = toPrimitive(t, "string");
+function toPropertyKey(t2) {
+  var i = toPrimitive(t2, "string");
   return "symbol" == _typeof(i) ? i : i + "";
 }
-function _defineProperty(e, r, t) {
+function _defineProperty(e, r, t2) {
   return (r = toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
-    value: t,
+    value: t2,
     enumerable: true,
     configurable: true,
     writable: true
-  }) : e[r] = t, e;
+  }) : e[r] = t2, e;
 }
 function ownKeys(e, r) {
-  var t = Object.keys(e);
+  var t2 = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
     r && (o = o.filter(function(r$1) {
       return Object.getOwnPropertyDescriptor(e, r$1).enumerable;
-    })), t.push.apply(t, o);
+    })), t2.push.apply(t2, o);
   }
-  return t;
+  return t2;
 }
 function _objectSpread2(e) {
   for (var r = 1; r < arguments.length; r++) {
-    var t = null != arguments[r] ? arguments[r] : {};
-    r % 2 ? ownKeys(Object(t), true).forEach(function(r$1) {
-      _defineProperty(e, r$1, t[r$1]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function(r$1) {
-      Object.defineProperty(e, r$1, Object.getOwnPropertyDescriptor(t, r$1));
+    var t2 = null != arguments[r] ? arguments[r] : {};
+    r % 2 ? ownKeys(Object(t2), true).forEach(function(r$1) {
+      _defineProperty(e, r$1, t2[r$1]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t2)) : ownKeys(Object(t2)).forEach(function(r$1) {
+      Object.defineProperty(e, r$1, Object.getOwnPropertyDescriptor(t2, r$1));
     });
   }
   return e;
@@ -10340,45 +10340,45 @@ function _typeof2(o) {
     return o$1 && "function" == typeof Symbol && o$1.constructor === Symbol && o$1 !== Symbol.prototype ? "symbol" : typeof o$1;
   }, _typeof2(o);
 }
-function toPrimitive2(t, r) {
-  if ("object" != _typeof2(t) || !t) return t;
-  var e = t[Symbol.toPrimitive];
+function toPrimitive2(t2, r) {
+  if ("object" != _typeof2(t2) || !t2) return t2;
+  var e = t2[Symbol.toPrimitive];
   if (void 0 !== e) {
-    var i = e.call(t, r || "default");
+    var i = e.call(t2, r || "default");
     if ("object" != _typeof2(i)) return i;
     throw new TypeError("@@toPrimitive must return a primitive value.");
   }
-  return ("string" === r ? String : Number)(t);
+  return ("string" === r ? String : Number)(t2);
 }
-function toPropertyKey2(t) {
-  var i = toPrimitive2(t, "string");
+function toPropertyKey2(t2) {
+  var i = toPrimitive2(t2, "string");
   return "symbol" == _typeof2(i) ? i : i + "";
 }
-function _defineProperty2(e, r, t) {
+function _defineProperty2(e, r, t2) {
   return (r = toPropertyKey2(r)) in e ? Object.defineProperty(e, r, {
-    value: t,
+    value: t2,
     enumerable: true,
     configurable: true,
     writable: true
-  }) : e[r] = t, e;
+  }) : e[r] = t2, e;
 }
 function ownKeys2(e, r) {
-  var t = Object.keys(e);
+  var t2 = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
     r && (o = o.filter(function(r$1) {
       return Object.getOwnPropertyDescriptor(e, r$1).enumerable;
-    })), t.push.apply(t, o);
+    })), t2.push.apply(t2, o);
   }
-  return t;
+  return t2;
 }
 function _objectSpread22(e) {
   for (var r = 1; r < arguments.length; r++) {
-    var t = null != arguments[r] ? arguments[r] : {};
-    r % 2 ? ownKeys2(Object(t), true).forEach(function(r$1) {
-      _defineProperty2(e, r$1, t[r$1]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys2(Object(t)).forEach(function(r$1) {
-      Object.defineProperty(e, r$1, Object.getOwnPropertyDescriptor(t, r$1));
+    var t2 = null != arguments[r] ? arguments[r] : {};
+    r % 2 ? ownKeys2(Object(t2), true).forEach(function(r$1) {
+      _defineProperty2(e, r$1, t2[r$1]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t2)) : ownKeys2(Object(t2)).forEach(function(r$1) {
+      Object.defineProperty(e, r$1, Object.getOwnPropertyDescriptor(t2, r$1));
     });
   }
   return e;
@@ -19269,7 +19269,7 @@ var GoTrueClient = class _GoTrueClient {
    * const { error } = await supabase.auth.unlinkIdentity(googleIdentity)
    * ```
    */
-  async unlinkIdentity(identity) {
+  async unlinkIdentity(identity2) {
     try {
       return await this._useSession(async (result) => {
         var _a, _b;
@@ -19277,7 +19277,7 @@ var GoTrueClient = class _GoTrueClient {
         if (error) {
           throw error;
         }
-        return await _request(this.fetch, "DELETE", `${this.url}/user/identities/${identity.identity_id}`, {
+        return await _request(this.fetch, "DELETE", `${this.url}/user/identities/${identity2.identity_id}`, {
           headers: this.headers,
           jwt: (_b = (_a = data.session) === null || _a === void 0 ? void 0 : _a.access_token) !== null && _b !== void 0 ? _b : void 0
         });
@@ -20644,45 +20644,45 @@ function _typeof3(o) {
     return o$1 && "function" == typeof Symbol && o$1.constructor === Symbol && o$1 !== Symbol.prototype ? "symbol" : typeof o$1;
   }, _typeof3(o);
 }
-function toPrimitive3(t, r) {
-  if ("object" != _typeof3(t) || !t) return t;
-  var e = t[Symbol.toPrimitive];
+function toPrimitive3(t2, r) {
+  if ("object" != _typeof3(t2) || !t2) return t2;
+  var e = t2[Symbol.toPrimitive];
   if (void 0 !== e) {
-    var i = e.call(t, r || "default");
+    var i = e.call(t2, r || "default");
     if ("object" != _typeof3(i)) return i;
     throw new TypeError("@@toPrimitive must return a primitive value.");
   }
-  return ("string" === r ? String : Number)(t);
+  return ("string" === r ? String : Number)(t2);
 }
-function toPropertyKey3(t) {
-  var i = toPrimitive3(t, "string");
+function toPropertyKey3(t2) {
+  var i = toPrimitive3(t2, "string");
   return "symbol" == _typeof3(i) ? i : i + "";
 }
-function _defineProperty3(e, r, t) {
+function _defineProperty3(e, r, t2) {
   return (r = toPropertyKey3(r)) in e ? Object.defineProperty(e, r, {
-    value: t,
+    value: t2,
     enumerable: true,
     configurable: true,
     writable: true
-  }) : e[r] = t, e;
+  }) : e[r] = t2, e;
 }
 function ownKeys3(e, r) {
-  var t = Object.keys(e);
+  var t2 = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
     var o = Object.getOwnPropertySymbols(e);
     r && (o = o.filter(function(r$1) {
       return Object.getOwnPropertyDescriptor(e, r$1).enumerable;
-    })), t.push.apply(t, o);
+    })), t2.push.apply(t2, o);
   }
-  return t;
+  return t2;
 }
 function _objectSpread23(e) {
   for (var r = 1; r < arguments.length; r++) {
-    var t = null != arguments[r] ? arguments[r] : {};
-    r % 2 ? ownKeys3(Object(t), true).forEach(function(r$1) {
-      _defineProperty3(e, r$1, t[r$1]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys3(Object(t)).forEach(function(r$1) {
-      Object.defineProperty(e, r$1, Object.getOwnPropertyDescriptor(t, r$1));
+    var t2 = null != arguments[r] ? arguments[r] : {};
+    r % 2 ? ownKeys3(Object(t2), true).forEach(function(r$1) {
+      _defineProperty3(e, r$1, t2[r$1]);
+    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t2)) : ownKeys3(Object(t2)).forEach(function(r$1) {
+      Object.defineProperty(e, r$1, Object.getOwnPropertyDescriptor(t2, r$1));
     });
   }
   return e;
@@ -21198,8 +21198,8 @@ Object.assign(UI_PATHS, {
 
 // book/business-card.js
 var SVG = "http://www.w3.org/2000/svg";
-var E2 = (t, v, c) => {
-  const n = document.createElement(t);
+var E2 = (t2, v, c) => {
+  const n = document.createElement(t2);
   if (v !== void 0 && v !== null) n.textContent = String(v);
   if (c) n.className = c;
   return n;
@@ -21386,8 +21386,8 @@ function createCardMenu({ url, display: display2, qrImage, name, data = {}, slug
   message2.setAttribute("role", "status");
   message2.setAttribute("aria-live", "polite");
   let clear = 0;
-  const say = (t) => {
-    message2.textContent = t;
+  const say = (t2) => {
+    message2.textContent = t2;
     clearTimeout(clear);
     clear = setTimeout(() => {
       message2.textContent = "";
@@ -21427,12 +21427,12 @@ function createCardMenu({ url, display: display2, qrImage, name, data = {}, slug
   const item = (ic, label2, hint, onSelect, cls = "") => {
     const b = E2("button", void 0, "mk-item " + cls);
     b.type = "button";
-    const t = E2("span", void 0, "mk-item-text");
-    t.append(E2("strong", label2));
-    if (hint) t.append(E2("small", hint));
+    const t2 = E2("span", void 0, "mk-item-text");
+    t2.append(E2("strong", label2));
+    if (hint) t2.append(E2("small", hint));
     const i = E2("span", void 0, "mk-item-icon");
     i.append(typeof ic === "string" ? icon(ic) : ic);
-    b.append(i, t);
+    b.append(i, t2);
     b.onclick = async () => {
       await onSelect(b);
     };
@@ -21831,13 +21831,13 @@ async function mountProfessionalIdentity({ root, api: api2, owner, staff }) {
       img.alt = d.full_name;
       portrait.append(img);
     } else portrait.append(E3("span", d.full_name.split(" ").slice(0, 2).map((v) => v[0]).join("")));
-    const identity = E3("div", void 0, "ws-member-identity");
-    identity.append(E3("p", "MUK TALENT \xB7 OUR PEOPLE", "ws-member-overline"), E3("h2", d.full_name), E3("p", d.job_title, "ws-member-role"), E3("p", d.assigned_city ? "Leading our presence in " + d.assigned_city : "Territory pending assignment", "ws-member-city"), E3("span", d.employee_code, "ws-member-code"));
+    const identity2 = E3("div", void 0, "ws-member-identity");
+    identity2.append(E3("p", "MUK TALENT \xB7 OUR PEOPLE", "ws-member-overline"), E3("h2", d.full_name), E3("p", d.job_title, "ws-member-role"), E3("p", d.assigned_city ? "Leading our presence in " + d.assigned_city : "Territory pending assignment", "ws-member-city"), E3("span", d.employee_code, "ws-member-code"));
     const metric = E3("div", void 0, "ws-member-impact");
     metric.append(E3("span", "YOUR PIPELINE POTENTIAL"), E3("strong", d.ready_count), E3("p", "Attributed leads ready for review"));
     if (d.potential_commission !== null) metric.append(E3("b", money(d.potential_commission, d.commission_currency) + " potential"), E3("small", "Indicative only \xB7 subject to approval and commission terms"));
     else metric.append(E3("small", "Your administrator has not set a commission rate."));
-    hero.append(portrait, identity, metric);
+    hero.append(portrait, identity2, metric);
     root.querySelector(".ws-header").after(hero);
   } catch {
   }
@@ -22417,8 +22417,8 @@ function manageAppointment({ a, api: api2, root, onSaved }) {
 }
 
 // admin-src/card-studio.js
-var E5 = (t, v, c) => {
-  const n = document.createElement(t);
+var E5 = (t2, v, c) => {
+  const n = document.createElement(t2);
   if (v !== void 0 && v !== null) n.textContent = String(v);
   if (c) n.className = c;
   return n;
@@ -22434,14 +22434,10 @@ function btn(text, fn, cls = "lx-button") {
 function cardData(d) {
   return { display_name: d.full_name, job_title: d.job_title, assigned_city: d.assigned_city, employee_code: d.employee_code, contact_phone: d.publish_contact ? d.contact_phone : "", contact_email: d.publish_contact ? d.contact_email : "", short_display: d.card?.handle ? d.card.display : null };
 }
-function miniBadge(d, photoUrl) {
-  const wrap = E5("div", void 0, "cs-mini");
-  wrap.append(createBusinessCard({ data: cardData(d), photoUrl: photoUrl ?? d.avatar_url, link: { display: d.card?.handle ? d.card.display : null } }));
-  return wrap;
-}
 async function renderCardStudio({ host, api: api2, owner, readOnly, directory, openTab, onChanged }) {
-  const d = directory, layout = E5("div", void 0, "cs-layout"), stage = E5("section", void 0, "cs-stage"), side = E5("div", void 0, "cs-side");
-  layout.append(stage, side);
+  const d = directory, layout = E5("div", void 0, "cs-layout cs-designer"), show = E5("section", void 0, "cs-showroom"), ident = E5("div", void 0, "cs-ident"), stage = E5("section", void 0, "cs-stage"), side = E5("div", void 0, "cs-side");
+  show.append(E5("span", void 0, "cs-grid-bg"), ident, stage);
+  layout.append(show, side);
   host.append(layout);
   let qr = null;
   if (d.card?.published) {
@@ -22455,6 +22451,7 @@ async function renderCardStudio({ host, api: api2, owner, readOnly, directory, o
   const data = cardData(d);
   if (qr?.handle) data.short_display = qr.display;
   const socials = Array.isArray(d.socials) ? d.socials : [];
+  identity({ host: ident, d, qr, socials, readOnly, openTab });
   let editor, menu = null;
   if (qr) {
     const extras = readOnly ? [] : [{ icon: "edit", label: "Edit short link", hint: "Choose muktalent.com/your-name", onSelect: () => {
@@ -22660,7 +22657,7 @@ async function renderSocialEditor({ host, api: api2, owner, readOnly, onSaved })
         const links = Object.fromEntries(Object.entries(inputs).map(([k, i]) => [k, i.value.trim()]));
         const r = (await api2("/api/workspace/socials", { method: "PUT", body: JSON.stringify({ links, show_on_card: toggle.checked }) })).data;
         for (const [k, i] of Object.entries(inputs)) i.value = editable(r.links[k]);
-        paint(r.links);
+        paint2(r.links);
         message2.textContent = "Saved. Your public card is updated.";
         onSaved?.();
       } catch (err2) {
@@ -22675,19 +22672,885 @@ async function renderSocialEditor({ host, api: api2, owner, readOnly, onSaved })
       }
     };
   } else form.append(E5("p", "Read-only preview.", "lx-muted"));
-  function paint(links) {
+  function paint2(links) {
     preview.replaceChildren(E5("p", "PREVIEW", "lx-overline"), createSocialLinks(Object.entries(links || {}).map(([platform, v]) => ({ platform, label: platform, value: v.value, url: v.url }))));
   }
-  paint(info.links);
+  paint2(info.links);
   panel.append(form, preview);
   const note = E5("details", void 0, "cs-details");
   note.append(E5("summary", "Why links and not a login with each network?"), E5("p", "Signing in with Instagram, TikTok or LinkedIn would give MUK Talent access to your private account data and requires approval from each platform. Linking your public profile gives clients the same one-tap access without sharing your passwords or permissions.", "lx-muted"));
   panel.append(note);
 }
+function identity({ host, d, qr, socials, readOnly, openTab }) {
+  const name = d.full_name || "MUK Talent", parts = name.trim().split(/\s+/), first = parts.shift() || name, rest = parts.join(" ");
+  host.append(E5("p", "MY CARD \xB7 DIGITAL IDENTITY", "cs-kicker"));
+  const h = E5("h2", void 0, "cs-name");
+  h.append(E5("span", first), E5("em", rest || ""));
+  host.append(h, E5("p", d.job_title || "MUK Talent team", "cs-role"));
+  const meta = E5("ul", void 0, "cs-meta");
+  for (const [ic, v] of [["card", d.employee_code ? "ID " + d.employee_code : null], ["home", d.assigned_city || null], ["users", d.languages || null]]) if (v) {
+    const li = E5("li");
+    li.append(icon(ic), E5("span", v));
+    meta.append(li);
+  }
+  host.append(meta);
+  const display2 = qr?.display || (d.card?.handle ? d.card.display : null);
+  const link = E5("div", void 0, "cs-live");
+  const dot = E5("i", void 0, d.card?.published ? "on" : "");
+  link.append(dot, E5("span", display2 || "Short link not set"));
+  if (display2 && qr?.url) {
+    const copy = btn("Copy", async () => {
+      try {
+        await navigator.clipboard.writeText(qr.url);
+        copy.textContent = "Copied";
+        setTimeout(() => {
+          copy.textContent = "Copy";
+        }, 1600);
+      } catch {
+      }
+    }, "cs-live-copy");
+    link.append(copy);
+  }
+  host.append(link);
+  const items = [Boolean(d.avatar_url), Boolean(d.contact_phone || d.contact_email), Boolean(d.card?.handle), Boolean(socials.length), Boolean(d.card?.published)], pct = Math.round(items.filter(Boolean).length / items.length * 100);
+  const stats = E5("dl", void 0, "cs-stats");
+  for (const [k, v] of [["Card strength", pct + "%"], ["Socials", String(socials.length)], ["Status", d.card?.published ? "Live" : "Preview"]]) {
+    const w = E5("div");
+    w.append(E5("dt", k), E5("dd", v));
+    stats.append(w);
+  }
+  host.append(stats);
+  if (!readOnly) {
+    const row = E5("div", void 0, "cs-ident-actions");
+    row.append(btn("Edit profile", () => openTab("profile"), "lx-button"), btn("Socials", () => openTab("social"), "lx-button"));
+    host.append(row);
+  }
+}
+
+// admin-src/gp-ui.js
+var SVG2 = "http://www.w3.org/2000/svg";
+var E6 = (t2, v, c) => {
+  const n = document.createElement(t2);
+  if (v !== void 0 && v !== null) n.textContent = String(v);
+  if (c) n.className = c;
+  return n;
+};
+var P = {
+  globe: ["M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z", "M3 12h18", "M12 3c2.6 2.8 3.8 5.8 3.8 9s-1.2 6.2-3.8 9c-2.6-2.8-3.8-5.8-3.8-9S9.4 5.8 12 3Z"],
+  cap: ["m2 9 10-5 10 5-10 5L2 9Z", "M6 11v5c3.5 2.6 8.5 2.6 12 0v-5", "M22 9v6"],
+  book: ["M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2V5Z", "M19 19v2H6", "M9 7h6"],
+  gauge: ["M4 15a8 8 0 1 1 16 0", "m12 15 4-5", "M12 15h.01"],
+  doc: ["M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z", "M14 3v5h5", "M9 13h6", "M9 17h4"],
+  upload: ["M12 16V4", "m7 9 5-5 5 5", "M5 20h14"],
+  calendar: ["M7 3v3", "M17 3v3", "M4 8h16", "M5 5h14a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"],
+  user: ["M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z", "M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"],
+  users: ["M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z", "M2 21c1.2-3.6 3.8-5.5 7-5.5s5.8 1.9 7 5.5", "M16 3.5a4 4 0 0 1 0 7", "M18 15.5c2 .7 3.3 2.5 4 5.5"],
+  chat: ["M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12Z"],
+  send: ["M22 2 11 13", "M22 2 15 22l-4-9-9-4 20-7Z"],
+  check: ["m5 12 5 5L20 7"],
+  dot: ["M12 12h.01"],
+  clock: ["M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z", "M12 7v5l3 2"],
+  alert: ["M12 3 2 20h20L12 3Z", "M12 10v4", "M12 17h.01"],
+  plane: ["M10.5 13.5 3 11l1.5-1.5 8 1L17 6a2.1 2.1 0 0 1 3 3l-4.5 4.5 1 8L15 23l-2.5-7.5", "M7 17l-3 3"],
+  pin: ["M12 21s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z", "M12 11a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"],
+  shield: ["M12 3 4 6v6c0 5 3.4 8.4 8 9 4.6-.6 8-4 8-9V6l-8-3Z", "m9 12 2 2 4-4"],
+  passport: ["M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6V3Z", "M12 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z", "M9 17h6"],
+  visa: ["M3 6h18v12H3z", "M7 10h4", "M7 14h7", "M16 10h2"],
+  flag: ["M5 21V4", "M5 4h11l-2 4 2 4H5"],
+  note: ["M5 4h10l4 4v12H5V4Z", "M9 12h6", "M9 16h4", "M15 4v4h4"],
+  lock: ["M6 11h12v10H6z", "M8 11V8a4 4 0 0 1 8 0v3"],
+  logout: ["M15 4h4v16h-4", "M10 17l5-5-5-5", "M15 12H4"],
+  plus: ["M12 5v14", "M5 12h14"],
+  x: ["M6 6l12 12", "M18 6 6 18"],
+  eye: ["M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z", "M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"],
+  chevron: ["m9 6 6 6-6 6"],
+  back: ["m15 6-6 6 6 6"],
+  search: ["M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z", "m21 21-4.3-4.3"],
+  refresh: ["M20 11a8 8 0 0 0-14.9-3.9L4 9", "M4 4v5h5", "M4 13a8 8 0 0 0 14.9 3.9L20 15", "M20 20v-5h-5"],
+  spark: ["M12 3v4", "M12 17v4", "M3 12h4", "M17 12h4", "m5.6 5.6 2.8 2.8", "m15.6 15.6 2.8 2.8", "m5.6 18.4 2.8-2.8", "m15.6 8.4 2.8-2.8"],
+  trash: ["M4 7h16", "M9 7V4h6v3", "M6 7l1 13h10l1-13"],
+  home: ["M3 11 12 4l9 7", "M5 10v10h14V10"]
+};
+function gi(name, cls = "gp-i") {
+  const s = document.createElementNS(SVG2, "svg");
+  s.setAttribute("viewBox", "0 0 24 24");
+  s.setAttribute("aria-hidden", "true");
+  s.setAttribute("focusable", "false");
+  s.setAttribute("class", cls);
+  s.setAttribute("fill", "none");
+  s.setAttribute("stroke", "currentColor");
+  s.setAttribute("stroke-width", "1.7");
+  s.setAttribute("stroke-linecap", "round");
+  s.setAttribute("stroke-linejoin", "round");
+  for (const d of P[name] || []) {
+    const p = document.createElementNS(SVG2, "path");
+    p.setAttribute("d", d);
+    s.append(p);
+  }
+  return s;
+}
+function btn2(label2, fn, cls = "gp-btn", ic) {
+  const b = E6("button", void 0, cls);
+  b.type = "button";
+  if (ic) b.append(gi(ic));
+  if (label2) b.append(E6("span", label2));
+  if (fn) b.onclick = fn;
+  return b;
+}
+function ring(pct, size = "md") {
+  const w = E6("div", void 0, "gp-ring gp-ring-" + size);
+  const s = document.createElementNS(SVG2, "svg");
+  s.setAttribute("viewBox", "0 0 44 44");
+  s.setAttribute("aria-hidden", "true");
+  for (const [cls, dash] of [["bg", "100 100"], ["fg", Math.max(0, Math.min(100, pct)) + " 100"]]) {
+    const c = document.createElementNS(SVG2, "circle");
+    c.setAttribute("cx", "22");
+    c.setAttribute("cy", "22");
+    c.setAttribute("r", "18");
+    c.setAttribute("pathLength", "100");
+    c.setAttribute("stroke-dasharray", dash);
+    c.setAttribute("class", "gp-ring-" + cls);
+    s.append(c);
+  }
+  const v = E6("strong", void 0);
+  v.append(document.createTextNode(String(pct)), E6("small", "%"));
+  w.append(s, v);
+  w.setAttribute("role", "img");
+  w.setAttribute("aria-label", pct + "%");
+  w.dataset.level = pct >= 75 ? "high" : pct >= 45 ? "mid" : "low";
+  return w;
+}
+function initials2(name) {
+  return String(name || "GP").trim().split(/\s+/).slice(0, 2).map((v) => v[0] || "").join("").toUpperCase();
+}
+function avatar(name, url, cls = "gp-avatar") {
+  const a = E6("span", void 0, cls);
+  a.append(E6("b", initials2(name)));
+  if (url) {
+    const i = E6("img");
+    i.alt = "";
+    i.decoding = "async";
+    i.referrerPolicy = "no-referrer";
+    i.onload = () => a.classList.add("has-img");
+    i.onerror = () => i.remove();
+    i.src = url;
+    a.append(i);
+  }
+  return a;
+}
+var COUNTRIES = "AF AL DZ AD AO AG AR AM AU AT AZ BS BH BD BB BY BE BZ BJ BT BO BA BW BR BN BG BF BI CV KH CM CA CF TD CL CN CO KM CG CD CR CI HR CU CY CZ DK DJ DM DO EC EG SV GQ ER EE SZ ET FJ FI FR GA GM GE DE GH GR GD GT GN GW GY HT HN HK HU IS IN ID IR IQ IE IL IT JM JP JO KZ KE KI KW KG LA LV LB LS LR LY LI LT LU MO MG MW MY MV ML MT MH MR MU MX FM MD MC MN ME MA MZ MM NA NR NP NL NZ NI NE NG KP MK NO OM PK PW PS PA PG PY PE PH PL PT PR QA RO RU RW KN LC VC WS SM ST SA SN RS SC SL SG SK SI SB SO ZA KR SS ES LK SD SR SE CH SY TW TJ TZ TH TL TG TO TT TN TR TM TV UG UA AE GB US UY UZ VU VA VE VN YE ZM ZW".split(" ");
+function countryName(code, lang2 = "en") {
+  try {
+    return new Intl.DisplayNames([lang2], { type: "region" }).of(code) || code;
+  } catch {
+    return code;
+  }
+}
+function countrySelect(id, lang2, value, placeholder) {
+  const s = E6("select");
+  s.id = id;
+  s.required = true;
+  const ph = new Option(placeholder || "\u2014", "");
+  ph.disabled = true;
+  s.append(ph);
+  const list = COUNTRIES.map((c) => [c, countryName(c, lang2)]).sort((a, b) => a[1].localeCompare(b[1], lang2));
+  for (const [c, n] of list) s.append(new Option(n, c));
+  s.value = value || "";
+  if (!value) ph.selected = true;
+  return s;
+}
+function iso(code) {
+  const b = E6("span", code || "\u2014", "gp-iso");
+  return b;
+}
+function fmtDate(v, lang2 = "en", opts = { day: "numeric", month: "short", year: "numeric" }) {
+  if (!v) return "\u2014";
+  const d = new Date(String(v).length === 10 ? v + "T12:00:00Z" : v);
+  return Number.isNaN(d.getTime()) ? "\u2014" : new Intl.DateTimeFormat(lang2 === "fr" ? "fr-FR" : "en-GB", { timeZone: "UTC", ...opts }).format(d);
+}
+function ago(v, lang2 = "en") {
+  const s = (Date.now() - Date.parse(v)) / 1e3;
+  const rtf = new Intl.RelativeTimeFormat(lang2, { numeric: "auto" });
+  if (s < 60) return rtf.format(0, "second");
+  if (s < 3600) return rtf.format(-Math.round(s / 60), "minute");
+  if (s < 86400) return rtf.format(-Math.round(s / 3600), "hour");
+  if (s < 86400 * 30) return rtf.format(-Math.round(s / 86400), "day");
+  return fmtDate(v, lang2);
+}
+function daysUntil(day) {
+  return Math.round((Date.parse(day + "T12:00:00Z") - Date.parse((/* @__PURE__ */ new Date()).toISOString().slice(0, 10) + "T12:00:00Z")) / 864e5);
+}
+function linkCss(id, href) {
+  if (!document.getElementById(id)) {
+    const l = E6("link");
+    l.id = id;
+    l.rel = "stylesheet";
+    l.href = href;
+    document.head.append(l);
+  }
+}
+var reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+function attachSwipe(el3, { onNext, onPrev, canSwipe = () => true }) {
+  let x0 = 0, y0 = 0, t0 = 0, active = false, locked = null, dx = 0;
+  const skip = (t2) => t2.closest("input,textarea,select,[contenteditable],dialog,[data-noswipe],.gp-hscroll,.lx-tabs,.lx-gallery,.lx-calendar,.cs-suggestions");
+  el3.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1 || !canSwipe() || skip(e.target)) {
+      active = false;
+      return;
+    }
+    const p = e.touches[0];
+    x0 = p.clientX;
+    y0 = p.clientY;
+    t0 = Date.now();
+    active = true;
+    locked = null;
+    dx = 0;
+  }, { passive: true });
+  el3.addEventListener("touchmove", (e) => {
+    if (!active) return;
+    const p = e.touches[0], mx = p.clientX - x0, my = p.clientY - y0;
+    if (locked === null && (Math.abs(mx) > 10 || Math.abs(my) > 10)) locked = Math.abs(mx) > Math.abs(my) * 1.3 ? "x" : "y";
+    if (locked !== "x") return;
+    dx = mx;
+    if (!reducedMotion()) el3.style.setProperty("--swipe-x", (dx * 0.35).toFixed(1) + "px");
+    el3.classList.add("is-swiping");
+  }, { passive: true });
+  const end = () => {
+    if (!active) return;
+    active = false;
+    el3.classList.remove("is-swiping");
+    el3.style.removeProperty("--swipe-x");
+    if (locked !== "x") return;
+    const fast = Date.now() - t0 < 450;
+    if (Math.abs(dx) > (fast ? 45 : 90)) {
+      if (dx < 0) onNext?.();
+      else onPrev?.();
+    }
+  };
+  el3.addEventListener("touchend", end, { passive: true });
+  el3.addEventListener("touchcancel", () => {
+    active = false;
+    el3.classList.remove("is-swiping");
+    el3.style.removeProperty("--swipe-x");
+  }, { passive: true });
+}
+function pager(items, current, go, cls = "gp-pager") {
+  const nav2 = E6("nav", void 0, cls);
+  nav2.setAttribute("aria-label", "Sections");
+  const label2 = E6("span", void 0, "gp-pager-label");
+  const dots = E6("div", void 0, "gp-pager-dots");
+  items.forEach(([id, text], i) => {
+    const d = E6("button", void 0, "gp-pager-dot");
+    d.type = "button";
+    d.setAttribute("aria-label", text);
+    if (id === current) {
+      d.setAttribute("aria-current", "page");
+      label2.textContent = text;
+    }
+    d.onclick = () => go(id);
+    dots.append(d);
+  });
+  nav2.append(label2, dots);
+  return nav2;
+}
+function hintOnce(key, text, host = document.body) {
+  try {
+    if (localStorage.getItem(key)) return;
+    localStorage.setItem(key, "1");
+  } catch {
+    return;
+  }
+  const h = E6("div", void 0, "gp-swipe-hint");
+  h.setAttribute("role", "status");
+  const hand = E6("span", void 0, "gp-swipe-hand");
+  hand.append(gi("back"), gi("chevron"));
+  h.append(hand, E6("span", text));
+  host.append(h);
+  setTimeout(() => h.classList.add("out"), 3600);
+  setTimeout(() => h.remove(), 4300);
+}
+function idleLogout(root, onLogout, minutes = 30) {
+  let last = Date.now();
+  const bump = () => {
+    last = Date.now();
+  };
+  for (const ev of ["pointerdown", "keydown", "touchstart", "scroll"]) addEventListener(ev, bump, { passive: true });
+  const timer = setInterval(() => {
+    if (!root.isConnected) {
+      clearInterval(timer);
+      return;
+    }
+    if (Date.now() - last > minutes * 6e4) {
+      clearInterval(timer);
+      onLogout();
+    }
+  }, 3e4);
+}
+
+// admin-src/counsellor.js
+var STAGES = [["registration", "Registration"], ["university", "University"], ["documents", "Documents"], ["application", "Application"], ["offer", "Offer"], ["visa", "Visa"], ["travel", "Travel"], ["arrival", "Arrival"]];
+var STATUS = { profile: "Profile in progress", preparing: "Preparing application", submitted: "Application submitted", awaiting: "Awaiting university", offer: "Offer received", visa: "Visa in progress", travel: "Preparing travel", enrolled: "Enrolled", on_hold: "On hold", withdrawn: "Withdrawn" };
+var LEVELS = ["Foundation", "Undergraduate", "Postgraduate taught (Master's)", "Postgraduate research (PhD)", "English language course", "Not sure yet"];
+var DOC = { requested: "Requested", uploaded: "To review", approved: "Approved", rejected: "Needs changes" };
+var FILTERS = [["all", "All"], ["attention", "Needs attention"], ["review", "Docs to review"], ["preparing", "Preparing"], ["awaiting", "Awaiting university"], ["unread", "Unread"]];
+async function renderControlCentre({ host, api: api2, admin = false, notice = () => {
+} }) {
+  linkCss("gpCentreCss", "/admin/counsellor-centre.css");
+  const wrap = E6("div", void 0, "cc");
+  host.append(wrap);
+  let list = null, filter = "all", query = "", scope = admin ? "all" : "mine", openId = null;
+  async function load() {
+    try {
+      list = await api2("/api/gp/students" + (scope === "all" ? "?scope=all" : ""));
+      draw();
+    } catch (e) {
+      wrap.replaceChildren(setupState(e.message));
+    }
+  }
+  function setupState(text) {
+    const s = E6("section", void 0, "cc-setup");
+    s.append(gi("shield", "gp-i cc-setup-i"), E6("h2", "Global Passport"), E6("p", text, "cc-muted"), btn2("Try again", load, "cc-btn cc-primary", "refresh"));
+    return s;
+  }
+  function draw() {
+    wrap.replaceChildren();
+    const m = list.metrics, rows = list.data;
+    const hero = E6("section", void 0, "cc-hero");
+    const ht = E6("div", void 0, "cc-hero-text");
+    ht.append(E6("p", "COUNSELLOR CONTROL CENTRE", "cc-kicker"), E6("h2", scope === "all" ? "All Global Passport students" : "Your students, one command view"), E6("p", "Review files, validate documents, assign tasks and keep every student moving to the UK.", "cc-muted"));
+    const tools = E6("div", void 0, "cc-hero-tools");
+    if (admin) {
+      const seg = E6("div", void 0, "cc-seg");
+      for (const [id, label2] of [["mine", "Mine"], ["all", "All students"]]) {
+        const b = E6("button", label2);
+        b.type = "button";
+        b.setAttribute("aria-pressed", String(scope === id));
+        b.onclick = () => {
+          scope = id;
+          load();
+        };
+        seg.append(b);
+      }
+      tools.append(seg);
+    }
+    const avail = E6("label", void 0, "cc-switch");
+    const cb = E6("input");
+    cb.type = "checkbox";
+    cb.checked = list.settings?.accepting !== false;
+    cb.onchange = async () => {
+      cb.disabled = true;
+      try {
+        await api2("/api/gp/settings", { method: "PUT", body: JSON.stringify({ accepting: cb.checked, capacity: list.settings?.capacity ?? 60 }) });
+        list.settings = { ...list.settings, accepting: cb.checked };
+        notice(cb.checked ? "You are receiving new students automatically." : "New students will be assigned to other counsellors.");
+      } catch (e) {
+        cb.checked = !cb.checked;
+        notice(e.message, true);
+      } finally {
+        cb.disabled = false;
+      }
+    };
+    avail.append(cb, E6("i"), E6("span", "Accepting new students"));
+    tools.append(avail, btn2("", load, "cc-icon", "refresh"));
+    ht.append(tools);
+    hero.append(ht);
+    const metrics = E6("div", void 0, "cc-metrics");
+    for (const [key, label2, ic, tone, f] of [["assigned", "Students assigned", "users", "", null], ["preparing", "Applications in preparation", "doc", "", "preparing"], ["documents_review", "Documents to review", "eye", "gold", "review"], ["awaiting", "Awaiting university response", "clock", "", "awaiting"], ["attention", "Need urgent attention", "alert", "red", "attention"]]) {
+      const c = E6("button", void 0, "cc-metric" + (tone ? " cc-" + tone : "") + (f && filter === f ? " is-on" : ""));
+      c.type = "button";
+      const i = E6("span", void 0, "cc-metric-i");
+      i.append(gi(ic));
+      c.append(i, E6("strong", m[key] ?? 0), E6("small", label2));
+      c.onclick = () => {
+        filter = f && filter !== f ? f : "all";
+        draw();
+      };
+      metrics.append(c);
+    }
+    hero.append(metrics);
+    wrap.append(hero);
+    const board = E6("div", void 0, "cc-board");
+    const pipe = E6("section", void 0, "cc-panel cc-pipe");
+    pipe.append(E6("h3", "Journey pipeline"));
+    const max = Math.max(1, ...STAGES.map(([k]) => rows.filter((r) => r.current_stage === k).length));
+    for (const [k, label2] of STAGES) {
+      const n = rows.filter((r2) => r2.current_stage === k).length;
+      const r = E6("div", void 0, "cc-pipe-row");
+      const bar2 = E6("span", void 0, "cc-pipe-bar");
+      const fill = E6("i");
+      fill.style.setProperty("--w", Math.round(n / max * 100) + "%");
+      bar2.append(fill);
+      r.append(E6("span", label2), bar2, E6("b", n));
+      pipe.append(r);
+    }
+    const docs = rows.reduce((a, r) => {
+      a.review += r.docs_to_review;
+      a.missing += r.docs_missing;
+      return a;
+    }, { review: 0, missing: 0 });
+    const donut = E6("section", void 0, "cc-panel cc-donut");
+    donut.append(E6("h3", "Documents"));
+    const total = Math.max(1, docs.review + docs.missing);
+    const d = E6("div", void 0, "cc-donut-ring");
+    d.style.setProperty("--a", Math.round(docs.review / total * 360) + "deg");
+    d.append(E6("strong", docs.review + docs.missing), E6("small", "open"));
+    const lg = E6("ul", void 0, "cc-legend");
+    lg.append(legend("gold", "To review", docs.review), legend("grey", "Missing / to fix", docs.missing));
+    donut.append(d, lg);
+    board.append(pipe, donut);
+    wrap.append(board);
+    const listPanel = E6("section", void 0, "cc-panel cc-list");
+    const bar = E6("div", void 0, "cc-list-bar");
+    const search = E6("input");
+    search.type = "search";
+    search.placeholder = "Search name, reference, university\u2026";
+    search.value = query;
+    search.setAttribute("aria-label", "Search students");
+    search.oninput = () => {
+      query = search.value;
+      paint2();
+    };
+    const sw = E6("div", void 0, "cc-search");
+    sw.append(gi("search"), search);
+    const chips = E6("div", void 0, "cc-chips gp-hscroll");
+    for (const [id, label2] of FILTERS) {
+      const c = E6("button", label2, "cc-chip");
+      c.type = "button";
+      c.setAttribute("aria-pressed", String(filter === id));
+      c.onclick = () => {
+        filter = id;
+        draw();
+      };
+      chips.append(c);
+    }
+    bar.append(sw, chips);
+    listPanel.append(bar);
+    const body = E6("div", void 0, "cc-rows");
+    listPanel.append(body);
+    wrap.append(listPanel);
+    function paint2() {
+      body.replaceChildren();
+      const q2 = query.toLowerCase().trim();
+      const att = new Set(m.attention_ids || []);
+      const shown = rows.filter((r) => filter === "all" || filter === "attention" && att.has(r.user_id) || filter === "review" && r.docs_to_review || filter === "preparing" && ["profile", "preparing"].includes(r.application_status) || filter === "awaiting" && ["submitted", "awaiting"].includes(r.application_status) || filter === "unread" && r.unread).filter((r) => !q2 || [r.full_name, r.reference, r.email, r.university, r.subject, countryName(r.country_residence)].join(" ").toLowerCase().includes(q2)).sort((a, b) => att.has(b.user_id) - att.has(a.user_id) || b.unread - a.unread || b.docs_to_review - a.docs_to_review);
+      for (const r of shown) body.append(studentRow(r, att.has(r.user_id)));
+      if (!shown.length) body.append(E6("p", rows.length ? "No students match this view." : "No students yet. New Global Passport sign-ups are assigned to you automatically.", "cc-empty"));
+    }
+    paint2();
+    if (openId) {
+      const id = openId;
+      openId = null;
+      openFile(id);
+    }
+  }
+  function legend(tone, label2, n) {
+    const li = E6("li");
+    li.append(E6("i", void 0, "cc-dot cc-dot-" + tone), E6("span", label2), E6("b", n));
+    return li;
+  }
+  function studentRow(r, attention) {
+    const row = E6("button", void 0, "cc-row" + (attention ? " is-attention" : ""));
+    row.type = "button";
+    const who = E6("div", void 0, "cc-who");
+    const txt = E6("div");
+    txt.append(E6("strong", r.full_name), E6("small", r.reference + " \xB7 " + (r.subject || "\u2014")));
+    who.append(avatar(r.full_name, null, "gp-avatar cc-av"), txt);
+    const geo = E6("div", void 0, "cc-geo");
+    geo.append(iso(r.country_residence), E6("span", "\u2192"), iso("UK"));
+    const stage = E6("div", void 0, "cc-stage");
+    stage.append(E6("small", STAGES.find((s) => s[0] === r.current_stage)?.[1] || "\u2014"), E6("span", STATUS[r.application_status] || r.application_status, "cc-status cc-st-" + r.application_status));
+    const ready = E6("div", void 0, "cc-ready");
+    const b = E6("span", void 0, "cc-ready-bar");
+    const f = E6("i");
+    f.style.setProperty("--w", r.readiness + "%");
+    b.dataset.level = r.readiness >= 75 ? "high" : r.readiness >= 45 ? "mid" : "low";
+    b.append(f);
+    ready.append(E6("b", r.readiness + "%"), b);
+    const flags = E6("div", void 0, "cc-flags");
+    if (attention) flags.append(tag("Attention", "red", "alert"));
+    if (r.docs_to_review) flags.append(tag(r.docs_to_review + " to review", "gold", "eye"));
+    if (r.unread) flags.append(tag(r.unread + " new", "blue", "chat"));
+    if (r.overdue_tasks) flags.append(tag(r.overdue_tasks + " overdue", "red", "clock"));
+    if (r.next_event) flags.append(tag(fmtDate(r.next_event.starts_on, "en", { day: "numeric", month: "short" }) + " \xB7 " + r.next_event.title, "grey", "calendar"));
+    row.append(who, geo, stage, ready, flags, gi("chevron", "gp-i cc-go"));
+    row.onclick = () => openFile(r.user_id);
+    return row;
+  }
+  function tag(text, tone, ic) {
+    const t2 = E6("span", void 0, "cc-tag cc-tag-" + tone);
+    t2.append(gi(ic), E6("span", text));
+    return t2;
+  }
+  async function openFile(id, tab = "overview") {
+    const d = E6("dialog", void 0, "cc-file");
+    d.setAttribute("aria-label", "Student file");
+    document.body.append(d);
+    const panel = E6("div", void 0, "cc-file-in");
+    d.append(panel);
+    d.addEventListener("close", () => {
+      d.remove();
+      load();
+    });
+    d.addEventListener("click", (e) => {
+      if (e.target === d) d.close();
+    });
+    d.showModal();
+    panel.append(E6("p", "Loading file\u2026", "cc-muted cc-pad"));
+    let f;
+    const reload = async (keep = tab) => {
+      try {
+        f = (await api2("/api/gp/students/" + id)).data;
+        tab = keep;
+        paintFile();
+      } catch (e) {
+        panel.replaceChildren(E6("p", e.message, "cc-pad cc-bad"), btn2("Close", () => d.close(), "cc-btn"));
+      }
+    };
+    const act = async (fn, ok) => {
+      try {
+        await fn();
+        if (ok) notice(ok);
+        await reload(tab);
+      } catch (e) {
+        alert(e.message);
+      }
+    };
+    function paintFile() {
+      const s = f.student;
+      panel.replaceChildren();
+      const head2 = E6("header", void 0, "cc-file-head");
+      const close = btn2("", () => d.close(), "cc-icon cc-close", "x");
+      close.setAttribute("aria-label", "Close file");
+      const idb = E6("div", void 0, "cc-file-id");
+      const t2 = E6("div");
+      t2.append(E6("p", s.reference + " \xB7 UNITED KINGDOM", "cc-kicker"), E6("h2", s.full_name), E6("p", [countryName(s.country_residence), "Nationality " + countryName(s.nationality), s.email].join(" \xB7 "), "cc-muted"));
+      idb.append(avatar(s.full_name, null, "gp-avatar cc-av-lg"), t2);
+      const right = E6("div", void 0, "cc-file-right");
+      right.append(ring(f.readiness, "md"));
+      const status = E6("select");
+      status.setAttribute("aria-label", "Application status");
+      for (const [k, v] of Object.entries(STATUS)) status.append(new Option(v, k));
+      status.value = s.application_status;
+      status.onchange = () => act(() => api2("/api/gp/students/" + id, { method: "PATCH", body: JSON.stringify({ application_status: status.value }) }), "Status updated \xB7 the student has been notified.");
+      const urgent = E6("label", void 0, "cc-switch cc-switch-red");
+      const u = E6("input");
+      u.type = "checkbox";
+      u.checked = s.urgent;
+      u.onchange = () => act(() => api2("/api/gp/students/" + id, { method: "PATCH", body: JSON.stringify({ urgent: u.checked }) }));
+      urgent.append(u, E6("i"), E6("span", "Urgent"));
+      right.append(status, urgent);
+      head2.append(close, idb, right);
+      panel.append(head2);
+      const tabs = E6("div", void 0, "cc-tabs gp-hscroll");
+      tabs.setAttribute("role", "tablist");
+      const toReview = f.documents.filter((x) => x.status === "uploaded").length;
+      for (const [k, label2, badge] of [["overview", "File"], ["journey", "Journey"], ["documents", "Documents", toReview], ["tasks", "Tasks & dates"], ["messages", "Messages"], ["notes", "Private notes"]]) {
+        const b = E6("button", label2, "cc-tab");
+        b.type = "button";
+        b.setAttribute("role", "tab");
+        b.setAttribute("aria-selected", String(tab === k));
+        if (badge) b.append(E6("i", badge, "cc-count"));
+        b.onclick = () => {
+          tab = k;
+          paintFile();
+        };
+        tabs.append(b);
+      }
+      panel.append(tabs);
+      const body = E6("div", void 0, "cc-file-body");
+      panel.append(body);
+      ({ overview, journey, documents, tasks, messages, notes })[tab](body, s);
+    }
+    function overview(body, s) {
+      const form = E6("form", void 0, "cc-form");
+      const v = {};
+      const grid = E6("div", void 0, "cc-form-grid");
+      const text = (k, label2, max = 160) => {
+        const w = E6("label", void 0, "cc-field");
+        const i = E6("input");
+        i.value = s[k] || "";
+        i.maxLength = max;
+        i.oninput = () => v[k] = i.value;
+        w.append(E6("span", label2), i);
+        grid.append(w);
+      };
+      text("university", "University");
+      text("programme", "Programme");
+      text("intake", "Intake", 40);
+      text("subject", "Subject area", 120);
+      text("english_test", "English test / level", 80);
+      const lw = E6("label", void 0, "cc-field");
+      const lv = E6("select");
+      for (const l of LEVELS) lv.append(new Option(l, l));
+      lv.value = s.study_level || LEVELS[5];
+      lv.onchange = () => v.study_level = lv.value;
+      lw.append(E6("span", "Study level"), lv);
+      grid.append(lw);
+      if (f.counsellors) {
+        const cw = E6("label", void 0, "cc-field");
+        const cs = E6("select");
+        cs.append(new Option("Unassigned", ""));
+        for (const c of f.counsellors) cs.append(new Option(c.full_name + (c.role === "admin" ? " \xB7 admin" : ""), c.user_id));
+        cs.value = s.counsellor_id || "";
+        cs.onchange = () => v.counsellor_id = cs.value || null;
+        cw.append(E6("span", "Counsellor (admin)"), cs);
+        grid.append(cw);
+      }
+      const save = E6("button", "Save file", "cc-btn cc-primary");
+      save.type = "submit";
+      form.append(grid, save);
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        if (!Object.keys(v).length) return;
+        act(() => api2("/api/gp/students/" + id, { method: "PATCH", body: JSON.stringify(v) }), "File saved.");
+      };
+      const facts = E6("dl", void 0, "cc-facts");
+      for (const [k, val] of [["Phone", s.phone || "\u2014"], ["Date of birth", fmtDate(s.date_of_birth)], ["Residence", countryName(s.country_residence)], ["Nationality", countryName(s.nationality)], ["Joined", fmtDate(s.created_at)], ["Counsellor", f.counsellor?.full_name || "Unassigned"]]) {
+        const it = E6("div", void 0, "cc-fact");
+        it.append(E6("dt", k), E6("dd", val));
+        facts.append(it);
+      }
+      body.append(facts, form);
+    }
+    function journey(body) {
+      const ol = E6("ol", void 0, "cc-journey");
+      for (const st of f.stages) {
+        const li = E6("li", void 0, "cc-j is-" + st.status);
+        const n = E6("span", void 0, "cc-j-node");
+        n.append(gi(st.status === "done" ? "check" : "dot"));
+        const t2 = E6("div", void 0, "cc-j-txt");
+        t2.append(E6("strong", f.stage_titles[st.stage_key]), E6("small", st.updated_at ? "Updated " + ago(st.updated_at) : "Not started yet"));
+        const seg = E6("div", void 0, "cc-seg cc-seg-sm");
+        for (const [k, label2] of [["pending", "Pending"], ["in_progress", "In progress"], ["done", "Done"]]) {
+          const b = E6("button", label2);
+          b.type = "button";
+          b.setAttribute("aria-pressed", String(st.status === k));
+          b.onclick = () => {
+            if (st.status !== k) act(() => api2("/api/gp/students/" + id + "/stages/" + st.stage_key, { method: "PUT", body: JSON.stringify({ status: k }) }), "Journey updated \xB7 the student sees it now.");
+          };
+          seg.append(b);
+        }
+        li.append(n, t2, seg);
+        ol.append(li);
+      }
+      body.append(E6("p", "Each change is shared with the student as a progress update.", "cc-muted"), ol);
+    }
+    function documents(body) {
+      for (const doc of f.documents) {
+        const r = E6("div", void 0, "cc-doc is-" + doc.status);
+        const t2 = E6("div", void 0, "cc-doc-txt");
+        t2.append(E6("strong", doc.label), E6("small", DOC[doc.status] + " \xB7 " + (f.stage_titles[doc.stage_key] || "") + (doc.file_name ? " \xB7 " + doc.file_name : "")));
+        if (doc.review_note) t2.append(E6("small", doc.review_note, "cc-bad"));
+        const a = E6("div", void 0, "cc-doc-acts");
+        if (doc.file_name) a.append(btn2("View", async () => {
+          try {
+            window.open((await api2("/api/gp/documents/" + doc.id + "/url")).data.url, "_blank", "noopener");
+          } catch (e) {
+            alert(e.message);
+          }
+        }, "cc-btn cc-sm", "eye"));
+        if (doc.status === "uploaded") {
+          a.append(btn2("Approve", () => act(() => api2("/api/gp/documents/" + doc.id + "/review", { method: "POST", body: JSON.stringify({ status: "approved" }) }), "Document approved."), "cc-btn cc-sm cc-ok", "check"), btn2("Request changes", () => {
+            const note = prompt("What should the student change?");
+            if (note && note.trim()) act(() => api2("/api/gp/documents/" + doc.id + "/review", { method: "POST", body: JSON.stringify({ status: "rejected", note: note.trim() }) }), "Change request sent.");
+          }, "cc-btn cc-sm cc-warn", "alert"));
+        }
+        r.append(gi(doc.status === "approved" ? "check" : doc.status === "rejected" ? "alert" : "doc", "gp-i cc-doc-i"), t2, a);
+        body.append(r);
+      }
+      const form = E6("form", void 0, "cc-inline");
+      const label2 = E6("input");
+      label2.placeholder = "Request a document, e.g. CAS letter";
+      label2.required = true;
+      label2.maxLength = 160;
+      label2.setAttribute("aria-label", "Document to request");
+      const stage = E6("select");
+      stage.setAttribute("aria-label", "Stage");
+      for (const [k] of STAGES) stage.append(new Option(f.stage_titles[k], k));
+      stage.value = "documents";
+      const msg = E6("input");
+      msg.placeholder = "Message (optional)";
+      msg.maxLength = 600;
+      msg.setAttribute("aria-label", "Message");
+      const go = E6("button", "Send request", "cc-btn cc-primary");
+      go.type = "submit";
+      form.append(label2, stage, msg, go);
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        act(() => api2("/api/gp/students/" + id + "/documents", { method: "POST", body: JSON.stringify({ label: label2.value, stage_key: stage.value, message: msg.value || null, doc_type: "other" }) }), "Document requested \xB7 the student has been notified.");
+      };
+      body.append(E6("h3", "Request documentation"), form);
+    }
+    function tasks(body) {
+      const open = f.tasks;
+      for (const t2 of open) {
+        const r = E6("div", void 0, "cc-task" + (t2.status === "done" ? " is-done" : ""));
+        const cb = E6("input");
+        cb.type = "checkbox";
+        cb.checked = t2.status === "done";
+        cb.setAttribute("aria-label", "Done");
+        cb.onchange = () => act(() => api2("/api/gp/tasks/" + t2.id, { method: "PATCH", body: JSON.stringify({ status: cb.checked ? "done" : "open" }) }));
+        const tx = E6("div");
+        tx.append(E6("strong", t2.title), E6("small", (f.stage_titles[t2.stage_key] || "") + (t2.due_date ? " \xB7 due " + fmtDate(t2.due_date) : ""), t2.due_date && t2.status === "open" && daysUntil(t2.due_date) < 0 ? "cc-bad" : "cc-muted"));
+        const del = btn2("", () => {
+          if (confirm("Delete this task?")) act(() => api2("/api/gp/tasks/" + t2.id, { method: "PATCH", body: JSON.stringify({ remove: true }) }));
+        }, "cc-icon", "trash");
+        del.setAttribute("aria-label", "Delete task");
+        r.append(cb, tx, del);
+        body.append(r);
+      }
+      const form = E6("form", void 0, "cc-inline");
+      const title = E6("input");
+      title.placeholder = "Assign a task";
+      title.required = true;
+      title.maxLength = 160;
+      title.setAttribute("aria-label", "Task");
+      const stage = E6("select");
+      stage.setAttribute("aria-label", "Stage");
+      for (const [k] of STAGES) stage.append(new Option(f.stage_titles[k], k));
+      stage.value = f.stages.find((s) => s.status === "in_progress")?.stage_key || "documents";
+      const due = E6("input");
+      due.type = "date";
+      due.setAttribute("aria-label", "Due date");
+      const go = E6("button", "Assign", "cc-btn cc-primary");
+      go.type = "submit";
+      form.append(title, stage, due, go);
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        act(() => api2("/api/gp/students/" + id + "/tasks", { method: "POST", body: JSON.stringify({ title: title.value, stage_key: stage.value, due_date: due.value || null, detail: null }) }), "Task assigned.");
+      };
+      body.append(E6("h3", "Assign task"), form, E6("h3", "Important dates"));
+      for (const ev of f.events) {
+        const r = E6("div", void 0, "cc-task");
+        const tx = E6("div");
+        tx.append(E6("strong", ev.title), E6("small", fmtDate(ev.starts_on) + " \xB7 " + ev.kind, "cc-muted"));
+        const del = btn2("", () => {
+          if (confirm("Remove this date?")) act(() => api2("/api/gp/events/" + ev.id, { method: "DELETE" }));
+        }, "cc-icon", "trash");
+        del.setAttribute("aria-label", "Remove date");
+        r.append(gi("calendar"), tx, del);
+        body.append(r);
+      }
+      const ef = E6("form", void 0, "cc-inline");
+      const et = E6("input");
+      et.placeholder = "e.g. UCAS deadline, visa appointment";
+      et.required = true;
+      et.maxLength = 160;
+      et.setAttribute("aria-label", "Date title");
+      const ed = E6("input");
+      ed.type = "date";
+      ed.required = true;
+      ed.setAttribute("aria-label", "Date");
+      const ek = E6("select");
+      ek.setAttribute("aria-label", "Kind");
+      for (const k of ["deadline", "meeting", "intake", "visa", "travel", "other"]) ek.append(new Option(k[0].toUpperCase() + k.slice(1), k));
+      const eg = E6("button", "Add date", "cc-btn cc-primary");
+      eg.type = "submit";
+      ef.append(et, ed, ek, eg);
+      ef.onsubmit = (e) => {
+        e.preventDefault();
+        act(() => api2("/api/gp/students/" + id + "/events", { method: "POST", body: JSON.stringify({ title: et.value, starts_on: ed.value, kind: ek.value }) }), "Date added to the student calendar.");
+      };
+      body.append(ef);
+    }
+    function messages(body) {
+      const th = E6("div", void 0, "cc-thread");
+      for (const m of f.messages) {
+        const b = E6("div", void 0, "cc-msg cc-msg-" + m.sender_role + (m.kind === "update" ? " is-update" : ""));
+        b.append(E6("p", m.body), E6("small", (m.sender_role === "student" ? f.student.full_name.split(" ")[0] : m.sender_role === "system" ? "System" : "You / team") + " \xB7 " + ago(m.created_at) + (m.kind === "update" ? " \xB7 update" : "")));
+        th.append(b);
+      }
+      if (!f.messages.length) th.append(E6("p", "No messages yet.", "cc-muted"));
+      const form = E6("form", void 0, "cc-composer");
+      const ta = E6("textarea");
+      ta.rows = 2;
+      ta.maxLength = 2e3;
+      ta.required = true;
+      ta.placeholder = "Write to " + f.student.full_name.split(" ")[0] + "\u2026";
+      ta.setAttribute("aria-label", "Message");
+      const kind = E6("label", void 0, "cc-check");
+      const k = E6("input");
+      k.type = "checkbox";
+      kind.append(k, E6("span", "Share as progress update"));
+      const go = E6("button", "Send", "cc-btn cc-primary");
+      go.type = "submit";
+      const row = E6("div", void 0, "cc-composer-row");
+      row.append(kind, go);
+      form.append(ta, row);
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        act(() => api2("/api/gp/students/" + id + "/messages", { method: "POST", body: JSON.stringify({ body: ta.value, kind: k.checked ? "update" : "message" }) }));
+      };
+      body.append(th, form);
+      requestAnimationFrame(() => {
+        th.scrollTop = th.scrollHeight;
+      });
+    }
+    function notes(body) {
+      body.append(E6("p", "Private: only the MUK Talent team can read these notes.", "cc-muted cc-private"));
+      const form = E6("form", void 0, "cc-composer");
+      const ta = E6("textarea");
+      ta.rows = 3;
+      ta.maxLength = 4e3;
+      ta.required = true;
+      ta.placeholder = "Add a private observation\u2026";
+      ta.setAttribute("aria-label", "Private note");
+      const go = E6("button", "Save note", "cc-btn cc-primary");
+      go.type = "submit";
+      form.append(ta, go);
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        act(() => api2("/api/gp/students/" + id + "/notes", { method: "POST", body: JSON.stringify({ body: ta.value }) }), "Note saved.");
+      };
+      body.append(form);
+      for (const n of f.notes) {
+        const c = E6("article", void 0, "cc-note");
+        c.append(E6("p", n.body), E6("small", ago(n.created_at), "cc-muted"));
+        body.append(c);
+      }
+    }
+    await reload();
+  }
+  await load();
+  return { reload: load };
+}
+function mountPassportAdmin({ api: api2, getStaff }) {
+  if (document.getElementById("passportAdminButton")) return;
+  const host = document.querySelector("#appShell .page-header");
+  if (!host) return;
+  const box = E6("div", void 0, "form-actions");
+  const b = E6("button", "Global Passport \xB7 Control Centre", "secondary");
+  b.type = "button";
+  b.id = "passportAdminButton";
+  box.append(b);
+  host.after(box);
+  b.onclick = async () => {
+    if (getStaff()?.role !== "admin") return;
+    document.getElementById("gpControlOverlay")?.remove();
+    const o = E6("div", void 0, "cc-overlay");
+    o.id = "gpControlOverlay";
+    o.lang = "en";
+    const top = E6("div", void 0, "cc-overlay-top");
+    top.append(E6("strong", "MUK TALENT \xB7 GLOBAL PASSPORT"), btn2("Back to administration", () => {
+      o.remove();
+      document.getElementById("appShell").hidden = false;
+    }, "cc-btn", "back"));
+    const body = E6("div", void 0, "cc-overlay-body");
+    o.append(top, body);
+    document.body.append(o);
+    document.getElementById("appShell").hidden = true;
+    const status = E6("p", "", "cc-toast");
+    top.after(status);
+    await renderControlCentre({ host: body, api: api2, admin: true, notice: (t2, err2) => {
+      status.textContent = t2;
+      status.classList.toggle("cc-bad", Boolean(err2));
+    } });
+  };
+}
 
 // admin-src/employee.js
-var E6 = (t, v, c) => {
-  const n = document.createElement(t);
+var E7 = (t2, v, c) => {
+  const n = document.createElement(t2);
   if (v !== void 0) n.textContent = String(v);
   if (c) n.className = c;
   return n;
@@ -22712,8 +23575,8 @@ function money2(v, c) {
   }
 }
 function linkStyles() {
-  for (const [id, href] of [["professionalStyles", "/admin/professional.css"], ["businessCardStyles", "/book/business-card.css"], ["luxuryWorkspaceStyles", "/admin/luxury-workspace.css"], ["mukSoftStyles", "/admin/muk-soft.css"]]) if (!document.getElementById(id)) {
-    const l = E6("link");
+  for (const [id, href] of [["professionalStyles", "/admin/professional.css"], ["businessCardStyles", "/book/business-card.css"], ["luxuryWorkspaceStyles", "/admin/luxury-workspace.css"], ["mukSoftStyles", "/admin/muk-soft.css"], ["mukAppStyles", "/admin/muk-app.css"]]) if (!document.getElementById(id)) {
+    const l = E7("link");
     l.id = id;
     l.rel = "stylesheet";
     l.href = href;
@@ -22723,18 +23586,18 @@ function linkStyles() {
 async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack = null }) {
   document.getElementById("employeeWorkspace")?.remove();
   linkStyles();
-  const readOnly = Boolean(owner), root = E6("div", void 0, "lux soft");
+  const readOnly = Boolean(owner), root = E7("div", void 0, "lux soft");
   root.id = "employeeWorkspace";
   root.lang = "en";
   softChrome();
-  const sidebar = E6("aside", void 0, "lx-sidebar"), brand = E6("a", "MUK TALENT", "lx-brand");
+  const sidebar = E7("aside", void 0, "lx-sidebar"), brand = E7("a", "MUK TALENT", "lx-brand");
   brand.href = "/";
-  sidebar.append(brand, E6("p", "PRIVATE TEAM WORKSPACE", "lx-overline"));
-  const nav2 = E6("nav");
+  sidebar.append(brand, E7("p", "PRIVATE TEAM WORKSPACE", "lx-overline"));
+  const nav2 = E7("nav");
   nav2.setAttribute("aria-label", "Workspace");
   sidebar.append(nav2);
-  const footer = E6("div", void 0, "lx-sidebar-footer");
-  footer.append(E6("strong", staff.full_name), E6("small", readOnly ? "Administrator preview" : "MUK Talent team"));
+  const footer = E7("div", void 0, "lx-sidebar-footer");
+  footer.append(E7("strong", staff.full_name), E7("small", readOnly ? "Administrator preview" : "MUK Talent team"));
   const exit = button2(readOnly ? "Back to administration" : "Sign out", async () => {
     exit.disabled = true;
     try {
@@ -22753,54 +23616,56 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     if (changed) notice("Password changed.");
   }));
   sidebar.append(footer);
-  const main = E6("main", void 0, "lx-main"), header = E6("header", void 0, "lx-header"), intro = E6("div"), title = E6("h1"), subtitle = E6("p", void 0, "lx-muted");
-  intro.append(E6("p", "MUK TALENT / TEAM OPERATIONS", "lx-overline"), title, subtitle);
-  const actions = E6("div", void 0, "lx-actions"), refresh = button2("", () => load()), add = button2("Add record", () => {
+  const main = E7("main", void 0, "lx-main"), header = E7("header", void 0, "lx-header"), intro = E7("div"), title = E7("h1"), subtitle = E7("p", void 0, "lx-muted");
+  intro.append(E7("p", "MUK TALENT / TEAM OPERATIONS", "lx-overline"), title, subtitle);
+  const actions = E7("div", void 0, "lx-actions"), refresh = button2("", () => load()), add = button2("Add record", () => {
   });
   add.classList.add("lx-primary");
-  refresh.append(icon("refresh", "lx-btn-icon"), E6("span", "Refresh", "lx-btn-label"));
+  refresh.append(icon("refresh", "lx-btn-icon"), E7("span", "Refresh", "lx-btn-label"));
   refresh.setAttribute("aria-label", "Refresh");
   actions.append(refresh, add);
   header.append(intro, actions);
-  const status = E6("p", "", "lx-status");
+  const status = E7("p", "", "lx-status");
   status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
-  const body = E6("div", void 0, "lx-body");
+  const body = E7("div", void 0, "lx-body");
   main.append(header, status, body);
   root.append(sidebar, main);
   document.body.append(root);
+  attachSwipe(main, { onNext: () => swipeTo(1), onPrev: () => swipeTo(-1), canSwipe: () => !dialogBusy && !document.querySelector("dialog[open]") && matchMedia("(max-width: 700px)").matches });
+  if (matchMedia("(max-width: 700px)").matches) setTimeout(() => hintOnce("lx-swipe-hint", "Swipe left or right to move between sections", root), 900);
   let data = { records: [], leads: [], appointments: [], activity: [] }, directory = null, assets = [], section = "overview", busy = false, dialogBusy = false, loadVersion = 0;
   let payroll = {}, payrollBusy = {};
   let selectedDay = dateKey(), month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1), studioTab = "productions";
-  const groups = [["home", "Home", "home", [["overview", "Home"]]], ["pipeline", "Pipeline", "pipeline", [["leads", "Leads"], ["partner", "Partners"]]], ["planner", "Planner", "planner", [["calendar", "Calendar & reports"], ["task", "Tasks"]]], ["studio", "Studio", "studio", [["content", "Productions"], ["library", "Media library"]]], ["me", "My card", "card", [["card", "Card"], ["social", "Socials"], ["profile", "Profile"], ["account", "Account"]]]];
+  const groups = [["home", "Home", "home", [["overview", "Home"]]], ["students", "Students", "users", [["students", "Control centre"]]], ["pipeline", "Pipeline", "pipeline", [["leads", "Leads"], ["partner", "Partners"]]], ["planner", "Planner", "planner", [["calendar", "Calendar & reports"], ["task", "Tasks"]]], ["studio", "Studio", "studio", [["content", "Productions"], ["library", "Media library"]]], ["me", "My card", "card", [["card", "Card"], ["social", "Socials"], ["profile", "Profile"], ["account", "Account"]]]];
   const pages = groups.flatMap((g) => g[3].map(([id, label2]) => [id, label2, g[0]]));
   const tabs = Object.fromEntries(groups.map((g) => [g[0], g[3][0][0]]));
   let group = "home";
   const navButtons = {}, dockButtons = {};
   for (const [id, label2, symbol] of groups) {
-    const b = E6("button", void 0, "lx-nav");
+    const b = E7("button", void 0, "lx-nav");
     b.type = "button";
-    b.append(icon(symbol, "lx-nav-icon"), E6("span", label2));
+    b.append(icon(symbol, "lx-nav-icon"), E7("span", label2));
     b.onclick = () => navigate2(tabs[id]);
     navButtons[id] = b;
     nav2.append(b);
   }
-  const dock = E6("nav", void 0, "lx-dock");
+  const dock = E7("nav", void 0, "lx-dock");
   dock.setAttribute("aria-label", "Workspace sections");
   for (const [id, label2, symbol] of groups) {
-    const b = E6("button");
+    const b = E7("button");
     b.type = "button";
-    b.append(icon(symbol, "lx-dock-icon"), E6("small", label2));
+    b.append(icon(symbol, "lx-dock-icon"), E7("small", label2));
     b.onclick = () => navigate2(tabs[id]);
     dockButtons[id] = b;
     dock.append(b);
   }
   root.append(dock);
-  const tabBar = E6("div", void 0, "lx-tabs");
+  const tabBar = E7("div", void 0, "lx-tabs");
   tabBar.setAttribute("role", "tablist");
   main.insertBefore(tabBar, status);
   function button2(text, fn) {
-    const b = E6("button", text, "lx-button");
+    const b = E7("button", text, "lx-button");
     b.type = "button";
     b.onclick = fn;
     return b;
@@ -22811,12 +23676,12 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     status.className = error ? "lx-status lx-error" : "lx-status";
   }
   function panel(text) {
-    const p = E6("section", void 0, "lx-panel");
-    if (text) p.append(E6("h2", text));
+    const p = E7("section", void 0, "lx-panel");
+    if (text) p.append(E7("h2", text));
     return p;
   }
   function empty(target, text) {
-    target.append(E6("p", text, "lx-empty"));
+    target.append(E7("p", text, "lx-empty"));
   }
   function records(kind) {
     return data.records.filter((r) => r.kind === kind);
@@ -22858,7 +23723,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       refresh.disabled = false;
     }
   }
-  const groupText = { home: "Your people, your priorities, your impact.", pipeline: "Leads and partners with clear next steps.", planner: "Appointments, daily reports and tasks in one place.", studio: "Ideas, production and your media library.", me: "Your digital introduction, ready to share." };
+  const groupText = { home: "Your people, your priorities, your impact.", pipeline: "Leads and partners with clear next steps.", planner: "Appointments, daily reports and tasks in one place.", studio: "Ideas, production and your media library.", me: "Your digital introduction, ready to share.", students: "Global Passport \xB7 every student file, document and message." };
   function render() {
     if (!root.isConnected) return;
     root.dataset.section = section;
@@ -22877,19 +23742,19 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     tabBar.hidden = g[3].length < 2;
     for (const [id, label2] of g[3]) {
       if (readOnly && id === "account") continue;
-      const t = E6("button", label2, "lx-tab");
-      t.type = "button";
-      t.setAttribute("role", "tab");
-      t.setAttribute("aria-selected", String(id === section));
-      t.tabIndex = id === section ? 0 : -1;
-      t.onclick = () => navigate2(id);
-      t.onkeydown = (e) => {
+      const t2 = E7("button", label2, "lx-tab");
+      t2.type = "button";
+      t2.setAttribute("role", "tab");
+      t2.setAttribute("aria-selected", String(id === section));
+      t2.tabIndex = id === section ? 0 : -1;
+      t2.onclick = () => navigate2(id);
+      t2.onkeydown = (e) => {
         if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
-        const list = [...tabBar.children], i = list.indexOf(t), next = list[(i + (e.key === "ArrowRight" ? 1 : list.length - 1)) % list.length];
+        const list = [...tabBar.children], i = list.indexOf(t2), next = list[(i + (e.key === "ArrowRight" ? 1 : list.length - 1)) % list.length];
         next.click();
         tabBar.querySelector("[aria-selected=true]")?.focus();
       };
-      tabBar.append(t);
+      tabBar.append(t2);
     }
     const actionsFor = { leads: ["Add lead", () => edit("lead")], partner: ["Add partner", () => edit("partner")], task: ["Add task", () => edit("task")], content: ["New production", () => edit("content")], library: ["Upload media", () => uploadDialog()], calendar: ["Today\u2019s report", () => edit("report", records("report").find((r) => r.record_date === dateKey()), dateKey())] };
     const act = actionsFor[section];
@@ -22911,85 +23776,124 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         render();
         notice(text);
       } });
-      else body.append(E6("p", "Loading your card\u2026", "lx-empty"));
+      else body.append(E7("p", "Loading your card\u2026", "lx-empty"));
     } else if (section === "social") renderSocialEditor({ ...ctx, onSaved: () => refreshDirectory() });
     else if (section === "account") account();
+    else if (section === "students") {
+      if (readOnly) body.append(E7("p", "Open Global Passport \xB7 Control Centre from the administration to see every student.", "lx-empty"));
+      else renderControlCentre({ host: body, api: api2, admin: staff.role === "admin", notice }).then(() => {
+        gpCache = null;
+      });
+    }
+    appChrome();
+  }
+  let gpCache = null, lastIndex = 0;
+  const flatPages = () => pages.filter((p) => !(readOnly && p[0] === "account"));
+  function appChrome() {
+    root.querySelector(".lx-pager")?.remove();
+    const items = groups.map((g2) => [g2[0], g2[1]]);
+    const nav3 = pager(items, group, (id) => navigate2(tabs[id]), "gp-pager lx-pager");
+    const label2 = nav3.querySelector(".gp-pager-label");
+    const pg = pages.find((p) => p[0] === section);
+    const g = groups.find((x) => x[0] === group);
+    if (label2 && g && g[3].length > 1) label2.textContent = g[1] + " \xB7 " + pg[1];
+    root.append(nav3);
+    const i = flatPages().findIndex((p) => p[0] === section);
+    if (i !== lastIndex && matchMedia("(max-width: 700px)").matches && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      body.classList.remove("lx-enter-left", "lx-enter-right");
+      void body.offsetWidth;
+      body.classList.add(i > lastIndex ? "lx-enter-left" : "lx-enter-right");
+    }
+    lastIndex = i;
+  }
+  function swipeTo(d) {
+    const list = flatPages(), i = list.findIndex((p) => p[0] === section) + d;
+    if (i < 0 || i >= list.length) return;
+    navigate2(list[i][0]);
+  }
+  function passportWidget() {
+    const p = panel();
+    p.classList.add("lx-passport");
+    const head2 = E7("div", void 0, "lx-passport-head");
+    head2.append(E7("span", "GLOBAL PASSPORT", "lx-overline"), E7("span", "UK", "lx-passport-flag"));
+    p.append(head2, E7("h2", "Your students"));
+    const grid = E7("div", void 0, "lx-passport-grid");
+    p.append(grid);
+    const paint2 = (m) => {
+      grid.replaceChildren();
+      for (const [k, l] of [["assigned", "Assigned"], ["documents_review", "Docs to review"], ["attention", "Need attention"]]) {
+        const c = E7("div", void 0, "lx-passport-stat" + (k === "attention" && m?.[k] ? " is-alert" : ""));
+        c.append(E7("strong", m ? String(m[k] ?? 0) : "\u2014"), E7("small", l));
+        grid.append(c);
+      }
+    };
+    paint2(gpCache);
+    if (!gpCache && !readOnly) api2("/api/gp/students").then((r) => {
+      gpCache = r.metrics;
+      if (p.isConnected) paint2(gpCache);
+    }).catch(() => {
+      grid.replaceChildren(E7("p", "Global Passport is not active yet.", "lx-muted"));
+    });
+    if (!readOnly) {
+      const open = button2("Open Control Centre", () => navigate2("students"));
+      open.classList.add("lx-primary");
+      p.append(open);
+    }
+    return p;
   }
   function account() {
-    const wrap = E6("div", void 0, "lx-account"), sec = panel("Security");
-    sec.append(E6("p", "Protect access to your leads, appointments and documents.", "lx-muted"));
+    const wrap = E7("div", void 0, "lx-account"), sec = panel("Security");
+    sec.append(E7("p", "Protect access to your leads, appointments and documents.", "lx-muted"));
     const rows = [["lock", "Password", "Change it any time. Use at least 12 characters you do not use elsewhere.", button2("Change password", async () => {
       const changed = await requirePasswordChange({ api: api2, mandatory: false });
       if (changed) notice("Password changed.");
     })], ["refresh", "Automatic sign-out", "For your security you are signed out after 30 minutes without activity, with a warning first.", null], ["logout", "Sign out", "Ends your session on this device.", button2("Sign out", () => exit.click())]];
-    for (const [ic, h, t, b] of rows) {
-      const row = E6("div", void 0, "lx-account-row"), i = E6("span", void 0, "lx-account-icon"), txt = E6("div");
+    for (const [ic, h, t2, b] of rows) {
+      const row = E7("div", void 0, "lx-account-row"), i = E7("span", void 0, "lx-account-icon"), txt = E7("div");
       i.append(icon(ic));
-      txt.append(E6("h3", h), E6("p", t, "lx-muted"));
+      txt.append(E7("h3", h), E7("p", t2, "lx-muted"));
       row.append(i, txt);
       if (b) row.append(b);
       sec.append(row);
     }
     wrap.append(sec);
     const tips = panel("Good habits");
-    for (const t of ["Never share your password or sign-in links, even with colleagues.", "Sign out on shared or public computers.", "MUK Talent will never ask for your password by email or WhatsApp.", "Report anything unusual to your administrator straight away."]) tips.append(E6("p", t, "lx-tip"));
+    for (const t2 of ["Never share your password or sign-in links, even with colleagues.", "Sign out on shared or public computers.", "MUK Talent will never ask for your password by email or WhatsApp.", "Report anything unusual to your administrator straight away."]) tips.append(E7("p", t2, "lx-tip"));
     wrap.append(tips);
     body.append(wrap);
   }
   function metric(label2, value, detail) {
     const c = panel();
     c.classList.add("lx-metric");
-    c.append(E6("p", label2, "lx-muted"), E6("strong", value), E6("small", detail));
+    c.append(E7("p", label2, "lx-muted"), E7("strong", value), E7("small", detail));
     return c;
   }
   function overview() {
     body.append(homeHero());
-    const metrics = E6("div", void 0, "lx-metrics");
-    metrics.append(metric("Assigned leads", data.leads.length, "Loaded non-archived records"), metric("Ready for review", directory?.ready_count || 0, "Attributed leads \xB7 exact count"), metric("Open tasks", records("task").filter((t) => t.status !== "Done").length, "In your workspace"), metric("Content in production", records("content").filter((c) => c.status !== "Published").length, "Ideas and work in progress"));
+    const metrics = E7("div", void 0, "lx-metrics");
+    metrics.append(metric("Assigned leads", data.leads.length, "Loaded non-archived records"), metric("Ready for review", directory?.ready_count || 0, "Attributed leads \xB7 exact count"), metric("Open tasks", records("task").filter((t2) => t2.status !== "Done").length, "In your workspace"), metric("Content in production", records("content").filter((c) => c.status !== "Published").length, "Ideas and work in progress"));
     body.append(metrics);
-    const board = E6("div", void 0, "lx-board"), left = E6("div", void 0, "lx-board-left"), centre = E6("div", void 0, "lx-board-centre"), right = E6("div", void 0, "lx-board-right");
-    if (directory) {
-      const mine = panel();
-      mine.classList.add("lx-card-widget");
-      mine.append(miniBadge(directory));
-      const row = E6("div", void 0, "lx-actions");
-      const url = directory.card?.published ? directory.card.url : null;
-      if (url && !readOnly) row.append(button2("Share my card", async () => {
-        try {
-          if (navigator.share) await navigator.share({ title: directory.full_name + " \xB7 MUK Talent", url });
-          else {
-            await navigator.clipboard.writeText(url);
-            notice("Card link copied \xB7 " + directory.card.display);
-          }
-        } catch (e) {
-          if (e.name !== "AbortError") notice(directory.card.display);
-        }
-      }));
-      const openCard = button2("Open my card", () => navigate2("card"));
-      if (!url || readOnly) openCard.classList.add("lx-primary");
-      row.append(openCard);
-      mine.append(row);
-      left.append(mine);
-    }
+    const board = E7("div", void 0, "lx-board"), left = E7("div", void 0, "lx-board-left"), centre = E7("div", void 0, "lx-board-centre"), right = E7("div", void 0, "lx-board-right");
+    left.append(passportWidget());
     const impact = panel("Your pipeline potential");
     impact.classList.add("lx-impact");
-    impact.append(E6("strong", directory?.ready_count || 0, "lx-impact-number"), E6("p", "Attributed leads ready for review", "lx-muted"));
-    if (directory?.potential_commission != null) impact.append(E6("b", money2(directory.potential_commission, directory.commission_currency) + " potential"));
-    impact.append(E6("small", directory?.potential_commission != null ? "Estimate only. Subject to approval and commission terms." : "Your administrator has not configured a commission rate."));
+    impact.append(E7("strong", directory?.ready_count || 0, "lx-impact-number"), E7("p", "Attributed leads ready for review", "lx-muted"));
+    if (directory?.potential_commission != null) impact.append(E7("b", money2(directory.potential_commission, directory.commission_currency) + " potential"));
+    impact.append(E7("small", directory?.potential_commission != null ? "Estimate only. Subject to approval and commission terms." : "Your administrator has not configured a commission rate."));
     left.append(impact);
-    const tasks = panel("Your priorities"), open = records("task").filter((t) => t.status !== "Done").sort((a, b) => (a.record_date || "9999").localeCompare(b.record_date || "9999")).slice(0, 4);
-    for (const t of open) {
-      const row = E6("div", void 0, "lx-row");
-      row.append(E6("span", t.payload.priority || "Medium", "lx-tag"), E6("h3", t.title), E6("p", t.record_date || "No due date", "lx-muted"));
-      if (!readOnly) row.append(button2("Open task", () => edit("task", t)));
+    const tasks = panel("Your priorities"), open = records("task").filter((t2) => t2.status !== "Done").sort((a, b) => (a.record_date || "9999").localeCompare(b.record_date || "9999")).slice(0, 4);
+    for (const t2 of open) {
+      const row = E7("div", void 0, "lx-row");
+      row.append(E7("span", t2.payload.priority || "Medium", "lx-tag"), E7("h3", t2.title), E7("p", t2.record_date || "No due date", "lx-muted"));
+      if (!readOnly) row.append(button2("Open task", () => edit("task", t2)));
       tasks.append(row);
     }
     if (!open.length) empty(tasks, "Your day is clear. Add a task to plan your next action.");
     centre.append(tasks);
     const follow = panel("Follow-ups that need attention"), overdue = data.leads.filter((l) => l.status !== "closed" && l.next_action_at && new Date(l.next_action_at) < /* @__PURE__ */ new Date()).slice(0, 3);
     for (const lead of overdue) {
-      const row = E6("div", void 0, "lx-row");
-      row.append(E6("h3", lead.first_name + " " + lead.last_name), E6("p", lead.next_action || "Follow-up required", "lx-muted"));
+      const row = E7("div", void 0, "lx-row");
+      row.append(E7("h3", lead.first_name + " " + lead.last_name), E7("p", lead.next_action || "Follow-up required", "lx-muted"));
       if (!readOnly) row.append(button2("Open lead", () => edit("lead", lead)));
       follow.append(row);
     }
@@ -22999,22 +23903,22 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     miniCalendar(day, true);
     right.append(day);
     const todayReport = records("report").find((r) => r.record_date === dateKey()), checkin = panel("Daily check-in");
-    checkin.append(E6("p", todayReport ? "Today\u2019s report \xB7 " + todayReport.status : "Capture the progress behind the numbers.", "lx-muted"), button2("Open today", () => {
+    checkin.append(E7("p", todayReport ? "Today\u2019s report \xB7 " + todayReport.status : "Capture the progress behind the numbers.", "lx-muted"), button2("Open today", () => {
       selectedDay = dateKey();
       month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
       navigate2("calendar");
     }));
     right.append(checkin);
-    right.prepend(strength());
+    right.prepend(strength2());
     right.append(streak());
     board.append(left, centre, right);
-    body.append(board, E6("p", "Operational view: up to 100 leads, 500 workspace records, 200 appointments and 100 recent activity events. Ready-lead potential uses a separate exact count.", "lx-footnote"));
+    body.append(board, E7("p", "Operational view: up to 100 leads, 500 workspace records, 200 appointments and 100 recent activity events. Ready-lead potential uses a separate exact count.", "lx-footnote"));
   }
-  function strength() {
+  function strength2() {
     const d = directory || {}, items = [["Profile photo", Boolean(d.avatar_url), "profile"], ["Work contact details", Boolean(d.contact_phone || d.contact_email), "profile"], ["Short link", Boolean(d.card?.handle), "card"], ["Social links", Boolean(d.socials?.length), "social"], ["Card published", Boolean(d.card?.published), "card"]], done = items.filter((i) => i[1]).length, pct = Math.round(done / items.length * 100);
     const p = panel();
     p.classList.add("lx-strength");
-    const top = E6("div", void 0, "lx-strength-top"), svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const top = E7("div", void 0, "lx-strength-top"), svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("viewBox", "0 0 44 44");
     svg.setAttribute("class", "lx-ring");
     svg.setAttribute("aria-hidden", "true");
@@ -23028,24 +23932,24 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       c.setAttribute("class", cls);
       svg.append(c);
     }
-    const ring = E6("div", void 0, "lx-ring-wrap");
-    ring.append(svg, E6("strong", pct + "%"));
-    const txt = E6("div");
-    txt.append(E6("h2", "Card strength"), E6("p", done === items.length ? "Complete. Your card is ready to impress." : items.length - done + " quick wins left.", "lx-muted"));
-    top.append(ring, txt);
+    const ring2 = E7("div", void 0, "lx-ring-wrap");
+    ring2.append(svg, E7("strong", pct + "%"));
+    const txt = E7("div");
+    txt.append(E7("h2", "Card strength"), E7("p", done === items.length ? "Complete. Your card is ready to impress." : items.length - done + " quick wins left.", "lx-muted"));
+    top.append(ring2, txt);
     p.append(top);
-    const list = E6("ul", void 0, "lx-checklist");
+    const list = E7("ul", void 0, "lx-checklist");
     for (const [label2, ok, target] of items) {
-      const li = E6("li", void 0, ok ? "done" : "");
-      const mark = E6("span", void 0, "lx-check");
+      const li = E7("li", void 0, ok ? "done" : "");
+      const mark = E7("span", void 0, "lx-check");
       if (ok) mark.append(icon("check"));
       li.append(mark);
       if (!ok && !readOnly && !(label2 === "Card published")) {
-        const b = E6("button", label2, "lx-check-link");
+        const b = E7("button", label2, "lx-check-link");
         b.type = "button";
         b.onclick = () => navigate2(target);
         li.append(b);
-      } else li.append(E6("span", label2 + (label2 === "Card published" && !ok ? " \xB7 by your administrator" : "")));
+      } else li.append(E7("span", label2 + (label2 === "Card published" && !ok ? " \xB7 by your administrator" : "")));
       list.append(li);
     }
     p.append(list);
@@ -23065,47 +23969,47 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       }
       day.setUTCDate(day.getUTCDate() - 1);
     }
-    const head2 = E6("div", void 0, "lx-streak-head");
-    head2.append(E6("strong", count, "lx-streak-number"), E6("span", count === 1 ? "working day in a row" : "working days in a row", "lx-muted"));
+    const head2 = E7("div", void 0, "lx-streak-head");
+    head2.append(E7("strong", count, "lx-streak-number"), E7("span", count === 1 ? "working day in a row" : "working days in a row", "lx-muted"));
     p.append(head2);
-    const week = E6("div", void 0, "lx-week"), today = /* @__PURE__ */ new Date(dateKey() + "T12:00:00Z"), monday = new Date(today);
+    const week = E7("div", void 0, "lx-week"), today = /* @__PURE__ */ new Date(dateKey() + "T12:00:00Z"), monday = new Date(today);
     monday.setUTCDate(today.getUTCDate() - (today.getUTCDay() + 6) % 7);
     for (let i = 0; i < 5; i++) {
       const d = new Date(monday);
       d.setUTCDate(monday.getUTCDate() + i);
-      const key = d.toISOString().slice(0, 10), cell = E6("span", ["M", "T", "W", "T", "F"][i], "lx-week-day");
+      const key = d.toISOString().slice(0, 10), cell = E7("span", ["M", "T", "W", "T", "F"][i], "lx-week-day");
       if (reports.has(key)) cell.classList.add("done");
       if (key === dateKey()) cell.classList.add("today");
       cell.setAttribute("aria-label", key + (reports.has(key) ? " \xB7 report sent" : " \xB7 no report"));
       week.append(cell);
     }
-    p.append(week, E6("small", count ? "Keep it going with today\u2019s report." : "Send today\u2019s report to start your streak.", "lx-footnote"));
+    p.append(week, E7("small", count ? "Keep it going with today\u2019s report." : "Send today\u2019s report to start your streak.", "lx-footnote"));
     return p;
   }
   function searchList(host, rows, draw) {
-    const input = E6("input");
+    const input = E7("input");
     input.type = "search";
     input.className = "lx-search";
     input.placeholder = "Search loaded records";
     input.setAttribute("aria-label", "Search loaded records");
-    const results = E6("div");
+    const results = E7("div");
     host.append(input, results);
-    const paint = () => {
+    const paint2 = () => {
       results.replaceChildren();
       const q2 = input.value.toLowerCase(), filtered = rows.filter((v) => JSON.stringify(v).toLowerCase().includes(q2));
       for (const v of filtered) draw(results, v);
       if (!filtered.length) empty(results, "No matching records.");
     };
-    input.oninput = paint;
-    paint();
+    input.oninput = paint2;
+    paint2();
   }
   function leads() {
     const host = panel();
     searchList(host, data.leads, (target, l) => {
-      const row = E6("article", void 0, "lx-row"), top = E6("div", void 0, "lx-row-top");
-      top.append(E6("h3", l.first_name + " " + l.last_name), E6("span", leadStates[l.status] || l.status, "lx-tag"));
-      row.append(top, E6("p", l.reference + " \xB7 " + (l.subject_interest || "Study interest not set"), "lx-muted"), E6("p", l.next_action || "No next action recorded."), E6("small", "Follow-up: " + time(l.next_action_at)));
-      const controls = E6("div", void 0, "lx-actions");
+      const row = E7("article", void 0, "lx-row"), top = E7("div", void 0, "lx-row-top");
+      top.append(E7("h3", l.first_name + " " + l.last_name), E7("span", leadStates[l.status] || l.status, "lx-tag"));
+      row.append(top, E7("p", l.reference + " \xB7 " + (l.subject_interest || "Study interest not set"), "lx-muted"), E7("p", l.next_action || "No next action recorded."), E7("small", "Follow-up: " + time(l.next_action_at)));
+      const controls = E7("div", void 0, "lx-actions");
       if (!readOnly) controls.append(button2("Open lead", () => edit("lead", l)));
       controls.append(button2("Qualification", () => editQualification({ lead: l, api: api2, readOnly, root })));
       row.append(controls);
@@ -23116,42 +24020,42 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   function listRecords(kind) {
     const host = panel();
     searchList(host, records(kind), (target, r) => {
-      const row = E6("article", void 0, "lx-row");
-      row.append(E6("div", r.status, "lx-tag"), E6("h3", r.title), E6("p", kind === "partner" ? [r.payload.type, r.payload.contact, r.payload.city].filter(Boolean).join(" \xB7 ") : [r.payload.priority, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E6("p", r.payload.next_action || r.payload.notes || ""));
+      const row = E7("article", void 0, "lx-row");
+      row.append(E7("div", r.status, "lx-tag"), E7("h3", r.title), E7("p", kind === "partner" ? [r.payload.type, r.payload.contact, r.payload.city].filter(Boolean).join(" \xB7 ") : [r.payload.priority, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E7("p", r.payload.next_action || r.payload.notes || ""));
       if (!readOnly) row.append(button2("Open / edit", () => edit(kind, r)));
       target.append(row);
     });
     body.append(host);
   }
   function appointment(host, a) {
-    const row = E6("article", void 0, "lx-appointment");
-    row.append(E6("span", new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Casablanca", hour: "2-digit", minute: "2-digit" }).format(new Date(a.starts_at)), "lx-appointment-time"), E6("h3", a.full_name), E6("p", a.subject || "Student consultation"), E6("p", (a.institution || "") + (a.institution ? " \xB7 " : "") + (a.meeting_mode === "in_person" ? "In person \xB7 confirm location" : "Phone consultation"), "lx-muted"), E6("p", (a.whatsapp_phone_e164 || "No phone") + " \xB7 " + (a.email || "No email"), "lx-muted"), E6("small", "UK: " + time(a.starts_at, "Europe/London")), E6("span", a.status, "lx-tag"));
+    const row = E7("article", void 0, "lx-appointment");
+    row.append(E7("span", new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Casablanca", hour: "2-digit", minute: "2-digit" }).format(new Date(a.starts_at)), "lx-appointment-time"), E7("h3", a.full_name), E7("p", a.subject || "Student consultation"), E7("p", (a.institution || "") + (a.institution ? " \xB7 " : "") + (a.meeting_mode === "in_person" ? "In person \xB7 confirm location" : "Phone consultation"), "lx-muted"), E7("p", (a.whatsapp_phone_e164 || "No phone") + " \xB7 " + (a.email || "No email"), "lx-muted"), E7("small", "UK: " + time(a.starts_at, "Europe/London")), E7("span", a.status, "lx-tag"));
     if (!readOnly && a.status !== "cancelled") row.append(button2("Manage appointment", () => manageAppointment({ a, api: api2, root, onSaved: load })));
     host.append(row);
   }
   function miniCalendar(host, compact = false) {
-    const tools = E6("div", void 0, "lx-calendar-tools");
+    const tools = E7("div", void 0, "lx-calendar-tools");
     tools.append(button2("\u2039", () => {
       month = new Date(month.getFullYear(), month.getMonth() - 1, 1);
       render();
-    }), E6("strong", new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month)), button2("\u203A", () => {
+    }), E7("strong", new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month)), button2("\u203A", () => {
       month = new Date(month.getFullYear(), month.getMonth() + 1, 1);
       render();
     }));
     host.append(tools);
-    const grid = E6("div", void 0, "lx-calendar");
-    for (const day of ["M", "T", "W", "T", "F", "S", "S"]) grid.append(E6("span", day, "lx-weekday"));
-    for (let i = 0; i < (month.getDay() + 6) % 7; i++) grid.append(E6("span"));
+    const grid = E7("div", void 0, "lx-calendar");
+    for (const day of ["M", "T", "W", "T", "F", "S", "S"]) grid.append(E7("span", day, "lx-weekday"));
+    for (let i = 0; i < (month.getDay() + 6) % 7; i++) grid.append(E7("span"));
     for (let d = 1; d <= new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate(); d++) {
-      const key = month.getFullYear() + "-" + String(month.getMonth() + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"), cell = E6("button", void 0, "lx-date");
+      const key = month.getFullYear() + "-" + String(month.getMonth() + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"), cell = E7("button", void 0, "lx-date");
       cell.type = "button";
-      cell.append(E6("span", d, "lx-date-num"));
+      cell.append(E7("span", d, "lx-date-num"));
       const wd = new Date(month.getFullYear(), month.getMonth(), d).getDay();
       if (wd === 0 || wd === 6) cell.classList.add("lx-weekend");
       const pay = payroll[monthKey()]?.days?.find((x) => x.date === key);
       if (pay?.verified) {
         cell.classList.add("lx-verified");
-        cell.append(E6("span", "+" + pay.verified * (payroll[monthKey()].per_verified_lead || 2e3) / 1e3 + "k", "lx-date-chip"));
+        cell.append(E7("span", "+" + pay.verified * (payroll[monthKey()].per_verified_lead || 2e3) / 1e3 + "k", "lx-date-chip"));
       }
       cell.classList.toggle("today", key === dateKey());
       cell.classList.toggle("selected", key === selectedDay);
@@ -23170,15 +24074,15 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     if (compact) {
       const upcoming = data.appointments.filter((a) => a.status === "confirmed" && new Date(a.starts_at) > /* @__PURE__ */ new Date()).sort((a, b) => a.starts_at.localeCompare(b.starts_at)).slice(0, 2);
       for (const a of upcoming) {
-        const row = E6("div", void 0, "lx-row");
-        row.append(E6("strong", a.full_name), E6("p", time(a.starts_at), "lx-muted"));
+        const row = E7("div", void 0, "lx-row");
+        row.append(E7("strong", a.full_name), E7("p", time(a.starts_at), "lx-muted"));
         host.append(row);
       }
     }
   }
   function calendarPage() {
     body.append(payrollHeader());
-    const grid = E6("div", void 0, "lx-day-layout"), calendar = panel("Plan your day");
+    const grid = E7("div", void 0, "lx-day-layout"), calendar = panel("Plan your day");
     calendar.append(button2("Today", () => {
       selectedDay = dateKey();
       month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
@@ -23186,34 +24090,34 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     }));
     miniCalendar(calendar);
     const day = panel(new Intl.DateTimeFormat("en-GB", { dateStyle: "full", timeZone: "UTC" }).format(/* @__PURE__ */ new Date(selectedDay + "T12:00:00Z"))), report = records("report").find((r) => r.record_date === selectedDay);
-    day.append(E6("span", selectedDay === dateKey() ? "TODAY" : "SELECTED DAY", "lx-overline"), dayPay());
-    const checkin = E6("section", void 0, "lx-day-report");
-    checkin.append(E6("h3", "Daily report"), E6("p", report ? "Status: " + report.status : "No daily report recorded.", "lx-muted"));
+    day.append(E7("span", selectedDay === dateKey() ? "TODAY" : "SELECTED DAY", "lx-overline"), dayPay());
+    const checkin = E7("section", void 0, "lx-day-report");
+    checkin.append(E7("h3", "Daily report"), E7("p", report ? "Status: " + report.status : "No daily report recorded.", "lx-muted"));
     if (report) {
-      for (const [key, label2] of fields.report) if (report.payload[key]) checkin.append(E6("strong", label2), E6("p", report.payload[key]));
+      for (const [key, label2] of fields.report) if (report.payload[key]) checkin.append(E7("strong", label2), E7("p", report.payload[key]));
     }
     if (!readOnly) checkin.append(button2(report ? "Edit daily report" : "Write daily report", () => edit("report", report, selectedDay)));
-    day.append(checkin, E6("h3", "Appointments"));
+    day.append(checkin, E7("h3", "Appointments"));
     const appointments = data.appointments.filter((a) => dateKey(a.starts_at) === selectedDay).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
     for (const a of appointments) appointment(day, a);
     if (!appointments.length) empty(day, "No appointments on this day among loaded records.");
-    day.append(E6("h3", "Tasks for this day"));
-    const tasks = records("task").filter((t) => t.record_date === selectedDay);
-    for (const t of tasks) {
-      const row = E6("div", void 0, "lx-row");
-      row.append(E6("strong", t.title), E6("span", t.status, "lx-tag"));
-      if (!readOnly) row.append(button2("Open task", () => edit("task", t)));
+    day.append(E7("h3", "Tasks for this day"));
+    const tasks = records("task").filter((t2) => t2.record_date === selectedDay);
+    for (const t2 of tasks) {
+      const row = E7("div", void 0, "lx-row");
+      row.append(E7("strong", t2.title), E7("span", t2.status, "lx-tag"));
+      if (!readOnly) row.append(button2("Open task", () => edit("task", t2)));
       day.append(row);
     }
     if (!tasks.length) empty(day, "No dated tasks.");
-    day.append(E6("h3", "Recorded workspace activity"));
-    const history = data.activity.filter((a) => dateKey(a.created_at) === selectedDay);
-    for (const a of history) {
-      const row = E6("div", void 0, "lx-history-line");
-      row.append(E6("strong", a.title), E6("small", a.kind + " \xB7 " + a.action + " \xB7 " + time(a.created_at)));
+    day.append(E7("h3", "Recorded workspace activity"));
+    const history2 = data.activity.filter((a) => dateKey(a.created_at) === selectedDay);
+    for (const a of history2) {
+      const row = E7("div", void 0, "lx-history-line");
+      row.append(E7("strong", a.title), E7("small", a.kind + " \xB7 " + a.action + " \xB7 " + time(a.created_at)));
       day.append(row);
     }
-    if (!history.length) empty(day, "No recorded workspace changes for this day among loaded activity.");
+    if (!history2.length) empty(day, "No recorded workspace changes for this day among loaded activity.");
     grid.append(calendar, day);
     body.append(grid);
   }
@@ -23237,24 +24141,24 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     return null;
   }
   function legend() {
-    const l = E6("div", void 0, "lx-legend");
+    const l = E7("div", void 0, "lx-legend");
     for (const [cls, text] of [["today", "Today"], ["events", "Report / appointment"], ["verified", "Verified lead \xB7 +commission"], ["weekend", "Weekend"]]) {
-      const i = E6("span", void 0, "lx-legend-item");
-      i.append(E6("i", void 0, "lx-legend-" + cls), E6("span", text));
+      const i = E7("span", void 0, "lx-legend-item");
+      i.append(E7("i", void 0, "lx-legend-" + cls), E7("span", text));
       l.append(i);
     }
     return l;
   }
   function pill(label2, value, tone) {
-    const p = E6("div", void 0, "lx-pill lx-pill-" + tone);
-    p.append(E6("span", label2), E6("strong", value));
+    const p = E7("div", void 0, "lx-pill lx-pill-" + tone);
+    p.append(E7("span", label2), E7("strong", value));
     return p;
   }
   function homeHero() {
-    const d = directory || {}, p = getPayroll(monthKey(/* @__PURE__ */ new Date())), name = d.full_name || staff.full_name, hero = E6("section", void 0, "lx-hero");
-    const photo = E6("figure", void 0, "lx-hero-photo");
+    const d = directory || {}, p = getPayroll(monthKey(/* @__PURE__ */ new Date())), name = d.full_name || staff.full_name, hero = E7("section", void 0, "lx-hero");
+    const photo = E7("figure", void 0, "lx-hero-photo");
     if (d.avatar_url) {
-      const img = E6("img");
+      const img = E7("img");
       img.src = d.avatar_url;
       img.alt = "Photo of " + name;
       img.decoding = "async";
@@ -23265,76 +24169,76 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       };
       photo.append(img);
     } else photo.classList.add("lx-no-photo");
-    const initials2 = E6("span", name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase(), "lx-hero-initials");
-    initials2.setAttribute("aria-hidden", "true");
-    const cap = E6("figcaption");
-    cap.append(E6("h2", name), E6("p", d.job_title || "MUK Talent team"));
-    photo.append(initials2, cap);
-    const facts = E6("div", void 0, "lx-hero-facts");
-    const id = E6("article", void 0, "lx-fact lx-fact-gold");
-    id.append(E6("span", "Staff ID"), E6("strong", d.employee_code || "\u2014"), E6("small", d.assigned_city || "MUK Talent"));
-    const contact = E6("article", void 0, "lx-fact lx-fact-glass");
-    contact.append(E6("span", d.contact_phone ? "Phone number" : "Work email"), E6("strong", d.contact_phone || d.contact_email || "Add in Profile"));
+    const initials3 = E7("span", name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase(), "lx-hero-initials");
+    initials3.setAttribute("aria-hidden", "true");
+    const cap = E7("figcaption");
+    cap.append(E7("h2", name), E7("p", d.job_title || "MUK Talent team"));
+    photo.append(initials3, cap);
+    const facts = E7("div", void 0, "lx-hero-facts");
+    const id = E7("article", void 0, "lx-fact lx-fact-gold");
+    id.append(E7("span", "Staff ID"), E7("strong", d.employee_code || "\u2014"), E7("small", d.assigned_city || "MUK Talent"));
+    const contact = E7("article", void 0, "lx-fact lx-fact-glass");
+    contact.append(E7("span", d.contact_phone ? "Phone number" : "Work email"), E7("strong", d.contact_phone || d.contact_email || "Add in Profile"));
     if (!d.contact_phone && !d.contact_email && !readOnly) {
       contact.classList.add("lx-clickable");
       contact.tabIndex = 0;
       contact.onclick = () => navigate2("profile");
     }
     facts.append(id, contact);
-    const chart = E6("article", void 0, "lx-chart");
-    const head2 = E6("div", void 0, "lx-chart-head");
-    head2.append(E6("span", "Verified leads"), E6("strong", p && !p.error ? String(p.verified_count) : "\u2014"));
+    const chart = E7("article", void 0, "lx-chart");
+    const head2 = E7("div", void 0, "lx-chart-head");
+    head2.append(E7("span", "Verified leads"), E7("strong", p && !p.error ? String(p.verified_count) : "\u2014"));
     chart.append(head2);
-    const bars = E6("div", void 0, "lx-bars");
+    const bars = E7("div", void 0, "lx-bars");
     const hist = p && !p.error ? p.history : Array.from({ length: 9 }, (_, i) => ({ month: monthKey(new Date((/* @__PURE__ */ new Date()).getFullYear(), (/* @__PURE__ */ new Date()).getMonth() - 8 + i, 1)), verified_count: 0, total: 0 }));
     const max = Math.max(1, ...hist.map((h) => h.total || 0));
     for (const h of hist) {
-      const b = E6("div", void 0, "lx-bar");
-      const fill = E6("i");
+      const b = E7("div", void 0, "lx-bar");
+      const fill = E7("i");
       fill.style.setProperty("--h", Math.max(4, Math.round((h.total || 0) / max * 100)) + "%");
       if (h.month === monthKey(/* @__PURE__ */ new Date())) b.classList.add("current");
       b.title = h.month + " \xB7 " + mad2(h.total) + " \xB7 " + h.verified_count + " verified";
-      b.append(fill, E6("small", new Intl.DateTimeFormat("en-GB", { month: "short" }).format(/* @__PURE__ */ new Date(h.month + "-15T12:00:00Z")).slice(0, 3)));
+      b.append(fill, E7("small", new Intl.DateTimeFormat("en-GB", { month: "short" }).format(/* @__PURE__ */ new Date(h.month + "-15T12:00:00Z")).slice(0, 3)));
       bars.append(b);
     }
-    chart.append(bars, E6("p", "Monthly earnings \xB7 last 9 months", "lx-chart-note"));
-    const links = E6("div", void 0, "lx-hero-links"), cardBtn = button2("", () => navigate2("card")), rep = button2("", () => {
+    chart.append(bars, E7("p", "Monthly earnings \xB7 last 9 months", "lx-chart-note"));
+    const links = E7("div", void 0, "lx-hero-links"), cardBtn = button2("", () => navigate2("card")), rep = button2("", () => {
       selectedDay = dateKey();
       month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
       navigate2("calendar");
     });
-    cardBtn.append(icon("card", "lx-btn-icon"), E6("span", "My card"));
-    rep.append(icon("planner", "lx-btn-icon"), E6("span", "Daily report"));
+    cardBtn.append(icon("card", "lx-btn-icon"), E7("span", "My card"));
+    rep.append(icon("planner", "lx-btn-icon"), E7("span", "Daily report"));
     cardBtn.classList.add("lx-chip-btn");
     rep.classList.add("lx-chip-btn");
     links.append(cardBtn, rep);
-    const side = E6("div", void 0, "lx-hero-side");
+    const side = E7("div", void 0, "lx-hero-side");
     side.append(facts, chart, links);
-    const pay = E6("article", void 0, "lx-hero-pay");
-    pay.append(E6("span", "This month \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long" }).format(/* @__PURE__ */ new Date()), "lx-overline"));
+    const pay = E7("article", void 0, "lx-hero-pay");
+    pay.append(E7("span", "This month \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long" }).format(/* @__PURE__ */ new Date()), "lx-overline"));
     if (p && !p.error) {
-      pay.append(E6("strong", mad2(p.earned_to_date)), E6("p", "Earned to date \xB7 projected " + mad2(p.projected_total), "lx-muted"));
-      const pills = E6("div", void 0, "lx-pills");
+      pay.append(E7("strong", mad2(p.earned_to_date)), E7("p", "Earned to date \xB7 projected " + mad2(p.projected_total), "lx-muted"));
+      const pills = E7("div", void 0, "lx-pills");
       pills.append(pill("Base", mad2(p.base_monthly), "gold"), pill("Leads", p.verified_count + " \xD7 " + mad2(p.per_verified_lead).replace(" MAD", ""), "dark"), pill("Days left", p.remaining_days, "grey"));
       pay.append(pills);
       const go = button2("Open salary calendar", () => navigate2("calendar"));
       go.classList.add("lx-link-btn");
       pay.append(go);
-    } else pay.append(E6("strong", p?.error ? "\u2014" : "\u2026"), E6("p", p?.error ? "Salary view unavailable. Refresh later." : "Loading your salary\u2026", "lx-muted"));
+    } else pay.append(E7("strong", p?.error ? "\u2014" : "\u2026"), E7("p", p?.error ? "Salary view unavailable. Refresh later." : "Loading your salary\u2026", "lx-muted"));
     side.append(pay);
     hero.append(photo, side);
     return hero;
   }
   function payrollHeader() {
-    const key = monthKey(), p = getPayroll(key), wrap = E6("section", void 0, "lx-payroll");
-    const top = E6("div", void 0, "lx-payroll-top"), left = E6("div");
-    left.append(E6("span", "Salary \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month), "lx-overline"));
-    const big = E6("div", void 0, "lx-payroll-big");
+    const key = monthKey(), p = getPayroll(key), wrap = E7("section", void 0, "lx-payroll");
+    const top = E7("div", void 0, "lx-payroll-top"), left = E7("div");
+    left.append(E7("span", "Salary \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month), "lx-overline"));
+    const big = E7("div", void 0, "lx-payroll-big");
     if (p && !p.error) {
-      big.append(E6("strong", p.elapsed_days + "/" + p.working_days + " days"), E6("b", mad2(key < dateKey().slice(0, 7) ? p.projected_total : p.earned_to_date)));
-    } else big.append(E6("strong", p?.error ? "Salary unavailable" : "Loading\u2026"));
+      big.append(E7("strong", p.elapsed_days + "/" + p.working_days + " days"), E7("b", mad2(key < dateKey().slice(0, 7) ? p.projected_total : p.earned_to_date)));
+    } else big.append(E7("strong", p?.error ? "Salary unavailable" : "Loading\u2026"));
     left.append(big);
-    const pick = E6("select", void 0, "lx-month-select");
+    const pick = E7("select", void 0, "lx-month-select");
     pick.setAttribute("aria-label", "Month");
     const now = /* @__PURE__ */ new Date();
     for (let i = -11; i <= 1; i++) {
@@ -23351,22 +24255,22 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     top.append(left, pick);
     wrap.append(top);
     if (p && !p.error) {
-      const pills = E6("div", void 0, "lx-pills");
+      const pills = E7("div", void 0, "lx-pills");
       pills.append(pill("Work days \xB7 base", mad2(p.base_accrued) + " / " + mad2(p.base_monthly), "gold"), pill("Verified leads", p.verified_count + " \xB7 " + mad2(p.commission), "dark"), pill("Projected month", mad2(p.projected_total), "grey"));
-      wrap.append(pills, E6("p", "Base " + mad2(p.base_monthly) + " per month, Monday to Friday (" + mad2(p.daily_rate) + " per working day), plus " + mad2(p.per_verified_lead) + " for each lead attributed to you and verified by administration. " + p.notice, "lx-footnote"));
+      wrap.append(pills, E7("p", "Base " + mad2(p.base_monthly) + " per month, Monday to Friday (" + mad2(p.daily_rate) + " per working day), plus " + mad2(p.per_verified_lead) + " for each lead attributed to you and verified by administration. " + p.notice, "lx-footnote"));
     }
     return wrap;
   }
   function dayPay() {
-    const p = payroll[monthKey(/* @__PURE__ */ new Date(selectedDay + "T12:00:00"))], info = p?.days?.find((x) => x.date === selectedDay), card = E6("article", void 0, "lx-day-pay");
+    const p = payroll[monthKey(/* @__PURE__ */ new Date(selectedDay + "T12:00:00"))], info = p?.days?.find((x) => x.date === selectedDay), card = E7("article", void 0, "lx-day-pay");
     if (!p || p.error || !info) return card;
     const w = (/* @__PURE__ */ new Date(selectedDay + "T12:00:00Z")).getUTCDay(), weekend = w === 0 || w === 6;
-    const txt = E6("div");
-    txt.append(E6("span", weekend ? "Weekend" : "Working day", "lx-day-pay-label"), E6("strong", weekend ? "No base accrual" : "+" + mad2(p.daily_rate) + " base"), E6("small", info.verified ? info.verified + " verified lead" + (info.verified > 1 ? "s" : "") + " \xB7 +" + mad2(info.verified * p.per_verified_lead) : "No verified leads on this day"));
+    const txt = E7("div");
+    txt.append(E7("span", weekend ? "Weekend" : "Working day", "lx-day-pay-label"), E7("strong", weekend ? "No base accrual" : "+" + mad2(p.daily_rate) + " base"), E7("small", info.verified ? info.verified + " verified lead" + (info.verified > 1 ? "s" : "") + " \xB7 +" + mad2(info.verified * p.per_verified_lead) : "No verified leads on this day"));
     const leadsHere = (p.leads || []).filter((l) => l.verified_on === selectedDay);
-    if (leadsHere.length) txt.append(E6("small", leadsHere.map((l) => l.reference).join(" \xB7 ")));
-    const amount = E6("b", (info.verified ? "+" : "") + mad2((weekend ? 0 : p.daily_rate) + info.verified * p.per_verified_lead), "lx-day-pay-amount");
-    const doc = E6("span", void 0, "lx-day-pay-doc");
+    if (leadsHere.length) txt.append(E7("small", leadsHere.map((l) => l.reference).join(" \xB7 ")));
+    const amount = E7("b", (info.verified ? "+" : "") + mad2((weekend ? 0 : p.daily_rate) + info.verified * p.per_verified_lead), "lx-day-pay-amount");
+    const doc = E7("span", void 0, "lx-day-pay-doc");
     doc.append(icon(info.verified ? "check" : "calendar"));
     card.append(doc, txt, amount);
     return card;
@@ -23374,14 +24278,14 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   function softChrome() {
     let m = document.querySelector("meta[name=theme-color]");
     if (!m) {
-      m = E6("meta");
+      m = E7("meta");
       m.name = "theme-color";
       document.head.append(m);
     }
     m.dataset.previous = m.dataset.previous || m.content;
     m.content = "#efe8dc";
     for (const [n, c] of [["apple-mobile-web-app-capable", "yes"], ["mobile-web-app-capable", "yes"], ["apple-mobile-web-app-status-bar-style", "black-translucent"]]) if (!document.querySelector("meta[name=" + n + "]")) {
-      const x = E6("meta");
+      const x = E7("meta");
       x.name = n;
       x.content = c;
       document.head.append(x);
@@ -23389,15 +24293,15 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     document.documentElement.classList.add("mt-soft");
   }
   function studio() {
-    const gallery = E6("div", void 0, "lx-gallery");
+    const gallery = E7("div", void 0, "lx-gallery");
     body.append(gallery);
     if (section === "library") {
       const media = assets.filter((a) => a.category === "content");
       for (const a of media) {
-        const c = E6("article", void 0, "lx-media-card"), cover = mediaCover(a);
-        c.append(cover, E6("h3", a.original_name), E6("p", a.mime === "application/pdf" ? "PDF asset" : "Image asset", "lx-muted"));
+        const c = E7("article", void 0, "lx-media-card"), cover = mediaCover(a);
+        c.append(cover, E7("h3", a.original_name), E7("p", a.mime === "application/pdf" ? "PDF asset" : "Image asset", "lx-muted"));
         if (a.url) {
-          const link = E6("a", "Download", "lx-link");
+          const link = E7("a", "Download", "lx-link");
           link.href = a.url;
           link.target = "_blank";
           link.rel = "noopener noreferrer";
@@ -23419,45 +24323,45 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     }
     const items = records("content");
     for (const r of items) {
-      const c = E6("article", void 0, "lx-media-card"), asset = assets.find((a) => a.id === r.payload.asset_id && a.category === "content");
-      c.append(mediaCover(asset, r.payload.format), E6("span", r.status, "lx-tag"), E6("h3", r.title), E6("p", [r.payload.platform, r.payload.format, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E6("p", (r.payload.caption || r.payload.notes || "").slice(0, 180), "lx-media-caption"));
+      const c = E7("article", void 0, "lx-media-card"), asset = assets.find((a) => a.id === r.payload.asset_id && a.category === "content");
+      c.append(mediaCover(asset, r.payload.format), E7("span", r.status, "lx-tag"), E7("h3", r.title), E7("p", [r.payload.platform, r.payload.format, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E7("p", (r.payload.caption || r.payload.notes || "").slice(0, 180), "lx-media-caption"));
       for (const [key, label2] of [["asset_url", "Open asset"], ["publication_url", "View publication"]]) if (/^https:\/\//i.test(r.payload[key] || "")) {
-        const a = E6("a", label2, "lx-link");
+        const a = E7("a", label2, "lx-link");
         a.href = r.payload[key];
         a.target = "_blank";
         a.rel = "noopener noreferrer";
         c.append(a);
       }
       if (!readOnly) c.append(button2("Open production", () => edit("content", r)));
-      else c.append(E6("p", r.payload.caption || "", "lx-muted"));
+      else c.append(E7("p", r.payload.caption || "", "lx-muted"));
       gallery.append(c);
     }
     if (!items.length) empty(gallery, "Create your first production. Attach a library image or use an external video link.");
   }
   function mediaCover(asset, format = "Creative") {
-    const cover = E6("div", void 0, "lx-media-cover");
+    const cover = E7("div", void 0, "lx-media-cover");
     if (asset?.url && asset.mime.startsWith("image/")) {
-      const img = E6("img");
+      const img = E7("img");
       img.src = asset.url;
       img.alt = asset.original_name;
       img.loading = "lazy";
       cover.append(img);
-    } else cover.append(E6("span", asset?.mime === "application/pdf" ? "PDF" : format));
+    } else cover.append(E7("span", asset?.mime === "application/pdf" ? "PDF" : format));
     return cover;
   }
   function uploadDialog() {
-    const d = E6("dialog", void 0, "lx-dialog");
+    const d = E7("dialog", void 0, "lx-dialog");
     d.lang = "en";
-    const f = E6("form"), file = E6("input");
+    const f = E7("form"), file = E7("input");
     file.type = "file";
     file.accept = "image/jpeg,image/png,application/pdf";
     file.setAttribute("aria-label", "Select media file");
-    const msg = E6("p", "Images and PDFs up to 10 MB. Large videos use an HTTPS link.", "lx-muted"), send = E6("button", "Upload to library", "lx-button lx-primary");
+    const msg = E7("p", "Images and PDFs up to 10 MB. Large videos use an HTTPS link.", "lx-muted"), send = E7("button", "Upload to library", "lx-button lx-primary");
     send.type = "submit";
     const close = button2("Close", () => {
       if (!dialogBusy) d.remove();
     });
-    f.append(E6("h2", "Upload media"), msg, file, send, close);
+    f.append(E7("h2", "Upload media"), msg, file, send, close);
     d.append(f);
     root.append(d);
     d.showModal();
@@ -23494,27 +24398,27 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   }
   function edit(kind, record = null, day = null) {
     if (readOnly || dialogBusy) return;
-    const d = E6("dialog", void 0, "lx-dialog");
+    const d = E7("dialog", void 0, "lx-dialog");
     d.lang = "en";
-    const form = E6("form"), top = E6("div", void 0, "lx-row-top");
-    top.append(E6("h2", (record ? "Edit " : "New ") + (kind === "content" ? "production" : kind)));
+    const form = E7("form"), top = E7("div", void 0, "lx-row-top");
+    top.append(E7("h2", (record ? "Edit " : "New ") + (kind === "content" ? "production" : kind)));
     const close = button2("Close", () => dismiss());
     top.append(close);
     form.append(top);
-    const grid = E6("div", void 0, "lx-form-grid"), inputs = {};
+    const grid = E7("div", void 0, "lx-form-grid"), inputs = {};
     let definitions = kind === "lead" ? fields.lead : [["title", "Title"], ["status", "Status", states[kind]], ["record_date", kind === "report" ? "Report date" : "Date / next action", "date"], ...fields[kind]];
     if (kind === "content") definitions = [...definitions, ["asset_id", "Media library asset", "asset-select"]];
     for (const [key, label2, type] of definitions) {
-      const wrap = E6("div", void 0, type === "textarea" ? "lx-field lx-wide" : "lx-field"), caption = E6("label", label2);
+      const wrap = E7("div", void 0, type === "textarea" ? "lx-field lx-wide" : "lx-field"), caption = E7("label", label2);
       let input;
       if (Array.isArray(type) || type === "asset-select") {
-        input = E6("select");
+        input = E7("select");
         if (type === "asset-select") {
           input.append(new Option("No library asset", ""));
           for (const a of assets.filter((a2) => a2.category === "content")) input.append(new Option(a.original_name, a.id));
         } else for (const v of type) input.append(new Option(kind === "lead" && key === "status" ? leadStates[v] : v || "Not specified", v));
       } else {
-        input = E6(type === "textarea" ? "textarea" : "input");
+        input = E7(type === "textarea" ? "textarea" : "input");
         if (input.tagName === "INPUT") input.type = type || "text";
       }
       input.id = "lx-edit-" + key;
@@ -23539,9 +24443,9 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       inputs[key] = input;
     }
     form.append(grid);
-    const message2 = E6("p", "", "lx-status");
+    const message2 = E7("p", "", "lx-status");
     message2.setAttribute("role", "status");
-    const controls = E6("div", void 0, "lx-actions"), save = E6("button", "Save changes", "lx-button lx-primary");
+    const controls = E7("div", void 0, "lx-actions"), save = E7("button", "Save changes", "lx-button lx-primary");
     save.type = "submit";
     controls.append(save);
     let dirty = false;
@@ -23618,10 +24522,10 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         return;
       }
       if (idle >= IDLE - WARN && !warning) {
-        warning = E6("div", void 0, "lx-idle");
+        warning = E7("div", void 0, "lx-idle");
         warning.setAttribute("role", "alertdialog");
         warning.setAttribute("aria-label", "Session timeout");
-        warning.append(E6("strong", "Still there?"), E6("p", "For your security you will be signed out in 2 minutes."), button2("Stay signed in", bump));
+        warning.append(E7("strong", "Still there?"), E7("p", "For your security you will be signed out in 2 minutes."), button2("Stay signed in", bump));
         root.append(warning);
         warning.querySelector("button").focus();
       }
@@ -23651,7 +24555,7 @@ function mountWorkspaceAdmin({ api: api2, getStaff }) {
   if (document.getElementById("workspaceAdminButton")) return;
   const host = document.querySelector("#appShell .page-header");
   if (!host) return;
-  const box = E6("div", void 0, "form-actions"), open = E6("button", "Employee workspaces", "secondary");
+  const box = E7("div", void 0, "form-actions"), open = E7("button", "Employee workspaces", "secondary");
   open.type = "button";
   open.id = "workspaceAdminButton";
   box.append(open);
@@ -23659,13 +24563,13 @@ function mountWorkspaceAdmin({ api: api2, getStaff }) {
   open.onclick = async () => {
     if (getStaff()?.role !== "admin") return;
     open.disabled = true;
-    const d = E6("dialog", void 0, "record-dialog"), body = E6("div", void 0, "dialog-body"), select = E6("select"), message2 = E6("p", "Loading team\u2026");
+    const d = E7("dialog", void 0, "record-dialog"), body = E7("div", void 0, "dialog-body"), select = E7("select"), message2 = E7("p", "Loading team\u2026");
     d.lang = "en";
     select.setAttribute("aria-label", "Team member");
-    const close = E6("button", "Close", "secondary");
+    const close = E7("button", "Close", "secondary");
     close.type = "button";
     close.onclick = () => d.remove();
-    const view = E6("button", "Open read-only workspace", "primary");
+    const view = E7("button", "Open read-only workspace", "primary");
     view.type = "button";
     view.disabled = true;
     let people = [];
@@ -23678,7 +24582,7 @@ function mountWorkspaceAdmin({ api: api2, getStaff }) {
         document.getElementById("appShell").hidden = false;
       } });
     };
-    body.append(E6("h2", "Employee workspaces"), select, message2, view, close);
+    body.append(E7("h2", "Employee workspaces"), select, message2, view, close);
     d.append(body);
     document.body.append(d);
     d.onclose = () => d.remove();
@@ -23695,6 +24599,1189 @@ function mountWorkspaceAdmin({ api: api2, getStaff }) {
       open.disabled = false;
     }
   };
+}
+
+// admin-src/gateway.js
+var $ = (id) => document.getElementById(id);
+var GATE_TEXT = {
+  en: {
+    kicker: "GLOBAL PASSPORT \xB7 UNITED KINGDOM",
+    headline: "The smart passport of the international student.",
+    lede: "One secure file from your first university search to your first day on campus \u2014 with your counsellor beside you at every step.",
+    open: "Open",
+    soon: "Coming soon",
+    secure: "Secure access",
+    tabSignin: "Sign in",
+    tabSignup: "Create student account",
+    welcome: "Welcome back",
+    welcomeText: "Students and MUK Talent team use the same door. We open the right space for you.",
+    email: "Email address",
+    password: "Password",
+    signin: "Sign in",
+    forgot: "Forgot your password?",
+    start: "Start your Global Passport",
+    startText: "Free for students. Your counsellor is assigned automatically.",
+    fullName: "Full name (as in your passport)",
+    newPassword: "Create a password",
+    passHint: "At least 10 characters. A short sentence works well.",
+    consent: 'I accept the <a href="/terms/" target="_blank" rel="noopener">terms</a> and the <a href="/privacy/" target="_blank" rel="noopener">privacy policy</a>.',
+    create: "Create my account",
+    newPassTitle: "Choose a new password",
+    savePass: "Save password",
+    encrypted: "Encrypted session \xB7 auto sign-out after 30 min idle",
+    signingIn: "Signing in\u2026",
+    creating: "Creating your account\u2026",
+    checkInbox: "Almost there. We sent a confirmation link to {email}. Open it on this device to activate your Global Passport.",
+    badCreds: "We could not sign you in. Check your email and password.",
+    notConfirmed: "Confirm your email first: open the link we sent you.",
+    weak: "Use at least 10 characters.",
+    exists: "An account already exists with this email. Sign in instead.",
+    resetSent: "If an account exists for {email}, a reset link is on its way.",
+    typeEmail: "Type your email above first.",
+    passSaved: "Password updated. You are signed in.",
+    confirmed: "Email confirmed. Opening your Global Passport\u2026",
+    linkError: "This link has expired or was already used. Sign in or request a new one."
+  },
+  fr: {
+    kicker: "GLOBAL PASSPORT \xB7 ROYAUME-UNI",
+    headline: "Le passeport intelligent de l\u2019\xE9tudiant international.",
+    lede: "Un dossier s\xE9curis\xE9, de la recherche d\u2019universit\xE9 jusqu\u2019\xE0 votre premier jour sur le campus \u2014 avec votre conseiller \xE0 chaque \xE9tape.",
+    open: "Ouvert",
+    soon: "Bient\xF4t",
+    secure: "Acc\xE8s s\xE9curis\xE9",
+    tabSignin: "Connexion",
+    tabSignup: "Cr\xE9er un compte \xE9tudiant",
+    welcome: "Bon retour",
+    welcomeText: "\xC9tudiants et \xE9quipe MUK Talent utilisent la m\xEAme porte. Nous ouvrons le bon espace pour vous.",
+    email: "Adresse e-mail",
+    password: "Mot de passe",
+    signin: "Se connecter",
+    forgot: "Mot de passe oubli\xE9 ?",
+    start: "Ouvrez votre Global Passport",
+    startText: "Gratuit pour les \xE9tudiants. Votre conseiller est attribu\xE9 automatiquement.",
+    fullName: "Nom complet (comme sur le passeport)",
+    newPassword: "Cr\xE9ez un mot de passe",
+    passHint: "Au moins 10 caract\xE8res. Une courte phrase fonctionne bien.",
+    consent: 'J\u2019accepte les <a href="/terms/" target="_blank" rel="noopener">conditions</a> et la <a href="/privacy/" target="_blank" rel="noopener">politique de confidentialit\xE9</a>.',
+    create: "Cr\xE9er mon compte",
+    newPassTitle: "Choisissez un nouveau mot de passe",
+    savePass: "Enregistrer",
+    encrypted: "Session chiffr\xE9e \xB7 d\xE9connexion apr\xE8s 30 min d\u2019inactivit\xE9",
+    signingIn: "Connexion\u2026",
+    creating: "Cr\xE9ation du compte\u2026",
+    checkInbox: "Presque fini. Nous avons envoy\xE9 un lien de confirmation \xE0 {email}. Ouvrez-le sur cet appareil pour activer votre Global Passport.",
+    badCreds: "Connexion impossible. V\xE9rifiez votre e-mail et votre mot de passe.",
+    notConfirmed: "Confirmez d\u2019abord votre e-mail : ouvrez le lien re\xE7u.",
+    weak: "Au moins 10 caract\xE8res.",
+    exists: "Un compte existe d\xE9j\xE0 avec cet e-mail. Connectez-vous.",
+    resetSent: "Si un compte existe pour {email}, un lien de r\xE9initialisation arrive.",
+    typeEmail: "Saisissez d\u2019abord votre e-mail.",
+    passSaved: "Mot de passe mis \xE0 jour.",
+    confirmed: "E-mail confirm\xE9. Ouverture de votre Global Passport\u2026",
+    linkError: "Ce lien a expir\xE9 ou a d\xE9j\xE0 \xE9t\xE9 utilis\xE9. Connectez-vous ou demandez-en un nouveau."
+  }
+};
+var lang = (() => {
+  try {
+    const s = localStorage.getItem("gp-lang");
+    if (s === "fr" || s === "en") return s;
+  } catch {
+  }
+  return /^fr/i.test(navigator.language || "") ? "fr" : "en";
+})();
+function gateLang() {
+  return lang;
+}
+function t(key, vars = {}) {
+  return String((GATE_TEXT[lang] || GATE_TEXT.en)[key] ?? GATE_TEXT.en[key] ?? key).replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
+}
+function paint() {
+  const v = $("loginView");
+  if (!v) return;
+  v.lang = lang;
+  v.querySelectorAll("[data-i18n]").forEach((n) => {
+    n.textContent = t(n.dataset.i18n);
+  });
+  v.querySelectorAll("[data-i18n-html]").forEach((n) => {
+    n.innerHTML = t(n.dataset.i18nHtml);
+  });
+  v.querySelectorAll("[data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+}
+var raf = 0;
+var running = false;
+function startMatrix() {
+  const c = $("gpMatrix");
+  if (!c || running) return;
+  const ctx = c.getContext("2d");
+  if (!ctx) return;
+  running = true;
+  const reduced2 = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const glyphs = "\u30A2\u30A4\u30A6\u30A8\u30AA\u30AB\u30AD\u30AF\u30B1\u30B3\u30B5\u30B7\u30B9\u30BB\u30BD\u30BF\u30C1\u30C4\u30C6\u30C8\u30CA\u30CB\u30CC\u30CD\u30CE\u30CF\u30D2\u30D5\u30D8\u30DB\u30DE\u30DF\u30E0\u30E1\u30E2\u30E4\u30E6\u30E8\u30E9\u30EA\u30EB\u30EC\u30ED\u30EF\u30F30123456789MUKTALENT\xA3\u20AC$\u25C7\u25C6+=<>/".split("");
+  let w = 0, h = 0, cols = 0, drops = [], speed = [], size = 16, dpr = 1, last = 0, hue = 42;
+  function resize() {
+    dpr = Math.min(1.5, window.devicePixelRatio || 1);
+    w = c.clientWidth;
+    h = c.clientHeight;
+    c.width = Math.round(w * dpr);
+    c.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    size = w < 600 ? 14 : 16;
+    cols = Math.ceil(w / size);
+    drops = Array.from({ length: cols }, () => Math.random() * -h / size);
+    speed = Array.from({ length: cols }, () => 0.35 + Math.random() * 0.75);
+    ctx.fillStyle = "#05070a";
+    ctx.fillRect(0, 0, w, h);
+  }
+  function frame(now) {
+    if (!running) return;
+    raf = requestAnimationFrame(frame);
+    if (document.hidden || now - last < 48) return;
+    const dt = Math.min(3, (now - last) / 48 || 1);
+    last = now;
+    hue = (42 + now / 240) % 360;
+    document.documentElement.style.setProperty("--gp-hue", hue.toFixed(0));
+    ctx.fillStyle = "rgba(5,7,10,.12)";
+    ctx.fillRect(0, 0, w, h);
+    ctx.font = "600 " + size + 'px "SFMono-Regular",Consolas,monospace';
+    for (let i = 0; i < cols; i++) {
+      const y = drops[i] * size, x = i * size;
+      if (y > 0) {
+        const head2 = Math.random() > 0.975;
+        ctx.fillStyle = head2 ? "hsla(" + hue + ",100%,88%,.95)" : "hsla(" + (hue + i * 0.6) % 360 + ",85%," + (48 + Math.random() * 14) + "%,.78)";
+        ctx.fillText(glyphs[Math.random() * glyphs.length | 0], x, y);
+      }
+      drops[i] += speed[i] * dt;
+      if (y > h && Math.random() > 0.972) drops[i] = Math.random() * -20;
+    }
+  }
+  resize();
+  addEventListener("resize", resize, { passive: true });
+  if (reduced2) {
+    hue = 42;
+    ctx.font = "600 16px monospace";
+    for (let i = 0; i < cols; i++) for (let j = 0; j < h / size; j += 1 + (Math.random() * 4 | 0)) {
+      ctx.fillStyle = "hsla(42,70%,50%," + Math.random() * 0.25 + ")";
+      ctx.fillText(glyphs[Math.random() * glyphs.length | 0], i * size, j * size);
+    }
+    running = false;
+    return;
+  }
+  raf = requestAnimationFrame(frame);
+}
+function stopMatrix() {
+  running = false;
+  cancelAnimationFrame(raf);
+}
+function showLoginMessage(text = "", kind = "") {
+  const m = $("loginMessage");
+  if (!m) return;
+  m.textContent = text;
+  m.classList.toggle("error", kind === "error");
+  m.classList.toggle("ok", kind === "ok");
+}
+function strength(v) {
+  let s = 0;
+  if (v.length >= 10) s++;
+  if (v.length >= 14) s++;
+  if (/[A-Z]/.test(v) && /[a-z]/.test(v)) s++;
+  if (/\d/.test(v)) s++;
+  if (/[^A-Za-z0-9]/.test(v) || /\s/.test(v)) s++;
+  return Math.min(4, s);
+}
+function showTab(which) {
+  const signin = which !== "signup";
+  $("loginForm").hidden = !signin;
+  $("signupForm").hidden = signin;
+  $("resetForm").hidden = true;
+  $("tabSignin").setAttribute("aria-selected", String(signin));
+  $("tabSignup").setAttribute("aria-selected", String(!signin));
+  $("tabSignin").tabIndex = signin ? 0 : -1;
+  $("tabSignup").tabIndex = signin ? -1 : 0;
+  $("gpCard").dataset.tab = signin ? "signin" : "signup";
+  showLoginMessage();
+}
+function showReset() {
+  $("loginForm").hidden = true;
+  $("signupForm").hidden = true;
+  $("resetForm").hidden = false;
+  $("gpCard").dataset.tab = "reset";
+}
+function initGateway({ getClient, onSignedIn }) {
+  paint();
+  startMatrix();
+  document.querySelectorAll("#loginView [data-lang]").forEach((b) => b.addEventListener("click", () => {
+    lang = b.dataset.lang;
+    try {
+      localStorage.setItem("gp-lang", lang);
+    } catch {
+    }
+    paint();
+    document.dispatchEvent(new CustomEvent("gp-lang", { detail: lang }));
+  }));
+  $("tabSignin").addEventListener("click", () => showTab("signin"));
+  $("tabSignup").addEventListener("click", () => showTab("signup"));
+  for (const tab of [$("tabSignin"), $("tabSignup")]) tab.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+      const other = tab.id === "tabSignin" ? $("tabSignup") : $("tabSignin");
+      other.click();
+      other.focus();
+    }
+  });
+  document.querySelectorAll("#loginView .gp-eye").forEach((b) => b.addEventListener("click", () => {
+    const i = $(b.dataset.eye);
+    const show = i.type === "password";
+    i.type = show ? "text" : "password";
+    b.classList.toggle("on", show);
+    b.setAttribute("aria-label", show ? "Hide password" : "Show password");
+  }));
+  const meter = document.querySelector("#loginView .gp-meter");
+  $("suPassword").addEventListener("input", (e) => {
+    meter.dataset.level = String(strength(e.target.value));
+  });
+  if (/^#?(signup|register)/.test(location.hash.replace("#", "")) || /[?&]signup\b/.test(location.search)) showTab("signup");
+  $("signupForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const client = getClient();
+    if (!client) return;
+    const btn3 = $("signupSubmit");
+    if (btn3.disabled) return;
+    const name = $("suName").value.trim(), email = $("suEmail").value.trim().toLowerCase(), password = $("suPassword").value;
+    if (password.length < 10) return showLoginMessage(t("weak"), "error");
+    if (!$("suConsent").checked) return;
+    btn3.disabled = true;
+    showLoginMessage(t("creating"));
+    try {
+      const { data, error } = await client.auth.signUp({ email, password, options: { emailRedirectTo: location.origin + "/portal/", data: { full_name: name, account: "student", lang } } });
+      if (error) throw error;
+      $("suPassword").value = "";
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        showTab("signin");
+        $("email").value = email;
+        return showLoginMessage(t("exists"), "error");
+      }
+      if (data.session) {
+        await onSignedIn(data.session);
+        return;
+      }
+      $("signupForm").reset();
+      showTab("signin");
+      $("email").value = email;
+      showLoginMessage(t("checkInbox", { email }), "ok");
+    } catch (err2) {
+      showLoginMessage(/registered|exists/i.test(err2.message || "") ? t("exists") : err2.message || "Error", "error");
+    } finally {
+      btn3.disabled = false;
+    }
+  });
+  $("forgotPassword").addEventListener("click", async () => {
+    const client = getClient();
+    const email = $("email").value.trim();
+    if (!email) {
+      showLoginMessage(t("typeEmail"), "error");
+      $("email").focus();
+      return;
+    }
+    try {
+      await client.auth.resetPasswordForEmail(email, { redirectTo: location.origin + "/portal/" });
+    } catch {
+    }
+    showLoginMessage(t("resetSent", { email }), "ok");
+  });
+  $("resetForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const client = getClient();
+    const v = $("newPassword").value;
+    if (v.length < 10) return showLoginMessage(t("weak"), "error");
+    const { error } = await client.auth.updateUser({ password: v });
+    $("newPassword").value = "";
+    if (error) return showLoginMessage(error.message, "error");
+    showLoginMessage(t("passSaved"), "ok");
+    const { data } = await client.auth.getSession();
+    if (data.session) await onSignedIn(data.session);
+  });
+}
+
+// admin-src/student-portal.js
+var TX = {
+  en: {
+    brand: "GLOBAL PASSPORT",
+    journeyTitle: "My Global Journey",
+    pages: { journey: "Journey", documents: "Documents", plan: "Plan", messages: "Messages", profile: "Profile" },
+    destination: "Destination",
+    university: "University",
+    programme: "Programme",
+    intake: "Intake",
+    status: "Application status",
+    readiness: "Application readiness",
+    counsellor: "Your counsellor",
+    noCounsellor: "Being assigned",
+    noCounsellorText: "We are matching you with the right counsellor. You will hear from us within 2 working days.",
+    toChoose: "To be selected with your counsellor",
+    pendingDocs: "Pending documents",
+    nextDates: "Upcoming dates",
+    noDates: "No dates yet. Your counsellor will add deadlines here.",
+    latest: "Latest from your counsellor",
+    message: "Message",
+    write: "Write a message\u2026",
+    send: "Send",
+    stage: { done: "Completed", in_progress: "In progress", pending: "Pending" },
+    doc: { requested: "To upload", uploaded: "In review", approved: "Approved", rejected: "Needs changes" },
+    upload: "Upload",
+    replace: "Replace",
+    view: "View",
+    uploading: "Uploading\u2026",
+    uploaded: "Uploaded. Your counsellor will review it.",
+    fileRule: "PDF, JPG, PNG or WebP \xB7 max 10 MB",
+    tooBig: "This file is larger than 10 MB.",
+    badType: "Use PDF, JPG, PNG or WebP.",
+    tasks: "Tasks",
+    noTasks: "No tasks in this stage.",
+    due: "Due",
+    overdue: "Overdue",
+    today: "Today",
+    inDays: "in {n} days",
+    docsDone: "{a} of {b} approved",
+    st: { profile: "Profile in progress", preparing: "Preparing application", submitted: "Application submitted", awaiting: "Awaiting university response", offer: "Offer received", visa: "Visa in progress", travel: "Preparing travel", enrolled: "Enrolled", on_hold: "On hold", withdrawn: "Withdrawn" },
+    profileTitle: "Your profile",
+    save: "Save changes",
+    saved: "Saved.",
+    fullName: "Full name",
+    phone: "Phone (with country code)",
+    residence: "Country of residence",
+    nationality: "Nationality",
+    dob: "Date of birth",
+    level: "Study level",
+    subject: "Subject area",
+    english: "English test / level",
+    preferred: "Preferred university",
+    preferredProg: "Preferred programme",
+    destinations: "Destinations",
+    active: "Active",
+    soon: "Coming soon",
+    signOut: "Sign out",
+    refresh: "Refresh",
+    swipe: "Swipe left or right to move between sections",
+    updated: "Updated",
+    you: "You",
+    system: "Update",
+    empty: "No messages yet. Say hello to your counsellor.",
+    ob: {
+      step: "Step {a} of {b}",
+      where: "Where do you want to study?",
+      whereText: "Global Passport opens with the United Kingdom. Canada and the USA are on the way.",
+      from: "Where are you from?",
+      fromText: "We are preparing MUK Talent for students from every country. This helps us assign the right counsellor and documents.",
+      plan: "Your study plan",
+      planText: "A first idea is enough. Your counsellor will refine it with you.",
+      confirm: "Open my Global Passport",
+      confirmText: "Your counsellor is assigned automatically as soon as your file is created.",
+      consent: "I agree that MUK Talent stores my file to support my application, as described in the privacy policy.",
+      next: "Continue",
+      back: "Back",
+      create: "Create my Global Passport",
+      creating: "Creating your file\u2026",
+      assigned: "Your counsellor",
+      welcome: "Welcome, {name}",
+      chooseLevel: "Choose a level",
+      intakePh: "e.g. September 2027",
+      subjectPh: "e.g. Computer Science",
+      englishPh: "e.g. IELTS 6.5 / not yet",
+      choose: "Choose\u2026"
+    }
+  },
+  fr: {
+    brand: "GLOBAL PASSPORT",
+    journeyTitle: "Mon parcours international",
+    pages: { journey: "Parcours", documents: "Documents", plan: "Plan", messages: "Messages", profile: "Profil" },
+    destination: "Destination",
+    university: "Universit\xE9",
+    programme: "Programme",
+    intake: "Rentr\xE9e",
+    status: "Statut de la candidature",
+    readiness: "Pr\xE9paration du dossier",
+    counsellor: "Votre conseiller",
+    noCounsellor: "Attribution en cours",
+    noCounsellorText: "Nous vous attribuons le bon conseiller. Vous aurez de nos nouvelles sous 2 jours ouvr\xE9s.",
+    toChoose: "\xC0 choisir avec votre conseiller",
+    pendingDocs: "Documents en attente",
+    nextDates: "Dates importantes",
+    noDates: "Pas encore de dates. Votre conseiller ajoutera vos \xE9ch\xE9ances ici.",
+    latest: "Derni\xE8res nouvelles",
+    message: "Message",
+    write: "\xC9crire un message\u2026",
+    send: "Envoyer",
+    stage: { done: "Termin\xE9", in_progress: "En cours", pending: "En attente" },
+    doc: { requested: "\xC0 envoyer", uploaded: "En v\xE9rification", approved: "Valid\xE9", rejected: "\xC0 corriger" },
+    upload: "Envoyer",
+    replace: "Remplacer",
+    view: "Voir",
+    uploading: "Envoi\u2026",
+    uploaded: "Envoy\xE9. Votre conseiller va le v\xE9rifier.",
+    fileRule: "PDF, JPG, PNG ou WebP \xB7 10 Mo max",
+    tooBig: "Le fichier d\xE9passe 10 Mo.",
+    badType: "Utilisez PDF, JPG, PNG ou WebP.",
+    tasks: "T\xE2ches",
+    noTasks: "Aucune t\xE2che dans cette \xE9tape.",
+    due: "\xC9ch\xE9ance",
+    overdue: "En retard",
+    today: "Aujourd\u2019hui",
+    inDays: "dans {n} jours",
+    docsDone: "{a} sur {b} valid\xE9s",
+    st: { profile: "Profil en cours", preparing: "Candidature en pr\xE9paration", submitted: "Candidature envoy\xE9e", awaiting: "En attente de l\u2019universit\xE9", offer: "Offre re\xE7ue", visa: "Visa en cours", travel: "Pr\xE9paration du voyage", enrolled: "Inscrit", on_hold: "En pause", withdrawn: "Retir\xE9" },
+    profileTitle: "Votre profil",
+    save: "Enregistrer",
+    saved: "Enregistr\xE9.",
+    fullName: "Nom complet",
+    phone: "T\xE9l\xE9phone (avec indicatif)",
+    residence: "Pays de r\xE9sidence",
+    nationality: "Nationalit\xE9",
+    dob: "Date de naissance",
+    level: "Niveau d\u2019\xE9tudes",
+    subject: "Domaine",
+    english: "Test / niveau d\u2019anglais",
+    preferred: "Universit\xE9 souhait\xE9e",
+    preferredProg: "Programme souhait\xE9",
+    destinations: "Destinations",
+    active: "Actif",
+    soon: "Bient\xF4t",
+    signOut: "Se d\xE9connecter",
+    refresh: "Actualiser",
+    swipe: "Glissez \xE0 gauche ou \xE0 droite pour changer de section",
+    updated: "Mis \xE0 jour",
+    you: "Vous",
+    system: "Mise \xE0 jour",
+    empty: "Pas encore de message. Dites bonjour \xE0 votre conseiller.",
+    ob: {
+      step: "\xC9tape {a} sur {b}",
+      where: "O\xF9 voulez-vous \xE9tudier ?",
+      whereText: "Global Passport ouvre avec le Royaume-Uni. Le Canada et les \xC9tats-Unis arrivent.",
+      from: "D\u2019o\xF9 venez-vous ?",
+      fromText: "MUK Talent se pr\xE9pare \xE0 accueillir des \xE9tudiants de tous les pays. Cela nous aide \xE0 choisir le bon conseiller et les bons documents.",
+      plan: "Votre projet d\u2019\xE9tudes",
+      planText: "Une premi\xE8re id\xE9e suffit. Votre conseiller l\u2019affinera avec vous.",
+      confirm: "Ouvrir mon Global Passport",
+      confirmText: "Votre conseiller est attribu\xE9 automatiquement d\xE8s la cr\xE9ation du dossier.",
+      consent: "J\u2019accepte que MUK Talent conserve mon dossier pour accompagner ma candidature, comme d\xE9crit dans la politique de confidentialit\xE9.",
+      next: "Continuer",
+      back: "Retour",
+      create: "Cr\xE9er mon Global Passport",
+      creating: "Cr\xE9ation du dossier\u2026",
+      assigned: "Votre conseiller",
+      welcome: "Bienvenue, {name}",
+      chooseLevel: "Choisir un niveau",
+      intakePh: "ex. septembre 2027",
+      subjectPh: "ex. Informatique",
+      englishPh: "ex. IELTS 6.5 / pas encore",
+      choose: "Choisir\u2026"
+    }
+  }
+};
+var LEVELS2 = { en: ["Foundation", "Undergraduate", "Postgraduate taught (Master's)", "Postgraduate research (PhD)", "English language course", "Not sure yet"], fr: ["Foundation (ann\xE9e pr\xE9paratoire)", "Licence (Undergraduate)", "Master (Postgraduate taught)", "Doctorat (PhD)", "Cours d\u2019anglais", "Je ne sais pas encore"] };
+var LEVEL_VALUES = LEVELS2.en;
+var STAGE_ICON = { registration: "user", university: "cap", documents: "doc", application: "send", offer: "spark", visa: "visa", travel: "plane", arrival: "pin" };
+var STAGE_FR = { registration: "Inscription et \xE9valuation", university: "Choix de l\u2019universit\xE9", documents: "Pr\xE9paration des documents", application: "Candidature", offer: "Offre universitaire", visa: "Pr\xE9paration du visa", travel: "Pr\xE9paration du voyage", arrival: "Arriv\xE9e \xE0 destination" };
+var DEST_FR = { UK: "Royaume-Uni", CA: "Canada", US: "\xC9tats-Unis" };
+var MAX = 10 * 1024 * 1024;
+var MIMES = ["application/pdf", "image/jpeg", "image/png", "image/webp"];
+async function mountStudentPortal({ api: api2, client, who, onLogout }) {
+  linkCss("gpPortalCss", "/admin/student-portal.css");
+  let mainEl = null;
+  document.getElementById("studentPortal")?.remove();
+  let lang2 = gateLang();
+  const tx = () => TX[lang2] || TX.en;
+  const L = (k) => k.split(".").reduce((o, p) => o?.[p], tx()) ?? k.split(".").reduce((o, p) => o?.[p], TX.en) ?? k;
+  const fill = (s, v) => String(s).replace(/\{(\w+)\}/g, (_, k) => v[k] ?? "");
+  const root = E6("div", void 0, "gp-app");
+  root.id = "studentPortal";
+  root.lang = lang2;
+  document.body.append(root);
+  const theme = document.querySelector("meta[name=theme-color]");
+  if (theme) theme.content = "#070a0f";
+  const logout = async () => {
+    root.remove();
+    await onLogout();
+  };
+  idleLogout(root, logout);
+  let data = null, page = "journey", openStage = null;
+  const pages = () => ["journey", "documents", "plan", "messages", "profile"].map((id) => [id, L("pages." + id)]);
+  const stageName = (k) => lang2 === "fr" ? STAGE_FR[k] : data?.stage_titles?.[k] || k;
+  const destName = (k) => lang2 === "fr" ? DEST_FR[k] : { UK: "United Kingdom", CA: "Canada", US: "United States" }[k];
+  const levelLabel = (v) => {
+    const i = LEVEL_VALUES.indexOf(v);
+    return i < 0 ? v : LEVELS2[lang2][i];
+  };
+  if (who.kind === "new") {
+    onboarding();
+    return;
+  }
+  await load();
+  async function load(silent) {
+    try {
+      data = (await api2("/api/passport/me")).data;
+      render();
+    } catch (e) {
+      if (!silent) {
+        root.replaceChildren(errorView(e.message));
+      }
+    }
+  }
+  function errorView(text) {
+    const w = E6("div", void 0, "gp-error");
+    w.append(gi("alert"), E6("h2", "Global Passport"), E6("p", text), btn2(L("refresh"), () => load(), "gp-btn gp-primary", "refresh"), btn2(L("signOut"), logout, "gp-btn gp-ghost", "logout"));
+    return w;
+  }
+  function onboarding() {
+    const v = { destination: "UK", full_name: who.name || "", country_residence: "", nationality: "", phone: "", study_level: "", subject: "", intake: "", english_test: "", consent: false };
+    let step2 = 0;
+    const shell = E6("section", void 0, "gp-onboard");
+    root.replaceChildren(shell);
+    const draw = () => {
+      shell.replaceChildren();
+      const total = 4;
+      const top = E6("header", void 0, "gp-ob-top");
+      top.append(E6("span", L("brand"), "gp-brand"), langToggle(() => draw()));
+      const bar = E6("div", void 0, "gp-ob-progress");
+      for (let i = 0; i < total; i++) {
+        const s = E6("i");
+        if (i <= step2) s.className = "on";
+        bar.append(s);
+      }
+      const card = E6("form", void 0, "gp-ob-card");
+      card.noValidate = false;
+      card.append(E6("p", fill(L("ob.step"), { a: step2 + 1, b: total }), "gp-kicker"));
+      const actions = E6("div", void 0, "gp-ob-actions");
+      if (step2 === 0) {
+        card.append(E6("h1", L("ob.where")), E6("p", L("ob.whereText"), "gp-muted"));
+        const g = E6("div", void 0, "gp-dest-grid");
+        for (const [code, flagCls, on] of [["UK", "uk", true], ["CA", "ca", false], ["US", "us", false]]) {
+          const o = E6("button", void 0, "gp-dest" + (on ? "" : " is-soon") + (v.destination === code ? " is-on" : ""));
+          o.type = "button";
+          o.disabled = !on;
+          o.setAttribute("aria-pressed", String(v.destination === code));
+          const f = E6("span", void 0, "gp-flag gp-flag-" + flagCls);
+          f.setAttribute("aria-hidden", "true");
+          o.append(f, E6("strong", destName(code)), E6("small", on ? L("active") : L("soon")));
+          if (on) o.onclick = () => {
+            v.destination = code;
+            draw();
+          };
+          g.append(o);
+        }
+        card.append(g);
+      }
+      if (step2 === 1) {
+        card.append(E6("h1", L("ob.from")), E6("p", L("ob.fromText"), "gp-muted"));
+        card.append(field2(L("fullName"), input("obName", v.full_name, (x) => v.full_name = x, { autocomplete: "name", required: true, minLength: 2, maxLength: 120 })));
+        const r = countrySelect("obRes", lang2, v.country_residence, L("ob.choose"));
+        r.onchange = () => {
+          v.country_residence = r.value;
+          if (!v.nationality) {
+            v.nationality = r.value;
+            n.value = r.value;
+          }
+        };
+        card.append(field2(L("residence"), r));
+        const n = countrySelect("obNat", lang2, v.nationality, L("ob.choose"));
+        n.onchange = () => {
+          v.nationality = n.value;
+        };
+        card.append(field2(L("nationality"), n));
+        card.append(field2(L("phone"), input("obPhone", v.phone, (x) => v.phone = x, { type: "tel", autocomplete: "tel", placeholder: "+212 6 00 00 00 00", pattern: "\\+?[0-9 ().-]{6,24}" })));
+      }
+      if (step2 === 2) {
+        card.append(E6("h1", L("ob.plan")), E6("p", L("ob.planText"), "gp-muted"));
+        const lv = E6("select");
+        lv.id = "obLevel";
+        lv.required = true;
+        lv.append(new Option(L("ob.chooseLevel"), ""));
+        LEVEL_VALUES.forEach((x, i) => lv.append(new Option(LEVELS2[lang2][i], x)));
+        lv.value = v.study_level;
+        lv.onchange = () => v.study_level = lv.value;
+        card.append(field2(L("level"), lv));
+        card.append(field2(L("subject"), input("obSubject", v.subject, (x) => v.subject = x, { required: true, minLength: 2, maxLength: 120, placeholder: L("ob.subjectPh") })));
+        const two = E6("div", void 0, "gp-two");
+        two.append(field2(L("intake"), input("obIntake", v.intake, (x) => v.intake = x, { maxLength: 40, placeholder: L("ob.intakePh") })), field2(L("english"), input("obEnglish", v.english_test, (x) => v.english_test = x, { maxLength: 80, placeholder: L("ob.englishPh") })));
+        card.append(two);
+      }
+      if (step2 === 3) {
+        card.append(E6("h1", L("ob.confirm")), E6("p", L("ob.confirmText"), "gp-muted"));
+        const sum = E6("dl", void 0, "gp-summary");
+        for (const [k, val] of [[L("destination"), destName(v.destination)], [L("residence"), countryName(v.country_residence, lang2)], [L("nationality"), countryName(v.nationality, lang2)], [L("level"), levelLabel(v.study_level)], [L("subject"), v.subject], [L("intake"), v.intake || "\u2014"]]) {
+          sum.append(E6("dt", k), E6("dd", val));
+        }
+        card.append(sum);
+        const c = E6("label", void 0, "gp-check");
+        const cb = E6("input");
+        cb.type = "checkbox";
+        cb.required = true;
+        cb.checked = v.consent;
+        cb.onchange = () => v.consent = cb.checked;
+        c.append(cb, E6("span", L("ob.consent")));
+        card.append(c);
+      }
+      const msg = E6("p", "", "gp-form-msg");
+      msg.setAttribute("role", "status");
+      if (step2 > 0) actions.append(btn2(L("ob.back"), () => {
+        step2--;
+        draw();
+      }, "gp-btn gp-ghost", "back"));
+      const next = E6("button", void 0, "gp-btn gp-primary");
+      next.type = "submit";
+      next.append(E6("span", step2 === 3 ? L("ob.create") : L("ob.next")), gi("chevron"));
+      actions.append(next);
+      card.append(actions, msg);
+      card.onsubmit = async (e) => {
+        e.preventDefault();
+        if (!card.reportValidity()) return;
+        if (step2 < 3) {
+          step2++;
+          draw();
+          shell.querySelector("input,select")?.focus();
+          return;
+        }
+        next.disabled = true;
+        msg.textContent = L("ob.creating");
+        try {
+          const body = { ...v };
+          for (const k of ["phone", "intake", "english_test"]) if (!body[k]) body[k] = null;
+          data = (await api2("/api/passport/register", { method: "POST", body: JSON.stringify(body) })).data;
+          celebrate();
+        } catch (err2) {
+          msg.textContent = err2.message;
+          msg.classList.add("error");
+          next.disabled = false;
+        }
+      };
+      shell.append(top, bar, card);
+    };
+    draw();
+  }
+  function celebrate() {
+    const s = E6("section", void 0, "gp-welcome");
+    const c = data.counsellor;
+    const card = E6("div", void 0, "gp-welcome-card");
+    card.append(ring(data.readiness, "lg"), E6("p", data.student.reference, "gp-kicker"), E6("h1", fill(L("ob.welcome"), { name: data.student.full_name.split(" ")[0] })));
+    if (c) {
+      const who2 = E6("div", void 0, "gp-welcome-c");
+      who2.append(avatar(c.full_name, c.avatar_url, "gp-avatar gp-avatar-lg"), E6("small", L("ob.assigned")), E6("strong", c.full_name), E6("span", c.job_title, "gp-muted"));
+      card.append(who2);
+    } else card.append(E6("p", L("noCounsellorText"), "gp-muted"));
+    card.append(btn2(L("journeyTitle"), () => render(), "gp-btn gp-primary", "chevron"));
+    s.append(card);
+    root.replaceChildren(s);
+  }
+  function input(id, value, set, attrs = {}) {
+    const i = E6("input");
+    i.id = id;
+    i.value = value || "";
+    for (const [k, val] of Object.entries(attrs)) i[k] = val;
+    i.oninput = () => set(i.value);
+    return i;
+  }
+  function field2(label2, control) {
+    const w = E6("div", void 0, "gp-field");
+    const l = E6("label", label2);
+    l.htmlFor = control.id;
+    w.append(l, control);
+    return w;
+  }
+  function langToggle(after) {
+    const g = E6("div", void 0, "gp-lang");
+    g.setAttribute("role", "group");
+    g.setAttribute("aria-label", "Language");
+    for (const code of ["en", "fr"]) {
+      const b = E6("button", code.toUpperCase());
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(lang2 === code));
+      b.onclick = () => {
+        lang2 = code;
+        try {
+          localStorage.setItem("gp-lang", code);
+        } catch {
+        }
+        root.lang = code;
+        after();
+      };
+      g.append(b);
+    }
+    return g;
+  }
+  function render(dir) {
+    const s = data.student;
+    root.replaceChildren();
+    root.lang = lang2;
+    const top = E6("header", void 0, "gp-top");
+    const brand = E6("div", void 0, "gp-top-brand");
+    brand.append(E6("span", "MUK TALENT", "gp-wm"), E6("b", L("brand")));
+    const right = E6("div", void 0, "gp-top-right");
+    const ref = E6("span", s.reference, "gp-ref");
+    right.append(ref, langToggle(() => render()), btn2("", () => load(), "gp-icon-btn", "refresh"));
+    const me = btn2("", null, "gp-me");
+    me.append(avatar(s.full_name));
+    me.setAttribute("aria-label", L("signOut"));
+    me.onclick = () => {
+      if (confirm(L("signOut") + "?")) logout();
+    };
+    right.append(me);
+    top.append(brand, right);
+    const side = E6("nav", void 0, "gp-side");
+    side.setAttribute("aria-label", "Global Passport");
+    for (const [id, label2] of pages()) {
+      const b = btn2(label2, () => go(id), "gp-side-btn", { journey: "globe", documents: "doc", plan: "calendar", messages: "chat", profile: "user" }[id]);
+      if (id === page) b.setAttribute("aria-current", "page");
+      if (id === "messages") {
+        const n = unreadCount();
+        if (n) b.append(E6("i", n, "gp-badge"));
+      }
+      side.append(b);
+    }
+    const out = btn2(L("signOut"), logout, "gp-side-btn gp-side-out", "logout");
+    side.append(out);
+    mainEl = E6("main", void 0, "gp-main");
+    mainEl.dataset.page = page;
+    if (dir && !reducedMotion()) mainEl.classList.add("enter-" + dir);
+    const head2 = E6("div", void 0, "gp-page-head");
+    head2.append(E6("p", page === "journey" ? L("brand") + " \xB7 " + destName(s.destination).toUpperCase() : L("journeyTitle").toUpperCase(), "gp-kicker"), E6("h1", page === "journey" ? L("journeyTitle") : L("pages." + page)));
+    mainEl.append(head2);
+    ({ journey, documents, plan, messages, profile })[page]();
+    root.append(top, side, mainEl, pager(pages(), page, go));
+    attachSwipe(mainEl, { onNext: () => step(1), onPrev: () => step(-1) });
+    if (matchMedia("(max-width: 820px)").matches) hintOnce("gp-swipe-hint", L("swipe"), root);
+  }
+  function step(d) {
+    const ids = pages().map((p) => p[0]);
+    const i = ids.indexOf(page) + d;
+    if (i < 0 || i >= ids.length) return;
+    go(ids[i], d > 0 ? "left" : "right");
+  }
+  function go(id, dir) {
+    if (id === page) return;
+    const ids = pages().map((p) => p[0]);
+    dir = dir || (ids.indexOf(id) > ids.indexOf(page) ? "left" : "right");
+    page = id;
+    render(dir);
+    window.scrollTo({ top: 0 });
+    if (id === "messages") load(true);
+  }
+  function unreadCount() {
+    return 0;
+  }
+  function statusPill(st) {
+    const p = E6("span", L("st." + st), "gp-status gp-status-" + st);
+    p.prepend(E6("i"));
+    return p;
+  }
+  function journey() {
+    const s = data.student, c = data.counsellor;
+    const hero = E6("section", void 0, "gp-hero");
+    const pass = E6("article", void 0, "gp-passport");
+    pass.setAttribute("aria-label", "Global Passport " + s.reference);
+    const ptop = E6("div", void 0, "gp-pp-top");
+    const f = E6("span", void 0, "gp-flag gp-flag-" + s.destination.toLowerCase());
+    f.setAttribute("aria-hidden", "true");
+    ptop.append(E6("span", "GLOBAL PASSPORT", "gp-pp-title"), f);
+    const pbody = E6("div", void 0, "gp-pp-body");
+    const photo = avatar(s.full_name, null, "gp-avatar gp-pp-photo");
+    const id = E6("dl", void 0, "gp-pp-id");
+    for (const [k, val] of [["Name / Nom", s.full_name], ["Nationality", countryName(s.nationality, lang2)], ["Destination", destName(s.destination)], ["File no.", s.reference]]) {
+      id.append(E6("dt", k), E6("dd", val));
+    }
+    pbody.append(photo, id);
+    const mrz = E6("p", mrzLine(s), "gp-mrz");
+    mrz.setAttribute("aria-hidden", "true");
+    pass.append(ptop, pbody, mrz, E6("span", void 0, "gp-pp-holo"));
+    const ready = E6("article", void 0, "gp-ready");
+    ready.append(E6("p", L("readiness"), "gp-kicker"), ring(data.readiness, "xl"));
+    const done = data.documents.filter((d) => d.required && d.status === "approved").length, req = data.documents.filter((d) => d.required).length;
+    ready.append(E6("p", fill(L("docsDone"), { a: done, b: req }), "gp-muted"), statusPill(s.application_status));
+    hero.append(pass, ready);
+    mainEl.append(hero);
+    const facts = E6("section", void 0, "gp-facts");
+    facts.append(fact("globe", L("destination"), destName(s.destination)), fact("cap", L("university"), s.university || L("toChoose"), !s.university), fact("book", L("programme"), s.programme || s.subject || L("toChoose"), !s.programme), fact("calendar", L("intake"), s.intake || "\u2014"));
+    mainEl.append(facts);
+    const grid = E6("div", void 0, "gp-grid");
+    const cc = E6("section", void 0, "gp-panel gp-counsellor");
+    cc.append(E6("p", L("counsellor"), "gp-kicker"));
+    if (c) {
+      const row = E6("div", void 0, "gp-c-row");
+      const txt = E6("div");
+      txt.append(E6("strong", c.full_name), E6("span", c.job_title, "gp-muted"));
+      if (c.languages) txt.append(E6("small", [].concat(c.languages).join(" \xB7 "), "gp-muted"));
+      row.append(avatar(c.full_name, c.avatar_url, "gp-avatar gp-avatar-lg"), txt);
+      cc.append(row);
+      const acts = E6("div", void 0, "gp-actions");
+      acts.append(btn2(L("message"), () => go("messages"), "gp-btn gp-primary", "chat"));
+      if (c.email) {
+        const a = E6("a", void 0, "gp-btn gp-ghost");
+        a.href = "mailto:" + c.email;
+        a.append(gi("send"), E6("span", c.email));
+        acts.append(a);
+      }
+      cc.append(acts);
+    } else {
+      cc.append(E6("strong", L("noCounsellor")), E6("p", L("noCounsellorText"), "gp-muted"));
+    }
+    grid.append(cc);
+    const pend = E6("section", void 0, "gp-panel");
+    pend.append(panelHead(L("pendingDocs"), () => go("documents")));
+    const pd = data.documents.filter((d) => ["requested", "rejected"].includes(d.status)).slice(0, 4);
+    for (const d of pd) pend.append(docRow(d, true));
+    if (!pd.length) pend.append(E6("p", fill(L("docsDone"), { a: done, b: req }), "gp-muted"));
+    grid.append(pend);
+    const dates = E6("section", void 0, "gp-panel");
+    dates.append(panelHead(L("nextDates"), () => go("plan")));
+    const upcoming = upcomingItems().slice(0, 4);
+    for (const u of upcoming) dates.append(dateRow(u));
+    if (!upcoming.length) dates.append(E6("p", L("noDates"), "gp-muted"));
+    grid.append(dates);
+    mainEl.append(grid);
+    const map = E6("section", void 0, "gp-panel gp-map-panel");
+    map.append(E6("p", L("journeyTitle"), "gp-kicker"));
+    map.append(journeyMap(false));
+    mainEl.append(map);
+    const last = data.messages.filter((m) => m.sender_role !== "student").slice(-1)[0];
+    if (last) {
+      const l = E6("section", void 0, "gp-panel gp-latest");
+      l.append(E6("p", L("latest"), "gp-kicker"), E6("p", last.body, "gp-latest-body"), E6("small", ago(last.created_at, lang2), "gp-muted"));
+      l.onclick = () => go("messages");
+      mainEl.append(l);
+    }
+  }
+  function mrzLine(s) {
+    const clean = (v) => String(v || "").normalize("NFKD").replace(/[^A-Za-z ]/g, "").toUpperCase().trim().replace(/\s+/g, "<");
+    const n = clean(s.full_name).split("<");
+    return ("P<" + (s.destination === "UK" ? "GBR" : s.destination) + (n.slice(-1)[0] || "") + "<<" + n.slice(0, -1).join("<")).padEnd(44, "<").slice(0, 44) + "\n" + (s.reference.replace(/-/g, "") + "<" + s.nationality + "<MUKTALENT").padEnd(44, "<").slice(0, 44);
+  }
+  function fact(ic, label2, value, muted) {
+    const a = E6("article", void 0, "gp-fact" + (muted ? " is-muted" : ""));
+    const i = E6("span", void 0, "gp-fact-i");
+    i.append(gi(ic));
+    a.append(i, E6("small", label2), E6("strong", value));
+    return a;
+  }
+  function panelHead(title, more) {
+    const h = E6("div", void 0, "gp-panel-head");
+    h.append(E6("h2", title));
+    if (more) h.append(btn2("", more, "gp-icon-btn", "chevron"));
+    return h;
+  }
+  function upcomingItems() {
+    const items = [...data.events.map((e) => ({ title: e.title, date: e.starts_on, kind: e.kind })), ...data.tasks.filter((t2) => t2.status === "open" && t2.due_date).map((t2) => ({ title: t2.title, date: t2.due_date, kind: "task" }))];
+    return items.sort((a, b) => a.date.localeCompare(b.date)).filter((x) => daysUntil(x.date) >= -14);
+  }
+  function dateRow(u) {
+    const r = E6("div", void 0, "gp-date-row");
+    const d = /* @__PURE__ */ new Date(u.date + "T12:00:00Z");
+    const cal = E6("span", void 0, "gp-cal");
+    cal.append(E6("b", d.getUTCDate()), E6("small", new Intl.DateTimeFormat(lang2 === "fr" ? "fr-FR" : "en-GB", { month: "short", timeZone: "UTC" }).format(d)));
+    const n = daysUntil(u.date);
+    const when = n < 0 ? L("overdue") : n === 0 ? L("today") : fill(L("inDays"), { n });
+    const t2 = E6("div");
+    t2.append(E6("strong", u.title), E6("small", when, n < 0 ? "gp-bad" : "gp-muted"));
+    r.append(cal, t2);
+    if (n < 0) r.classList.add("is-overdue");
+    return r;
+  }
+  function journeyMap(detailed) {
+    const ol = E6("ol", void 0, "gp-journey" + (detailed ? " is-detailed" : ""));
+    for (const st of data.stages) {
+      const li = E6("li", void 0, "gp-stage is-" + st.status);
+      const node = E6("span", void 0, "gp-node");
+      node.append(gi(st.status === "done" ? "check" : STAGE_ICON[st.stage_key]));
+      const txt = E6("div", void 0, "gp-stage-txt");
+      txt.append(E6("strong", stageName(st.stage_key)), E6("small", L("stage." + st.status)));
+      li.append(node, txt);
+      if (detailed) {
+        const tasks = data.tasks.filter((t2) => t2.stage_key === st.stage_key), docs = data.documents.filter((d) => d.stage_key === st.stage_key), ev = data.events.filter((e) => e.kind === { visa: "visa", travel: "travel", arrival: "travel", application: "deadline" }[st.stage_key]);
+        const count = E6("span", tasks.filter((t2) => t2.status === "done").length + "/" + tasks.length, "gp-stage-count");
+        if (tasks.length) txt.append(count);
+        const open = openStage === st.stage_key || openStage === null && st.status === "in_progress";
+        li.classList.toggle("is-open", open);
+        const tog = E6("button", void 0, "gp-stage-toggle");
+        tog.type = "button";
+        tog.setAttribute("aria-expanded", String(open));
+        tog.setAttribute("aria-label", stageName(st.stage_key));
+        tog.append(gi("chevron"));
+        tog.onclick = () => {
+          openStage = open ? "" : st.stage_key;
+          render();
+        };
+        li.append(tog);
+        if (open) {
+          const body = E6("div", void 0, "gp-stage-body");
+          body.append(E6("h3", L("tasks")));
+          for (const t2 of tasks) body.append(taskRow(t2));
+          if (!tasks.length) body.append(E6("p", L("noTasks"), "gp-muted"));
+          if (docs.length) {
+            body.append(E6("h3", L("pages.documents")));
+            for (const d of docs) body.append(docRow(d, true));
+          }
+          for (const e of ev) body.append(dateRow({ title: e.title, date: e.starts_on }));
+          li.append(body);
+        }
+      }
+      ol.append(li);
+    }
+    return ol;
+  }
+  function taskRow(t2) {
+    const r = E6("label", void 0, "gp-task" + (t2.status === "done" ? " is-done" : ""));
+    const cb = E6("input");
+    cb.type = "checkbox";
+    cb.checked = t2.status === "done";
+    cb.onchange = async () => {
+      cb.disabled = true;
+      try {
+        await api2("/api/passport/tasks/" + t2.id, { method: "POST", body: JSON.stringify({ done: cb.checked }) });
+        t2.status = cb.checked ? "done" : "open";
+        r.classList.toggle("is-done", cb.checked);
+        load(true);
+      } catch (e) {
+        cb.checked = !cb.checked;
+        alert(e.message);
+      } finally {
+        cb.disabled = false;
+      }
+    };
+    const box = E6("span", void 0, "gp-box");
+    box.append(gi("check"));
+    const txt = E6("span", void 0, "gp-task-txt");
+    txt.append(E6("strong", t2.title));
+    if (t2.detail) txt.append(E6("small", t2.detail, "gp-muted"));
+    if (t2.due_date && t2.status !== "done") {
+      const n = daysUntil(t2.due_date);
+      txt.append(E6("small", L("due") + " \xB7 " + fmtDate(t2.due_date, lang2), n < 0 ? "gp-bad" : "gp-muted"));
+    }
+    r.append(cb, box, txt);
+    return r;
+  }
+  function documents() {
+    const done = data.documents.filter((d) => d.status === "approved").length;
+    const sum = E6("section", void 0, "gp-doc-summary");
+    const bar = E6("div", void 0, "gp-bar");
+    const fillEl = E6("i");
+    fillEl.style.setProperty("--w", (data.documents.length ? Math.round(done / data.documents.length * 100) : 0) + "%");
+    bar.append(fillEl);
+    sum.append(E6("strong", fill(L("docsDone"), { a: done, b: data.documents.length })), bar, E6("small", L("fileRule"), "gp-muted"));
+    mainEl.append(sum);
+    for (const st of data.stages) {
+      const docs = data.documents.filter((d) => d.stage_key === st.stage_key);
+      if (!docs.length) continue;
+      const p = E6("section", void 0, "gp-panel");
+      p.append(E6("h2", stageName(st.stage_key)));
+      for (const d of docs) p.append(docRow(d));
+      mainEl.append(p);
+    }
+  }
+  function docRow(d, compact) {
+    const r = E6("div", void 0, "gp-doc is-" + d.status);
+    const i = E6("span", void 0, "gp-doc-i");
+    i.append(gi(d.status === "approved" ? "check" : d.status === "rejected" ? "alert" : "doc"));
+    const txt = E6("div", void 0, "gp-doc-txt");
+    txt.append(E6("strong", d.label));
+    const meta = E6("small", L("doc." + d.status), "gp-doc-state");
+    txt.append(meta);
+    if (d.status === "rejected" && d.review_note) txt.append(E6("small", d.review_note, "gp-bad"));
+    if (!compact && d.file_name) txt.append(E6("small", d.file_name, "gp-muted"));
+    r.append(i, txt);
+    const acts = E6("div", void 0, "gp-doc-acts");
+    if (d.file_name && !compact) acts.append(btn2("", async () => {
+      try {
+        const u = (await api2("/api/passport/documents/" + d.id + "/url")).data.url;
+        window.open(u, "_blank", "noopener");
+      } catch (e) {
+        alert(e.message);
+      }
+    }, "gp-icon-btn", "eye"));
+    if (d.status !== "approved" && (!compact || d.status !== "uploaded")) {
+      const f = E6("input");
+      f.type = "file";
+      f.accept = MIMES.join(",");
+      f.hidden = true;
+      f.id = "f-" + d.id;
+      const up = btn2(d.status === "requested" ? L("upload") : L("replace"), () => f.click(), "gp-btn gp-sm" + (d.status === "requested" || d.status === "rejected" ? " gp-primary" : " gp-ghost"), "upload");
+      f.onchange = () => upload2(d, f.files[0], up, meta);
+      acts.append(f, up);
+    }
+    r.append(acts);
+    return r;
+  }
+  async function upload2(d, file, b, meta) {
+    if (!file) return;
+    if (!MIMES.includes(file.type)) return alert(L("badType"));
+    if (file.size > MAX) return alert(L("tooBig"));
+    b.disabled = true;
+    meta.textContent = L("uploading");
+    try {
+      const u = (await api2("/api/passport/documents/" + d.id + "/upload-url", { method: "POST", body: JSON.stringify({ file_name: file.name.slice(0, 160), mime: file.type, size: file.size }) })).data;
+      const r = await client.storage.from(u.bucket).uploadToSignedUrl(u.path, u.token, file, { contentType: file.type });
+      if (r.error) throw new Error(r.error.message);
+      await api2("/api/passport/documents/" + d.id + "/uploaded", { method: "POST", body: JSON.stringify({ path: u.path, file_name: file.name.slice(0, 160), mime: file.type, size: file.size }) });
+      meta.textContent = L("uploaded");
+      await load(true);
+    } catch (e) {
+      meta.textContent = e.message;
+      b.disabled = false;
+    }
+  }
+  function plan() {
+    const p = E6("section", void 0, "gp-panel");
+    p.append(journeyMap(true));
+    mainEl.append(p);
+    const d = E6("section", void 0, "gp-panel");
+    d.append(E6("h2", L("nextDates")));
+    const u = upcomingItems();
+    for (const x of u) d.append(dateRow(x));
+    if (!u.length) d.append(E6("p", L("noDates"), "gp-muted"));
+    mainEl.append(d);
+  }
+  function messages() {
+    const wrap = E6("section", void 0, "gp-panel gp-thread-panel");
+    const c = data.counsellor;
+    const head2 = E6("div", void 0, "gp-thread-head");
+    head2.append(avatar(c?.full_name || "MUK Talent", c?.avatar_url), E6("div"));
+    head2.lastChild.append(E6("strong", c?.full_name || L("noCounsellor")), E6("small", c?.job_title || "MUK Talent", "gp-muted"));
+    wrap.append(head2);
+    const list = E6("div", void 0, "gp-thread");
+    list.setAttribute("aria-live", "polite");
+    for (const m of data.messages) list.append(bubble(m));
+    if (!data.messages.length) list.append(E6("p", L("empty"), "gp-muted gp-empty"));
+    wrap.append(list);
+    const form = E6("form", void 0, "gp-composer");
+    const ta = E6("textarea");
+    ta.rows = 1;
+    ta.maxLength = 2e3;
+    ta.placeholder = L("write");
+    ta.setAttribute("aria-label", L("write"));
+    ta.oninput = () => {
+      ta.style.height = "auto";
+      ta.style.height = Math.min(140, ta.scrollHeight) + "px";
+    };
+    ta.onkeydown = (e) => {
+      if (e.key === "Enter" && !e.shiftKey && !matchMedia("(pointer: coarse)").matches) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    };
+    const send = E6("button", void 0, "gp-send");
+    send.type = "submit";
+    send.setAttribute("aria-label", L("send"));
+    send.append(gi("send"));
+    form.append(ta, send);
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const body = ta.value.trim();
+      if (!body) return;
+      send.disabled = true;
+      try {
+        await api2("/api/passport/messages", { method: "POST", body: JSON.stringify({ body }) });
+        ta.value = "";
+        await load(true);
+        document.querySelector(".gp-composer textarea")?.focus();
+      } catch (err2) {
+        alert(err2.message);
+      } finally {
+        send.disabled = false;
+      }
+    };
+    wrap.append(form);
+    mainEl.append(wrap);
+    requestAnimationFrame(() => {
+      list.scrollTop = list.scrollHeight;
+    });
+    const poll = setInterval(() => {
+      if (!root.isConnected || page !== "messages") {
+        clearInterval(poll);
+        return;
+      }
+      if (!document.hidden && !ta.value) load(true);
+    }, 3e4);
+  }
+  function bubble(m) {
+    const b = E6("div", void 0, "gp-msg gp-msg-" + m.sender_role + (m.kind === "update" ? " is-update" : ""));
+    if (m.sender_role === "system" || m.kind === "update") {
+      const i = E6("span", void 0, "gp-msg-i");
+      i.append(gi(m.sender_role === "system" ? "spark" : "flag"));
+      b.append(i);
+    }
+    const t2 = E6("div", void 0, "gp-msg-body");
+    t2.append(E6("p", m.body), E6("small", (m.sender_role === "student" ? L("you") : m.sender_role === "system" ? L("system") : data.counsellor?.full_name || "MUK Talent") + " \xB7 " + ago(m.created_at, lang2)));
+    b.append(t2);
+    return b;
+  }
+  function profile() {
+    const s = data.student;
+    const f = E6("form", void 0, "gp-panel gp-profile");
+    f.append(E6("h2", L("profileTitle")));
+    const v = {};
+    const add = (k, label2, control) => {
+      f.append(field2(label2, control));
+    };
+    const text = (k, label2, attrs = {}) => {
+      const i = input("pf-" + k, s[k], (x) => v[k] = x, attrs);
+      add(k, label2, i);
+    };
+    text("full_name", L("fullName"), { required: true, minLength: 2, maxLength: 120 });
+    text("phone", L("phone"), { type: "tel", pattern: "\\+?[0-9 ().-]{6,24}" });
+    const two = E6("div", void 0, "gp-two");
+    const r = countrySelect("pf-res", lang2, s.country_residence);
+    r.onchange = () => v.country_residence = r.value;
+    const n = countrySelect("pf-nat", lang2, s.nationality);
+    n.onchange = () => v.nationality = n.value;
+    two.append(field2(L("residence"), r), field2(L("nationality"), n));
+    f.append(two);
+    const dob = input("pf-dob", s.date_of_birth, (x) => v.date_of_birth = x, { type: "date" });
+    add("dob", L("dob"), dob);
+    const lv = E6("select");
+    lv.id = "pf-level";
+    LEVEL_VALUES.forEach((x, i) => lv.append(new Option(LEVELS2[lang2][i], x)));
+    lv.value = s.study_level || LEVEL_VALUES[5];
+    lv.onchange = () => v.study_level = lv.value;
+    add("level", L("level"), lv);
+    text("subject", L("subject"), { required: true, minLength: 2, maxLength: 120 });
+    const t2 = E6("div", void 0, "gp-two");
+    t2.append(field2(L("intake"), input("pf-intake", s.intake, (x) => v.intake = x, { maxLength: 40 })), field2(L("english"), input("pf-eng", s.english_test, (x) => v.english_test = x, { maxLength: 80 })));
+    f.append(t2);
+    text("university", L("preferred"), { maxLength: 160 });
+    text("programme", L("preferredProg"), { maxLength: 160 });
+    const msg = E6("p", "", "gp-form-msg");
+    msg.setAttribute("role", "status");
+    const save = E6("button", L("save"), "gp-btn gp-primary");
+    save.type = "submit";
+    f.append(save, msg);
+    f.onsubmit = async (e) => {
+      e.preventDefault();
+      if (!Object.keys(v).length) return;
+      save.disabled = true;
+      try {
+        data = (await api2("/api/passport/me", { method: "PATCH", body: JSON.stringify(v) })).data;
+        msg.textContent = L("saved");
+        msg.className = "gp-form-msg ok";
+        for (const k of Object.keys(v)) delete v[k];
+      } catch (err2) {
+        msg.textContent = err2.message;
+        msg.className = "gp-form-msg error";
+      } finally {
+        save.disabled = false;
+      }
+    };
+    mainEl.append(f);
+    const d = E6("section", void 0, "gp-panel");
+    d.append(E6("h2", L("destinations")));
+    const g = E6("div", void 0, "gp-dest-grid gp-dest-mini");
+    for (const [code, on] of [["UK", true], ["CA", false], ["US", false]]) {
+      const o = E6("div", void 0, "gp-dest" + (on ? " is-on" : " is-soon"));
+      const fl = E6("span", void 0, "gp-flag gp-flag-" + code.toLowerCase());
+      fl.setAttribute("aria-hidden", "true");
+      o.append(fl, E6("strong", destName(code)), E6("small", on ? L("active") : L("soon")));
+      g.append(o);
+    }
+    d.append(g);
+    mainEl.append(d);
+    const acc = E6("section", void 0, "gp-panel gp-account");
+    acc.append(E6("h2", "Account"), E6("p", data.student.email, "gp-muted"), btn2(L("signOut"), logout, "gp-btn gp-ghost", "logout"));
+    mainEl.append(acc);
+  }
 }
 
 // admin-src/exports.js
@@ -23751,8 +25838,8 @@ function mountExportButtons(getSession) {
 }
 
 // admin-src/admin-soft.js
-var E7 = (t, v, c) => {
-  const n = document.createElement(t);
+var E8 = (t2, v, c) => {
+  const n = document.createElement(t2);
   if (v !== void 0 && v !== null) n.textContent = String(v);
   if (c) n.className = c;
   return n;
@@ -23762,13 +25849,13 @@ function chrome() {
   document.documentElement.classList.add("mt-soft");
   let m = document.querySelector("meta[name=theme-color]");
   if (!m) {
-    m = E7("meta");
+    m = E8("meta");
     m.name = "theme-color";
     document.head.append(m);
   }
   m.content = "#efe8dc";
   for (const [n, c] of [["apple-mobile-web-app-capable", "yes"], ["mobile-web-app-capable", "yes"], ["apple-mobile-web-app-status-bar-style", "black-translucent"]]) if (!document.querySelector("meta[name=" + n + "]")) {
-    const x = E7("meta");
+    const x = E8("meta");
     x.name = n;
     x.content = c;
     document.head.append(x);
@@ -23787,64 +25874,64 @@ function mountAdminSoft({ api: api2, getState, navigate: navigate2 }) {
   function hero() {
     let h = document.getElementById("adminSoftHero");
     if (h) return h;
-    h = E7("section", void 0, "as-hero");
+    h = E8("section", void 0, "as-hero");
     h.id = "adminSoftHero";
     h.setAttribute("aria-label", "Resumen del d\xEDa");
     overview.prepend(h);
     return h;
   }
-  async function paint() {
+  async function paint2() {
     const s = getState();
     if (!s.staff || s.staff.role !== "admin" || busy) return;
     const id = ++stamp;
     busy = true;
     const h = hero();
     const first = String(s.staff.full_name || "").split(/\s+/)[0] || "equipo";
-    const greet = E7("article", void 0, "as-greet");
-    greet.append(E7("p", "MUK TALENT \xB7 ADMINISTRACI\xD3N", "as-overline"), E7("h2", "Hola, " + first), E7("p", new Intl.DateTimeFormat("es-ES", { timeZone: "Africa/Casablanca", weekday: "long", day: "numeric", month: "long" }).format(/* @__PURE__ */ new Date()) + " \xB7 Africa/Casablanca", "as-muted"));
-    const quick = E7("div", void 0, "as-quick");
+    const greet = E8("article", void 0, "as-greet");
+    greet.append(E8("p", "MUK TALENT \xB7 ADMINISTRACI\xD3N", "as-overline"), E8("h2", "Hola, " + first), E8("p", new Intl.DateTimeFormat("es-ES", { timeZone: "Africa/Casablanca", weekday: "long", day: "numeric", month: "long" }).format(/* @__PURE__ */ new Date()) + " \xB7 Africa/Casablanca", "as-muted"));
+    const quick = E8("div", void 0, "as-quick");
     for (const [label2, section] of [["Leads y casos", "candidates"], ["Pipeline e informes", "intelligence"], ["Equipo", "staff"], ["Citas", "appointments"]]) {
-      const b = E7("button", label2, "as-quick-btn");
+      const b = E8("button", label2, "as-quick-btn");
       b.type = "button";
       b.onclick = () => navigate2(section);
       quick.append(b);
     }
     greet.append(quick);
-    const pay = E7("article", void 0, "as-pay");
-    pay.append(E7("p", "N\xD3MINA DEL EQUIPO \xB7 " + new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(/* @__PURE__ */ new Date()).toUpperCase(), "as-overline"));
+    const pay = E8("article", void 0, "as-pay");
+    pay.append(E8("p", "N\xD3MINA DEL EQUIPO \xB7 " + new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(/* @__PURE__ */ new Date()).toUpperCase(), "as-overline"));
     h.replaceChildren(greet, pay);
     try {
       const r = await api2("/api/admin/payroll?month=" + monthKey());
       if (id !== stamp) return;
-      const tot = E7("div", void 0, "as-pay-total");
-      tot.append(E7("strong", mad(r.totals.projected_total)), E7("span", "previsto este mes"));
+      const tot = E8("div", void 0, "as-pay-total");
+      tot.append(E8("strong", mad(r.totals.projected_total)), E8("span", "previsto este mes"));
       pay.append(tot);
-      const pills = E7("div", void 0, "as-pills");
+      const pills = E8("div", void 0, "as-pills");
       for (const [label2, value, tone] of [["Base", mad(r.base_monthly) + " / persona", "gold"], ["Leads verificados", String(r.totals.verified_count), "dark"], ["Comisiones", mad(r.totals.commission), "grey"]]) {
-        const p = E7("span", void 0, "as-pill as-pill-" + tone);
-        p.append(E7("span", label2), E7("b", value));
+        const p = E8("span", void 0, "as-pill as-pill-" + tone);
+        p.append(E8("span", label2), E8("b", value));
         pills.append(p);
       }
       pay.append(pills);
-      const list = E7("div", void 0, "as-pay-list");
+      const list = E8("div", void 0, "as-pay-list");
       const max = Math.max(1, ...r.data.map((x) => x.projected_total));
       for (const row of r.data.slice(0, 6)) {
-        const line = E7("div", void 0, "as-pay-row"), bar = E7("i");
+        const line = E8("div", void 0, "as-pay-row"), bar = E8("i");
         bar.style.setProperty("--w", Math.round(row.projected_total / max * 100) + "%");
-        const name = E7("span", row.full_name, "as-pay-name");
-        line.append(name, E7("span", row.verified_count + " leads", "as-pay-leads"), E7("b", mad(row.projected_total)), bar);
+        const name = E8("span", row.full_name, "as-pay-name");
+        line.append(name, E8("span", row.verified_count + " leads", "as-pay-leads"), E8("b", mad(row.projected_total)), bar);
         list.append(line);
       }
-      if (!r.data.length) list.append(E7("p", "A\xFAn no hay colaboradores activos.", "as-muted"));
-      pay.append(list, E7("p", "Base " + mad(r.base_monthly) + " (lunes a viernes) + " + mad(r.per_verified_lead) + " por lead verificado. Un lead cuenta cuando administraci\xF3n lo acepta como caso.", "as-foot"));
+      if (!r.data.length) list.append(E8("p", "A\xFAn no hay colaboradores activos.", "as-muted"));
+      pay.append(list, E8("p", "Base " + mad(r.base_monthly) + " (lunes a viernes) + " + mad(r.per_verified_lead) + " por lead verificado. Un lead cuenta cuando administraci\xF3n lo acepta como caso.", "as-foot"));
     } catch (e) {
-      if (id === stamp) pay.append(E7("p", "N\xF3mina no disponible ahora mismo.", "as-muted"));
+      if (id === stamp) pay.append(E8("p", "N\xF3mina no disponible ahora mismo.", "as-muted"));
     } finally {
       busy = false;
     }
   }
   new MutationObserver(() => {
-    if (!overview.hidden && metrics.children.length) paint();
+    if (!overview.hidden && metrics.children.length) paint2();
   }).observe(metrics, { childList: true });
   new MutationObserver(() => {
     document.querySelector("#navigation .nav-button.active")?.scrollIntoView({ inline: "center", block: "nearest" });
@@ -23852,7 +25939,7 @@ function mountAdminSoft({ api: api2, getState, navigate: navigate2 }) {
 }
 
 // admin-src/app.js
-var $ = (id) => document.getElementById(id);
+var $2 = (id) => document.getElementById(id);
 var state = { client: null, session: null, staff: null, config: null, section: "overview", page: 1, total: 0, epoch: 0, listRequest: 0, detailRequest: 0, relatedRequest: 0, busy: false, loading: false, detail: null, dirty: false, related: "notes", relatedPage: 1, staffOptions: [] };
 var titles = { overview: "Resumen", candidates: "Leads y casos", enquiries: "Consultas", appointments: "Citas", staff: "Equipo", documents: "Documentos", intelligence: "Pipeline e informes" };
 var statusText = { new: "Nuevo", contacted: "Contactado", assessment_in_progress: "Evaluaci\xF3n en curso", documents_pending: "Documentos pendientes", ready_for_review: "Listo para revisi\xF3n", on_hold: "En espera", closed: "Cerrado", in_progress: "En curso", awaiting_reply: "Esperando respuesta", resolved: "Resuelto", archived: "Archivado", confirmed: "Confirmada", completed: "Completada", cancelled: "Cancelada", no_show: "No se present\xF3", pending: "Pendiente", accepted: "Aceptado", rejected: "Rechazado", clean: "Limpio", infected: "Infectado", failed: "Fallido", open: "Abierta", revoked: "Revocada", admin: "Administrador", collaborator: "Colaborador", fr: "Franc\xE9s", en: "Ingl\xE9s" };
@@ -23864,8 +25951,8 @@ function el2(tag, text, cls) {
   return n;
 }
 function message(id, text = "", error = false) {
-  $(id).textContent = text;
-  $(id).classList.toggle("error", error);
+  $2(id).textContent = text;
+  $2(id).classList.toggle("error", error);
 }
 function label(key) {
   return state.config?.labels[key] || key;
@@ -23883,6 +25970,8 @@ function valueText(key, value) {
 }
 function resetLogin(text = "") {
   document.getElementById("employeeWorkspace")?.remove();
+  document.getElementById("studentPortal")?.remove();
+  document.getElementById("gpControlOverlay")?.remove();
   state.epoch++;
   state.session = null;
   state.staff = null;
@@ -23892,17 +25981,18 @@ function resetLogin(text = "") {
   state.dirty = false;
   state.busy = false;
   state.loading = false;
-  if ($("recordDialog").open) $("recordDialog").close();
-  $("tableBody").replaceChildren();
-  $("metrics").replaceChildren();
-  $("pipeline").replaceChildren();
-  $("formFields").replaceChildren();
-  $("relatedRows").replaceChildren();
-  $("detailMetadata").replaceChildren();
-  $("appShell").hidden = true;
-  $("loginView").hidden = false;
-  $("password").value = "";
-  message("loginMessage", text, Boolean(text));
+  if ($2("recordDialog").open) $2("recordDialog").close();
+  $2("tableBody").replaceChildren();
+  $2("metrics").replaceChildren();
+  $2("pipeline").replaceChildren();
+  $2("formFields").replaceChildren();
+  $2("relatedRows").replaceChildren();
+  $2("detailMetadata").replaceChildren();
+  $2("appShell").hidden = true;
+  $2("loginView").hidden = false;
+  $2("password").value = "";
+  showLoginMessage(text, text ? "error" : "");
+  startMatrix();
 }
 async function api(url, options = {}) {
   const epoch = state.epoch;
@@ -23933,7 +26023,7 @@ function resource() {
   return state.config.resources[state.section];
 }
 function nav() {
-  const nav2 = $("navigation");
+  const nav2 = $2("navigation");
   nav2.replaceChildren();
   for (const [name, title] of Object.entries(titles)) {
     const b = el2("button", title, "nav-button");
@@ -23951,20 +26041,20 @@ async function navigate(name, overdue = false) {
     state.page = 1;
     state.listRequest++;
     state.loading = false;
-    $("overview").hidden = true;
-    $("listView").hidden = true;
-    $("createRecord").hidden = true;
-    $("pageTitle").textContent = "Pipeline e informes";
-    $("pageDescription").textContent = "Casos aceptados, hoja interna e informes de pipeline para universidades y partners.";
+    $2("overview").hidden = true;
+    $2("listView").hidden = true;
+    $2("createRecord").hidden = true;
+    $2("pageTitle").textContent = "Pipeline e informes";
+    $2("pageDescription").textContent = "Casos aceptados, hoja interna e informes de pipeline para universidades y partners.";
     message("globalMessage");
-    for (const b of $("navigation").children) {
+    for (const b of $2("navigation").children) {
       b.classList.toggle("active", b.dataset.section === name);
       if (b.dataset.section === name) b.setAttribute("aria-current", "page");
       else b.removeAttribute("aria-current");
     }
     const host = document.createElement("section");
     host.id = "adminPipelineView";
-    $("globalMessage").after(host);
+    $2("globalMessage").after(host);
     return renderAdminPipeline({ api, getState: () => state, openRecord, host });
   }
   state.section = name;
@@ -23972,42 +26062,42 @@ async function navigate(name, overdue = false) {
   state.listRequest++;
   state.loading = false;
   message("globalMessage");
-  $("pageTitle").textContent = titles[name];
-  $("pageDescription").textContent = descriptions[name] || "";
-  for (const b of $("navigation").children) {
+  $2("pageTitle").textContent = titles[name];
+  $2("pageDescription").textContent = descriptions[name] || "";
+  for (const b of $2("navigation").children) {
     b.classList.toggle("active", b.dataset.section === name);
     if (b.dataset.section === name) b.setAttribute("aria-current", "page");
     else b.removeAttribute("aria-current");
   }
-  $("overview").hidden = name !== "overview";
-  $("listView").hidden = name === "overview";
-  $("createRecord").hidden = name === "overview" || !resource()?.create;
+  $2("overview").hidden = name !== "overview";
+  $2("listView").hidden = name === "overview";
+  $2("createRecord").hidden = name === "overview" || !resource()?.create;
   if (name === "overview") return loadOverview();
   const r = resource();
-  $("search").value = "";
-  $("search").disabled = !r.search.length;
-  $("archiveFilter").value = "false";
-  $("overdueFilter").checked = overdue;
-  $("archiveField").hidden = name !== "candidates";
-  $("overdueField").hidden = name !== "candidates";
-  $("statusField").hidden = !r.columns.status?.options;
-  $("statusFilter").replaceChildren(new Option("Todos los estados", ""));
-  for (const v of r.columns.status?.options || []) $("statusFilter").append(new Option(valueText("status", v), v));
-  $("createRecord").textContent = name === "staff" ? "Vincular colaborador" : "A\xF1adir registro";
+  $2("search").value = "";
+  $2("search").disabled = !r.search.length;
+  $2("archiveFilter").value = "false";
+  $2("overdueFilter").checked = overdue;
+  $2("archiveField").hidden = name !== "candidates";
+  $2("overdueField").hidden = name !== "candidates";
+  $2("statusField").hidden = !r.columns.status?.options;
+  $2("statusFilter").replaceChildren(new Option("Todos los estados", ""));
+  for (const v of r.columns.status?.options || []) $2("statusFilter").append(new Option(valueText("status", v), v));
+  $2("createRecord").textContent = name === "staff" ? "Vincular colaborador" : "A\xF1adir registro";
   await loadList();
 }
 async function loadOverview() {
   const epoch = state.epoch, request = ++state.listRequest;
   message("globalMessage", "Cargando resumen\u2026");
-  $("metrics").replaceChildren();
-  $("pipeline").replaceChildren();
+  $2("metrics").replaceChildren();
+  $2("pipeline").replaceChildren();
   try {
     const { data } = await api("/api/overview");
     if (epoch !== state.epoch || request !== state.listRequest) return;
     for (const [key, title] of [["candidates", "Candidatos activos"], ["enquiries", "Consultas abiertas"], ["appointments", "Pr\xF3ximas citas"], ["overdue", "Seguimientos vencidos"], ["documents", "Documentos pendientes"]]) {
       const card = el2("article", void 0, "metric");
       card.append(el2("p", title, "muted"), el2("strong", data[key]));
-      $("metrics").append(card);
+      $2("metrics").append(card);
     }
     for (const [status, count] of Object.entries(data.statuses)) {
       const row = el2("div", void 0, "pipeline-row");
@@ -24018,9 +26108,9 @@ async function loadOverview() {
       meter.value = count;
       meter.setAttribute("aria-label", valueText("status", status));
       row.append(info, meter);
-      $("pipeline").append(row);
+      $2("pipeline").append(row);
     }
-    $("asOf").textContent = `Actualizado: ${valueText("created_at", data.asOf)} \xB7 Africa/Casablanca`;
+    $2("asOf").textContent = `Actualizado: ${valueText("created_at", data.asOf)} \xB7 Africa/Casablanca`;
     message("globalMessage");
   } catch (e) {
     if (epoch === state.epoch && request === state.listRequest) message("globalMessage", e.message, true);
@@ -24031,18 +26121,18 @@ async function loadList() {
   if (!r) return;
   const request = ++state.listRequest, epoch = state.epoch;
   state.loading = true;
-  $("previous").disabled = true;
-  $("next").disabled = true;
-  $("refresh").disabled = true;
-  $("tableBody").replaceChildren();
+  $2("previous").disabled = true;
+  $2("next").disabled = true;
+  $2("refresh").disabled = true;
+  $2("tableBody").replaceChildren();
   message("listMessage", "Cargando registros\u2026");
   try {
     const params = new URLSearchParams({ page: String(state.page), page_size: "25" });
-    if ($("search").value.trim()) params.set("q", $("search").value.trim());
-    if (r.columns.status?.options && $("statusFilter").value) params.set("status", $("statusFilter").value);
+    if ($2("search").value.trim()) params.set("q", $2("search").value.trim());
+    if (r.columns.status?.options && $2("statusFilter").value) params.set("status", $2("statusFilter").value);
     if (name === "candidates") {
-      params.set("archived", $("archiveFilter").value);
-      if ($("overdueFilter").checked) params.set("overdue", "true");
+      params.set("archived", $2("archiveFilter").value);
+      if ($2("overdueFilter").checked) params.set("overdue", "true");
     }
     const result = await api(`/api/${name}?${params}`);
     if (request !== state.listRequest || epoch !== state.epoch) return;
@@ -24054,8 +26144,8 @@ async function loadList() {
       head2.append(th);
     }
     head2.append(el2("th", "Acci\xF3n"));
-    $("tableHead").replaceChildren(head2);
-    $("tableCaption").textContent = r.title;
+    $2("tableHead").replaceChildren(head2);
+    $2("tableCaption").textContent = r.title;
     for (const record of result.data || []) {
       const tr = el2("tr");
       for (const f of r.summary) {
@@ -24070,21 +26160,21 @@ async function loadList() {
       button2.addEventListener("click", () => openRecord(name, record[r.key]));
       td.append(button2);
       tr.append(td);
-      $("tableBody").append(tr);
+      $2("tableBody").append(tr);
     }
     message("listMessage", state.total ? `${state.total} registro${state.total === 1 ? "" : "s"}.` : "No hay registros para estos filtros.");
-    $("pageInfo").textContent = `P\xE1gina ${state.page} de ${Math.max(1, Math.ceil(state.total / 25))}`;
-    $("previous").disabled = state.page <= 1;
-    $("next").disabled = state.page * 25 >= state.total;
+    $2("pageInfo").textContent = `P\xE1gina ${state.page} de ${Math.max(1, Math.ceil(state.total / 25))}`;
+    $2("previous").disabled = state.page <= 1;
+    $2("next").disabled = state.page * 25 >= state.total;
   } catch (e) {
     if (request === state.listRequest && epoch === state.epoch) {
       message("listMessage", e.message, true);
-      $("pageInfo").textContent = "";
+      $2("pageInfo").textContent = "";
     }
   } finally {
     if (request === state.listRequest && epoch === state.epoch) {
       state.loading = false;
-      $("refresh").disabled = false;
+      $2("refresh").disabled = false;
     }
   }
 }
@@ -24095,7 +26185,7 @@ function closeDialog() {
   state.relatedRequest++;
   state.detail = null;
   state.dirty = false;
-  $("recordDialog").close();
+  $2("recordDialog").close();
 }
 function inputFor(name, key, rule, record, create) {
   let field2;
@@ -24154,53 +26244,53 @@ async function openRecord(name, id = null, candidateId = null) {
   state.relatedRequest++;
   state.dirty = false;
   state.detail = null;
-  $("formFields").replaceChildren();
-  $("detailMetadata").replaceChildren();
-  $("candidateRelated").hidden = true;
-  $("recordForm").hidden = true;
-  $("archiveRecord").hidden = true;
-  $("detailNotice").textContent = "";
-  $("backCandidate").hidden = true;
-  $("detailTitle").textContent = "Cargando\u2026";
+  $2("formFields").replaceChildren();
+  $2("detailMetadata").replaceChildren();
+  $2("candidateRelated").hidden = true;
+  $2("recordForm").hidden = true;
+  $2("archiveRecord").hidden = true;
+  $2("detailNotice").textContent = "";
+  $2("backCandidate").hidden = true;
+  $2("detailTitle").textContent = "Cargando\u2026";
   message("detailMessage");
-  if (!$("recordDialog").open) $("recordDialog").showModal();
+  if (!$2("recordDialog").open) $2("recordDialog").showModal();
   try {
     const r = state.config.resources[name];
     let record = {};
     if (id !== null) record = (await api(`/api/${name}/${encodeURIComponent(id)}`)).data;
     if (request !== state.detailRequest || epoch !== state.epoch) return;
     state.detail = { name, id, record, candidateId };
-    $("backCandidate").hidden = !candidateId;
-    $("detailEyebrow").textContent = r.title;
-    $("detailTitle").textContent = record.reference || record.full_name || record.title || record.original_filename || (id === null ? "Nuevo registro" : r.title);
-    $("detailNotice").textContent = r.readonly ? "Vista de consulta. Esta entrega no sube, descarga ni revisa archivos ni genera enlaces privados." : name === "staff" ? "Vincula colaboradores mediante el UUID de un usuario ya creado en Authentication. No crea cuentas, contrase\xF1as ni administradores. No permite desactivar administradores." : name === "appointments" ? "Gesti\xF3n de citas existentes. Aqu\xED no se crean, reactivan ni reprograman reservas." : name === "blocks" ? "Un bloqueo registra una indisponibilidad. No cancela ni modifica citas existentes." : name === "settings" ? "Se mantienen Africa/Casablanca, citas de 30 minutos y margen de 10 minutos. Cambiar este horario no modifica citas existentes." : name === "notes" ? "Notas compartidas: se a\xF1aden como historial, sin edici\xF3n ni borrado." : "";
+    $2("backCandidate").hidden = !candidateId;
+    $2("detailEyebrow").textContent = r.title;
+    $2("detailTitle").textContent = record.reference || record.full_name || record.title || record.original_filename || (id === null ? "Nuevo registro" : r.title);
+    $2("detailNotice").textContent = r.readonly ? "Vista de consulta. Esta entrega no sube, descarga ni revisa archivos ni genera enlaces privados." : name === "staff" ? "Vincula colaboradores mediante el UUID de un usuario ya creado en Authentication. No crea cuentas, contrase\xF1as ni administradores. No permite desactivar administradores." : name === "appointments" ? "Gesti\xF3n de citas existentes. Aqu\xED no se crean, reactivan ni reprograman reservas." : name === "blocks" ? "Un bloqueo registra una indisponibilidad. No cancela ni modifica citas existentes." : name === "settings" ? "Se mantienen Africa/Casablanca, citas de 30 minutos y margen de 10 minutos. Cambiar este horario no modifica citas existentes." : name === "notes" ? "Notas compartidas: se a\xF1aden como historial, sin edici\xF3n ni borrado." : "";
     if (id !== null) {
       for (const key of r.select.split(",").filter((k) => !r.fields.includes(k))) {
         if (record[key] === void 0) continue;
         const item = el2("div");
         item.append(el2("small", label(key)), el2("p", valueText(key, record[key])));
-        $("detailMetadata").append(item);
+        $2("detailMetadata").append(item);
       }
     }
     const editable2 = !r.readonly && !(id !== null && r.immutable);
-    $("recordForm").hidden = !editable2;
+    $2("recordForm").hidden = !editable2;
     if (editable2) {
       const fields2 = [...r.fields];
       if (name === "staff" && id === null) fields2.unshift("user_id");
-      for (const key of fields2) $("formFields").append(inputFor(name, key, r.columns[key], record, id === null));
-      $("saveRecord").textContent = id === null ? "Crear registro" : "Guardar cambios";
-      $("saveRecord").disabled = false;
+      for (const key of fields2) $2("formFields").append(inputFor(name, key, r.columns[key], record, id === null));
+      $2("saveRecord").textContent = id === null ? "Crear registro" : "Guardar cambios";
+      $2("saveRecord").disabled = false;
     } else if (r.immutable) {
       for (const key of r.fields) {
         const item = el2("div");
         item.append(el2("small", label(key)), el2("p", valueText(key, record[key])));
-        $("detailMetadata").append(item);
+        $2("detailMetadata").append(item);
       }
     }
-    $("archiveRecord").hidden = name !== "candidates" || id === null;
-    $("archiveRecord").textContent = record.archived_at ? "Restaurar candidato" : "Archivar candidato";
+    $2("archiveRecord").hidden = name !== "candidates" || id === null;
+    $2("archiveRecord").textContent = record.archived_at ? "Restaurar candidato" : "Archivar candidato";
     if (name === "candidates" && id !== null) {
-      $("candidateRelated").hidden = false;
+      $2("candidateRelated").hidden = false;
       state.related = "notes";
       state.relatedPage = 1;
       renderRelatedTabs();
@@ -24208,13 +26298,13 @@ async function openRecord(name, id = null, candidateId = null) {
     }
   } catch (e) {
     if (request === state.detailRequest && epoch === state.epoch) {
-      $("detailTitle").textContent = "No se pudo abrir el registro";
+      $2("detailTitle").textContent = "No se pudo abrir el registro";
       message("detailMessage", e.message, true);
     }
   }
 }
 function renderRelatedTabs() {
-  $("relatedTabs").replaceChildren();
+  $2("relatedTabs").replaceChildren();
   for (const name of ["notes", "admin-notes", "education", "documents"]) {
     const r = state.config.resources[name];
     const b = el2("button", r.title, "tab");
@@ -24226,19 +26316,19 @@ function renderRelatedTabs() {
       renderRelatedTabs();
       loadRelated();
     });
-    $("relatedTabs").append(b);
+    $2("relatedTabs").append(b);
   }
 }
 async function loadRelated() {
   const context = state.detail;
   if (context?.name !== "candidates") return;
   const name = state.related, r = state.config.resources[name], request = ++state.relatedRequest, epoch = state.epoch;
-  $("relatedRows").replaceChildren();
+  $2("relatedRows").replaceChildren();
   message("relatedMessage", "Cargando\u2026");
-  $("addRelated").hidden = !r.create;
-  $("relatedPrevious").disabled = true;
-  $("relatedNext").disabled = true;
-  $("relatedDescription").textContent = name === "admin-notes" ? "Solo administradores. No se mezclan con las notas compartidas." : r.readonly ? "Consulta de registros existentes; sin acciones sobre archivos ni enlaces." : "Registros vinculados a este candidato.";
+  $2("addRelated").hidden = !r.create;
+  $2("relatedPrevious").disabled = true;
+  $2("relatedNext").disabled = true;
+  $2("relatedDescription").textContent = name === "admin-notes" ? "Solo administradores. No se mezclan con las notas compartidas." : r.readonly ? "Consulta de registros existentes; sin acciones sobre archivos ni enlaces." : "Registros vinculados a este candidato.";
   try {
     const result = await api(`/api/${name}?candidate_id=${encodeURIComponent(context.id)}&page=${state.relatedPage}&page_size=10`);
     if (request !== state.relatedRequest || epoch !== state.epoch || state.detail !== context) return;
@@ -24253,22 +26343,22 @@ async function loadRelated() {
       b.type = "button";
       b.addEventListener("click", () => openRecord(name, record[r.key], context.id));
       card.append(b);
-      $("relatedRows").append(card);
+      $2("relatedRows").append(card);
     }
     message("relatedMessage", result.total ? `${result.total} registro(s).` : "Todav\xEDa no hay registros en este apartado.");
-    $("relatedPage").textContent = `P\xE1gina ${state.relatedPage}`;
-    $("relatedPrevious").disabled = state.relatedPage <= 1;
-    $("relatedNext").disabled = state.relatedPage * 10 >= result.total;
+    $2("relatedPage").textContent = `P\xE1gina ${state.relatedPage}`;
+    $2("relatedPrevious").disabled = state.relatedPage <= 1;
+    $2("relatedNext").disabled = state.relatedPage * 10 >= result.total;
   } catch (e) {
     if (request === state.relatedRequest && epoch === state.epoch) message("relatedMessage", e.message, true);
   }
 }
-$("recordForm").addEventListener("submit", async (event) => {
+$2("recordForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   if (state.busy || !state.detail) return;
   const context = state.detail, { name, id, record, candidateId } = context, r = state.config.resources[name], values = {};
   try {
-    for (const field2 of $("formFields").querySelectorAll("input,select,textarea")) {
+    for (const field2 of $2("formFields").querySelectorAll("input,select,textarea")) {
       if (field2.disabled) continue;
       const rule = r.columns[field2.name];
       let v = field2.type === "checkbox" ? field2.checked : field2.value.trim();
@@ -24280,7 +26370,7 @@ $("recordForm").addEventListener("submit", async (event) => {
       values[field2.name] = v;
     }
     state.busy = true;
-    $("saveRecord").disabled = true;
+    $2("saveRecord").disabled = true;
     message("detailMessage", "Guardando\u2026");
     const epoch = state.epoch;
     const result = await api(`/api/${name}${id === null ? "" : `/${encodeURIComponent(id)}`}`, { method: id === null ? "POST" : "PATCH", body: JSON.stringify({ values, version: record.updated_at, candidate_id: candidateId }) });
@@ -24296,10 +26386,10 @@ $("recordForm").addEventListener("submit", async (event) => {
     if (state.detail === context) message("detailMessage", e.message, true);
   } finally {
     state.busy = false;
-    $("saveRecord").disabled = false;
+    $2("saveRecord").disabled = false;
   }
 });
-$("archiveRecord").addEventListener("click", async () => {
+$2("archiveRecord").addEventListener("click", async () => {
   const context = state.detail;
   if (!context || state.busy) return;
   if (state.dirty) {
@@ -24310,7 +26400,7 @@ $("archiveRecord").addEventListener("click", async () => {
   if (!window.confirm(archived ? "\xBFArchivar este candidato? Se conservar\xE1 su expediente." : "\xBFRestaurar este candidato?")) return;
   const epoch = state.epoch;
   state.busy = true;
-  $("archiveRecord").disabled = true;
+  $2("archiveRecord").disabled = true;
   try {
     await api(`/api/candidates/${context.id}/archive`, { method: "POST", body: JSON.stringify({ archived, version: context.record.updated_at }) });
     if (epoch !== state.epoch) return;
@@ -24321,7 +26411,7 @@ $("archiveRecord").addEventListener("click", async () => {
     if (epoch === state.epoch) message("detailMessage", e.message, true);
   } finally {
     state.busy = false;
-    $("archiveRecord").disabled = false;
+    $2("archiveRecord").disabled = false;
   }
 });
 async function loadStaffOptions() {
@@ -24333,113 +26423,132 @@ async function loadStaffOptions() {
   }
   state.staffOptions = all;
 }
-$("loginForm").addEventListener("submit", async (event) => {
+$2("loginForm").addEventListener("submit", async (event) => {
   event.preventDefault();
-  if (!state.client || $("loginSubmit").disabled) return;
-  $("loginSubmit").disabled = true;
-  message("loginMessage", "Entrando\u2026");
+  if (!state.client || $2("loginSubmit").disabled) return;
+  $2("loginSubmit").disabled = true;
+  showLoginMessage(t("signingIn"));
   try {
     const { data, error } = await state.client.auth.signInWithPassword({
-      email: $("email").value.trim(),
-      password: $("password").value
+      email: $2("email").value.trim(),
+      password: $2("password").value
     });
-    $("password").value = "";
-    if (error) throw new Error("No se pudo iniciar sesi\xF3n. Revisa tus credenciales.");
-    if (!data.session) throw new Error("No se recibi\xF3 una sesi\xF3n.");
-    state.session = data.session;
-    state.epoch++;
-    state.staff = (await api("/api/me")).staff;
-    if (state.staff.must_change_password) {
-      await requirePasswordChange({ api, mandatory: true });
-      state.staff = (await api("/api/me")).staff;
-    }
-    if (!["admin", "collaborator"].includes(state.staff.role)) {
-      throw new Error("Esta cuenta no tiene un rol de acceso v\xE1lido.");
-    }
-    if (state.staff.role === "collaborator") {
-      $("loginView").hidden = true;
-      $("appShell").hidden = true;
-      await mountEmployee({
-        staff: state.staff,
-        api,
-        onLogout: async () => {
-          const { error: error2 } = await state.client.auth.signOut({ scope: "local" });
-          if (error2) throw error2;
-          resetLogin();
-          message("loginMessage", "Sesi\xF3n cerrada.");
-        }
-      });
-      return;
-    }
-    state.config = await api("/api/admin-config");
-    await loadStaffOptions();
-    nav();
-    $("staffName").textContent = state.staff.full_name;
-    $("loginView").hidden = true;
-    $("appShell").hidden = false;
-    await navigate("overview");
+    $2("password").value = "";
+    if (error) throw new Error(/confirm/i.test(error.message || "") ? t("notConfirmed") : t("badCreds"));
+    if (!data.session) throw new Error(t("badCreds"));
+    await enter(data.session);
   } catch (error) {
     resetLogin(error.message);
     await state.client.auth.signOut({ scope: "local" }).catch(() => {
     });
   } finally {
-    $("loginSubmit").disabled = false;
+    $2("loginSubmit").disabled = false;
   }
 });
-$("logout").addEventListener("click", async () => {
+async function enter(session) {
+  state.session = session;
+  state.epoch++;
+  const who = await api("/api/whoami");
+  if (who.kind === "inactive") throw new Error("Esta cuenta del equipo no est\xE1 activa.");
+  if (who.kind === "student" || who.kind === "new") {
+    $2("loginView").hidden = true;
+    $2("appShell").hidden = true;
+    stopMatrix();
+    await mountStudentPortal({ api, client: state.client, who, onLogout: async () => {
+      await state.client.auth.signOut({ scope: "local" }).catch(() => {
+      });
+      resetLogin();
+      startMatrix();
+    } });
+    return;
+  }
+  state.staff = (await api("/api/me")).staff;
+  if (state.staff.must_change_password) {
+    await requirePasswordChange({ api, mandatory: true });
+    state.staff = (await api("/api/me")).staff;
+  }
+  if (!["admin", "collaborator"].includes(state.staff.role)) {
+    throw new Error("Esta cuenta no tiene un rol de acceso v\xE1lido.");
+  }
+  stopMatrix();
+  if (state.staff.role === "collaborator") {
+    $2("loginView").hidden = true;
+    $2("appShell").hidden = true;
+    await mountEmployee({
+      staff: state.staff,
+      api,
+      onLogout: async () => {
+        const { error } = await state.client.auth.signOut({ scope: "local" });
+        if (error) throw error;
+        resetLogin();
+        startMatrix();
+        showLoginMessage("Signed out.", "ok");
+      }
+    });
+    return;
+  }
+  state.config = await api("/api/admin-config");
+  await loadStaffOptions();
+  nav();
+  $2("staffName").textContent = state.staff.full_name;
+  $2("loginView").hidden = true;
+  $2("appShell").hidden = false;
+  await navigate("overview");
+}
+$2("logout").addEventListener("click", async () => {
   if (state.busy) return;
   if (state.dirty && !window.confirm("\xBFDescartar los cambios y cerrar sesi\xF3n?")) return;
   resetLogin();
   await state.client.auth.signOut({ scope: "local" }).catch(() => {
   });
 });
-$("filters").addEventListener("submit", (event) => {
+$2("filters").addEventListener("submit", (event) => {
   event.preventDefault();
   state.page = 1;
   loadList();
 });
-$("refresh").addEventListener("click", () => loadList());
-$("previous").addEventListener("click", () => {
+$2("refresh").addEventListener("click", () => loadList());
+$2("previous").addEventListener("click", () => {
   if (!state.loading && state.page > 1) {
     state.page--;
     loadList();
   }
 });
-$("next").addEventListener("click", () => {
+$2("next").addEventListener("click", () => {
   if (!state.loading && state.page * 25 < state.total) {
     state.page++;
     loadList();
   }
 });
-$("createRecord").addEventListener("click", () => openRecord(state.section));
-$("closeDialog").addEventListener("click", closeDialog);
-$("backCandidate").addEventListener("click", () => {
+$2("createRecord").addEventListener("click", () => openRecord(state.section));
+$2("closeDialog").addEventListener("click", closeDialog);
+$2("backCandidate").addEventListener("click", () => {
   if (state.detail?.candidateId) openRecord("candidates", state.detail.candidateId);
 });
-$("recordDialog").addEventListener("cancel", (event) => {
+$2("recordDialog").addEventListener("cancel", (event) => {
   event.preventDefault();
   closeDialog();
 });
-$("recordDialog").addEventListener("close", () => {
+$2("recordDialog").addEventListener("close", () => {
   if (state.session && state.staff?.role === "admin" && state.config) {
     if (state.section === "overview") loadOverview();
     else loadList();
   }
 });
-$("addRelated").addEventListener("click", () => {
+$2("addRelated").addEventListener("click", () => {
   if (state.detail?.name === "candidates") openRecord(state.related, null, state.detail.id);
 });
-$("relatedPrevious").addEventListener("click", () => {
+$2("relatedPrevious").addEventListener("click", () => {
   if (state.relatedPage > 1) {
     state.relatedPage--;
     loadRelated();
   }
 });
-$("relatedNext").addEventListener("click", () => {
+$2("relatedNext").addEventListener("click", () => {
   state.relatedPage++;
   loadRelated();
 });
-$("openOverdue").addEventListener("click", () => navigate("candidates", true));
+$2("openOverdue").addEventListener("click", () => navigate("candidates", true));
 window.addEventListener("beforeunload", (event) => {
   if (state.dirty || state.busy) {
     event.preventDefault();
@@ -24447,20 +26556,51 @@ window.addEventListener("beforeunload", (event) => {
   }
 });
 async function initialise() {
+  initGateway({ getClient: () => state.client, onSignedIn: async (session) => {
+    try {
+      await enter(session);
+    } catch (e) {
+      resetLogin(e.message);
+    }
+  } });
   try {
     const response = await fetch("/api/public-config", { cache: "no-store" });
-    if (!response.ok) throw new Error("Configuraci\xF3n no disponible.");
+    if (!response.ok) throw new Error("Configuration unavailable.");
     const cfg = await response.json();
-    if (!cfg.supabaseUrl || !cfg.supabasePublicKey) throw new Error("Configuraci\xF3n incompleta.");
-    state.client = createClient(cfg.supabaseUrl, cfg.supabasePublicKey, { auth: { persistSession: false, autoRefreshToken: true, detectSessionInUrl: false } });
+    if (!cfg.supabaseUrl || !cfg.supabasePublicKey) throw new Error("Incomplete configuration.");
+    const fromLink = /(access_token|error_description|type=recovery|type=signup)/.test(location.hash) || /[?&]code=/.test(location.search);
+    const linkError = /error_description=([^&]+)/.exec(location.hash);
+    state.client = createClient(cfg.supabaseUrl, cfg.supabasePublicKey, { auth: { persistSession: false, autoRefreshToken: true, detectSessionInUrl: fromLink } });
+    let recovery = /type=recovery/.test(location.hash);
     state.client.auth.onAuthStateChange((event, session) => {
       state.session = session;
-      if (event === "SIGNED_OUT" && state.staff) resetLogin("La sesi\xF3n ha terminado.");
+      if (event === "PASSWORD_RECOVERY") {
+        recovery = true;
+        showReset();
+      }
+      if (event === "SIGNED_OUT" && (state.staff || document.getElementById("studentPortal"))) resetLogin("Session ended.");
     });
-    message("loginMessage");
-    $("loginSubmit").disabled = false;
+    showLoginMessage();
+    $2("loginSubmit").disabled = false;
+    $2("signupSubmit").disabled = false;
+    if (linkError) {
+      showLoginMessage(t("linkError"), "error");
+      history.replaceState(null, "", location.pathname);
+    } else if (fromLink) {
+      const { data } = await state.client.auth.getSession();
+      history.replaceState(null, "", location.pathname);
+      if (data.session && recovery) showReset();
+      else if (data.session) {
+        showLoginMessage(t("confirmed"), "ok");
+        try {
+          await enter(data.session);
+        } catch (e) {
+          resetLogin(e.message);
+        }
+      }
+    }
   } catch (e) {
-    message("loginMessage", `No se pudo conectar con la administraci\xF3n. ${e.message}`, true);
+    showLoginMessage(`Unable to connect. ${e.message}`, "error");
   }
 }
 mountStaffAccounts({
@@ -24472,6 +26612,7 @@ mountStaffAccounts({
   }
 });
 mountWorkspaceAdmin({ api, getStaff: () => state.staff });
+mountPassportAdmin({ api, getStaff: () => state.staff });
 mountProfessionalAdmin({ api, getStaff: () => state.staff });
 initialise();
 mountExportButtons(async () => {

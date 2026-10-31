@@ -8,8 +8,10 @@ import { mountStaffAccounts } from "./staff-accounts.mjs";
 import { mountPersonal } from "./personal-public.mjs";
 import { mountExports } from "./exports.mjs";
 import { mountEvaluation } from "./evaluation-public.mjs";
+import { mountAssistant } from "./assistant.mjs";
 import { mountCardLinks } from "./card-links.mjs";
 import { mountPayroll } from "./payroll.mjs";
+import { mountGlobalPassport } from "./global-passport.mjs";
 import "dotenv/config";
 import express from "express";
 import helmet from "helmet";
@@ -78,6 +80,7 @@ mountProfessionalWorkspace(app, { requireStaff, requireAdmin });
 mountPayroll(app, { requireStaff, requireAdmin });
 mountAdminPipeline(app, { requireStaff, requireAdmin });
 mountEvaluation(app);
+mountAssistant(app);
 mountPersonal(app);
 app.get("/api/employee/overview", requireStaff, async (req, res) => {
   const userId = req.staff.user_id;
@@ -118,6 +121,7 @@ mountWorkspace(app, { requireStaff });
 mountEmployeeSecurity(app, { requireStaff });
 mountWorkspaceExtras(app, { requireStaff });
 mountBusinessWallet(app);
+mountGlobalPassport(app, { requireStaff });
 app.use("/api",requireStaff,requireAdmin);
 mountExports(app);
 app.get("/api/admin-config",(req,res)=>res.json(config));
@@ -220,7 +224,7 @@ app.post("/api/candidates/:id/archive",async(req,res)=>{
  const {data,error}=await req.db.from("crm_candidates").update({archived_at:req.body.archived?now:null,updated_at:now}).eq("id",id).eq("updated_at",req.body.version).select(resources.candidates.select).maybeSingle();
  if(error)dbError(error,req);if(!data)throw new InputError("El registro cambió o ya no está disponible. Vuelve a abrirlo.",409);res.json({data});
 });
-app.get(["/admin","/admin/"],(req,res)=>res.sendFile(path.join(root,"admin","index.html")));
+app.get(["/admin","/admin/","/portal","/portal/","/login","/login/"],(req,res)=>res.sendFile(path.join(root,"admin","index.html")));
 app.use("/admin",express.static(path.join(root,"admin"),{dotfiles:"deny",redirect:false,index:false,etag:false,maxAge:0}));
 app.use((req,res)=>fail(req,res,404,"Endpoint no encontrado."));
 app.use((error,req,res,next)=>{

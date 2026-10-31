@@ -23,11 +23,27 @@
       "destination": "/admin/index.html"
     },
     {
-      "source": "/:handle((?!(?:admin|api|book|services|privacy|terms|portfolio|certificates|personal-admin|pipeline-share|assets|fonts|images|img|css|js)(?![a-zA-Z0-9-]))[a-zA-Z0-9][a-zA-Z0-9-]{1,28}[a-zA-Z0-9])",
+      "source": "/portal",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/portal/",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/login/",
+      "destination": "/admin/index.html"
+    },
+    {
+      "source": "/:handle((?!(?:admin|api|portal|login|book|services|privacy|terms|portfolio|certificates|personal-admin|pipeline-share|assets|fonts|images|img|css|js)(?![a-zA-Z0-9-]))[a-zA-Z0-9][a-zA-Z0-9-]{1,28}[a-zA-Z0-9])",
       "destination": "/book/index.html"
     },
     {
-      "source": "/:handle((?!(?:admin|api|book|services|privacy|terms|portfolio|certificates|personal-admin|pipeline-share|assets|fonts|images|img|css|js)(?![a-zA-Z0-9-]))[a-zA-Z0-9][a-zA-Z0-9-]{1,28}[a-zA-Z0-9])/",
+      "source": "/:handle((?!(?:admin|api|portal|login|book|services|privacy|terms|portfolio|certificates|personal-admin|pipeline-share|assets|fonts|images|img|css|js)(?![a-zA-Z0-9-]))[a-zA-Z0-9][a-zA-Z0-9-]{1,28}[a-zA-Z0-9])/",
       "destination": "/book/index.html"
     }
   ],
@@ -45,7 +61,7 @@
         },
         {
           "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()"
+          "value": "camera=(), microphone=(self), geolocation=(), payment=(), usb=(), interest-cohort=()"
         },
         {
           "key": "X-Frame-Options",
@@ -106,6 +122,74 @@
     },
     {
       "source": "/admin/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+        }
+      ]
+    },
+    {
+      "source": "/portal",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+        }
+      ]
+    },
+    {
+      "source": "/portal/",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+        }
+      ]
+    },
+    {
+      "source": "/login",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+        }
+      ]
+    },
+    {
+      "source": "/login/",
       "headers": [
         {
           "key": "Cache-Control",

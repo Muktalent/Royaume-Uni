@@ -4,7 +4,7 @@
 html.mt-soft,body:has(#employeeWorkspace.lux.soft){background:#efe8dc;color-scheme:light}
 #employeeWorkspace.lux.soft{--s-bg:#efe8dc;--s-ink:#1d1b17;--s-muted:#7b7366;--s-line:rgba(120,98,62,.14);--s-glass:rgba(255,252,246,.64);--s-glass-strong:rgba(255,253,249,.86);--s-gold:#c8a464;--s-gold-2:#e7c873;--s-butter:#f1d27a;--s-dark:#171614;--s-dark-2:#24221e;--s-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 12px 34px -14px rgba(84,62,28,.22);--s-radius:22px;
  background:radial-gradient(1200px 700px at 8% -10%,#f8f2e7 0,transparent 60%),radial-gradient(900px 600px at 100% 0,#f3e3bf 0,transparent 55%),radial-gradient(800px 700px at 70% 110%,#e8dccb 0,transparent 60%),var(--s-bg);background-attachment:fixed;color:var(--s-ink);min-height:100dvh}
-#employeeWorkspace.lux.soft :is(h1,h2,h3,strong,b){color:var(--s-ink)}
+#employeeWorkspace.lux.soft :is(h1,h2,h3,strong,b):not(.cc *,.cc-file *,.cs-showroom *,.lx-passport *){color:var(--s-ink)}
 #employeeWorkspace.lux.soft .lx-muted,#employeeWorkspace.lux.soft .lx-footnote,#employeeWorkspace.lux.soft .lx-empty,#employeeWorkspace.lux.soft .lx-status,#employeeWorkspace.lux.soft small{color:var(--s-muted)}
 #employeeWorkspace.lux.soft .lx-overline{color:#a07f45;letter-spacing:1.6px;font-weight:650}
 #employeeWorkspace.lux.soft .lx-error{color:#b3412f}

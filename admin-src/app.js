@@ -3,6 +3,9 @@ import { mountProfessionalAdmin } from "./professional-workspace.js";
 import { requirePasswordChange } from "./employee-security.js";
 import { mountStaffAccounts } from "./staff-accounts.js";
 import { mountEmployee, mountWorkspaceAdmin } from "./employee.js";
+import { initGateway, showLoginMessage, startMatrix, stopMatrix, showReset, t } from "./gateway.js";
+import { mountStudentPortal } from "./student-portal.js";
+import { mountPassportAdmin } from "./counsellor.js";
 import { mountExportButtons } from "./exports.js";
 import { createClient } from "@supabase/supabase-js";
 import { mountAdminSoft } from "./admin-soft.js";
@@ -25,11 +28,11 @@ function valueText(key,value){
  return statusText[value]||String(value).replaceAll("_"," ");
 }
 function resetLogin(text=""){
- document.getElementById("employeeWorkspace")?.remove();
+ document.getElementById("employeeWorkspace")?.remove();document.getElementById("studentPortal")?.remove();document.getElementById("gpControlOverlay")?.remove();
  state.epoch++;state.session=null;state.staff=null;state.config=null;state.staffOptions=[];state.detail=null;state.dirty=false;state.busy=false;state.loading=false;
  if($("recordDialog").open)$("recordDialog").close();
  $("tableBody").replaceChildren();$("metrics").replaceChildren();$("pipeline").replaceChildren();$("formFields").replaceChildren();$("relatedRows").replaceChildren();$("detailMetadata").replaceChildren();
- $("appShell").hidden=true;$("loginView").hidden=false;$("password").value="";message("loginMessage",text,Boolean(text));
+ $("appShell").hidden=true;$("loginView").hidden=false;$("password").value="";showLoginMessage(text,text?"error":"");startMatrix();
 }
 async function api(url,options={}){
  const epoch=state.epoch;if(!state.session)throw new Error("Inicia sesión para continuar.");
@@ -222,47 +225,16 @@ $("loginForm").addEventListener("submit", async event => {
   event.preventDefault();
   if (!state.client || $("loginSubmit").disabled) return;
   $("loginSubmit").disabled = true;
-  message("loginMessage", "Entrando…");
+  showLoginMessage(t("signingIn"));
   try {
     const { data, error } = await state.client.auth.signInWithPassword({
       email: $("email").value.trim(),
       password: $("password").value
     });
     $("password").value = "";
-    if (error) throw new Error("No se pudo iniciar sesión. Revisa tus credenciales.");
-    if (!data.session) throw new Error("No se recibió una sesión.");
-    state.session = data.session;
-    state.epoch++;
-    state.staff = (await api("/api/me")).staff;
-    if(state.staff.must_change_password){
-      await requirePasswordChange({api,mandatory:true});
-      state.staff = (await api("/api/me")).staff;
-    }
-    if (!["admin", "collaborator"].includes(state.staff.role)) {
-      throw new Error("Esta cuenta no tiene un rol de acceso válido.");
-    }
-    if (state.staff.role === "collaborator") {
-      $("loginView").hidden = true;
-      $("appShell").hidden = true;
-      await mountEmployee({
-        staff: state.staff,
-        api,
-        onLogout: async () => {
-          const { error } = await state.client.auth.signOut({ scope: "local" });
-          if (error) throw error;
-          resetLogin();
-          message("loginMessage", "Sesión cerrada.");
-        }
-      });
-      return;
-    }
-    state.config = await api("/api/admin-config");
-    await loadStaffOptions();
-    nav();
-    $("staffName").textContent = state.staff.full_name;
-    $("loginView").hidden = true;
-    $("appShell").hidden = false;
-    await navigate("overview");
+    if (error) throw new Error(/confirm/i.test(error.message || "") ? t("notConfirmed") : t("badCreds"));
+    if (!data.session) throw new Error(t("badCreds"));
+    await enter(data.session);
   } catch (error) {
     resetLogin(error.message);
     await state.client.auth.signOut({ scope: "local" }).catch(() => {});
@@ -270,6 +242,53 @@ $("loginForm").addEventListener("submit", async event => {
     $("loginSubmit").disabled = false;
   }
 });
+// One door for everyone: whoami decides between the team workspace and the student Global Passport.
+async function enter(session){
+  state.session = session;
+  state.epoch++;
+  const who = await api("/api/whoami");
+  if (who.kind === "inactive") throw new Error("Esta cuenta del equipo no está activa.");
+  if (who.kind === "student" || who.kind === "new") {
+    $("loginView").hidden = true; $("appShell").hidden = true; stopMatrix();
+    await mountStudentPortal({ api, client: state.client, who, onLogout: async () => {
+      await state.client.auth.signOut({ scope: "local" }).catch(() => {});
+      resetLogin(); startMatrix();
+    } });
+    return;
+  }
+  state.staff = (await api("/api/me")).staff;
+  if(state.staff.must_change_password){
+    await requirePasswordChange({api,mandatory:true});
+    state.staff = (await api("/api/me")).staff;
+  }
+  if (!["admin", "collaborator"].includes(state.staff.role)) {
+    throw new Error("Esta cuenta no tiene un rol de acceso válido.");
+  }
+  stopMatrix();
+  if (state.staff.role === "collaborator") {
+    $("loginView").hidden = true;
+    $("appShell").hidden = true;
+    await mountEmployee({
+      staff: state.staff,
+      api,
+      onLogout: async () => {
+        const { error } = await state.client.auth.signOut({ scope: "local" });
+        if (error) throw error;
+        resetLogin();
+        startMatrix();
+        showLoginMessage("Signed out.", "ok");
+      }
+    });
+    return;
+  }
+  state.config = await api("/api/admin-config");
+  await loadStaffOptions();
+  nav();
+  $("staffName").textContent = state.staff.full_name;
+  $("loginView").hidden = true;
+  $("appShell").hidden = false;
+  await navigate("overview");
+}
 $("logout").addEventListener("click",async()=>{if(state.busy)return;if(state.dirty&&!window.confirm("¿Descartar los cambios y cerrar sesión?"))return;resetLogin();await state.client.auth.signOut({scope:"local"}).catch(()=>{});});
 $("filters").addEventListener("submit",event=>{event.preventDefault();state.page=1;loadList();});
 $("refresh").addEventListener("click",()=>loadList());
@@ -286,12 +305,20 @@ $("relatedNext").addEventListener("click",()=>{state.relatedPage++;loadRelated()
 $("openOverdue").addEventListener("click",()=>navigate("candidates",true));
 window.addEventListener("beforeunload",event=>{if(state.dirty||state.busy){event.preventDefault();event.returnValue="";}});
 async function initialise(){
+ initGateway({getClient:()=>state.client,onSignedIn:async session=>{try{await enter(session);}catch(e){resetLogin(e.message);}}});
  try{
-  const response=await fetch("/api/public-config",{cache:"no-store"});if(!response.ok)throw new Error("Configuración no disponible.");const cfg=await response.json();if(!cfg.supabaseUrl||!cfg.supabasePublicKey)throw new Error("Configuración incompleta.");
-  state.client=createClient(cfg.supabaseUrl,cfg.supabasePublicKey,{auth:{persistSession:false,autoRefreshToken:true,detectSessionInUrl:false}});
-  state.client.auth.onAuthStateChange((event,session)=>{state.session=session;if(event==="SIGNED_OUT"&&state.staff)resetLogin("La sesión ha terminado.");});
-  message("loginMessage");$("loginSubmit").disabled=false;
- }catch(e){message("loginMessage",`No se pudo conectar con la administración. ${e.message}`,true);}
+  const response=await fetch("/api/public-config",{cache:"no-store"});if(!response.ok)throw new Error("Configuration unavailable.");const cfg=await response.json();if(!cfg.supabaseUrl||!cfg.supabasePublicKey)throw new Error("Incomplete configuration.");
+  const fromLink=/(access_token|error_description|type=recovery|type=signup)/.test(location.hash)||/[?&]code=/.test(location.search);
+  const linkError=/error_description=([^&]+)/.exec(location.hash);
+  state.client=createClient(cfg.supabaseUrl,cfg.supabasePublicKey,{auth:{persistSession:false,autoRefreshToken:true,detectSessionInUrl:fromLink}});
+  let recovery=/type=recovery/.test(location.hash);
+  state.client.auth.onAuthStateChange((event,session)=>{state.session=session;if(event==="PASSWORD_RECOVERY"){recovery=true;showReset();}if(event==="SIGNED_OUT"&&(state.staff||document.getElementById("studentPortal")))resetLogin("Session ended.");});
+  showLoginMessage();$("loginSubmit").disabled=false;$("signupSubmit").disabled=false;
+  if(linkError){showLoginMessage(t("linkError"),"error");history.replaceState(null,"",location.pathname);}
+  else if(fromLink){const {data}=await state.client.auth.getSession();history.replaceState(null,"",location.pathname);
+   if(data.session&&recovery)showReset();
+   else if(data.session){showLoginMessage(t("confirmed"),"ok");try{await enter(data.session);}catch(e){resetLogin(e.message);}}}
+ }catch(e){showLoginMessage(`Unable to connect. ${e.message}`,"error");}
 }
 mountStaffAccounts({
   api,
@@ -302,6 +329,7 @@ mountStaffAccounts({
   }
 });
 mountWorkspaceAdmin({ api, getStaff: () => state.staff });
+mountPassportAdmin({ api, getStaff: () => state.staff });
 mountProfessionalAdmin({ api, getStaff: () => state.staff });
 initialise();
 

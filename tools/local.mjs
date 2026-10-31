@@ -14,8 +14,10 @@ execSync(
 
 const local = express();
 local.use(express.static("web-dist"));
+// Global Passport: student portal and unified login share the admin app.
+local.get(["/portal","/portal/","/login","/login/"], (req, res) => res.sendFile(path.resolve("web-dist/admin/index.html")));
 // Short business-card links, e.g. http://127.0.0.1:3000/laura (same rule as vercel.json).
-local.get(/^\/(?!(?:admin|api|book|services|privacy|terms|portfolio|certificates|personal-admin|pipeline-share|assets|fonts|images|img|css|js)(?![a-zA-Z0-9-]))[a-zA-Z0-9][a-zA-Z0-9-]{1,28}[a-zA-Z0-9]\/?$/, (req, res) => {
+local.get(/^\/(?!(?:admin|api|portal|login|book|services|privacy|terms|portfolio|certificates|personal-admin|pipeline-share|assets|fonts|images|img|css|js)(?![a-zA-Z0-9-]))[a-zA-Z0-9][a-zA-Z0-9-]{1,28}[a-zA-Z0-9]\/?$/, (req, res) => {
   res.sendFile(path.resolve("web-dist/book/index.html"));
 });
 local.use(app);

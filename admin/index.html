@@ -2,58 +2,76 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="robots" content="noindex,nofollow"><title>MUKTALENT · Administration</title>
+<meta name="robots" content="noindex,nofollow"><title>MUK Talent · Global Passport</title>
 <link rel="stylesheet" href="/admin/style.css"><script type="module" src="/admin/app.js"></script>
 <link rel="manifest" href="/admin/team.webmanifest">
-<meta name="theme-color" content="#efe8dc">
+<meta name="theme-color" content="#05070a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="/assets/logo.png">
 <link rel="stylesheet" href="/admin/admin-premium.css">
 <link rel="stylesheet" href="/admin/muk-soft-admin.css">
+<link rel="stylesheet" href="/admin/gateway.css">
 </head>
 <body>
-<section id="loginView" class="login-screen" lang="fr">
-  <div class="login-card">
-    <a class="wordmark" href="/admin/">MUK<span>TALENT</span></a>
-
-    <p class="eyebrow">ESPACE &Eacute;QUIPE</p>
-
-    <h1>Tout votre travail,<br>au m&ecirc;me endroit.</h1>
-
-    <p class="muted">
-      Acc&egrave;s priv&eacute; r&eacute;serv&eacute; &agrave; l&rsquo;&eacute;quipe MUK Talent.
-    </p>
-
-    <form id="loginForm">
-      <label for="email">Adresse e-mail</label>
-      <input
-        id="email"
-        type="email"
-        autocomplete="username"
-        maxlength="320"
-        required
-      >
-
-      <label for="password">Mot de passe</label>
-      <input
-        id="password"
-        type="password"
-        autocomplete="current-password"
-        required
-      >
-
-      <button id="loginSubmit" class="primary" type="submit" disabled>
-        Acc&eacute;der au tableau de bord
-      </button>
-    </form>
-
-    <p
-      id="loginMessage"
-      class="message"
-      role="status"
-      aria-live="polite"
-    >Connexion en cours&hellip;</p>
+<section id="loginView" class="gp-gate" lang="en">
+  <canvas id="gpMatrix" class="gp-matrix" aria-hidden="true"></canvas>
+  <div class="gp-vignette" aria-hidden="true"></div>
+  <div class="gp-gate-inner">
+    <aside class="gp-gate-copy">
+      <a class="gp-wordmark" href="/">MUK<span>TALENT</span></a>
+      <p class="gp-kicker" data-i18n="kicker">GLOBAL PASSPORT · UNITED KINGDOM</p>
+      <h1 data-i18n="headline">The smart passport of the international student.</h1>
+      <p class="gp-lede" data-i18n="lede">One secure file from your first university search to your first day on campus — with your counsellor beside you at every step.</p>
+      <ul class="gp-destinations" aria-label="Destinations">
+        <li class="on"><span class="gp-flag gp-flag-uk" aria-hidden="true"></span>United Kingdom <small data-i18n="open">Open</small></li>
+        <li><span class="gp-flag gp-flag-ca" aria-hidden="true"></span>Canada <small data-i18n="soon">Coming soon</small></li>
+        <li><span class="gp-flag gp-flag-us" aria-hidden="true"></span>USA <small data-i18n="soon">Coming soon</small></li>
+      </ul>
+    </aside>
+    <div class="gp-card" id="gpCard">
+      <div class="gp-card-top">
+        <span class="gp-chip"><i aria-hidden="true"></i><span data-i18n="secure">Secure access</span></span>
+        <div class="gp-lang" role="group" aria-label="Language"><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="fr" aria-pressed="false">FR</button></div>
+      </div>
+      <div class="gp-tabs" role="tablist" aria-label="Access">
+        <button type="button" role="tab" id="tabSignin" aria-controls="loginForm" aria-selected="true" data-i18n="tabSignin">Sign in</button>
+        <button type="button" role="tab" id="tabSignup" aria-controls="signupForm" aria-selected="false" tabindex="-1" data-i18n="tabSignup">Create student account</button>
+        <span class="gp-tabs-ink" aria-hidden="true"></span>
+      </div>
+      <form id="loginForm" class="gp-form" role="tabpanel" aria-labelledby="tabSignin">
+        <h2 data-i18n="welcome">Welcome back</h2>
+        <p class="gp-muted" data-i18n="welcomeText">Students and MUK Talent team use the same door. We open the right space for you.</p>
+        <label for="email" data-i18n="email">Email address</label>
+        <input id="email" type="email" autocomplete="username" maxlength="320" required placeholder="name@example.com">
+        <label for="password" data-i18n="password">Password</label>
+        <div class="gp-pass"><input id="password" type="password" autocomplete="current-password" required><button type="button" class="gp-eye" data-eye="password" aria-label="Show password"></button></div>
+        <button id="loginSubmit" class="gp-primary" type="submit" disabled><span data-i18n="signin">Sign in</span></button>
+        <button id="forgotPassword" class="gp-link" type="button" data-i18n="forgot">Forgot your password?</button>
+      </form>
+      <form id="signupForm" class="gp-form" role="tabpanel" aria-labelledby="tabSignup" hidden>
+        <h2 data-i18n="start">Start your Global Passport</h2>
+        <p class="gp-muted" data-i18n="startText">Free for students. Your counsellor is assigned automatically.</p>
+        <label for="suName" data-i18n="fullName">Full name (as in your passport)</label>
+        <input id="suName" autocomplete="name" maxlength="120" minlength="2" required>
+        <label for="suEmail" data-i18n="email">Email address</label>
+        <input id="suEmail" type="email" autocomplete="email" maxlength="320" required placeholder="name@example.com">
+        <label for="suPassword" data-i18n="newPassword">Create a password</label>
+        <div class="gp-pass"><input id="suPassword" type="password" autocomplete="new-password" minlength="10" maxlength="72" required aria-describedby="suHint"><button type="button" class="gp-eye" data-eye="suPassword" aria-label="Show password"></button></div>
+        <div class="gp-meter" aria-hidden="true"><i></i></div>
+        <p id="suHint" class="gp-hint" data-i18n="passHint">At least 10 characters. A short sentence works well.</p>
+        <label class="gp-check"><input id="suConsent" type="checkbox" required> <span data-i18n-html="consent">I accept the <a href="/terms/" target="_blank" rel="noopener">terms</a> and the <a href="/privacy/" target="_blank" rel="noopener">privacy policy</a>.</span></label>
+        <button id="signupSubmit" class="gp-primary" type="submit" disabled><span data-i18n="create">Create my account</span></button>
+      </form>
+      <form id="resetForm" class="gp-form" hidden>
+        <h2 data-i18n="newPassTitle">Choose a new password</h2>
+        <label for="newPassword" data-i18n="newPassword">Create a password</label>
+        <input id="newPassword" type="password" autocomplete="new-password" minlength="10" maxlength="72" required>
+        <button id="resetSubmit" class="gp-primary" type="submit"><span data-i18n="savePass">Save password</span></button>
+      </form>
+      <p id="loginMessage" class="gp-message" role="status" aria-live="polite">Connecting…</p>
+      <p class="gp-foot"><span data-i18n="encrypted">Encrypted session · auto sign-out after 30 min idle</span></p>
+    </div>
   </div>
 </section>
 <div id="appShell" class="app-shell" hidden>

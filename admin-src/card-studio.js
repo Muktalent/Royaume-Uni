@@ -11,12 +11,14 @@ export function cardData(d){return {display_name:d.full_name,job_title:d.job_tit
 export function miniBadge(d,photoUrl){const wrap=E('div',undefined,'cs-mini');wrap.append(createBusinessCard({data:cardData(d),photoUrl:photoUrl??d.avatar_url,link:{display:d.card?.handle?d.card.display:null}}));return wrap;}
 
 export async function renderCardStudio({host,api,owner,readOnly,directory,openTab,onChanged}){
- const d=directory,layout=E('div',undefined,'cs-layout'),stage=E('section',undefined,'cs-stage'),side=E('div',undefined,'cs-side');layout.append(stage,side);host.append(layout);
+ const d=directory,layout=E('div',undefined,'cs-layout cs-designer'),show=E('section',undefined,'cs-showroom'),ident=E('div',undefined,'cs-ident'),stage=E('section',undefined,'cs-stage'),side=E('div',undefined,'cs-side');
+ show.append(E('span',undefined,'cs-grid-bg'),ident,stage);layout.append(show,side);host.append(layout);
  let qr=null;
  if(d.card?.published){try{qr=await api('/api/workspace/card/qr'+q(owner));}catch{qr=null;}}
  if(!host.isConnected)return;
  const data=cardData(d);if(qr?.handle)data.short_display=qr.display;
  const socials=Array.isArray(d.socials)?d.socials:[];
+ identity({host:ident,d,qr,socials,readOnly,openTab});
  let editor,menu=null;
  if(qr){const extras=readOnly?[]:[{icon:'edit',label:'Edit short link',hint:'Choose muktalent.com/your-name',onSelect:()=>{editor?.focus();editor?.scrollIntoView({block:'center',behavior:'smooth'});}},{icon:'users',label:'Edit social links',hint:'LinkedIn, Instagram, TikTok…',onSelect:()=>openTab('social')}];
   menu=createCardMenu({url:qr.url,display:qr.display,qrImage:qr.image,name:d.full_name,data,slug:qr.slug,socials,showOpen:true,extras});}
@@ -82,4 +84,17 @@ export async function renderSocialEditor({host,api,owner,readOnly,onSaved}){
  function paint(links){preview.replaceChildren(E('p','PREVIEW','lx-overline'),createSocialLinks(Object.entries(links||{}).map(([platform,v])=>({platform,label:platform,value:v.value,url:v.url}))));}
  paint(info.links);panel.append(form,preview);
  const note=E('details',undefined,'cs-details');note.append(E('summary','Why links and not a login with each network?'),E('p','Signing in with Instagram, TikTok or LinkedIn would give MUK Talent access to your private account data and requires approval from each platform. Linking your public profile gives clients the same one-tap access without sharing your passwords or permissions.','lx-muted'));panel.append(note);
+}
+
+// Designer identity column: editorial name, credentials, live short link and card health.
+function identity({host,d,qr,socials,readOnly,openTab}){
+ const name=d.full_name||'MUK Talent',parts=name.trim().split(/\s+/),first=parts.shift()||name,rest=parts.join(' ');
+ host.append(E('p','MY CARD · DIGITAL IDENTITY','cs-kicker'));
+ const h=E('h2',undefined,'cs-name');h.append(E('span',first),E('em',rest||''));host.append(h,E('p',d.job_title||'MUK Talent team','cs-role'));
+ const meta=E('ul',undefined,'cs-meta');for(const [ic,v]of [['card',d.employee_code?'ID '+d.employee_code:null],['home',d.assigned_city||null],['users',d.languages||null]])if(v){const li=E('li');li.append(icon(ic),E('span',v));meta.append(li);}host.append(meta);
+ const display=qr?.display||(d.card?.handle?d.card.display:null);const link=E('div',undefined,'cs-live');const dot=E('i',undefined,d.card?.published?'on':'');link.append(dot,E('span',display||'Short link not set'));
+ if(display&&qr?.url){const copy=btn('Copy',async()=>{try{await navigator.clipboard.writeText(qr.url);copy.textContent='Copied';setTimeout(()=>{copy.textContent='Copy';},1600);}catch{}},'cs-live-copy');link.append(copy);}host.append(link);
+ const items=[Boolean(d.avatar_url),Boolean(d.contact_phone||d.contact_email),Boolean(d.card?.handle),Boolean(socials.length),Boolean(d.card?.published)],pct=Math.round(items.filter(Boolean).length/items.length*100);
+ const stats=E('dl',undefined,'cs-stats');for(const [k,v]of [['Card strength',pct+'%'],['Socials',String(socials.length)],['Status',d.card?.published?'Live':'Preview']]){const w=E('div');w.append(E('dt',k),E('dd',v));stats.append(w);}host.append(stats);
+ if(!readOnly){const row=E('div',undefined,'cs-ident-actions');row.append(btn('Edit profile',()=>openTab('profile'),'lx-button'),btn('Socials',()=>openTab('social'),'lx-button'));host.append(row);}
 }
