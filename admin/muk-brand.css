@@ -402,3 +402,38 @@ html:has(#studentPortal){overscroll-behavior-y:none}
 @media(max-width:700px){#appShell .admin-heart{right:108px;top:calc(13px + env(safe-area-inset-top))}#appShell#appShell .page-header>div:first-child{padding-right:150px}}
 #appShell .nav-chat svg.nav-icon{width:20px;height:20px;flex:none}
 #appShell .nav-chat{margin-top:14px;border:1px solid rgba(201,164,92,.4)}
+
+/* ---------- v14: Studio simplified (Productions + Media library) ---------- */
+#employeeWorkspace.lux.soft .lx-studio-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 14px}
+#employeeWorkspace.lux.soft .lx-studio-bar p{margin:0;max-width:62ch;font-size:13.5px}
+#employeeWorkspace.lux.soft .lx-studio-sent{min-height:38px}
+#employeeWorkspace.lux.soft .lx-prod-wait{grid-column:1/-1;margin:8px 0}
+#employeeWorkspace.lux.soft .lx-tile-dl{position:absolute;right:8px;top:44px;z-index:3;display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.94);color:#152e36;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+#employeeWorkspace.lux.soft .lx-tile-dl svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+#employeeWorkspace.lux.soft .lx-tile:not(:has(.lx-tile-del)) .lx-tile-dl{top:8px}
+#employeeWorkspace.lux.soft .lx-tile-pubbtn.is-done{background:#2a7563;cursor:default}
+#employeeWorkspace.lux.soft .lx-pub-row{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+#employeeWorkspace.lux.soft .lx-pub{font:700 10.5px/1 var(--b-font);font-style:normal;padding:4px 7px;border-radius:999px;background:#e6efe9;color:#1f5f51}
+#employeeWorkspace.lux.soft .lx-pub-web{background:#f4ead2;color:#7d5d22}
+#employeeWorkspace .lx-perm{max-width:420px;text-align:center;display:grid;gap:10px;justify-items:center;padding:28px 24px}
+#employeeWorkspace .lx-perm h2{margin:4px 0 0}
+#employeeWorkspace .lx-perm-ic{display:grid;place-items:center;width:64px;height:64px;border-radius:20px;background:#152e36;color:#e2c07a}
+#employeeWorkspace .lx-perm-ic svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#employeeWorkspace .lx-perm-row{display:flex;gap:10px;width:100%;margin-top:6px}
+#employeeWorkspace .lx-perm-row .lx-button{flex:1;min-height:46px}
+#employeeWorkspace .lx-queue{width:min(460px,calc(100vw - 24px))}
+#employeeWorkspace .lx-queue-list{list-style:none;margin:12px 0;padding:0;display:grid;gap:10px;max-height:50vh;overflow:auto}
+#employeeWorkspace .lx-queue-list li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center}
+#employeeWorkspace .lx-queue-list strong{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#employeeWorkspace .lx-queue-list small{font-size:12px;color:var(--b-muted)}
+#employeeWorkspace .lx-queue-list .lx-progress{grid-column:1/-1}
+#employeeWorkspace .lx-queue-list li.is-ok small{color:#2a7563}
+#employeeWorkspace .lx-queue-list li.is-error small{color:#9a3a26;grid-column:1/-1}
+#employeeWorkspace .lx-lb-acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+#employeeWorkspace .lx-lb-add{background:#c9a45c;color:#152e36;border-color:#c9a45c;cursor:pointer;font:700 13px/1 system-ui}
+#employeeWorkspace .lx-lb-add:disabled{background:transparent;color:#a9d8c9;border-color:rgba(169,216,201,.5);cursor:default}
+#employeeWorkspace .lx-lb-embed{width:min(1100px,100%);aspect-ratio:16/9;max-height:calc(100dvh - 120px);border:0;border-radius:8px;background:#000}
+@media(max-width:700px){#employeeWorkspace .lx-lb-bar{flex-wrap:wrap}#employeeWorkspace .lx-lb-acts{order:3;width:100%;justify-content:flex-start}#employeeWorkspace.lux.soft .lx-studio-sent{width:100%}}
+#employeeWorkspace .lx-lb-bar>.lx-lb-acts{display:flex;flex:0 1 auto;min-width:0}
+@media(max-width:700px){#employeeWorkspace .lx-lb-bar>.lx-lb-acts{order:3;flex:1 1 100%}}
+#employeeWorkspace.lux.soft .lx-tile .lx-media-cover>.lx-cover-tag{right:10px;bottom:10px;letter-spacing:.04em}

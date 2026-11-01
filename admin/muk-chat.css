@@ -202,3 +202,4 @@ html.mkc-lock,html.mkc-lock body{overflow:hidden!important;overscroll-behavior:n
 .mkc-vmnote{grid-column:1/-1;margin:0;padding:10px 12px;border-radius:12px;background:#f4efe3;font-size:14px;color:#4b5a5c}
 .mkc-vmnote.is-error{background:#fbe9e7;color:#9b2c1f}
 .mkc-vmmore{grid-column:1/-1;min-height:42px;border:1px solid #cfd9d4;border-radius:12px;background:#fff;font:inherit;font-weight:650;color:#16393a;cursor:pointer}
+.mkc-audnote{display:block;margin-top:6px;color:#5d6f69;font-size:12.5px;line-height:1.45}.mkc-audnote[hidden]{display:none}

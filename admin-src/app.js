@@ -3,7 +3,7 @@ import { mountProfessionalAdmin } from "./professional-workspace.js";
 import { requirePasswordChange } from "./employee-security.js";
 import { mountStaffAccounts } from "./staff-accounts.js";
 import { mountEmployee, mountWorkspaceAdmin } from "./employee.js";
-import { initGateway, showLoginMessage, startMatrix, stopMatrix, showReset, t } from "./gateway.js";
+import { initGateway, showLoginMessage, startMatrix, stopMatrix, showReset, t, gateLang } from "./gateway.js";
 import { mountStudentPortal } from "./student-portal.js";
 import { openMessenger, heartButton, watchNotifications, setDot, linkChatCss, icon as mkIcon } from "./muk-chat.js";
 import { renderControlCentre } from "./counsellor.js";
@@ -12,6 +12,7 @@ import { mountExportButtons } from "./exports.js";
 import { createClient } from "@supabase/supabase-js";
 import { AUTH_OPTIONS, watchDayEnd, stopWatch, setRememberDevice } from "./session-store.js";
 import { mountAdminSoft } from "./admin-soft.js";
+import { offerInstall } from "./install-app.js";
 const $ = id => document.getElementById(id);
 const state = {client:null,session:null,staff:null,config:null,section:"overview",page:1,total:0,epoch:0,listRequest:0,detailRequest:0,relatedRequest:0,busy:false,loading:false,detail:null,dirty:false,related:"notes",relatedPage:1,staffOptions:[]};
 const titles={overview:"Resumen",passport:"Global Passport",candidates:"Leads y casos",enquiries:"Consultas",appointments:"Citas",staff:"Equipo",documents:"Documentos",intelligence:"Pipeline e informes"};
@@ -287,6 +288,7 @@ async function enter(session){
       await state.client.auth.signOut({ scope: "local" }).catch(() => {});
       resetLogin(); startMatrix();
     } });
+    offerInstall({ lang: gateLang() });
     return;
   }
   state.staff = (await api("/api/me")).staff;
@@ -312,6 +314,7 @@ async function enter(session){
         showLoginMessage("Signed out.", "ok");
       }
     });
+    offerInstall({ lang: "en" });
     return;
   }
   state.config = await api("/api/admin-config");

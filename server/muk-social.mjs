@@ -77,7 +77,7 @@ export const postSchema = z.object({
   asset_id: z.union([z.null(), uuid]).optional().transform(v => v || null),
   media_id: z.union([z.null(), uuid]).optional().transform(v => v || null),
   live_at: z.union([z.literal(""), z.null(), z.string().datetime({ offset: true })]).optional().transform(v => v || null),
-  audience: z.enum(["all", "mine"]).default("all")
+  audience: z.enum(["all", "mine", "web"]).default("all")
 }).strict().superRefine((v, ctx) => {
   if (v.kind === "video" && !v.media_url && !v.asset_id && !v.media_id) ctx.addIssue({ code: "custom", path: ["media_url"], message: "Video required" });
   if (v.kind === "live" && !v.live_at) ctx.addIssue({ code: "custom", path: ["live_at"], message: "Date required" });
@@ -89,7 +89,7 @@ function service() {
   return createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 function ok(r, what = "Database operation failed") {
-  if (r.error) { const missing = r.error.code === "42P01" || r.error.code === "PGRST205" || r.error.code === "42703"; throw new SocialError(missing ? "Messaging database is not installed yet. Run supabase/muk-social.sql." : what, 503); }
+  if (r.error) { const missing = r.error.code === "42P01" || r.error.code === "PGRST205" || r.error.code === "42703"; throw new SocialError(missing ? (/v14/.test(what) ? what : "Messaging database is not installed yet. Run supabase/muk-social.sql.") : (r.error.code === "23514" && /audience/.test(r.error.message || "") ? "Website publishing needs the v14 database update. Run supabase/muk-v14.sql." : what), 503); }
   return r.data;
 }
 function bearer(req) { const m = /^Bearer ([^\s]+)$/i.exec(req.get("authorization") || ""); return m && m[1].length < 16384 ? m[1] : null; }
@@ -307,7 +307,7 @@ export function mountMukSocial(app, { db = service } = {}) {
   }));
 
   // ---------- Feed & notifications ----------
-  function visiblePosts(q, me) { return me.kind === "student" ? q.or(me.counsellor_id ? `audience.eq.all,author_id.eq.${me.counsellor_id}` : "audience.eq.all") : q; }
+  function visiblePosts(q, me) { return me.kind === "student" ? q.or(me.counsellor_id ? `audience.in.(all,web),author_id.eq.${me.counsellor_id}` : "audience.in.(all,web)") : q; }
   async function decorate(client, posts, me) {
     const ids = posts.map(p => p.id);
     const [reads, authors, assets, media] = await Promise.all([
@@ -320,11 +320,13 @@ export function mountMukSocial(app, { db = service } = {}) {
     return Promise.all(posts.map(async p => {
       let url = p.media_url, poster = p.poster_url;
       if (p.media_id && mmap.get(p.media_id)) { const m = mmap.get(p.media_id); url = url || m.url; poster = poster || m.poster_url; }
-      if (p.asset_id && amap.get(p.asset_id)) url = (await client.storage.from("mt-employee-private").createSignedUrl(amap.get(p.asset_id).object_path, 7200)).data?.signedUrl || url;
-      const em = url && !p.asset_id ? embedInfo(url) : null;
+      const asset = p.asset_id ? amap.get(p.asset_id) : null;
+      if (asset) { const signed = (await client.storage.from("mt-employee-private").createSignedUrl(asset.object_path, 7200)).data?.signedUrl || null; if (/^image\//.test(asset.mime || "")) { poster = signed || poster; url = p.media_url || null; } else url = signed || url; }
+      const fileVideo = Boolean(asset && /^video\//.test(asset.mime || ""));
+      const em = url && !fileVideo ? embedInfo(url) : null;
       if (!poster && url) poster = cloudinaryPoster(url) || em?.poster || null;
       const a = authors.get(p.author_id);
-      return { id: p.id, kind: p.kind, title: p.title, body: p.body, url, poster, embed: em?.src || null, play: url ? (p.asset_id ? "video" : videoKind(url)) : null, live_at: p.live_at, audience: p.audience, author: a?.name || "MUK Talent", author_id: p.author_id, at: p.created_at, read: read.has(p.id), mine: p.author_id === me.id };
+      return { id: p.id, kind: p.kind, title: p.title, body: p.body, url, poster, embed: em?.src || null, play: url ? (fileVideo ? "video" : videoKind(url)) : null, live_at: p.live_at, audience: p.audience, author: a?.name || "MUK Talent", author_id: p.author_id, at: p.created_at, read: read.has(p.id), mine: p.author_id === me.id };
     }));
   }
   app.get("/api/feed", limiter(600), route(async (req, res, me) => {
@@ -336,8 +338,9 @@ export function mountMukSocial(app, { db = service } = {}) {
     const { client } = me; if (me.kind !== "staff") throw new SocialError("Only the MUK Talent team can publish.", 403);
     const v = postSchema.parse(req.body);
     if (v.media_url && embedInfo(v.media_url)) { const e = embedInfo(v.media_url); v.media_url = e.url; if (!v.poster_url) { const meta = await vimeoMeta(e.url).catch(() => null); if (meta?.poster && /^https:\/\//.test(meta.poster)) v.poster_url = meta.poster; } }
-    if (v.asset_id) { const a = ok(await client.from("mt_employee_assets").select("id,owner_id,mime,state").eq("id", v.asset_id).maybeSingle()); if (!a || a.state !== "uploaded" || (!me.admin && a.owner_id !== me.id) || !/^video\//.test(a.mime || "")) throw new SocialError("Video not found in your library.", 404); }
-    if (v.media_id) { const m = ok(await client.from("mk_media").select("id,owner_id").eq("id", v.media_id).maybeSingle()); if (!m || (!me.admin && m.owner_id !== me.id)) throw new SocialError("Video not found in your library.", 404); }
+    if (v.media_id) { const m = ok(await client.from("mk_media").select("*").eq("id", v.media_id).maybeSingle()); if (!m || (!me.admin && m.owner_id !== me.id)) throw new SocialError("Video not found in your library.", 404); if (m.asset_id) v.asset_id = m.asset_id; }
+    if (v.asset_id) { const a = ok(await client.from("mt_employee_assets").select("id,owner_id,mime,state").eq("id", v.asset_id).maybeSingle()); if (!a || a.state !== "uploaded" || (!me.admin && a.owner_id !== me.id) || !/^(video|image)\//.test(a.mime || "")) throw new SocialError("File not found in your library.", 404); if (/^image\//.test(a.mime) && v.kind === "video") v.kind = "news"; }
+    if (v.audience === "web" && v.kind !== "video") throw new SocialError("Only videos can be published on the website.", 400);
     const row = ok(await client.from("mk_posts").insert({ ...v, author_id: me.id }).select("*").single(), "Unable to publish.");
     res.status(201).json({ data: (await decorate(client, [row], me))[0] });
   }));
@@ -384,6 +387,39 @@ export function mountMukSocial(app, { db = service } = {}) {
     const data = (j.data || []).map(v => { const id = String(v.uri || "").split("/").pop(); const h = /[?&]h=([0-9a-f]+)/i.exec(v.player_embed_url || "")?.[1]; const e = embedInfo(`https://player.vimeo.com/video/${id}${h ? `?h=${h}` : ""}`); const sizes = v.pictures?.sizes || []; return e && { ...e, title: v.name, duration: v.duration, poster: sizes.filter(x => x.width >= 640).sort((a, b) => a.width - b.width)[0]?.link || sizes.at(-1)?.link || null, at: v.created_time }; }).filter(Boolean);
     res.json({ data, more: Boolean(j.paging?.next) });
   }));
+  // Productions gallery: links (Vimeo, YouTube, Cloudinary) and files added from the Media library.
+  async function mediaRows(client, rows) {
+    const assetIds = rows.filter(m => m.asset_id).map(m => m.asset_id), ids = rows.map(m => m.id);
+    const [assets, posts] = await Promise.all([
+      assetIds.length ? client.from("mt_employee_assets").select("id,object_path,mime,original_name,bytes").in("id", assetIds) : { data: [] },
+      ids.length ? client.from("mk_posts").select("id,media_id,audience").in("media_id", ids) : { data: [] }
+    ]);
+    const amap = new Map((assets.data || []).map(a => [a.id, a])), pub = new Map();
+    for (const p of posts.data || []) { const l = pub.get(p.media_id) || []; l.push({ id: p.id, audience: p.audience }); pub.set(p.media_id, l); }
+    return Promise.all(rows.map(async m => {
+      const published = pub.get(m.id) || [];
+      if (m.asset_id) {
+        const a = amap.get(m.asset_id); if (!a) return null;
+        const bucket = client.storage.from("mt-employee-private");
+        const [view, dl] = await Promise.all([bucket.createSignedUrl(a.object_path, 3600), bucket.createSignedUrl(a.object_path, 3600, { download: a.original_name || true })]);
+        const image = /^image\//.test(a.mime || "");
+        return { ...m, url: view.data?.signedUrl || null, download_url: dl.data?.signedUrl || null, poster_url: image ? view.data?.signedUrl || null : m.poster_url, embed: null, play: image ? "image" : "video", source: "file", mime: a.mime, bytes: m.bytes || a.bytes, published };
+      }
+      const e = embedInfo(m.url), cloud = /^https:\/\/res\.cloudinary\.com\//.test(m.url || "");
+      return { ...m, poster_url: m.poster_url || cloudinaryPoster(m.url) || e?.poster || null, embed: e?.src || null, play: videoKind(m.url), source: e?.provider || (cloud ? "cloudinary" : "link"), download_url: cloud ? m.url.replace("/upload/", "/upload/fl_attachment/") : null, published };
+    })).then(list => list.filter(Boolean));
+  }
+  app.post("/api/media/from-asset", limiter(120), route(async (req, res, me) => {
+    if (me.kind !== "staff") throw new SocialError("Not allowed.", 403);
+    const v = z.object({ asset_id: uuid, title: z.string().trim().min(1).max(140).optional() }).strict().parse(req.body);
+    const a = ok(await me.client.from("mt_employee_assets").select("id,owner_id,mime,state,category,original_name,bytes").eq("id", v.asset_id).maybeSingle());
+    if (!a || a.state !== "uploaded" || a.category !== "content" || a.owner_id !== me.id) throw new SocialError("File not found in your library.", 404);
+    if (!/^(video|image)\//.test(a.mime || "")) throw new SocialError("Only photos and videos can be added to Productions.", 400);
+    const existing = ok(await me.client.from("mk_media").select("*").eq("asset_id", a.id).eq("owner_id", me.id).maybeSingle());
+    if (existing) return res.json({ data: (await mediaRows(me.client, [existing]))[0], existing: true });
+    const row = ok(await me.client.from("mk_media").insert({ owner_id: me.id, asset_id: a.id, url: null, title: (v.title || String(a.original_name || "Production").replace(/\.[^.]+$/, "")).slice(0, 140), kind: /^image\//.test(a.mime) ? "image" : "video", bytes: a.bytes || null }).select("*").single(), "Productions need the v14 database update. Run supabase/muk-v14.sql.");
+    res.status(201).json({ data: (await mediaRows(me.client, [row]))[0] });
+  }));
   app.post("/api/media/cloudinary-sign", limiter(60), route(async (req, res, me) => {
     if (me.kind !== "staff") throw new SocialError("Not allowed.", 403);
     const { CLOUDINARY_CLOUD_NAME: cloud, CLOUDINARY_API_KEY: key, CLOUDINARY_API_SECRET: secret } = process.env;
@@ -393,15 +429,17 @@ export function mountMukSocial(app, { db = service } = {}) {
   }));
   app.get("/api/media", limiter(300), route(async (req, res, me) => {
     if (me.kind !== "staff") throw new SocialError("Not allowed.", 403);
-    let q = me.client.from("mk_media").select("*").order("created_at", { ascending: false }).limit(200); if (!me.admin) q = q.eq("owner_id", me.id);
-    res.json({ data: ok(await q).map(m => ({ ...m, poster_url: m.poster_url || cloudinaryPoster(m.url) || embedInfo(m.url)?.poster || null, embed: embedInfo(m.url)?.src || null, play: videoKind(m.url) })) });
+    const owner = me.admin && uuid.safeParse(req.query.owner).success ? req.query.owner : null;
+    let q = me.client.from("mk_media").select("*").order("created_at", { ascending: false }).limit(200); if (!me.admin) q = q.eq("owner_id", me.id); else if (owner) q = q.eq("owner_id", owner);
+    const rows = ok(await q);
+    res.json({ data: await mediaRows(me.client, rows) });
   }));
   app.post("/api/media", limiter(60), route(async (req, res, me) => {
     if (me.kind !== "staff") throw new SocialError("Not allowed.", 403);
     const v = mediaSchema.parse(req.body);
     const em = embedInfo(v.url); if (em) { v.url = em.url; if (!v.poster_url) { const meta = await vimeoMeta(em.url).catch(() => null); if (meta?.poster && /^https:\/\//.test(meta.poster)) v.poster_url = meta.poster; if (meta?.duration && !v.duration) v.duration = meta.duration; } }
     const row = ok(await me.client.from("mk_media").insert({ ...v, poster_url: v.poster_url || cloudinaryPoster(v.url), owner_id: me.id, kind: videoKind(v.url) }).select("*").single());
-    res.status(201).json({ data: { ...row, embed: embedInfo(row.url)?.src || null, play: videoKind(row.url) } });
+    res.status(201).json({ data: (await mediaRows(me.client, [row]))[0] });
   }));
   app.delete("/api/media/:id", limiter(60), route(async (req, res, me) => {
     if (me.kind !== "staff") throw new SocialError("Not allowed.", 403);

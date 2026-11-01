@@ -4,6 +4,7 @@ import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import { randomBytes } from "node:crypto";
 import { z } from "zod";
 import { cardLinkFor } from "./card-links.mjs";
+import { embedInfo, videoKind, cloudinaryPoster } from "./muk-social.mjs";
 
 export class PublicError extends Error { constructor(message, status = 400) { super(message); this.status = status; } }
 const service = () => {
@@ -100,6 +101,34 @@ export function mountMukPublic(app, { db = service } = {}) {
     out.sort((a, b) => String(a.name).localeCompare(String(b.name)));
     cache = { at: Date.now(), data: out };
     res.set("Cache-Control", "public, max-age=300");
+    res.json({ data: out });
+  }));
+
+  /* Website "New content": the 3 latest videos published with the audience "Website". */
+  let vcache = { at: 0, data: null };
+  app.get("/api/public/videos", limiter(300), route(async (req, res) => {
+    if (vcache.data && Date.now() - vcache.at < 60 * 1000) { res.set("Cache-Control", "public, max-age=60"); return res.json({ data: vcache.data }); }
+    const client = db();
+    const posts = ok(await client.from("mk_posts").select("id,title,body,media_url,poster_url,asset_id,media_id,author_id,created_at").eq("audience", "web").eq("kind", "video").order("created_at", { ascending: false }).limit(3));
+    const pick = (ids, q) => ids.length ? q(ids) : Promise.resolve({ data: [] });
+    const [assets, media, staff] = await Promise.all([
+      pick(posts.filter(p => p.asset_id).map(p => p.asset_id), ids => client.from("mt_employee_assets").select("id,object_path,mime").in("id", ids)),
+      pick(posts.filter(p => p.media_id).map(p => p.media_id), ids => client.from("mk_media").select("id,url,poster_url").in("id", ids)),
+      pick(posts.map(p => p.author_id).filter(Boolean), ids => client.from("crm_staff").select("user_id,full_name").in("user_id", ids))
+    ]);
+    const am = new Map((assets.data || []).map(a => [a.id, a])), mm = new Map((media.data || []).map(m => [m.id, m])), sm = new Map((staff.data || []).map(x => [x.user_id, x.full_name]));
+    const out = [];
+    for (const p of posts) {
+      let url = p.media_url, poster = p.poster_url, play = null, embed = null;
+      const m = p.media_id && mm.get(p.media_id); if (m) { url = url || m.url; poster = poster || m.poster_url; }
+      const a = p.asset_id && am.get(p.asset_id);
+      if (a && /^video\//.test(a.mime || "")) { url = (await client.storage.from("mt-employee-private").createSignedUrl(a.object_path, 6 * 3600)).data?.signedUrl || null; play = "video"; }
+      else if (url) { const e = embedInfo(url); embed = e?.src || null; play = videoKind(url); poster = poster || cloudinaryPoster(url) || e?.poster || null; }
+      if (!url) continue;
+      out.push({ id: p.id, title: p.title, body: p.body || null, url, embed, play, poster: poster || null, author: sm.get(p.author_id) || "MUK Talent", at: p.created_at });
+    }
+    vcache = { at: Date.now(), data: out };
+    res.set("Cache-Control", "public, max-age=60");
     res.json({ data: out });
   }));
 

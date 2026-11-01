@@ -21452,8 +21452,8 @@ function createCardMenu({ url, display: display2, qrImage, name, data = {}, slug
       if (!id) throw Error("Publish your card to enable Wallet.");
       const info = await readResponse(await fetch("/api/business-card/" + encodeURIComponent(id) + "/wallet", { cache: "no-store" }));
       if (info.version !== 2) throw Error("Wallet needs the latest server version.");
-      const ua = navigator.userAgent || "", ios = /iPhone|iPad|iPod/.test(ua) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1, android = /Android/i.test(ua);
-      if (ios && info.apple) info.google = false;
+      const ua = navigator.userAgent || "", ios2 = /iPhone|iPad|iPod/.test(ua) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1, android = /Android/i.test(ua);
+      if (ios2 && info.apple) info.google = false;
       else if (android && info.google) info.apple = false;
       if (info.apple) {
         const target = new URL(info.appleUrl, location.origin);
@@ -22106,9 +22106,9 @@ var ibtn = (name, label2, cls = "mkc-ib") => {
   return b;
 };
 var TX = {
-  en: { chats: "Chats", search: "Search", newChat: "New chat", write: "Message", send: "Send", record: "Hold to record a voice note", recording: "Recording\u2026", cancel: "Cancel", voice: "Voice message", empty: "No conversations yet. Start one with the + button.", emptyThread: "Say hello. Messages are private between the people in this chat.", counsellor: "Your counsellor", students: "Students", team: "MUK Talent team", you: "You", today: "Today", yesterday: "Yesterday", online: "MUK Talent", micDenied: "Microphone access is blocked. Allow it in your browser settings.", noMic: "Voice notes are not supported in this browser.", notif: "Notifications", messages: "Messages", unread: "{n} unread", allRead: "You are up to date", news: "News", live: "Live", video: "Video", noFeed: "No news yet. The MUK Talent team will post updates, lives and videos here.", watch: "Watch", ago: "ago", share: "Share", save: "Save", saved: "Saved", copied: "Link copied", openLink: "Open video", liveOn: "Live on {d}", publish: "Publish to students", title: "Title", description: "Description", kind: "Type", when: "Date and time", audience: "Audience", all: "All students", mine: "My students", videoSrc: "Video", upload: "Upload to Cloudinary", paste: "Paste a link", urlPh: "Vimeo, YouTube or Cloudinary link (or Vimeo embed code)", uploading: "Uploading\u2026 {p}%", published: "Published. Students will see it in their notifications.", remove: "Delete", close: "Close", fromLib: "From your library", retry: "Try again", loading: "Loading\u2026", vimeo: "Choose from Vimeo", vimeoEmpty: "No videos found in your Vimeo account.", vimeoMore: "Load more", vimeoReady: "Vimeo video ready", resolving: "Reading the video\u2026", hours: { s: "Just now", m: "{n} min ago", h: "{n} hours ago", h1: "1 hour ago", d: "{n} days ago", d1: "Yesterday" } },
-  fr: { chats: "Discussions", search: "Rechercher", newChat: "Nouvelle discussion", write: "Message", send: "Envoyer", record: "Maintenez pour enregistrer un vocal", recording: "Enregistrement\u2026", cancel: "Annuler", voice: "Message vocal", empty: "Aucune discussion. Commencez avec le bouton +.", emptyThread: "Dites bonjour. Les messages restent priv\xE9s entre les participants.", counsellor: "Votre conseill\xE8re", students: "\xC9tudiants", team: "\xC9quipe MUK Talent", you: "Vous", today: "Aujourd\u2019hui", yesterday: "Hier", online: "MUK Talent", micDenied: "Le micro est bloqu\xE9. Autorisez-le dans les r\xE9glages du navigateur.", noMic: "Les vocaux ne sont pas pris en charge par ce navigateur.", notif: "Notifications", messages: "Messages", unread: "{n} non lus", allRead: "Vous \xEAtes \xE0 jour", news: "Actualit\xE9", live: "Direct", video: "Vid\xE9o", noFeed: "Pas encore d\u2019actualit\xE9s. L\u2019\xE9quipe MUK Talent publiera ici infos, directs et vid\xE9os.", watch: "Regarder", ago: "", share: "Partager", save: "Enregistrer", saved: "Enregistr\xE9", copied: "Lien copi\xE9", openLink: "Ouvrir la vid\xE9o", liveOn: "En direct le {d}", publish: "Publier aux \xE9tudiants", title: "Titre", description: "Description", kind: "Type", when: "Date et heure", audience: "Public", all: "Tous les \xE9tudiants", mine: "Mes \xE9tudiants", videoSrc: "Vid\xE9o", upload: "Envoyer sur Cloudinary", paste: "Coller un lien", urlPh: "Lien Vimeo, YouTube ou Cloudinary (ou code d\u2019int\xE9gration Vimeo)", uploading: "Envoi\u2026 {p} %", published: "Publi\xE9. Les \xE9tudiants le verront dans leurs notifications.", remove: "Supprimer", close: "Fermer", fromLib: "Depuis votre biblioth\xE8que", retry: "R\xE9essayer", loading: "Chargement\u2026", vimeo: "Choisir sur Vimeo", vimeoEmpty: "Aucune vid\xE9o dans votre compte Vimeo.", vimeoMore: "Voir plus", vimeoReady: "Vid\xE9o Vimeo pr\xEAte", resolving: "Lecture de la vid\xE9o\u2026", hours: { s: "\xC0 l\u2019instant", m: "Il y a {n} min", h: "Il y a {n} heures", h1: "Il y a 1 heure", d: "Il y a {n} jours", d1: "Hier" } },
-  es: { chats: "Chats", search: "Buscar", newChat: "Nuevo chat", write: "Mensaje", send: "Enviar", record: "Mant\xE9n pulsado para grabar un audio", recording: "Grabando\u2026", cancel: "Cancelar", voice: "Mensaje de voz", empty: "A\xFAn no hay chats. Empieza uno con el bot\xF3n +.", emptyThread: "Saluda. Los mensajes son privados entre los participantes.", counsellor: "Tu counsellor", students: "Estudiantes", team: "Equipo MUK Talent", you: "T\xFA", today: "Hoy", yesterday: "Ayer", online: "MUK Talent", micDenied: "El micr\xF3fono est\xE1 bloqueado. Perm\xEDtelo en los ajustes del navegador.", noMic: "Este navegador no permite grabar audios.", notif: "Notificaciones", messages: "Mensajes", unread: "{n} sin leer", allRead: "Est\xE1s al d\xEDa", news: "Noticia", live: "Directo", video: "V\xEDdeo", noFeed: "A\xFAn no hay novedades. El equipo publicar\xE1 aqu\xED noticias, directos y v\xEDdeos.", watch: "Ver", ago: "", share: "Compartir", save: "Guardar", saved: "Guardado", copied: "Enlace copiado", openLink: "Abrir v\xEDdeo", liveOn: "En directo el {d}", publish: "Publicar a estudiantes", title: "T\xEDtulo", description: "Descripci\xF3n", kind: "Tipo", when: "Fecha y hora", audience: "P\xFAblico", all: "Todos los estudiantes", mine: "Mis estudiantes", videoSrc: "V\xEDdeo", upload: "Subir a Cloudinary", paste: "Pegar enlace", urlPh: "Enlace de Vimeo, YouTube o Cloudinary (o c\xF3digo embed de Vimeo)", uploading: "Subiendo\u2026 {p} %", published: "Publicado. Los estudiantes lo ver\xE1n en sus notificaciones.", remove: "Eliminar", close: "Cerrar", fromLib: "De tu biblioteca", retry: "Reintentar", loading: "Cargando\u2026", vimeo: "Elegir de Vimeo", vimeoEmpty: "No hay v\xEDdeos en tu cuenta de Vimeo.", vimeoMore: "Ver m\xE1s", vimeoReady: "V\xEDdeo de Vimeo listo", resolving: "Leyendo el v\xEDdeo\u2026", hours: { s: "Ahora", m: "Hace {n} min", h: "Hace {n} horas", h1: "Hace 1 hora", d: "Hace {n} d\xEDas", d1: "Ayer" } }
+  en: { chats: "Chats", search: "Search", newChat: "New chat", write: "Message", send: "Send", record: "Hold to record a voice note", recording: "Recording\u2026", cancel: "Cancel", voice: "Voice message", empty: "No conversations yet. Start one with the + button.", emptyThread: "Say hello. Messages are private between the people in this chat.", counsellor: "Your counsellor", students: "Students", team: "MUK Talent team", you: "You", today: "Today", yesterday: "Yesterday", online: "MUK Talent", micDenied: "Microphone access is blocked. Allow it in your browser settings.", noMic: "Voice notes are not supported in this browser.", notif: "Notifications", messages: "Messages", unread: "{n} unread", allRead: "You are up to date", news: "News", live: "Live", video: "Video", noFeed: "No news yet. The MUK Talent team will post updates, lives and videos here.", watch: "Watch", ago: "ago", share: "Share", save: "Save", saved: "Saved", copied: "Link copied", openLink: "Open video", liveOn: "Live on {d}", publish: "Publish to students", title: "Title", description: "Description", kind: "Type", when: "Date and time", audience: "Audience", all: "All students", mine: "My students", web: "Website (public, home page)", pubWeb: "Publish on the website", newProd: "New production", saveProd: "Save to Productions", prodSaved: "Saved to Productions", needVideo: "Paste a link, choose a Vimeo video or upload a file.", webNote: "Shown to everyone on muktalent.com in \u201COur latest videos\u201D. Students also see it.", videoSrc: "Video", upload: "Upload to Cloudinary", paste: "Paste a link", urlPh: "Vimeo, YouTube or Cloudinary link (or Vimeo embed code)", uploading: "Uploading\u2026 {p}%", published: "Published. Students will see it in their notifications.", remove: "Delete", close: "Close", fromLib: "From your library", retry: "Try again", loading: "Loading\u2026", vimeo: "Choose from Vimeo", vimeoEmpty: "No videos found in your Vimeo account.", vimeoMore: "Load more", vimeoReady: "Vimeo video ready", resolving: "Reading the video\u2026", hours: { s: "Just now", m: "{n} min ago", h: "{n} hours ago", h1: "1 hour ago", d: "{n} days ago", d1: "Yesterday" } },
+  fr: { chats: "Discussions", search: "Rechercher", newChat: "Nouvelle discussion", write: "Message", send: "Envoyer", record: "Maintenez pour enregistrer un vocal", recording: "Enregistrement\u2026", cancel: "Annuler", voice: "Message vocal", empty: "Aucune discussion. Commencez avec le bouton +.", emptyThread: "Dites bonjour. Les messages restent priv\xE9s entre les participants.", counsellor: "Votre conseill\xE8re", students: "\xC9tudiants", team: "\xC9quipe MUK Talent", you: "Vous", today: "Aujourd\u2019hui", yesterday: "Hier", online: "MUK Talent", micDenied: "Le micro est bloqu\xE9. Autorisez-le dans les r\xE9glages du navigateur.", noMic: "Les vocaux ne sont pas pris en charge par ce navigateur.", notif: "Notifications", messages: "Messages", unread: "{n} non lus", allRead: "Vous \xEAtes \xE0 jour", news: "Actualit\xE9", live: "Direct", video: "Vid\xE9o", noFeed: "Pas encore d\u2019actualit\xE9s. L\u2019\xE9quipe MUK Talent publiera ici infos, directs et vid\xE9os.", watch: "Regarder", ago: "", share: "Partager", save: "Enregistrer", saved: "Enregistr\xE9", copied: "Lien copi\xE9", openLink: "Ouvrir la vid\xE9o", liveOn: "En direct le {d}", publish: "Publier aux \xE9tudiants", title: "Titre", description: "Description", kind: "Type", when: "Date et heure", audience: "Public", all: "Tous les \xE9tudiants", mine: "Mes \xE9tudiants", web: "Site web (public, page d\u2019accueil)", pubWeb: "Publier sur le site", newProd: "Nouvelle production", saveProd: "Enregistrer dans Productions", prodSaved: "Enregistr\xE9 dans Productions", needVideo: "Collez un lien, choisissez une vid\xE9o Vimeo ou importez un fichier.", webNote: "Visible par tous sur muktalent.com dans \xAB Nos derni\xE8res vid\xE9os \xBB. Les \xE9tudiants la voient aussi.", videoSrc: "Vid\xE9o", upload: "Envoyer sur Cloudinary", paste: "Coller un lien", urlPh: "Lien Vimeo, YouTube ou Cloudinary (ou code d\u2019int\xE9gration Vimeo)", uploading: "Envoi\u2026 {p} %", published: "Publi\xE9. Les \xE9tudiants le verront dans leurs notifications.", remove: "Supprimer", close: "Fermer", fromLib: "Depuis votre biblioth\xE8que", retry: "R\xE9essayer", loading: "Chargement\u2026", vimeo: "Choisir sur Vimeo", vimeoEmpty: "Aucune vid\xE9o dans votre compte Vimeo.", vimeoMore: "Voir plus", vimeoReady: "Vid\xE9o Vimeo pr\xEAte", resolving: "Lecture de la vid\xE9o\u2026", hours: { s: "\xC0 l\u2019instant", m: "Il y a {n} min", h: "Il y a {n} heures", h1: "Il y a 1 heure", d: "Il y a {n} jours", d1: "Hier" } },
+  es: { chats: "Chats", search: "Buscar", newChat: "Nuevo chat", write: "Mensaje", send: "Enviar", record: "Mant\xE9n pulsado para grabar un audio", recording: "Grabando\u2026", cancel: "Cancelar", voice: "Mensaje de voz", empty: "A\xFAn no hay chats. Empieza uno con el bot\xF3n +.", emptyThread: "Saluda. Los mensajes son privados entre los participantes.", counsellor: "Tu counsellor", students: "Estudiantes", team: "Equipo MUK Talent", you: "T\xFA", today: "Hoy", yesterday: "Ayer", online: "MUK Talent", micDenied: "El micr\xF3fono est\xE1 bloqueado. Perm\xEDtelo en los ajustes del navegador.", noMic: "Este navegador no permite grabar audios.", notif: "Notificaciones", messages: "Mensajes", unread: "{n} sin leer", allRead: "Est\xE1s al d\xEDa", news: "Noticia", live: "Directo", video: "V\xEDdeo", noFeed: "A\xFAn no hay novedades. El equipo publicar\xE1 aqu\xED noticias, directos y v\xEDdeos.", watch: "Ver", ago: "", share: "Compartir", save: "Guardar", saved: "Guardado", copied: "Enlace copiado", openLink: "Abrir v\xEDdeo", liveOn: "En directo el {d}", publish: "Publicar a estudiantes", title: "T\xEDtulo", description: "Descripci\xF3n", kind: "Tipo", when: "Fecha y hora", audience: "P\xFAblico", all: "Todos los estudiantes", mine: "Mis estudiantes", web: "Web (p\xFAblica, p\xE1gina de inicio)", pubWeb: "Publicar en la web", newProd: "Nueva producci\xF3n", saveProd: "Guardar en Productions", prodSaved: "Guardado en Productions", needVideo: "Pega un enlace, elige un v\xEDdeo de Vimeo o sube un archivo.", webNote: "Visible para todos en muktalent.com en \xABNuestros \xFAltimos v\xEDdeos\xBB. Los estudiantes tambi\xE9n lo ven.", videoSrc: "V\xEDdeo", upload: "Subir a Cloudinary", paste: "Pegar enlace", urlPh: "Enlace de Vimeo, YouTube o Cloudinary (o c\xF3digo embed de Vimeo)", uploading: "Subiendo\u2026 {p} %", published: "Publicado. Los estudiantes lo ver\xE1n en sus notificaciones.", remove: "Eliminar", close: "Cerrar", fromLib: "De tu biblioteca", retry: "Reintentar", loading: "Cargando\u2026", vimeo: "Elegir de Vimeo", vimeoEmpty: "No hay v\xEDdeos en tu cuenta de Vimeo.", vimeoMore: "Ver m\xE1s", vimeoReady: "V\xEDdeo de Vimeo listo", resolving: "Leyendo el v\xEDdeo\u2026", hours: { s: "Ahora", m: "Hace {n} min", h: "Hace {n} horas", h1: "Hace 1 hora", d: "Hace {n} d\xEDas", d1: "Ayer" } }
 };
 var tx = (lang2) => TX[lang2] || TX.en;
 var fill = (s, v) => String(s).replace(/\{(\w+)\}/g, (_, k) => v[k] ?? "");
@@ -22929,18 +22929,18 @@ function openPost(p, { lang: lang2 = "en", api: api2 = null, onDelete = null } =
   bk.focus();
   return { close };
 }
-function openComposer({ api: api2, lang: lang2 = "en", preset = {}, onDone = () => {
+function openComposer({ api: api2, lang: lang2 = "en", preset = {}, mode = "publish", onDone = () => {
 } }) {
-  const L = tx(lang2);
-  const { o, close } = overlay("mkc-compose", L.publish);
+  const L = tx(lang2), prod = mode === "production", heading = prod ? L.newProd : L.publish;
+  const { o, close } = overlay("mkc-compose", heading);
   o.lang = lang2;
   const f = E4("form", void 0, "mkc-cform");
   const hd = E4("header", void 0, "mkc-bar");
   const x = ibtn("close", L.close);
   x.onclick = close;
-  hd.append(x, E4("h2", L.publish), E4("span"));
+  hd.append(x, E4("h2", heading), E4("span"));
   f.append(hd);
-  const v = { kind: preset.kind || "video", title: preset.title || "", body: "", media_url: preset.url || "", asset_id: preset.asset_id || null, media_id: preset.media_id || null, poster_url: preset.poster_url || "", live_at: "", audience: "all" };
+  const v = { kind: preset.kind || "video", title: preset.title || "", body: "", media_url: preset.url || "", asset_id: preset.asset_id || null, media_id: preset.media_id || null, poster_url: preset.poster_url || "", live_at: "", audience: preset.audience || "all" };
   const field2 = (label2, ctl) => {
     const w = E4("label", void 0, "mkc-field");
     w.append(E4("span", label2), ctl);
@@ -22973,9 +22973,18 @@ function openComposer({ api: api2, lang: lang2 = "en", preset = {}, onDone = () 
   const when = E4("input");
   when.type = "datetime-local";
   when.oninput = () => v.live_at = when.value;
+  let go = null;
   const aud = E4("select");
-  aud.append(new Option(L.all, "all"), new Option(L.mine, "mine"));
-  aud.onchange = () => v.audience = aud.value;
+  aud.append(new Option(L.all, "all"), new Option(L.mine, "mine"), new Option(L.web, "web"));
+  aud.value = v.audience;
+  const audNote = E4("small", L.webNote, "mkc-audnote");
+  aud.onchange = () => {
+    v.audience = aud.value;
+    audNote.hidden = aud.value !== "web";
+    const sp = go?.querySelector("span");
+    if (sp && !prod) sp.textContent = aud.value === "web" ? L.pubWeb || L.publish : L.publish;
+  };
+  audNote.hidden = v.audience !== "web";
   const src = E4("div", void 0, "mkc-src");
   const lib = E4("p", "", "mkc-libnote");
   const url = E4("input");
@@ -23149,19 +23158,32 @@ function openComposer({ api: api2, lang: lang2 = "en", preset = {}, onDone = () 
     }
   };
   const wTitle = field2(L.title, title), wDesc = field2(L.description, desc), wWhen = field2(L.when, when), wAud = field2(L.audience, aud), wSrc = field2(L.videoSrc, src);
+  wAud.append(audNote);
   const msg = E4("p", "", "mkc-fmsg");
   msg.setAttribute("role", "status");
-  const go = E4("button", void 0, "mkc-primary");
+  go = E4("button", void 0, "mkc-primary");
   go.type = "submit";
-  go.append(icon2("send"), E4("span", L.publish));
+  go.append(icon2(prod ? "upload" : "send"), E4("span", prod ? L.saveProd : v.audience === "web" ? L.pubWeb : L.publish));
+  const fixed = Boolean(preset.media_id || preset.asset_id) && !prod;
   const scroll = E4("div", void 0, "mkc-cscroll");
-  scroll.append(seg, wSrc, wTitle, wDesc, wWhen, wAud, msg, go);
+  scroll.append(...prod ? [wSrc, wTitle, msg, go] : [seg, wSrc, wTitle, wDesc, wWhen, wAud, msg, go]);
   f.append(scroll);
+  if (fixed) {
+    seg.hidden = true;
+    up.hidden = vm.hidden = true;
+    url.closest(".mkc-field").hidden = true;
+  }
   function draw() {
     for (const b of seg.children) b.setAttribute("aria-checked", String(b.dataset.k === v.kind));
-    wSrc.hidden = v.kind === "news";
+    wSrc.hidden = v.kind === "news" && !fixed;
     wWhen.hidden = v.kind !== "live";
     when.required = v.kind === "live";
+    [...aud.options].find((op) => op.value === "web").disabled = v.kind !== "video";
+    if (v.kind !== "video" && aud.value === "web") {
+      aud.value = "all";
+      v.audience = "all";
+      audNote.hidden = true;
+    }
   }
   draw();
   f.onsubmit = async (e) => {
@@ -23170,7 +23192,28 @@ function openComposer({ api: api2, lang: lang2 = "en", preset = {}, onDone = () 
     go.disabled = true;
     msg.textContent = "";
     msg.className = "mkc-fmsg";
-    const payload = { kind: v.kind, title: v.title.trim(), body: v.body.trim() || null, audience: v.audience, media_url: v.kind === "news" ? v.media_url || null : v.media_id || v.asset_id ? null : v.media_url || null, asset_id: v.kind === "news" ? null : v.asset_id, media_id: v.kind === "news" ? null : v.media_id, poster_url: v.poster_url || null, live_at: v.live_at ? new Date(v.live_at).toISOString() : null };
+    if (prod) {
+      try {
+        let m = null;
+        if (v.media_id) m = { id: v.media_id };
+        else if (v.media_url) m = (await api2("/api/media", { method: "POST", body: JSON.stringify({ url: v.media_url, title: v.title.trim().slice(0, 140), poster_url: v.poster_url || null }) })).data;
+        else {
+          msg.textContent = L.needVideo;
+          msg.classList.add("error");
+          go.disabled = false;
+          return;
+        }
+        toast(L.prodSaved);
+        close();
+        onDone(m);
+      } catch (err2) {
+        msg.textContent = err2.message;
+        msg.classList.add("error");
+        go.disabled = false;
+      }
+      return;
+    }
+    const payload = { kind: v.kind, title: v.title.trim(), body: v.body.trim() || null, audience: v.audience, media_url: v.kind === "news" ? v.media_url || null : v.media_id || v.asset_id ? null : v.media_url || null, asset_id: v.kind === "news" && !fixed ? null : v.asset_id, media_id: v.kind === "news" && !fixed ? null : v.media_id, poster_url: v.poster_url || null, live_at: v.live_at ? new Date(v.live_at).toISOString() : null };
     try {
       const r = await api2("/api/feed", { method: "POST", body: JSON.stringify(payload) });
       toast(L.published);
@@ -23186,9 +23229,9 @@ function openComposer({ api: api2, lang: lang2 = "en", preset = {}, onDone = () 
   title.focus();
   return { close };
 }
-async function listMedia(api2) {
+async function listMedia(api2, owner = null) {
   try {
-    return (await api2("/api/media")).data || [];
+    return (await api2("/api/media" + (owner ? "?owner=" + encodeURIComponent(owner) : ""))).data || [];
   } catch {
     return [];
   }
@@ -23425,11 +23468,11 @@ function visitCard({ d, data, qr }) {
   front.append(logo, star, id, list);
   const back = E6("article", void 0, "cs-face cs-back");
   back.setAttribute("aria-hidden", "true");
-  const mark = E6("img", void 0, "cs-mark");
-  mark.src = "/assets/brand/mark-noir.svg";
-  mark.alt = "";
-  mark.width = 64;
-  mark.height = 64;
+  const mark2 = E6("img", void 0, "cs-mark");
+  mark2.src = "/assets/brand/mark-noir.svg";
+  mark2.alt = "";
+  mark2.width = 64;
+  mark2.height = 64;
   const code = E6("div", void 0, "cs-qr");
   if (qr?.image) {
     const im = E6("img");
@@ -23438,7 +23481,7 @@ function visitCard({ d, data, qr }) {
     code.append(im);
   } else code.append(E6("span", "QR after publishing", "cs-qr-empty"));
   const bt = E6("div", void 0, "cs-back-text");
-  bt.append(mark, E6("strong", data.short_display || "muktalent.com"), E6("small", "MAGHREB \xB7 UK \xB7 TALENT"));
+  bt.append(mark2, E6("strong", data.short_display || "muktalent.com"), E6("small", "MAGHREB \xB7 UK \xB7 TALENT"));
   back.append(bt, code);
   inner.append(front, back);
   return scene;
@@ -24536,7 +24579,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       refresh.disabled = false;
     }
   }
-  const groupText = { home: "Your people, your priorities, your impact.", pipeline: "Leads and partners with clear next steps.", planner: "Appointments, daily reports and tasks in one place.", studio: "Ideas, production and your media library.", me: "Your digital introduction, ready to share.", students: "Global Passport \xB7 every student file, document and message." };
+  const groupText = { home: "Your people, your priorities, your impact.", pipeline: "Leads and partners with clear next steps.", planner: "Appointments, daily reports and tasks in one place.", studio: "Your productions and your media library, in one place.", me: "Your digital introduction, ready to share.", students: "Global Passport \xB7 every student file, document and message." };
   function render() {
     if (!root.isConnected) return;
     root.dataset.section = section;
@@ -24569,7 +24612,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       };
       tabBar.append(t2);
     }
-    const actionsFor = { leads: ["Add lead", () => edit("lead")], partner: ["Add partner", () => edit("partner")], task: ["Add task", () => edit("task")], content: ["New production", () => edit("content")], library: ["Upload media", () => uploadDialog()], calendar: ["Today\u2019s report", () => edit("report", records("report").find((r) => r.record_date === dateKey()), dateKey())] };
+    const actionsFor = { leads: ["Add lead", () => edit("lead")], partner: ["Add partner", () => edit("partner")], task: ["Add task", () => edit("task")], content: ["New production", () => newProduction()], library: ["Add from phone", () => pickFromPhone()], calendar: ["Today\u2019s report", () => edit("report", records("report").find((r) => r.record_date === dateKey()), dateKey())] };
     const act = actionsFor[section];
     add.hidden = readOnly || !act;
     if (act) {
@@ -24730,9 +24773,9 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     const list = E8("ul", void 0, "lx-checklist");
     for (const [label2, ok, target] of items) {
       const li = E8("li", void 0, ok ? "done" : "");
-      const mark = E8("span", void 0, "lx-check");
-      if (ok) mark.append(icon("check"));
-      li.append(mark);
+      const mark2 = E8("span", void 0, "lx-check");
+      if (ok) mark2.append(icon("check"));
+      li.append(mark2);
       if (!ok && !readOnly && !(label2 === "Card published")) {
         const b = E8("button", label2, "lx-check-link");
         b.type = "button";
@@ -25102,150 +25145,328 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     if (!b) return "";
     return b >= 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB";
   }
+  const SRC_TAG = { vimeo: "Vimeo", youtube: "YouTube", cloudinary: "Cloudinary", file: "Library", link: "Link" }, AUD_TAG = { all: "All students", mine: "My students", web: "Website" };
+  let prodCache = null;
+  function prodItem(m) {
+    return { name: m.title, url: m.url, download: m.download_url || null, kind: m.play === "image" ? "image" : m.play === "video" ? "video" : m.embed ? "embed" : "link", embed: m.embed, bytes: m.bytes, poster: m.poster_url, media: m };
+  }
+  function assetItem(a) {
+    return { name: a.original_name, url: a.url, download: a.download_url || a.url, kind: kindOf(a), bytes: a.bytes, asset: a };
+  }
+  function dlIcon(href, name) {
+    const a = E8("a", void 0, "lx-tile-dl");
+    a.href = href;
+    a.setAttribute("download", name || "");
+    a.setAttribute("aria-label", "Download " + (name || ""));
+    a.title = "Download";
+    a.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M5 19h14"/></svg>';
+    a.onclick = (e) => e.stopPropagation();
+    return a;
+  }
+  function publish(m) {
+    const image = m.play === "image";
+    openComposer({ api: api2, lang: "en", preset: { kind: image ? "news" : "video", media_id: m.id, title: m.title, audience: "all" }, onDone: () => {
+      prodCache = null;
+      if (section === "content") render();
+    } });
+  }
   function studio() {
-    const gallery = E8("div", void 0, "lx-gallery lx-gallery-grid");
-    body.append(gallery);
+    const bar = E8("div", void 0, "lx-studio-bar"), gallery = E8("div", void 0, "lx-gallery lx-gallery-grid");
+    body.append(bar, gallery);
     if (section === "library") {
-      const media = assets.filter((a) => a.category === "content");
-      if (!readOnly) {
-        const drop = E8("button", void 0, "lx-tile lx-tile-add");
-        drop.type = "button";
-        drop.append(E8("b", "+"), E8("strong", "Upload media"), E8("small", "Photos, videos (MP4, MOV, WebM) and PDFs"));
-        drop.onclick = () => uploadDialog();
-        drop.ondragover = (e) => {
-          e.preventDefault();
-          drop.classList.add("is-over");
-        };
-        drop.ondragleave = () => drop.classList.remove("is-over");
-        drop.ondrop = (e) => {
-          e.preventDefault();
-          drop.classList.remove("is-over");
-          const f = e.dataTransfer?.files?.[0];
-          if (f) uploadDialog(f);
-        };
-        gallery.append(drop);
-        const pub = E8("button", void 0, "lx-tile lx-tile-add lx-tile-pub");
-        pub.type = "button";
-        pub.append(icon2("send", "lx-tile-ic"), E8("strong", "Publish to students"), E8("small", "Large video (Cloudinary, up to 100 MB), video link, news or a scheduled live"));
-        pub.onclick = () => openComposer({ api: api2, lang: "en", onDone: () => render() });
-        gallery.append(pub);
-        const feedBtn = E8("button", void 0, "lx-tile lx-tile-add lx-tile-feed");
-        feedBtn.type = "button";
-        feedBtn.append(icon2("heart", "lx-tile-ic"), E8("strong", "Student notifications"), E8("small", "See what students receive. Open a post to delete it."));
-        feedBtn.onclick = () => openNotifications({ api: api2, lang: "en", onOpenChat: openChat, onChange: () => watcher2?.refresh() });
-        gallery.append(feedBtn);
-      }
-      media.forEach((a, i) => {
-        const c = E8("figure", void 0, "lx-tile lx-tile-" + kindOf(a)), open = E8("button", void 0, "lx-tile-open");
+      libraryView(bar, gallery);
+      return;
+    }
+    bar.append(E8("p", readOnly ? "Videos and photos saved in this counsellor\u2019s Productions. Use \u2193 to download." : "Your videos (link, Vimeo, upload) and photos added from the Media library. Publish each one to all students, your students or the website.", "lx-muted"));
+    if (!readOnly) {
+      const sent = button2("Published posts", () => openNotifications({ api: api2, lang: "en", onOpenChat: openChat, onChange: () => {
+        prodCache = null;
+        watcher2?.refresh();
+      } }));
+      sent.classList.add("lx-studio-sent");
+      bar.append(sent);
+      const add2 = E8("button", void 0, "lx-tile lx-tile-add");
+      add2.type = "button";
+      add2.append(E8("b", "+"), E8("strong", "New production"), E8("small", "Paste a link, choose from Vimeo or upload a video"));
+      add2.onclick = newProduction;
+      gallery.append(add2);
+    }
+    const wait = E8("p", "Loading productions\u2026", "lx-muted lx-prod-wait");
+    gallery.append(wait);
+    listMedia(api2, owner).then((list) => {
+      prodCache = list;
+      if (!gallery.isConnected) return;
+      wait.remove();
+      const items = list.map(prodItem);
+      list.forEach((m, i) => {
+        const c = E8("figure", void 0, "lx-tile lx-tile-prod lx-tile-cloud"), open = E8("button", void 0, "lx-tile-open");
         open.type = "button";
-        open.setAttribute("aria-label", "Open " + a.original_name);
-        open.append(mediaCover(a));
-        open.onclick = () => lightbox(media, i);
+        open.setAttribute("aria-label", "Open " + m.title);
+        const cv = E8("div", void 0, "lx-media-cover lx-cover-" + (m.play === "image" ? "image" : "video"));
+        if (m.poster_url) {
+          const im = E8("img");
+          im.src = m.poster_url;
+          im.alt = "";
+          im.loading = "lazy";
+          im.referrerPolicy = "no-referrer";
+          im.onerror = () => im.remove();
+          cv.append(im);
+        } else if (m.play === "video" && m.url) {
+          const v = E8("video");
+          v.src = m.url + "#t=0.5";
+          v.muted = true;
+          v.playsInline = true;
+          v.preload = "metadata";
+          v.setAttribute("aria-hidden", "true");
+          cv.append(v);
+        }
+        if (m.play !== "image") cv.append(E8("span", "\u25B6", "lx-play"));
+        cv.append(E8("span", SRC_TAG[m.source] || "Video", "lx-cover-tag"));
+        open.append(cv);
+        open.onclick = () => viewer(items, i);
         const cap = E8("figcaption");
-        cap.append(E8("strong", a.original_name), E8("small", [{ video: "Video", image: "Image", pdf: "PDF", file: "File" }[kindOf(a)], sizeText(a.bytes)].filter(Boolean).join(" \xB7 ")));
+        cap.append(E8("strong", m.title));
+        const pubs = [...new Set((m.published || []).map((p) => p.audience))];
+        if (pubs.length) {
+          const row = E8("span", void 0, "lx-pub-row");
+          for (const a of pubs) row.append(E8("em", AUD_TAG[a] || a, "lx-pub lx-pub-" + a));
+          cap.append(row);
+        } else cap.append(E8("small", (m.play === "image" ? "Photo" : "Video") + " \xB7 not published yet"));
         c.append(open, cap);
-        if (!readOnly && kindOf(a) === "video") {
+        if (!readOnly) {
           const pb = E8("button", void 0, "lx-tile-pubbtn");
           pb.type = "button";
           pb.append(icon2("send"), E8("span", "Publish"));
-          pb.setAttribute("aria-label", "Publish " + a.original_name + " to students");
+          pb.setAttribute("aria-label", "Publish " + m.title);
           pb.onclick = (ev) => {
             ev.stopPropagation();
-            openComposer({ api: api2, lang: "en", preset: { kind: "video", asset_id: a.id, title: a.original_name.replace(/\.[^.]+$/, "") } });
+            publish(m);
           };
           c.append(pb);
-        }
-        if (!readOnly) {
           const del = E8("button", "\xD7", "lx-tile-del");
           del.type = "button";
-          del.setAttribute("aria-label", "Delete " + a.original_name);
+          del.setAttribute("aria-label", "Remove " + m.title);
           del.onclick = async (ev) => {
             ev.stopPropagation();
-            if (!confirm("Delete this media file?")) return;
+            if (!confirm("Remove from Productions? Published posts stay until you delete them in \u201CPublished posts\u201D. The original file is not deleted.")) return;
             try {
-              await api2("/api/workspace/assets/" + a.id, { method: "DELETE" });
-              await load();
+              await api2("/api/media/" + m.id, { method: "DELETE" });
+              prodCache = null;
+              render();
             } catch (error) {
               notice(error.message, true);
             }
           };
           c.append(del);
         }
+        if (m.download_url) c.append(dlIcon(m.download_url, m.title));
         gallery.append(c);
       });
-      if (!readOnly) listMedia(api2).then((list) => {
-        if (!gallery.isConnected) return;
-        for (const m of list) {
-          const c = E8("figure", void 0, "lx-tile lx-tile-video lx-tile-cloud"), open = E8("button", void 0, "lx-tile-open");
-          open.type = "button";
-          open.setAttribute("aria-label", "Open " + m.title);
-          const cv = E8("div", void 0, "lx-media-cover lx-cover-video");
-          if (m.poster_url) {
-            const im = E8("img");
-            im.src = m.poster_url;
-            im.alt = "";
-            im.loading = "lazy";
-            im.referrerPolicy = "no-referrer";
-            im.onerror = () => im.remove();
-            cv.append(im);
+      if (!list.length) empty(gallery, readOnly ? "No productions yet." : "No productions yet. Add a video link or a Vimeo video, or send files from the Media library.");
+    }).catch((e) => {
+      wait.textContent = e.message;
+    });
+  }
+  function newProduction() {
+    if (readOnly) return;
+    openComposer({ api: api2, lang: "en", mode: "production", onDone: () => {
+      prodCache = null;
+      section = "content";
+      render();
+    } });
+  }
+  async function addToProductions(a, btn3) {
+    if (btn3) btn3.disabled = true;
+    try {
+      const r = await api2("/api/media/from-asset", { method: "POST", body: JSON.stringify({ asset_id: a.id }) });
+      prodCache = null;
+      notice(r.existing ? "Already in Productions." : "Added to Productions. Open Productions to publish it.");
+      return r.data;
+    } catch (e) {
+      notice(e.message, true);
+      if (btn3) btn3.disabled = false;
+      return null;
+    }
+  }
+  function libraryView(bar, gallery) {
+    const media = assets.filter((a) => a.category === "content");
+    bar.append(E8("p", readOnly ? "Files this counsellor uploaded. Use \u2193 to download." : "Your phone gallery for MUK Talent. Tap a file to view it and add it to Productions.", "lx-muted"));
+    if (!readOnly) {
+      const drop = E8("button", void 0, "lx-tile lx-tile-add");
+      drop.type = "button";
+      drop.append(E8("b", "+"), E8("strong", "Add from your phone"), E8("small", "Select several photos and videos at once from your gallery"));
+      drop.onclick = () => pickFromPhone();
+      drop.ondragover = (e) => {
+        e.preventDefault();
+        drop.classList.add("is-over");
+      };
+      drop.ondragleave = () => drop.classList.remove("is-over");
+      drop.ondrop = (e) => {
+        e.preventDefault();
+        drop.classList.remove("is-over");
+        const fl = [...e.dataTransfer?.files || []];
+        if (fl.length) uploadMany(fl);
+      };
+      gallery.append(drop);
+    }
+    const items = media.map(assetItem), tiles = /* @__PURE__ */ new Map();
+    media.forEach((a, i) => {
+      const c = E8("figure", void 0, "lx-tile lx-tile-" + kindOf(a)), open = E8("button", void 0, "lx-tile-open");
+      open.type = "button";
+      open.setAttribute("aria-label", "Open " + a.original_name);
+      open.append(mediaCover(a));
+      open.onclick = () => viewer(items, i);
+      const cap = E8("figcaption");
+      cap.append(E8("strong", a.original_name), E8("small", [{ video: "Video", image: "Photo", pdf: "PDF", file: "File" }[kindOf(a)], sizeText(a.bytes)].filter(Boolean).join(" \xB7 ")));
+      c.append(open, cap);
+      if (!readOnly && ["video", "image"].includes(kindOf(a))) {
+        const pb = E8("button", void 0, "lx-tile-pubbtn");
+        pb.type = "button";
+        pb.append(E8("span", "+ Productions"));
+        pb.setAttribute("aria-label", "Add " + a.original_name + " to Productions");
+        pb.onclick = async (ev) => {
+          ev.stopPropagation();
+          if (await addToProductions(a, pb)) {
+            pb.replaceChildren(E8("span", "In Productions"));
+            pb.classList.add("is-done");
           }
-          cv.append(E8("span", m.play === "video" ? "Cloudinary" : m.play === "vimeo" ? "Vimeo" : m.play === "youtube" ? "YouTube" : "Link", "lx-cover-tag"));
-          open.append(cv);
-          open.onclick = () => openPost({ id: m.id, kind: "video", title: m.title, url: m.url, poster: m.poster_url, play: m.play, embed: m.embed, at: m.created_at, author: "Library" }, { lang: "en" });
-          const cap = E8("figcaption");
-          cap.append(E8("strong", m.title), E8("small", (m.play === "video" ? "Cloudinary video" : m.play === "vimeo" ? "Vimeo video" : m.play === "youtube" ? "YouTube video" : "Video link") + (m.bytes ? " \xB7 " + sizeText(m.bytes) : "")));
-          const pb = E8("button", void 0, "lx-tile-pubbtn");
-          pb.type = "button";
-          pb.append(icon2("send"), E8("span", "Publish"));
-          pb.onclick = (ev) => {
-            ev.stopPropagation();
-            openComposer({ api: api2, lang: "en", preset: { kind: "video", media_id: m.id, title: m.title } });
-          };
-          const del = E8("button", "\xD7", "lx-tile-del");
-          del.type = "button";
-          del.setAttribute("aria-label", "Delete " + m.title);
-          del.onclick = async (ev) => {
-            ev.stopPropagation();
-            if (!confirm("Remove this video from your library? (The file stays in Cloudinary.)")) return;
-            try {
-              await api2("/api/media/" + m.id, { method: "DELETE" });
-              render();
-            } catch (error) {
-              notice(error.message, true);
-            }
-          };
-          c.append(open, cap, pb, del);
-          gallery.append(c);
-        }
-      });
-      if (!media.length && readOnly) empty(gallery, "No media uploaded yet.");
+        };
+        c.append(pb);
+        tiles.set(a.id, pb);
+      }
+      if (!readOnly) {
+        const del = E8("button", "\xD7", "lx-tile-del");
+        del.type = "button";
+        del.setAttribute("aria-label", "Delete " + a.original_name);
+        del.onclick = async (ev) => {
+          ev.stopPropagation();
+          if (!confirm("Delete this file from your library?")) return;
+          try {
+            await api2("/api/workspace/assets/" + a.id, { method: "DELETE" });
+            await load();
+          } catch (error) {
+            notice(error.message, true);
+          }
+        };
+        c.append(del);
+      }
+      if (a.download_url || a.url) c.append(dlIcon(a.download_url || a.url, a.original_name));
+      gallery.append(c);
+    });
+    if (!readOnly && tiles.size) (prodCache ? Promise.resolve(prodCache) : listMedia(api2)).then((list) => {
+      prodCache = list;
+      for (const m of list) if (m.asset_id && tiles.has(m.asset_id)) {
+        const b = tiles.get(m.asset_id);
+        b.replaceChildren(E8("span", "In Productions"));
+        b.classList.add("is-done");
+        b.disabled = true;
+      }
+    });
+    if (!media.length) empty(gallery, readOnly ? "No media uploaded yet." : "Your library is empty. Add photos and videos from your phone.");
+  }
+  function pickFromPhone() {
+    if (readOnly) return;
+    const input = E8("input");
+    input.type = "file";
+    input.multiple = true;
+    input.accept = "image/*,video/*,application/pdf,.mov,.mp4,.webm";
+    input.hidden = true;
+    root.append(input);
+    input.onchange = () => {
+      const fl = [...input.files || []];
+      input.remove();
+      if (fl.length) uploadMany(fl);
+    };
+    let granted = false;
+    try {
+      granted = localStorage.getItem("muk-gallery-ok") === "1";
+    } catch {
+    }
+    if (granted) {
+      input.click();
       return;
     }
-    const items = records("content");
-    for (const r of items) {
-      const c = E8("article", void 0, "lx-media-card"), asset = assets.find((a) => a.id === r.payload.asset_id && a.category === "content");
-      const cover = mediaCover(asset, r.payload.format);
-      if (asset?.url) {
-        const ob = E8("button", void 0, "lx-tile-open");
-        ob.type = "button";
-        ob.setAttribute("aria-label", "Open media");
-        ob.append(cover);
-        ob.onclick = () => lightbox([asset], 0);
-        c.append(ob);
-      } else c.append(cover);
-      c.append(E8("span", r.status, "lx-tag"), E8("h3", r.title), E8("p", [r.payload.platform, r.payload.format, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E8("p", (r.payload.caption || r.payload.notes || "").slice(0, 180), "lx-media-caption"));
-      for (const [key, label2] of [["asset_url", "Open asset"], ["publication_url", "View publication"]]) if (/^https:\/\//i.test(r.payload[key] || "")) {
-        const a = E8("a", label2, "lx-link");
-        a.href = r.payload[key];
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        c.append(a);
+    const d = E8("dialog", void 0, "lx-dialog lx-perm");
+    d.lang = "en";
+    const ic = E8("div", void 0, "lx-perm-ic");
+    ic.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/></svg>';
+    const ok = E8("button", "Allow access", "lx-button lx-primary"), no = button2("Not now", () => {
+      d.close();
+      input.remove();
+    });
+    ok.type = "button";
+    ok.onclick = () => {
+      try {
+        localStorage.setItem("muk-gallery-ok", "1");
+      } catch {
       }
-      if (!readOnly) c.append(button2("Open production", () => edit("content", r)));
-      else c.append(E8("p", r.payload.caption || "", "lx-muted"));
-      gallery.append(c);
-    }
-    if (!items.length) empty(gallery, "Create your first production. Attach a photo or video from your library.");
+      d.close();
+      input.click();
+    };
+    const row = E8("div", void 0, "lx-perm-row");
+    row.append(no, ok);
+    d.append(ic, E8("h2", "Access your photo gallery"), E8("p", "MUK Talent will open your phone\u2019s gallery so you can choose photos and videos for your library. Only the files you select are uploaded, privately, to your workspace. We ask only this once.", "lx-muted"), row);
+    d.onclose = () => d.remove();
+    root.append(d);
+    d.showModal();
+  }
+  function uploadMany(files) {
+    if (readOnly || dialogBusy) return;
+    const d = E8("dialog", void 0, "lx-dialog lx-queue");
+    d.lang = "en";
+    const list = E8("ol", void 0, "lx-queue-list"), msg = E8("p", "", "lx-muted"), close = button2("Close", () => {
+      if (!dialogBusy) d.close();
+    });
+    d.append(E8("h2", "Uploading " + files.length + " file" + (files.length > 1 ? "s" : "")), list, msg, close);
+    d.oncancel = (e) => {
+      if (dialogBusy) e.preventDefault();
+    };
+    d.onclose = () => d.remove();
+    root.append(d);
+    d.showModal();
+    const rows = files.map((f) => {
+      const li = E8("li"), bar = E8("div", void 0, "lx-progress"), fill2 = E8("i"), st = E8("small", "Waiting");
+      bar.append(fill2);
+      li.append(E8("strong", f.name), st, bar);
+      list.append(li);
+      return { f, fill: fill2, st, li };
+    });
+    (async () => {
+      dialogBusy = true;
+      close.disabled = true;
+      let ok = 0;
+      for (const r of rows) {
+        try {
+          await uploadOne(r.f, (p) => {
+            r.fill.style.width = Math.max(4, Math.round(p * 100)) + "%";
+            r.st.textContent = Math.round(p * 100) + "%";
+          });
+          r.fill.style.width = "100%";
+          r.st.textContent = "Uploaded";
+          r.li.classList.add("is-ok");
+          ok++;
+        } catch (e) {
+          r.st.textContent = e.message || "Upload interrupted.";
+          r.li.classList.add("is-error");
+        }
+      }
+      dialogBusy = false;
+      close.disabled = false;
+      msg.textContent = ok + " of " + rows.length + " uploaded.";
+      section = "library";
+      await load();
+      if (ok === rows.length) setTimeout(() => d.isConnected && d.close(), 900);
+      notice(ok ? "Added to your library." : "Nothing was uploaded.", !ok);
+    })();
+  }
+  async function uploadOne(asset, onProgress) {
+    const mime = fileMime(asset);
+    if (!ACCEPT.includes(mime)) throw Error("Format not supported (use JPG, PNG, WebP, PDF, MP4, MOV or WebM).");
+    const max = mime.startsWith("video/") ? VIDEO_MAX : FILE_MAX;
+    if (asset.size > max) throw Error(mime.startsWith("video/") ? "Videos up to 50 MB. For longer videos use Vimeo in Productions." : "Files up to 10 MB.");
+    const started = await api2("/api/workspace/assets/start", { method: "POST", body: JSON.stringify({ category: "content", name: asset.name, mime, bytes: asset.size }) });
+    await putWithProgress(null, started, asset, mime, onProgress);
+    await api2("/api/workspace/assets/finish", { method: "POST", body: JSON.stringify({ id: started.id }) });
   }
   function mediaCover(asset, format = "Creative") {
     const k = kindOf(asset), cover = E8("div", void 0, "lx-media-cover lx-cover-" + k);
@@ -25268,6 +25489,9 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     return cover;
   }
   function lightbox(list, start) {
+    viewer(list.map(assetItem), start);
+  }
+  function viewer(list, start) {
     let i = start;
     const d = E8("dialog", void 0, "lx-lightbox");
     d.lang = "en";
@@ -25279,16 +25503,14 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     prev.type = next.type = "button";
     prev.setAttribute("aria-label", "Previous");
     next.setAttribute("aria-label", "Next");
-    const dl = E8("a", "Download", "lx-lb-dl");
-    dl.target = "_blank";
-    dl.rel = "noopener noreferrer";
-    const info = E8("div");
+    const acts = E8("div", void 0, "lx-lb-acts"), info = E8("div");
     info.append(title2, count);
-    bar.append(info, dl, close);
+    bar.append(info, acts, close);
     const show = () => {
-      const a = list[i], k = kindOf(a);
+      const a = list[i], k = a.kind;
       stage.querySelectorAll("video").forEach((v) => v.pause());
       stage.replaceChildren();
+      acts.replaceChildren();
       if (k === "video") {
         const v = E8("video");
         v.src = a.url;
@@ -25296,25 +25518,70 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         v.playsInline = true;
         v.autoplay = true;
         v.preload = "auto";
+        if (a.poster) v.poster = a.poster;
         stage.append(v);
       } else if (k === "image") {
         const im = E8("img");
         im.src = a.url;
-        im.alt = a.original_name;
+        im.alt = a.name;
         stage.append(im);
+      } else if (k === "embed") {
+        const fr = E8("iframe", void 0, "lx-lb-embed");
+        fr.src = a.embed;
+        fr.title = a.name;
+        fr.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
+        fr.allowFullscreen = true;
+        fr.referrerPolicy = "strict-origin-when-cross-origin";
+        stage.append(fr);
       } else {
         const box = E8("div", void 0, "lx-lb-file");
-        box.append(E8("b", k === "pdf" ? "PDF" : "FILE"), E8("p", a.original_name));
-        const o = E8("a", "Open document", "lx-button lx-primary");
+        box.append(E8("b", k === "pdf" ? "PDF" : k === "link" ? "LINK" : "FILE"), E8("p", a.name));
+        const o = E8("a", k === "pdf" ? "Open document" : "Open", "lx-button lx-primary");
         o.href = a.url;
         o.target = "_blank";
         o.rel = "noopener noreferrer";
         box.append(o);
         stage.append(box);
       }
-      title2.textContent = a.original_name;
+      if (!readOnly && a.asset && ["video", "image"].includes(k)) {
+        const add2 = E8("button", "+ Add to Productions", "lx-lb-dl lx-lb-add");
+        add2.type = "button";
+        const inProd = (prodCache || []).some((m) => m.asset_id === a.asset.id);
+        if (inProd) {
+          add2.textContent = "In Productions";
+          add2.disabled = true;
+        }
+        add2.onclick = async () => {
+          if (await addToProductions(a.asset, add2)) {
+            add2.textContent = "In Productions \u2713";
+            add2.disabled = true;
+          }
+        };
+        acts.append(add2);
+      }
+      if (!readOnly && a.media) {
+        const pb = E8("button", "Publish", "lx-lb-dl lx-lb-add");
+        pb.type = "button";
+        pb.onclick = () => {
+          d.close();
+          publish(a.media);
+        };
+        acts.append(pb);
+      }
+      if (a.download) {
+        const dl = E8("a", "Download", "lx-lb-dl");
+        dl.href = a.download;
+        dl.setAttribute("download", a.name || "");
+        acts.append(dl);
+      } else if (k === "embed" || k === "link") {
+        const op = E8("a", a.media?.source === "vimeo" ? "Open on Vimeo" : a.media?.source === "youtube" ? "Open on YouTube" : "Open link", "lx-lb-dl");
+        op.href = a.media?.url || a.url;
+        op.target = "_blank";
+        op.rel = "noopener noreferrer";
+        acts.append(op);
+      }
+      title2.textContent = a.name;
       count.textContent = list.length > 1 ? i + 1 + " / " + list.length : sizeText(a.bytes);
-      dl.href = a.url;
       prev.hidden = next.hidden = list.length < 2;
     };
     prev.onclick = () => {
@@ -25356,101 +25623,6 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     if (f.type) return f.type;
     const x = (f.name.split(".").pop() || "").toLowerCase();
     return { mp4: "video/mp4", m4v: "video/mp4", mov: "video/quicktime", webm: "video/webm", jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", pdf: "application/pdf" }[x] || "";
-  }
-  function uploadDialog(preset = null) {
-    const d = E8("dialog", void 0, "lx-dialog lx-upload");
-    d.lang = "en";
-    const f = E8("form"), file = E8("input");
-    file.type = "file";
-    file.accept = ACCEPT.join(",") + ",.mov,.mp4,.webm";
-    file.id = "lxUploadFile";
-    file.className = "lx-upload-input";
-    file.setAttribute("aria-label", "Select media file");
-    const zone = E8("label", void 0, "lx-upload-zone");
-    zone.htmlFor = "lxUploadFile";
-    zone.append(E8("b", "+"), E8("strong", "Choose from your phone or computer"), E8("small", "Photos (JPG, PNG, WebP) and PDFs up to 10 MB \xB7 Videos (MP4, MOV, WebM) up to 50 MB"));
-    const chosen = E8("p", "", "lx-upload-chosen"), bar = E8("div", void 0, "lx-progress"), fill2 = E8("i");
-    bar.append(fill2);
-    bar.hidden = true;
-    const msg = E8("p", "", "lx-muted"), send = E8("button", "Upload to library", "lx-button lx-primary");
-    send.type = "submit";
-    const close = button2("Close", () => {
-      if (!dialogBusy) d.remove();
-    });
-    f.append(E8("h2", "Upload media"), file, zone, chosen, bar, msg, send, close);
-    d.append(f);
-    root.append(d);
-    d.showModal();
-    d.oncancel = (e) => {
-      if (dialogBusy) e.preventDefault();
-    };
-    d.onclose = () => d.remove();
-    let picked = preset;
-    const describe = () => {
-      chosen.textContent = picked ? picked.name + " \xB7 " + sizeText(picked.size) : "";
-      msg.textContent = "";
-    };
-    describe();
-    file.onchange = () => {
-      picked = file.files[0] || null;
-      describe();
-    };
-    zone.ondragover = (e) => {
-      e.preventDefault();
-      zone.classList.add("is-over");
-    };
-    zone.ondragleave = () => zone.classList.remove("is-over");
-    zone.ondrop = (e) => {
-      e.preventDefault();
-      zone.classList.remove("is-over");
-      picked = e.dataTransfer?.files?.[0] || null;
-      describe();
-    };
-    f.onsubmit = async (e) => {
-      e.preventDefault();
-      if (dialogBusy) return;
-      const asset = picked;
-      if (!asset) {
-        msg.textContent = "Choose a file.";
-        return;
-      }
-      const mime = fileMime(asset);
-      if (!ACCEPT.includes(mime)) {
-        msg.textContent = "This format is not supported. Use JPG, PNG, WebP, PDF, MP4, MOV or WebM.";
-        return;
-      }
-      const max = mime.startsWith("video/") ? VIDEO_MAX : FILE_MAX;
-      if (asset.size > max) {
-        msg.textContent = mime.startsWith("video/") ? 'Videos can be up to 50 MB. On iPhone, choose "Most compatible" or shorten the clip.' : "Files can be up to 10 MB.";
-        return;
-      }
-      dialogBusy = true;
-      send.disabled = close.disabled = true;
-      bar.hidden = false;
-      fill2.style.width = "4%";
-      msg.textContent = "Preparing upload\u2026";
-      try {
-        const started = await api2("/api/workspace/assets/start", { method: "POST", body: JSON.stringify({ category: "content", name: asset.name, mime, bytes: asset.size }) });
-        msg.textContent = "Uploading\u2026";
-        await putWithProgress(started.signedUrl || null, started, asset, mime, (p) => {
-          fill2.style.width = Math.max(4, Math.round(p * 100)) + "%";
-        });
-        fill2.style.width = "100%";
-        msg.textContent = "Checking file\u2026";
-        await api2("/api/workspace/assets/finish", { method: "POST", body: JSON.stringify({ id: started.id }) });
-        d.remove();
-        section = "library";
-        tabs.studio = "library";
-        await load();
-        notice("Uploaded to your library.");
-      } catch (error) {
-        msg.textContent = error.message || "Upload interrupted.";
-        bar.hidden = true;
-      } finally {
-        dialogBusy = false;
-        send.disabled = close.disabled = false;
-      }
-    };
   }
   async function putWithProgress(_unused, started, asset, mime, onProgress) {
     const r = await fetch("/api/public-config", { cache: "no-store" }), cfg = await r.json();
@@ -27307,6 +27479,148 @@ function mountAdminSoft({ api: api2, getState, navigate: navigate2 }) {
   }).observe(metrics, { childList: true });
 }
 
+// admin-src/install-app.js
+var KEY2 = "muk-app-installed";
+var SNOOZE = "muk-app-snooze";
+var deferred = null;
+var isStandalone = () => matchMedia("(display-mode: standalone)").matches || matchMedia("(display-mode: minimal-ui)").matches || navigator.standalone === true;
+var isPhone = () => matchMedia("(pointer:coarse)").matches && Math.min(screen.width, screen.height) < 820;
+var ios = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1;
+var mark = () => {
+  try {
+    localStorage.setItem(KEY2, "1");
+  } catch {
+  }
+  document.getElementById("mukInstall")?.remove();
+};
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferred = e;
+  });
+  window.addEventListener("appinstalled", mark);
+  if (isStandalone()) {
+    try {
+      localStorage.setItem(KEY2, "1");
+    } catch {
+    }
+  }
+}
+var TX3 = {
+  en: { t: "Install the MUK Talent app", s: "Open your space in one tap, full screen, like any other app.", go: "Install app", later: "Not now", iosT: "Add MUK Talent to your Home Screen", ios1: "Tap the Share button", ios2: "Choose \u201CAdd to Home Screen\u201D", ios3: "Tap \u201CAdd\u201D", andT: "Install from your browser menu", and1: "Open the browser menu \u22EE", and2: "Choose \u201CInstall app\u201D or \u201CAdd to Home screen\u201D", ok: "Got it" },
+  fr: { t: "Installez l\u2019application MUK Talent", s: "Ouvrez votre espace en un geste, en plein \xE9cran, comme une application.", go: "Installer l\u2019app", later: "Plus tard", iosT: "Ajoutez MUK Talent \xE0 l\u2019\xE9cran d\u2019accueil", ios1: "Touchez le bouton Partager", ios2: "Choisissez \xAB Sur l\u2019\xE9cran d\u2019accueil \xBB", ios3: "Touchez \xAB Ajouter \xBB", andT: "Installez depuis le menu du navigateur", and1: "Ouvrez le menu du navigateur \u22EE", and2: "Choisissez \xAB Installer l\u2019application \xBB ou \xAB Ajouter \xE0 l\u2019\xE9cran d\u2019accueil \xBB", ok: "Compris" },
+  es: { t: "Instala la app de MUK Talent", s: "Abre tu espacio con un toque, a pantalla completa, como cualquier app.", go: "Instalar app", later: "Ahora no", iosT: "A\xF1ade MUK Talent a tu pantalla de inicio", ios1: "Toca el bot\xF3n Compartir", ios2: "Elige \xABA\xF1adir a pantalla de inicio\xBB", ios3: "Toca \xABA\xF1adir\xBB", andT: "Instala desde el men\xFA del navegador", and1: "Abre el men\xFA del navegador \u22EE", and2: "Elige \xABInstalar aplicaci\xF3n\xBB o \xABA\xF1adir a pantalla de inicio\xBB", ok: "Entendido" },
+  ar: { t: "\u062B\u0628\u0651\u062A \u062A\u0637\u0628\u064A\u0642 MUK Talent", s: "\u0627\u0641\u062A\u062D \u0645\u0633\u0627\u062D\u062A\u0643 \u0628\u0644\u0645\u0633\u0629 \u0648\u0627\u062D\u062F\u0629 \u0648\u0628\u0645\u0644\u0621 \u0627\u0644\u0634\u0627\u0634\u0629 \u0645\u062B\u0644 \u0623\u064A \u062A\u0637\u0628\u064A\u0642.", go: "\u062A\u062B\u0628\u064A\u062A \u0627\u0644\u062A\u0637\u0628\u064A\u0642", later: "\u0644\u064A\u0633 \u0627\u0644\u0622\u0646", iosT: "\u0623\u0636\u0641 MUK Talent \u0625\u0644\u0649 \u0627\u0644\u0634\u0627\u0634\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629", ios1: "\u0627\u0644\u0645\u0633 \u0632\u0631 \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629", ios2: "\u0627\u062E\u062A\u0631 \xAB\u0625\u0636\u0627\u0641\u0629 \u0625\u0644\u0649 \u0627\u0644\u0634\u0627\u0634\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629\xBB", ios3: "\u0627\u0644\u0645\u0633 \xAB\u0625\u0636\u0627\u0641\u0629\xBB", andT: "\u062B\u0628\u0651\u062A \u0645\u0646 \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0645\u062A\u0635\u0641\u062D", and1: "\u0627\u0641\u062A\u062D \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0645\u062A\u0635\u0641\u062D \u22EE", and2: "\u0627\u062E\u062A\u0631 \xAB\u062A\u062B\u0628\u064A\u062A \u0627\u0644\u062A\u0637\u0628\u064A\u0642\xBB \u0623\u0648 \xAB\u0625\u0636\u0627\u0641\u0629 \u0625\u0644\u0649 \u0627\u0644\u0634\u0627\u0634\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629\xBB", ok: "\u062D\u0633\u0646\u064B\u0627" }
+};
+var E10 = (t2, v, c) => {
+  const n = document.createElement(t2);
+  if (v !== void 0) n.textContent = String(v);
+  if (c) n.className = c;
+  return n;
+};
+function css() {
+  if (document.getElementById("mukInstallCss")) return;
+  const s = E10("style");
+  s.id = "mukInstallCss";
+  s.textContent = `.mki{position:fixed;z-index:9500;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));display:grid;gap:12px;padding:16px;border-radius:22px;background:#0d2224;color:#f7f1e3;border:1px solid rgba(201,164,92,.4);box-shadow:0 24px 60px -20px rgba(4,16,17,.7);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;transform:translateY(130%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.mki.in{transform:none}.mki-top{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center}.mki img{width:52px;height:52px;border-radius:14px;display:block}
+.mki strong{display:block;font-size:15.5px}.mki p{margin:2px 0 0;color:#a9bfb8;font-size:13px}.mki-x{width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#c9d8d2;font-size:20px;line-height:1;cursor:pointer}
+.mki-row{display:flex;gap:10px}.mki-row button{flex:1;min-height:46px;border-radius:14px;border:1px solid rgba(233,240,236,.18);background:transparent;color:#f7f1e3;font:inherit;font-weight:650;cursor:pointer}
+.mki-row .mki-go{background:#c9a45c;border-color:#c9a45c;color:#0d2224}.mki ol{margin:0;padding:0;list-style:none;display:grid;gap:8px}.mki li{display:flex;gap:10px;align-items:center;color:#e9f0ec}
+.mki li b{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(201,164,92,.18);color:#e2c07a;font-size:12px}.mki li svg{width:18px;height:18px;fill:none;stroke:#e2c07a;stroke-width:2;vertical-align:-3px}
+.mki button:focus-visible{outline:2px solid #c9a45c;outline-offset:2px}@media(min-width:700px){.mki{left:auto;right:20px;width:380px}}@media(prefers-reduced-motion:reduce){.mki{transition:none}}`;
+  document.head.append(s);
+}
+function offerInstall({ lang: lang2 = "en" } = {}) {
+  try {
+    if (isStandalone()) {
+      mark();
+      return;
+    }
+    if (localStorage.getItem(KEY2) === "1" || sessionStorage.getItem(SNOOZE) === "1" || !isPhone() || document.getElementById("mukInstall")) return;
+  } catch {
+    return;
+  }
+  const L = TX3[lang2] || TX3.en;
+  const show = () => {
+    css();
+    const box = E10("section", void 0, "mki");
+    box.id = "mukInstall";
+    box.setAttribute("role", "dialog");
+    box.setAttribute("aria-label", L.t);
+    box.lang = lang2;
+    if (lang2 === "ar") box.dir = "rtl";
+    const top = E10("div", void 0, "mki-top"), img = E10("img");
+    img.src = "/icon-192.png";
+    img.alt = "";
+    const txt = E10("div");
+    txt.append(E10("strong", L.t), E10("p", L.s));
+    const x = E10("button", "\xD7", "mki-x");
+    x.type = "button";
+    x.setAttribute("aria-label", L.later);
+    top.append(img, txt, x);
+    box.append(top);
+    const row = E10("div", void 0, "mki-row"), later = E10("button", L.later), go = E10("button", L.go, "mki-go");
+    later.type = go.type = "button";
+    row.append(later, go);
+    box.append(row);
+    const close = () => {
+      try {
+        sessionStorage.setItem(SNOOZE, "1");
+      } catch {
+      }
+      box.classList.remove("in");
+      setTimeout(() => box.remove(), 350);
+    };
+    x.onclick = later.onclick = close;
+    const steps = (title, items) => {
+      txt.replaceChildren(E10("strong", title));
+      const ol = E10("ol");
+      items.forEach((t2, i) => {
+        const li = E10("li");
+        li.append(E10("b", i + 1));
+        const sp = E10("span", t2);
+        if (i === 0 && ios()) sp.insertAdjacentHTML("beforeend", ' <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>');
+        li.append(sp);
+        ol.append(li);
+      });
+      row.before(ol);
+      go.remove();
+      later.textContent = L.ok;
+      later.onclick = close;
+    };
+    go.onclick = async () => {
+      if (deferred) {
+        go.disabled = true;
+        try {
+          deferred.prompt();
+          const r = await deferred.userChoice;
+          deferred = null;
+          if (r?.outcome === "accepted") mark();
+          else close();
+        } catch {
+          close();
+        }
+        return;
+      }
+      if (ios()) steps(L.iosT, [L.ios1, L.ios2, L.ios3]);
+      else steps(L.andT, [L.and1, L.and2]);
+    };
+    document.body.append(box);
+    requestAnimationFrame(() => requestAnimationFrame(() => box.classList.add("in")));
+  };
+  const check = navigator.getInstalledRelatedApps ? navigator.getInstalledRelatedApps().then((a) => {
+    if (a?.length) {
+      mark();
+      return false;
+    }
+    return true;
+  }).catch(() => true) : Promise.resolve(true);
+  check.then((okToShow) => {
+    if (okToShow) setTimeout(show, 1200);
+  });
+}
+
 // admin-src/app.js
 var $2 = (id) => document.getElementById(id);
 var state = { client: null, session: null, staff: null, config: null, section: "overview", page: 1, total: 0, epoch: 0, listRequest: 0, detailRequest: 0, relatedRequest: 0, busy: false, loading: false, detail: null, dirty: false, related: "notes", relatedPage: 1, staffOptions: [] };
@@ -27955,6 +28269,7 @@ async function enter(session) {
       resetLogin();
       startMatrix();
     } });
+    offerInstall({ lang: gateLang() });
     return;
   }
   state.staff = (await api("/api/me")).staff;
@@ -27980,6 +28295,7 @@ async function enter(session) {
         showLoginMessage("Signed out.", "ok");
       }
     });
+    offerInstall({ lang: "en" });
     return;
   }
   state.config = await api("/api/admin-config");

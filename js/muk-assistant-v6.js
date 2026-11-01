@@ -6,10 +6,10 @@ const d=document.documentElement,V="6.0.0",KEY="muk-assistant-v6",TEASE="muk-ass
 const LANGS=["fr","en","es","ar"],VOICE={fr:"fr-FR",en:"en-GB",es:"es-ES",ar:"ar-SA"},REC={fr:"fr-FR",en:"en-GB",es:"es-ES",ar:"ar-MA"};
 const lang=()=>{const l=(window.MUKSite&&window.MUKSite.lang)||(d.lang||"fr").slice(0,2);return LANGS.includes(l)?l:"fr";};
 const UI={
- fr:{title:"Assistant MUK Talent",sub:"Écrire ou parler",open:"Ouvrir l’assistant",close:"Fermer l’assistant",reset:"Nouvelle conversation",call:"Appel vocal",ph:"Posez votre question…",send:"Envoyer",mic:"Dicter votre question",micStop:"Arrêter la dictée",listen:"Écouter la réponse",stop:"Arrêter la lecture",typing:"L’assistant écrit…",teaser:"Une question sur vos études au Royaume-Uni ?",teaserClose:"Masquer",disc:"Assistant automatique : il peut se tromper. Ne partagez pas de données sensibles.",privacy:"Confidentialité",micDenied:"Le micro n’est pas autorisé. Vous pouvez écrire votre question.",callTitle:"Appel avec l’assistant",callHello:"Je vous écoute. Posez votre question.",callListening:"Je vous écoute…",callThinking:"Je réfléchis…",callSpeaking:"Je réponds…",callPaused:"Micro en pause",callUnsupported:"La voix n’est pas disponible dans ce navigateur. Essayez Chrome, Edge ou Safari, ou réservez un échange avec un conseiller.",callEnd:"Raccrocher",callMute:"Couper le micro",callUnmute:"Réactiver le micro",book:"Réserver une visio avec un conseiller",phone:"Appeler un conseiller",suggest:"Suggestions",you:"Vous",bot:"Assistant",live:"IA"},
- en:{title:"MUK Talent assistant",sub:"Type or talk",open:"Open the assistant",close:"Close the assistant",reset:"New conversation",call:"Voice call",ph:"Ask your question…",send:"Send",mic:"Dictate your question",micStop:"Stop dictation",listen:"Listen to the answer",stop:"Stop reading",typing:"The assistant is typing…",teaser:"A question about studying in the UK?",teaserClose:"Hide",disc:"Automated assistant: it may make mistakes. Do not share sensitive data.",privacy:"Privacy",micDenied:"Microphone access is blocked. You can type your question.",callTitle:"Call with the assistant",callHello:"I’m listening. Ask your question.",callListening:"Listening…",callThinking:"Thinking…",callSpeaking:"Answering…",callPaused:"Microphone paused",callUnsupported:"Voice is not available in this browser. Try Chrome, Edge or Safari, or book a call with an adviser.",callEnd:"Hang up",callMute:"Mute microphone",callUnmute:"Unmute microphone",book:"Book a video call with an adviser",phone:"Call an adviser",suggest:"Suggestions",you:"You",bot:"Assistant",live:"AI"},
- es:{title:"Asistente MUK Talent",sub:"Escribe o habla",open:"Abrir el asistente",close:"Cerrar el asistente",reset:"Nueva conversación",call:"Llamada de voz",ph:"Escribe tu pregunta…",send:"Enviar",mic:"Dictar tu pregunta",micStop:"Detener el dictado",listen:"Escuchar la respuesta",stop:"Detener la lectura",typing:"El asistente está escribiendo…",teaser:"¿Una pregunta sobre estudiar en el Reino Unido?",teaserClose:"Ocultar",disc:"Asistente automático: puede equivocarse. No compartas datos sensibles.",privacy:"Privacidad",micDenied:"El micrófono no está autorizado. Puedes escribir tu pregunta.",callTitle:"Llamada con el asistente",callHello:"Te escucho. Haz tu pregunta.",callListening:"Te escucho…",callThinking:"Pensando…",callSpeaking:"Respondiendo…",callPaused:"Micrófono en pausa",callUnsupported:"La voz no está disponible en este navegador. Prueba Chrome, Edge o Safari, o reserva una cita con un asesor.",callEnd:"Colgar",callMute:"Silenciar micrófono",callUnmute:"Activar micrófono",book:"Reservar una videollamada con un asesor",phone:"Llamar a un asesor",suggest:"Sugerencias",you:"Tú",bot:"Asistente",live:"IA"},
- ar:{title:"مساعد MUK Talent",sub:"اكتب أو تحدث",open:"فتح المساعد",close:"إغلاق المساعد",reset:"محادثة جديدة",call:"مكالمة صوتية",ph:"اكتب سؤالك…",send:"إرسال",mic:"إملاء سؤالك",micStop:"إيقاف الإملاء",listen:"الاستماع إلى الإجابة",stop:"إيقاف القراءة",typing:"المساعد يكتب…",teaser:"هل لديك سؤال عن الدراسة في المملكة المتحدة؟",teaserClose:"إخفاء",disc:"مساعد آلي: قد يخطئ. لا تشارك بيانات حساسة.",privacy:"الخصوصية",micDenied:"الميكروفون غير مسموح. يمكنك كتابة سؤالك.",callTitle:"مكالمة مع المساعد",callHello:"أنا أستمع إليك. اطرح سؤالك.",callListening:"أستمع إليك…",callThinking:"أفكر…",callSpeaking:"أجيب…",callPaused:"الميكروفون متوقف",callUnsupported:"الصوت غير متاح في هذا المتصفح. جرّب Chrome أو Edge أو Safari، أو احجز موعدًا مع مستشار.",callEnd:"إنهاء المكالمة",callMute:"كتم الميكروفون",callUnmute:"تشغيل الميكروفون",book:"حجز مكالمة فيديو مع مستشار",phone:"الاتصال بمستشار",suggest:"اقتراحات",you:"أنت",bot:"المساعد",live:"ذكاء اصطناعي"}
+ fr:{title:"Assistant MUK Talent",sub:"Écrire ou parler",open:"Ouvrir l’assistant",close:"Fermer l’assistant",reset:"Nouvelle conversation",call:"Appel vocal",ph:"Posez votre question…",send:"Envoyer",mic:"Dicter votre question",micStop:"Arrêter la dictée",listen:"Écouter la réponse",stop:"Arrêter la lecture",typing:"L’assistant écrit…",teaser:"Une question sur vos études au Royaume-Uni ?",teaserClose:"Masquer",disc:"Assistant automatique : il peut se tromper. Ne partagez pas de données sensibles.",privacy:"Confidentialité",micDenied:"Le micro n’est pas autorisé. Vous pouvez écrire votre question.",callTitle:"Appel avec l’assistant",callHello:"Je vous écoute. Posez votre question.",callListening:"Je vous écoute…",callThinking:"Je réfléchis…",callSpeaking:"Je réponds…",callPaused:"Micro en pause",callTap:"Touchez le cercle pour parler",noHear:"Je n’ai rien entendu. Réessayez en parlant près du micro.",callUnsupported:"La voix n’est pas disponible dans ce navigateur. Essayez Chrome, Edge ou Safari, ou réservez un échange avec un conseiller.",callEnd:"Raccrocher",callMute:"Couper le micro",callUnmute:"Réactiver le micro",book:"Réserver une visio avec un conseiller",phone:"Appeler un conseiller",suggest:"Suggestions",you:"Vous",bot:"Assistant",live:"IA"},
+ en:{title:"MUK Talent assistant",sub:"Type or talk",open:"Open the assistant",close:"Close the assistant",reset:"New conversation",call:"Voice call",ph:"Ask your question…",send:"Send",mic:"Dictate your question",micStop:"Stop dictation",listen:"Listen to the answer",stop:"Stop reading",typing:"The assistant is typing…",teaser:"A question about studying in the UK?",teaserClose:"Hide",disc:"Automated assistant: it may make mistakes. Do not share sensitive data.",privacy:"Privacy",micDenied:"Microphone access is blocked. You can type your question.",callTitle:"Call with the assistant",callHello:"I’m listening. Ask your question.",callListening:"Listening…",callThinking:"Thinking…",callSpeaking:"Answering…",callPaused:"Microphone paused",callTap:"Tap the circle to speak",noHear:"I didn’t hear anything. Try again, speaking close to the microphone.",callUnsupported:"Voice is not available in this browser. Try Chrome, Edge or Safari, or book a call with an adviser.",callEnd:"Hang up",callMute:"Mute microphone",callUnmute:"Unmute microphone",book:"Book a video call with an adviser",phone:"Call an adviser",suggest:"Suggestions",you:"You",bot:"Assistant",live:"AI"},
+ es:{title:"Asistente MUK Talent",sub:"Escribe o habla",open:"Abrir el asistente",close:"Cerrar el asistente",reset:"Nueva conversación",call:"Llamada de voz",ph:"Escribe tu pregunta…",send:"Enviar",mic:"Dictar tu pregunta",micStop:"Detener el dictado",listen:"Escuchar la respuesta",stop:"Detener la lectura",typing:"El asistente está escribiendo…",teaser:"¿Una pregunta sobre estudiar en el Reino Unido?",teaserClose:"Ocultar",disc:"Asistente automático: puede equivocarse. No compartas datos sensibles.",privacy:"Privacidad",micDenied:"El micrófono no está autorizado. Puedes escribir tu pregunta.",callTitle:"Llamada con el asistente",callHello:"Te escucho. Haz tu pregunta.",callListening:"Te escucho…",callThinking:"Pensando…",callSpeaking:"Respondiendo…",callPaused:"Micrófono en pausa",callTap:"Toca el círculo para hablar",noHear:"No he oído nada. Inténtalo de nuevo hablando cerca del micrófono.",callUnsupported:"La voz no está disponible en este navegador. Prueba Chrome, Edge o Safari, o reserva una cita con un asesor.",callEnd:"Colgar",callMute:"Silenciar micrófono",callUnmute:"Activar micrófono",book:"Reservar una videollamada con un asesor",phone:"Llamar a un asesor",suggest:"Sugerencias",you:"Tú",bot:"Asistente",live:"IA"},
+ ar:{title:"مساعد MUK Talent",sub:"اكتب أو تحدث",open:"فتح المساعد",close:"إغلاق المساعد",reset:"محادثة جديدة",call:"مكالمة صوتية",ph:"اكتب سؤالك…",send:"إرسال",mic:"إملاء سؤالك",micStop:"إيقاف الإملاء",listen:"الاستماع إلى الإجابة",stop:"إيقاف القراءة",typing:"المساعد يكتب…",teaser:"هل لديك سؤال عن الدراسة في المملكة المتحدة؟",teaserClose:"إخفاء",disc:"مساعد آلي: قد يخطئ. لا تشارك بيانات حساسة.",privacy:"الخصوصية",micDenied:"الميكروفون غير مسموح. يمكنك كتابة سؤالك.",callTitle:"مكالمة مع المساعد",callHello:"أنا أستمع إليك. اطرح سؤالك.",callListening:"أستمع إليك…",callThinking:"أفكر…",callSpeaking:"أجيب…",callPaused:"الميكروفون متوقف",callTap:"المس الدائرة للتحدث",noHear:"لم أسمع شيئًا. حاول مرة أخرى بالقرب من الميكروفون.",callUnsupported:"الصوت غير متاح في هذا المتصفح. جرّب Chrome أو Edge أو Safari، أو احجز موعدًا مع مستشار.",callEnd:"إنهاء المكالمة",callMute:"كتم الميكروفون",callUnmute:"تشغيل الميكروفون",book:"حجز مكالمة فيديو مع مستشار",phone:"الاتصال بمستشار",suggest:"اقتراحات",you:"أنت",bot:"المساعد",live:"ذكاء اصطناعي"}
 };
 const ui=k=>(UI[lang()]||UI.fr)[k]||UI.fr[k];
 const SVG={
@@ -34,7 +34,7 @@ let KB=null,kbPromise=null,aiEnabled=null,busy=false;
 function loadKB(){
  if(KB)return Promise.resolve(KB);
  if(window.MUK_ASSISTANT_KB){KB=prepare(window.MUK_ASSISTANT_KB);return Promise.resolve(KB);}
- if(!kbPromise)kbPromise=new Promise((res,rej)=>{const s=document.createElement("script");s.src=`/js/muk-assistant-kb-v6.js?v=13.0.0`;s.async=true;s.onload=()=>{KB=prepare(window.MUK_ASSISTANT_KB);res(KB);};s.onerror=()=>{kbPromise=null;rej(new Error("kb"));};document.head.append(s);});
+ if(!kbPromise)kbPromise=new Promise((res,rej)=>{const s=document.createElement("script");s.src=`/js/muk-assistant-kb-v6.js?v=14.0.0`;s.async=true;s.onload=()=>{KB=prepare(window.MUK_ASSISTANT_KB);res(KB);};s.onerror=()=>{kbPromise=null;rej(new Error("kb"));};document.head.append(s);});
  return kbPromise;
 }
 const norm=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[\u064B-\u065F\u0670\u0640]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي").replace(/[’'`´]/g," ").replace(/[^\p{L}\p{N}\s-]/gu," ").replace(/\s+/g," ").trim();
@@ -222,16 +222,23 @@ async function ask(text,chipId){
 let speakingBtn=null;
 function pickVoice(l){const vs=speechSynthesis.getVoices();const want=VOICE[l].toLowerCase(),pre=l;return vs.find(v=>v.lang.toLowerCase()===want&&/natural|google|premium|enhanced/i.test(v.name))||vs.find(v=>v.lang.toLowerCase()===want)||vs.find(v=>v.lang.toLowerCase().startsWith(pre));}
 function clean(t){return String(t).replace(/https?:\/\/\S+/g,"").replace(/[•→↗]/g," ").replace(/\s+/g," ").trim();}
+/* Mobile: iOS only plays speech started from a tap, so we "unlock" the engine on the first tap. Android reports speaking=false before the
+   voice starts, which used to end the turn early and start the microphone on top of the voice (cutting it). */
+let ttsUnlocked=false;
+function unlockTTS(){if(!TTS||ttsUnlocked)return;ttsUnlocked=true;try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u);}catch{}}
 function speak(text,l,btn,onend){
  if(!TTS){onend&&onend();return;}
  stopSpeak();
- const u=new SpeechSynthesisUtterance(clean(text));u.lang=VOICE[l]||"fr-FR";const v=pickVoice(l);if(v)u.voice=v;u.rate=1.02;u.pitch=1;
+ const txt=clean(text);const u=new SpeechSynthesisUtterance(txt);u.lang=VOICE[l]||"fr-FR";const v=pickVoice(l);if(v)u.voice=v;u.rate=1.02;u.pitch=1;u.volume=1;
  if(btn){speakingBtn=btn;btn.classList.add("is-on");btn.innerHTML=icon("stop");btn.setAttribute("aria-label",ui("stop"));}
- const done=()=>{if(btn){btn.classList.remove("is-on");btn.innerHTML=icon("speaker");btn.setAttribute("aria-label",ui("listen"));}if(speakingBtn===btn)speakingBtn=null;onend&&onend();onend=null;};
- u.onend=done;u.onerror=done;
- speechSynthesis.speak(u);
- // Chrome sometimes never fires onend for long texts.
- const guard=setInterval(()=>{if(!speechSynthesis.speaking){clearInterval(guard);done();}},600);
+ let started=false,finished=false,guard=0,limit=0;
+ const done=()=>{if(finished)return;finished=true;clearInterval(guard);clearTimeout(limit);if(btn){btn.classList.remove("is-on");btn.innerHTML=icon("speaker");btn.setAttribute("aria-label",ui("listen"));}if(speakingBtn===btn)speakingBtn=null;const f=onend;onend=null;f&&f();};
+ u.onstart=()=>{started=true;};u.onend=done;u.onerror=done;
+ // iOS drops an utterance queued in the same tick as cancel().
+ setTimeout(()=>{try{speechSynthesis.resume();speechSynthesis.speak(u);}catch{done();}},60);
+ // Chrome sometimes never fires onend: finish only once the voice has really started and stopped.
+ guard=setInterval(()=>{if(started&&!speechSynthesis.speaking&&!speechSynthesis.pending)done();},700);
+ limit=setTimeout(done,Math.min(120000,5000+txt.length*90));
 }
 function stopSpeak(){if(TTS){speechSynthesis.cancel();}if(speakingBtn){speakingBtn.classList.remove("is-on");speakingBtn.innerHTML=icon("speaker");speakingBtn.setAttribute("aria-label",ui("listen"));speakingBtn=null;}}
 
@@ -239,11 +246,12 @@ function stopSpeak(){if(TTS){speechSynthesis.cancel();}if(speakingBtn){speakingB
 let rec=null,listening=false;
 function startDictation(){
  if(!SR)return;if(listening){rec&&rec.stop();return;}
- stopSpeak();rec=new SR();rec.lang=REC[lang()];rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1;
- let finalText="";
- rec.onresult=e=>{let interim="";for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];if(r.isFinal)finalText+=r[0].transcript;else interim+=r[0].transcript;}input.value=(finalText+interim).trim();autosize();};
- rec.onerror=e=>{if(e.error==="not-allowed"||e.error==="service-not-allowed")notice(ui("micDenied"));};
- rec.onend=()=>{listening=false;micBtn.classList.remove("is-on");micBtn.innerHTML=icon("mic");micBtn.setAttribute("aria-label",ui("mic"));if(finalText.trim())ask(finalText.trim());};
+ unlockTTS();stopSpeak();rec=new SR();rec.lang=REC[lang()];rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1;
+ let finalText="",interim="",failed="";
+ rec.onresult=e=>{interim="";for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];if(r.isFinal)finalText+=r[0].transcript+" ";else interim+=r[0].transcript;}input.value=(finalText+interim).trim();autosize();};
+ rec.onerror=e=>{failed=e.error;if(e.error==="not-allowed"||e.error==="service-not-allowed"||e.error==="audio-capture")notice(ui("micDenied"));};
+ // Android and iOS often end without a "final" result: keep what was heard.
+ rec.onend=()=>{listening=false;micBtn.classList.remove("is-on");micBtn.innerHTML=icon("mic");micBtn.setAttribute("aria-label",ui("mic"));const q=(finalText+interim).replace(/\s+/g," ").trim();if(q)ask(q);else if(!failed||failed==="no-speech")notice(ui("noHear"));};
  try{rec.start();listening=true;micBtn.classList.add("is-on");micBtn.innerHTML=icon("micOff");micBtn.setAttribute("aria-label",ui("micStop"));}catch{listening=false;}
 }
 function notice(t){const n=el("p",{class:"v6a-notice",role:"status",text:t});log.append(n);scrollEnd();setTimeout(()=>n.remove(),6000);}
@@ -254,38 +262,42 @@ const callStatus=$(".v6a-call-status"),callText=$(".v6a-call-text"),orb=$(".v6a-
 function setCall(stateName,text){callBox.dataset.state=stateName;callStatus.textContent=text||"";}
 function startCall(){
  inCall=true;callMuted=false;callBox.hidden=false;panel.classList.add("v6a-in-call");callText.textContent="";
- labels();
+ labels();unlockTTS();
  if(!SR||!TTS){setCall("idle",ui("callUnsupported"));return;}
  setCall("speaking",ui("callSpeaking"));
  speak(ui("callHello"),lang(),null,()=>{if(inCall)callListen();});
  setTimeout(()=>panel.querySelector('[data-a="hang"]').focus(),60);
 }
+let callMisses=0;
 function callListen(){
- if(!inCall||callMuted)return;
+ if(!inCall||callMuted||callRec)return;
+ if(TTS&&(speechSynthesis.speaking||speechSynthesis.pending)){setTimeout(callListen,300);return;}
  setCall("listening",ui("callListening"));
- callRec=new SR();callRec.lang=REC[lang()];callRec.interimResults=true;callRec.continuous=false;
- let finalText="";
- callRec.onresult=e=>{let interim="";for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];if(r.isFinal)finalText+=r[0].transcript;else interim+=r[0].transcript;}callText.textContent=(finalText+interim).trim();};
- callRec.onerror=e=>{if(e.error==="not-allowed"||e.error==="service-not-allowed"){setCall("idle",ui("micDenied"));callMuted=true;}};
- callRec.onend=async()=>{
-  callRec=null;if(!inCall)return;
-  const q=finalText.trim();
-  if(!q){if(!callMuted)setTimeout(callListen,250);return;}
-  setCall("thinking",ui("callThinking"));
+ const r=new SR();callRec=r;r.lang=REC[lang()];r.interimResults=true;r.continuous=false;r.maxAlternatives=1;
+ let finalText="",interim="",failed="";
+ r.onresult=e=>{interim="";for(let i=e.resultIndex;i<e.results.length;i++){const x=e.results[i];if(x.isFinal)finalText+=x[0].transcript+" ";else interim+=x[0].transcript;}callText.textContent=(finalText+interim).trim();};
+ r.onerror=e=>{failed=e.error;if(e.error==="not-allowed"||e.error==="service-not-allowed"||e.error==="audio-capture"){/* iOS refuses to restart the mic without a tap */setCall("idle",callMisses||e.error!=="not-allowed"?ui("callTap"):ui("micDenied"));callMuted=true;callBox.classList.add("v6a-tap");}};
+ r.onend=async()=>{
+  if(callRec===r)callRec=null;if(!inCall||callMuted)return;
+  const q=(finalText+interim).replace(/\s+/g," ").trim();
+  if(!q){callMisses++;if(callMisses>=3){callMuted=true;callBox.classList.add("v6a-tap");setCall("idle",ui("callTap"));return;}setTimeout(callListen,350);return;}
+  callMisses=0;setCall("thinking",ui("callThinking"));
   const m=await ask(q);if(!inCall)return;
   if(!m){callListen();return;}
   callText.textContent=clean(m.t).slice(0,220)+(m.t.length>220?"…":"");
   setCall("speaking",ui("callSpeaking"));
-  speak(m.t,lang(),null,()=>{if(inCall)callListen();});
+  speak(m.t,lang(),null,()=>{if(inCall)setTimeout(callListen,250);});
  };
- try{callRec.start();}catch{setTimeout(callListen,400);}
+ try{r.start();}catch{callRec=null;setTimeout(callListen,500);}
 }
+// Tap the orb to talk again (needed on iPhone after a pause).
+orb.addEventListener("click",()=>{if(!inCall)return;unlockTTS();callBox.classList.remove("v6a-tap");callMisses=0;if(callMuted){callMuted=false;const b=panel.querySelector('[data-a="mute"]');b.classList.remove("is-off");b.innerHTML=icon("mic");b.setAttribute("aria-label",ui("callMute"));}stopSpeak();callRec&&callRec.abort();callRec=null;callListen();});
 function toggleMute(){
  callMuted=!callMuted;const b=panel.querySelector('[data-a="mute"]');b.classList.toggle("is-off",callMuted);b.innerHTML=icon(callMuted?"micOff":"mic");
  b.setAttribute("aria-label",callMuted?ui("callUnmute"):ui("callMute"));
- if(callMuted){callRec&&callRec.abort();stopSpeak();setCall("idle",ui("callPaused"));}else callListen();
+ if(callMuted){callRec&&callRec.abort();stopSpeak();setCall("idle",ui("callPaused"));}else{callBox.classList.remove("v6a-tap");callMisses=0;callListen();}
 }
-function endCall(){inCall=false;callRec&&callRec.abort();callRec=null;stopSpeak();callBox.hidden=true;panel.classList.remove("v6a-in-call");panel.querySelector('[data-a="call"]').focus();}
+function endCall(){inCall=false;callBox.classList.remove("v6a-tap");callRec&&callRec.abort();callRec=null;stopSpeak();callBox.hidden=true;panel.classList.remove("v6a-in-call");panel.querySelector('[data-a="call"]').focus();}
 
 /* ---------- open / close ---------- */
 let opened=false;

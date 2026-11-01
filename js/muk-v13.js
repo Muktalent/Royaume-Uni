@@ -1,4 +1,4 @@
-/* MUK Talent v13 · Our Team carousel, counsellor faces, "Speak to Our Team" form (parents + assistant hand-off). */
+/* MUK Talent v13–v14 · Our Team gallery (About), new-content videos (home), counsellor faces, "Speak to Our Team" form (parents + assistant hand-off). */
 (() => {
   "use strict";
   const d = document, $ = (s, r = d) => r.querySelector(s), $$ = (s, r = d) => [...r.querySelectorAll(s)];
@@ -6,7 +6,6 @@
   const t = s => (window.MUKSite && window.MUKSite.t ? window.MUKSite.t(s) : s);
   const el = (tag, cls, text) => { const n = d.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
   const initials = n => String(n || "").split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join("").toUpperCase() || "M";
-  const REGION_LABEL = { maghreb: "Maghreb", asia: "Asie", latam: "Amérique latine" };
 
   /* ---------------- Team data ---------------- */
   let teamPromise = null;
@@ -18,35 +17,91 @@
     return box;
   };
 
-  /* ---------------- Footer carousel ---------------- */
+  /* ---------------- Team gallery (About page) ---------------- */
   function mountTeam(section) {
     const track = $("[data-v13-team]", section); if (!track) return;
-    const tabs = $$(".v13-team-tabs [data-region]", section);
     const navs = $$(".v13-team-nav", section);
-    let region = lang() === "es" ? "latam" : "maghreb", people = [];
     const card = m => {
       const a = el("a", "v13-tcard"); a.href = m.url || "#"; a.setAttribute("aria-label", `${m.name} · ${m.title}`);
-      const ph = photo(m, "v13-tcard-photo"); const tag = el("span", "v13-tcard-region", REGION_LABEL[m.region] || ""); ph.append(tag);
+      const ph = photo(m, "v13-tcard-photo");
       const body = el("div", "v13-tcard-body"); const nm = el("strong", "", m.name); nm.setAttribute("data-no-i18n", "");
       body.append(nm, el("span", "", m.title));
       if (m.city) { const c = el("span", "", m.city); c.setAttribute("data-no-i18n", ""); body.append(c); }
       body.append(el("em", "", "Voir la carte ↗"));
       a.append(ph, body); return a;
     };
-    const soon = () => { const a = el("a", "v13-tcard v13-tcard-soon"); a.href = "/contact/"; a.append(el("strong", "", "L’équipe s’agrandit"), el("span", "", "De nouveaux counsellors rejoignent bientôt cette région. Écrivez-nous en attendant : nous vous répondons depuis le Royaume-Uni."), el("em", "", "Nous contacter ↗")); return a; };
-    const updateNav = () => { const max = track.scrollWidth - track.clientWidth - 2; const x = Math.abs(track.scrollLeft); navs[0] && (navs[0].disabled = x <= 2); navs[1] && (navs[1].disabled = x >= max); };
-    const render = () => {
-      tabs.forEach(b => b.setAttribute("aria-selected", String(b.dataset.region === region)));
-      const list = people.filter(p => p.region === region);
-      track.replaceChildren(...(list.length ? list.map(card) : []), ...(list.length < 2 ? [soon()] : []));
-      track.scrollLeft = 0; requestAnimationFrame(updateNav);
-    };
-    tabs.forEach(b => b.addEventListener("click", () => { region = b.dataset.region; render(); }));
-    section.querySelector(".v13-team-tabs")?.addEventListener("keydown", e => { if (!/Arrow(Left|Right)/.test(e.key)) return; const i = tabs.findIndex(b => b.dataset.region === region); const dir = (e.key === "ArrowRight") !== (d.documentElement.dir === "rtl") ? 1 : -1; const n = tabs[(i + dir + tabs.length) % tabs.length]; region = n.dataset.region; render(); n.focus(); });
+    const soon = () => { const a = el("a", "v13-tcard v13-tcard-soon"); a.href = "/contact/"; a.append(el("strong", "", "L’équipe s’agrandit"), el("span", "", "De nouveaux counsellors nous rejoignent bientôt. Écrivez-nous en attendant : nous vous répondons depuis le Royaume-Uni."), el("em", "", "Nous contacter ↗")); return a; };
+    const updateNav = () => { const max = track.scrollWidth - track.clientWidth - 2; const x = Math.abs(track.scrollLeft); navs[0] && (navs[0].disabled = x <= 2); navs[1] && (navs[1].disabled = x >= max); navs.forEach(b => b.hidden = max <= 2); };
     navs.forEach(b => b.addEventListener("click", () => { const step = (track.querySelector(".v13-tcard")?.offsetWidth || 220) + 16; const rtl = d.documentElement.dir === "rtl"; track.scrollBy({ left: Number(b.dataset.dir) * step * (rtl ? -1 : 1) * Math.max(1, Math.floor(track.clientWidth / step)), behavior: "smooth" }); }));
     track.addEventListener("scroll", () => requestAnimationFrame(updateNav), { passive: true });
     addEventListener("resize", updateNav, { passive: true });
-    team().then(list => { people = list; if (!list.some(p => p.region === region) && list.length) region = list[0].region; render(); });
+    team().then(list => { track.replaceChildren(...list.map(card), ...(list.length < 2 ? [soon()] : [])); track.scrollLeft = 0; requestAnimationFrame(updateNav); });
+  }
+
+  /* ---------------- New content (home): floating banner + full-screen latest videos ---------------- */
+  function mountLatest() {
+    if (!/^\/(index\.html)?$/.test(location.pathname)) return;
+    fetch("/api/public/videos", { headers: { accept: "application/json" } }).then(r => r.ok ? r.json() : { data: [] }).then(j => {
+      const list = (Array.isArray(j.data) ? j.data : []).filter(v => v && v.url).slice(0, 3); if (!list.length) return;
+      const seenKey = "muk_latest_seen", seen = (() => { try { return localStorage.getItem(seenKey); } catch { return null; } })();
+      const fmt = iso => { try { return new Intl.DateTimeFormat(({ fr: "fr-FR", en: "en-GB", es: "es-ES", ar: "ar-MA" })[lang()] || "fr-FR", { day: "numeric", month: "short", year: "numeric" }).format(new Date(iso)); } catch { return ""; } };
+      const thumb = (v, cls) => { const b = el("span", cls); if (v.poster) { const im = el("img"); im.src = v.poster; im.alt = ""; im.loading = "lazy"; im.decoding = "async"; im.referrerPolicy = "no-referrer"; im.onerror = () => im.remove(); b.append(im); } b.insertAdjacentHTML("beforeend", '<i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></svg></i>'); return b; };
+      /* banner */
+      const ban = el("div", "v14-new"), go = el("button", "v14-new-open"); go.type = "button"; go.setAttribute("aria-haspopup", "dialog");
+      if (seen !== list[0].id) ban.classList.add("is-fresh");
+      go.append(thumb(list[0], "v14-new-thumb"));
+      const txt = el("span", "v14-new-txt"); txt.append(el("small", "", "Nouveau contenu"), el("strong", "", "Nos dernières vidéos"));
+      go.append(txt);
+      const x = el("button", "v14-new-x"); x.type = "button"; x.setAttribute("aria-label", "Masquer"); x.textContent = "×";
+      ban.append(go, x);
+      let hidden = false; try { hidden = sessionStorage.getItem("muk_latest_hide") === "1"; } catch {}
+      // Wait for the cookie choice to be made so the banner is never hidden behind it.
+      const cookieOpen = () => [...d.querySelectorAll(".muk-cookie-info,[class*=muk-cookie]")].some(n => n.offsetParent !== null && n.getBoundingClientRect().height > 0);
+      const reveal = () => { if (cookieOpen()) return setTimeout(reveal, 700); d.body.append(ban); setTimeout(() => ban.classList.add("is-in"), 400); };
+      if (!hidden) setTimeout(reveal, 300);
+      x.addEventListener("click", () => { ban.classList.remove("is-in"); try { sessionStorage.setItem("muk_latest_hide", "1"); } catch {} setTimeout(() => ban.remove(), 300); });
+      /* full-screen viewer */
+      let dlg = null, current = 0;
+      const player = v => {
+        if (v.play === "vimeo" || v.play === "youtube") { const f = el("iframe"); const src = new URL(v.embed || v.url); src.searchParams.set("autoplay", "1"); f.src = src.toString(); f.title = v.title; f.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media"; f.allowFullscreen = true; f.loading = "lazy"; f.referrerPolicy = "strict-origin-when-cross-origin"; return f; }
+        if (v.play === "video") { const vid = el("video"); vid.src = v.url; vid.controls = true; vid.playsInline = true; vid.autoplay = true; vid.preload = "metadata"; if (v.poster) vid.poster = v.poster; return vid; }
+        const a = el("a", "v14-lv-link", "Ouvrir la vidéo ↗"); a.href = v.url; a.target = "_blank"; a.rel = "noopener noreferrer"; return a;
+      };
+      const build = () => {
+        dlg = el("dialog", "v14-lv"); dlg.setAttribute("aria-labelledby", "v14-lv-title");
+        const top = el("div", "v14-lv-top"); const hd = el("div"); hd.append(el("p", "v14-lv-kicker", "#MUKTalent"), Object.assign(el("h2", "", "Dernières vidéos"), { id: "v14-lv-title" }));
+        const cl = el("button", "v14-lv-close"); cl.type = "button"; cl.setAttribute("aria-label", "Fermer"); cl.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg><span>Fermer</span>'; cl.onclick = () => dlg.close();
+        top.append(hd, cl);
+        const grid = el("div", "v14-lv-grid"), stage = el("div", "v14-lv-stage"), side = el("ol", "v14-lv-list");
+        const info = el("div", "v14-lv-info");
+        const show = i => {
+          current = i; stage.querySelectorAll("video").forEach(v => v.pause()); stage.replaceChildren(player(list[i]));
+          info.replaceChildren(); const h = el("h3", "", list[i].title); h.setAttribute("data-no-i18n", ""); info.append(h);
+          if (list[i].body) { const p = el("p", "", list[i].body); p.setAttribute("data-no-i18n", ""); info.append(p); }
+          [...side.children].forEach((li, k) => li.querySelector("button").setAttribute("aria-current", String(k === i)));
+        };
+        list.forEach((v, i) => {
+          const li = el("li"), b = el("button", "v14-lv-card"); b.type = "button";
+          b.append(thumb(v, "v14-lv-thumb"));
+          const t = el("span", "v14-lv-meta"); const tt = el("strong", "", v.title); tt.setAttribute("data-no-i18n", "");
+          const m = el("span", "v14-lv-sub"); m.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>'; const dt = el("span", "", fmt(v.at)); dt.setAttribute("data-no-i18n", ""); m.append(dt);
+          const au = el("span", "v14-lv-sub"); au.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>'; const an = el("span", "", v.author || "MUK Talent"); an.setAttribute("data-no-i18n", ""); au.append(an);
+          const row = el("span", "v14-lv-row"); row.append(m, au); t.append(el("small", "", i === 0 ? "Nouveau" : "Vidéo"), tt, row); b.append(t);
+          b.onclick = () => show(i); li.append(b); side.append(li);
+        });
+        const left = el("div", "v14-lv-main"); left.append(stage, info);
+        grid.append(left, side); dlg.append(top, grid); d.body.append(dlg);
+        dlg.addEventListener("close", () => { stage.replaceChildren(); d.documentElement.classList.remove("v13-lock"); go.isConnected && go.focus(); });
+        dlg.addEventListener("click", e => { if (e.target === dlg) dlg.close(); });
+        dlg._show = show;
+      };
+      go.addEventListener("click", () => {
+        if (!dlg) build(); dlg._show(0);
+        try { localStorage.setItem(seenKey, list[0].id); } catch {} ban.classList.remove("is-fresh");
+        d.documentElement.classList.add("v13-lock"); dlg.showModal ? dlg.showModal() : dlg.setAttribute("open", "");
+        setTimeout(() => dlg.querySelector(".v14-lv-close")?.focus(), 50);
+      });
+    }).catch(() => {});
   }
 
   /* ---------------- Home faces ---------------- */
@@ -144,6 +199,7 @@
   function init() {
     $$("#notre-equipe").forEach(mountTeam);
     $$("[data-v13-faces]").forEach(mountFaces);
+    mountLatest();
     d.addEventListener("click", e => { const b = e.target.closest("[data-v13-talk]"); if (!b) return; e.preventDefault(); open({ source: location.pathname.startsWith("/parents") ? "parents" : "home", priority: b.dataset.priority }); });
     if (location.hash === "#parler") open({ source: "parents" });
   }
