@@ -145,14 +145,30 @@ export async function mountEmployee({staff,api,onLogout,owner=null,onBack=null})
    if(galFilter==='video')items=items.filter(isVideo);else if(galFilter==='image')items=items.filter(it=>it.kind==='image');else if(galFilter==='web')items=items.filter(it=>pubs(it).some(p=>p.audience==='web'));else if(galFilter==='students')items=items.filter(it=>pubs(it).some(p=>p.audience!=='web'));
    grid.replaceChildren();
    if(!items.length){grid.append(E('p',galFilter!=='all'?'Nothing here yet.':readOnly?'This gallery is empty.':'Your gallery is empty. Tap + to add photos and videos from your phone, a link or Vimeo.','lx-gal-note'));return;}
-   items.forEach((it,i)=>{const [c,r]=SIZES[i%SIZES.length],t=E('button',undefined,'lx-gal-tile');t.type='button';t.style.gridColumn='span '+c;t.style.gridRow='span '+r;t.setAttribute('aria-label',(isVideo(it)?'Video: ':'Photo: ')+it.title);
-    if(it.poster){const im=E('img');im.src=it.poster;im.alt='';im.loading='lazy';im.decoding='async';im.referrerPolicy='no-referrer';im.onerror=()=>im.remove();t.append(im);}
-    else if(it.kind==='video'&&it.url){const v=E('video');v.src=it.url+'#t=0.6';v.muted=true;v.playsInline=true;v.preload='metadata';v.setAttribute('aria-hidden','true');v.tabIndex=-1;t.append(v);}
+   items.forEach((it,i)=>{const [c,r]=SIZES[i%SIZES.length],t=E('div',undefined,'lx-gal-tile'),open=E('button',undefined,'lx-gal-open');open.type='button';t.style.gridColumn='span '+c;t.style.gridRow='span '+r;open.setAttribute('aria-label',(isVideo(it)?'Open video: ':'Open photo: ')+it.title);
+    if(it.poster){const im=E('img');im.src=it.poster;im.alt='';im.loading='lazy';im.decoding='async';im.referrerPolicy='no-referrer';im.onerror=()=>im.remove();open.append(im);}
+    else if(it.kind==='video'&&it.url){const v=E('video');v.src=it.url+'#t=0.6';v.muted=true;v.playsInline=true;v.preload='metadata';v.setAttribute('aria-hidden','true');v.tabIndex=-1;open.append(v);}
     else if(it.kind==='pdf'||it.kind==='file')t.classList.add('is-doc');
-    t.onclick=()=>gview(items,i);grid.append(t);});}
+    open.onclick=()=>gview(items,i);t.append(open);
+    if(!readOnly){const pb=E('button',undefined,'lx-gal-pub');pb.type='button';pb.setAttribute('aria-haspopup','menu');const lab=()=>{const n=pubs(it).length;pb.replaceChildren(svg(n?'check':'globe'),E('span',n?'Published · '+n:'Publish'));pb.classList.toggle('is-on',!!n);};lab();pb.onclick=e=>{e.stopPropagation();pubMenu(it,pb,lab);};t.append(pb);}
+    grid.append(t);});}
   galDraw=draw;
   (prodCache?Promise.resolve(prodCache):listMedia(api,owner)).then(list=>{prodCache=list;draw();});}
  function redraw(){galDraw&&galDraw();}
+ function pubMenu(it,anchor,onChange){root.querySelector('.lx-pubmenu')?.__close?.();const m=E('div',undefined,'lx-pubmenu');m.setAttribute('role','menu');m.lang='en';let changed=false;
+  const place=()=>{const r=anchor.getBoundingClientRect(),w=268,h=m.offsetHeight||300;let x=Math.min(Math.max(8,r.right-w),innerWidth-w-8),y=r.bottom+8;if(y+h>innerHeight-8)y=Math.max(8,r.top-h-8);m.style.left=x+'px';m.style.top=y+'px';};
+  function build(msg=''){m.replaceChildren(E('strong',it.title,'lx-pm-title'));
+   for(const [aud,ic,label,sub] of [['web','globe','Website','Publish on muktalent.com'],['all','users','All students','Every student in the app'],['mine','user','My students','Only students assigned to you']]){const on=pubs(it).some(p=>p.audience===aud),b=E('button',undefined,'lx-pm-opt');b.type='button';b.setAttribute('role','menuitemcheckbox');b.setAttribute('aria-checked',String(on));b.append(svg(ic,'lx-pm-ic'));const tx=E('span');tx.append(E('b',label),E('small',aud==='web'&&!isVideo(it)?'Only videos can go on the website':on?'Published · click to remove':sub));b.append(tx,svg('check','lx-pm-tick'));
+    if(aud==='web'&&!isVideo(it))b.disabled=true;
+    b.onclick=async()=>{m.querySelectorAll('button').forEach(x=>x.disabled=true);try{const now=await togglePub(it,aud);changed=true;onChange&&onChange();build(aud==='web'?(now?'Published on the website.':'Removed from the website.'):(now?'Sent to '+label.toLowerCase()+'.':'Removed from '+label.toLowerCase()+'.'));}catch(e){build(e.message);}};m.append(b);}
+   const foot=E('div',undefined,'lx-pm-foot');
+   if(it.download){const a=E('a',undefined,'lx-pm-tool');a.href=it.download;a.setAttribute('download',it.title||'');a.append(svg('down'),E('span','Download'));foot.append(a);}
+   else if(it.kind==='embed'||it.kind==='link'){const a=E('a',undefined,'lx-pm-tool');a.href=it.media?.url||it.url;a.target='_blank';a.rel='noopener noreferrer';a.append(svg('link'),E('span',it.source==='vimeo'?'Vimeo':it.source==='youtube'?'YouTube':'Open'));foot.append(a);}
+   const del=E('button',undefined,'lx-pm-tool lx-pm-del');del.type='button';del.append(svg('trash'),E('span','Delete'));del.onclick=async()=>{try{if(await removeItem(it)){close();redraw();}}catch(e){build(e.message);}};foot.append(del);m.append(foot);
+   const st=E('p',msg,'lx-pm-msg');st.setAttribute('role','status');st.hidden=!msg;m.append(st);place();}
+  const outside=e=>{if(!m.contains(e.target)&&e.target!==anchor&&!anchor.contains(e.target))close();},key=e=>{if(e.key==='Escape')close();};
+  function close(){m.remove();document.removeEventListener('pointerdown',outside,true);document.removeEventListener('keydown',key);removeEventListener('scroll',close,true);removeEventListener('resize',close);if(changed&&galFilter!=='all')redraw();}
+  m.__close=close;root.append(m);build();setTimeout(()=>{document.addEventListener('pointerdown',outside,true);document.addEventListener('keydown',key);addEventListener('scroll',close,{capture:true,passive:true});addEventListener('resize',close);},0);m.querySelector('.lx-pm-opt:not(:disabled)')?.focus();}
  function sheet(title,opts){const d=E('dialog',undefined,'lx-sheet');d.lang='en';const h=E('div',undefined,'lx-sheet-head');h.append(E('strong',title));const x=E('button',undefined,'lx-sheet-x');x.type='button';x.setAttribute('aria-label','Close');x.append(svg('close'));x.onclick=()=>d.close();h.append(x);d.append(h);
   for(const [ic,label,sub,fn] of opts){const b=E('button',undefined,'lx-sheet-opt');b.type='button';b.append(svg(ic,'lx-sheet-ic'));const tx=E('span');tx.append(E('b',label),E('small',sub));b.append(tx);b.onclick=()=>{d.close();fn();};d.append(b);}
   d.onclick=e=>{if(e.target===d)d.close();};d.onclose=()=>d.remove();root.append(d);d.showModal();}

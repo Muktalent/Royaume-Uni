@@ -24910,11 +24910,11 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         return;
       }
       items.forEach((it, i) => {
-        const [c, r] = SIZES[i % SIZES.length], t2 = E8("button", void 0, "lx-gal-tile");
-        t2.type = "button";
+        const [c, r] = SIZES[i % SIZES.length], t2 = E8("div", void 0, "lx-gal-tile"), open = E8("button", void 0, "lx-gal-open");
+        open.type = "button";
         t2.style.gridColumn = "span " + c;
         t2.style.gridRow = "span " + r;
-        t2.setAttribute("aria-label", (isVideo(it) ? "Video: " : "Photo: ") + it.title);
+        open.setAttribute("aria-label", (isVideo(it) ? "Open video: " : "Open photo: ") + it.title);
         if (it.poster) {
           const im = E8("img");
           im.src = it.poster;
@@ -24923,7 +24923,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
           im.decoding = "async";
           im.referrerPolicy = "no-referrer";
           im.onerror = () => im.remove();
-          t2.append(im);
+          open.append(im);
         } else if (it.kind === "video" && it.url) {
           const v = E8("video");
           v.src = it.url + "#t=0.6";
@@ -24932,9 +24932,26 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
           v.preload = "metadata";
           v.setAttribute("aria-hidden", "true");
           v.tabIndex = -1;
-          t2.append(v);
+          open.append(v);
         } else if (it.kind === "pdf" || it.kind === "file") t2.classList.add("is-doc");
-        t2.onclick = () => gview(items, i);
+        open.onclick = () => gview(items, i);
+        t2.append(open);
+        if (!readOnly) {
+          const pb = E8("button", void 0, "lx-gal-pub");
+          pb.type = "button";
+          pb.setAttribute("aria-haspopup", "menu");
+          const lab = () => {
+            const n = pubs(it).length;
+            pb.replaceChildren(svg(n ? "check" : "globe"), E8("span", n ? "Published \xB7 " + n : "Publish"));
+            pb.classList.toggle("is-on", !!n);
+          };
+          lab();
+          pb.onclick = (e) => {
+            e.stopPropagation();
+            pubMenu(it, pb, lab);
+          };
+          t2.append(pb);
+        }
         grid.append(t2);
       });
     }
@@ -24946,6 +24963,104 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   }
   function redraw() {
     galDraw && galDraw();
+  }
+  function pubMenu(it, anchor, onChange) {
+    root.querySelector(".lx-pubmenu")?.__close?.();
+    const m = E8("div", void 0, "lx-pubmenu");
+    m.setAttribute("role", "menu");
+    m.lang = "en";
+    let changed = false;
+    const place = () => {
+      const r = anchor.getBoundingClientRect(), w = 268, h = m.offsetHeight || 300;
+      let x = Math.min(Math.max(8, r.right - w), innerWidth - w - 8), y = r.bottom + 8;
+      if (y + h > innerHeight - 8) y = Math.max(8, r.top - h - 8);
+      m.style.left = x + "px";
+      m.style.top = y + "px";
+    };
+    function build(msg = "") {
+      m.replaceChildren(E8("strong", it.title, "lx-pm-title"));
+      for (const [aud, ic, label2, sub] of [["web", "globe", "Website", "Publish on muktalent.com"], ["all", "users", "All students", "Every student in the app"], ["mine", "user", "My students", "Only students assigned to you"]]) {
+        const on = pubs(it).some((p) => p.audience === aud), b = E8("button", void 0, "lx-pm-opt");
+        b.type = "button";
+        b.setAttribute("role", "menuitemcheckbox");
+        b.setAttribute("aria-checked", String(on));
+        b.append(svg(ic, "lx-pm-ic"));
+        const tx2 = E8("span");
+        tx2.append(E8("b", label2), E8("small", aud === "web" && !isVideo(it) ? "Only videos can go on the website" : on ? "Published \xB7 click to remove" : sub));
+        b.append(tx2, svg("check", "lx-pm-tick"));
+        if (aud === "web" && !isVideo(it)) b.disabled = true;
+        b.onclick = async () => {
+          m.querySelectorAll("button").forEach((x) => x.disabled = true);
+          try {
+            const now = await togglePub(it, aud);
+            changed = true;
+            onChange && onChange();
+            build(aud === "web" ? now ? "Published on the website." : "Removed from the website." : now ? "Sent to " + label2.toLowerCase() + "." : "Removed from " + label2.toLowerCase() + ".");
+          } catch (e) {
+            build(e.message);
+          }
+        };
+        m.append(b);
+      }
+      const foot = E8("div", void 0, "lx-pm-foot");
+      if (it.download) {
+        const a = E8("a", void 0, "lx-pm-tool");
+        a.href = it.download;
+        a.setAttribute("download", it.title || "");
+        a.append(svg("down"), E8("span", "Download"));
+        foot.append(a);
+      } else if (it.kind === "embed" || it.kind === "link") {
+        const a = E8("a", void 0, "lx-pm-tool");
+        a.href = it.media?.url || it.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.append(svg("link"), E8("span", it.source === "vimeo" ? "Vimeo" : it.source === "youtube" ? "YouTube" : "Open"));
+        foot.append(a);
+      }
+      const del = E8("button", void 0, "lx-pm-tool lx-pm-del");
+      del.type = "button";
+      del.append(svg("trash"), E8("span", "Delete"));
+      del.onclick = async () => {
+        try {
+          if (await removeItem(it)) {
+            close();
+            redraw();
+          }
+        } catch (e) {
+          build(e.message);
+        }
+      };
+      foot.append(del);
+      m.append(foot);
+      const st = E8("p", msg, "lx-pm-msg");
+      st.setAttribute("role", "status");
+      st.hidden = !msg;
+      m.append(st);
+      place();
+    }
+    const outside = (e) => {
+      if (!m.contains(e.target) && e.target !== anchor && !anchor.contains(e.target)) close();
+    }, key = (e) => {
+      if (e.key === "Escape") close();
+    };
+    function close() {
+      m.remove();
+      document.removeEventListener("pointerdown", outside, true);
+      document.removeEventListener("keydown", key);
+      removeEventListener("scroll", close, true);
+      removeEventListener("resize", close);
+      if (changed && galFilter !== "all") redraw();
+    }
+    m.__close = close;
+    root.append(m);
+    build();
+    setTimeout(() => {
+      document.addEventListener("pointerdown", outside, true);
+      document.addEventListener("keydown", key);
+      addEventListener("scroll", close, { capture: true, passive: true });
+      addEventListener("resize", close);
+    }, 0);
+    m.querySelector(".lx-pm-opt:not(:disabled)")?.focus();
   }
   function sheet(title2, opts) {
     const d = E8("dialog", void 0, "lx-sheet");
