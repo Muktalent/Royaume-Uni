@@ -25,7 +25,7 @@ export function shortName(full) {
 }
 export function directKey(a, b) { return [a, b].sort().join(":"); }
 export function parseThread(id) {
-  const m = /^(gp|mk):([0-9a-f-]{36})$/i.exec(String(id || ""));
+  const m = /^(gp|mk)[_:]([0-9a-f-]{36})$/i.exec((() => { try { return decodeURIComponent(String(id || "")); } catch { return ""; } })());
   if (!m || !uuid.safeParse(m[2]).success) throw new SocialError("Conversation not found.", 404);
   return { kind: m[1].toLowerCase(), id: m[2].toLowerCase() };
 }
@@ -33,11 +33,30 @@ export function cloudinarySignature(params, secret) {
   const base = Object.keys(params).filter(k => params[k] !== undefined && params[k] !== "" && k !== "file" && k !== "api_key" && k !== "cloud_name" && k !== "resource_type").sort().map(k => `${k}=${params[k]}`).join("&");
   return createHash("sha1").update(base + secret).digest("hex");
 }
+export function embedInfo(raw) {
+  // Accepts a Vimeo / YouTube page URL, player URL or a pasted <iframe> embed snippet.
+  let str = String(raw || "").trim(); const m = /src=["']([^"']+)["']/i.exec(str); if (m) str = m[1].replace(/&amp;/g, "&");
+  let u; try { u = new URL(str); } catch { return null; }
+  if (u.protocol !== "https:") return null;
+  const host = u.hostname.replace(/^www\./, "").toLowerCase(); const parts = u.pathname.split("/").filter(Boolean);
+  if (host === "vimeo.com" || host === "player.vimeo.com") {
+    const i = parts.findIndex(p => /^\d{5,12}$/.test(p)); if (i < 0) return null;
+    const id = parts[i]; const next = parts[i + 1]; const hash = (u.searchParams.get("h") || (next && /^[0-9a-f]{6,20}$/i.test(next) ? next : "") || "").toLowerCase();
+    const src = `https://player.vimeo.com/video/${id}?${hash ? `h=${hash}&` : ""}badge=0&autopause=0&dnt=1&title=0&byline=0&portrait=0`;
+    return { provider: "vimeo", id, hash: hash || null, src, url: `https://player.vimeo.com/video/${id}${hash ? `?h=${hash}` : ""}` };
+  }
+  if (["youtube.com", "m.youtube.com", "youtu.be", "youtube-nocookie.com"].includes(host)) {
+    let id = host === "youtu.be" ? parts[0] : u.searchParams.get("v") || (["embed", "shorts", "live", "v"].includes(parts[0]) ? parts[1] : null);
+    if (!id || !/^[A-Za-z0-9_-]{11}$/.test(id)) return null;
+    return { provider: "youtube", id, hash: null, src: `https://www.youtube-nocookie.com/embed/${id}?rel=0&modestbranding=1&playsinline=1`, url: `https://www.youtube.com/watch?v=${id}`, poster: `https://i.ytimg.com/vi/${id}/hqdefault.jpg` };
+  }
+  return null;
+}
 export function videoKind(url) {
   let u; try { u = new URL(url); } catch { return "link"; }
   if (u.protocol !== "https:") return "link";
   if (u.hostname === "res.cloudinary.com" || /\.(mp4|webm|mov|m4v)$/i.test(u.pathname)) return "video";
-  if (/(^|\.)youtube\.com$|(^|\.)youtu\.be$|(^|\.)vimeo\.com$/i.test(u.hostname)) return "embed";
+  const e = embedInfo(url); if (e) return e.provider;
   return "link";
 }
 export function cloudinaryPoster(url) {
@@ -75,6 +94,23 @@ function ok(r, what = "Database operation failed") {
 }
 function bearer(req) { const m = /^Bearer ([^\s]+)$/i.exec(req.get("authorization") || ""); return m && m[1].length < 16384 ? m[1] : null; }
 function ip(req) { return (process.env.VERCEL ? String(req.headers["x-vercel-forwarded-for"] || req.headers["x-forwarded-for"] || "").split(",")[0].trim() : req.ip) || "127.0.0.1"; }
+
+export async function vimeoMeta(raw, { fetchImpl = globalThis.fetch, token = process.env.VIMEO_ACCESS_TOKEN } = {}) {
+  const e = embedInfo(raw); if (!e) throw new SocialError("Paste a Vimeo or YouTube link.", 400);
+  if (e.provider === "youtube") return { ...e, title: null, poster: e.poster, duration: null };
+  const pick = sizes => (sizes || []).filter(x => x.width >= 640).sort((a, b) => a.width - b.width)[0]?.link || (sizes || []).at(-1)?.link || null;
+  if (token) {
+    try {
+      const r = await fetchImpl(`https://api.vimeo.com/videos/${e.id}?fields=name,duration,pictures.sizes,player_embed_url,link`, { headers: { authorization: `bearer ${token}`, accept: "application/vnd.vimeo.*+json;version=3.4" }, signal: AbortSignal.timeout(6000) });
+      if (r.ok) { const j = await r.json(); const ph = /[?&]h=([0-9a-f]+)/i.exec(j.player_embed_url || "")?.[1] || e.hash; const f = embedInfo(`https://player.vimeo.com/video/${e.id}${ph ? `?h=${ph}` : ""}`); return { ...f, title: j.name || null, poster: pick(j.pictures?.sizes), duration: j.duration || null }; }
+    } catch { /* fall back to oEmbed */ }
+  }
+  try {
+    const r = await fetchImpl(`https://vimeo.com/api/oembed.json?width=960&url=${encodeURIComponent(e.hash ? `https://vimeo.com/${e.id}/${e.hash}` : `https://vimeo.com/${e.id}`)}`, { signal: AbortSignal.timeout(6000) });
+    if (r.ok) { const j = await r.json(); return { ...e, title: j.title || null, poster: j.thumbnail_url ? String(j.thumbnail_url).replace(/_\d+x\d+/, "_960") : null, duration: j.duration || null }; }
+  } catch { /* ignore */ }
+  return { ...e, title: null, poster: null, duration: null };
+}
 
 export function mountMukSocial(app, { db = service } = {}) {
   const limiter = (limit, minutes = 15) => rateLimit({ windowMs: minutes * 60000, limit, keyGenerator: req => ipKeyGenerator(ip(req)), validate: { xForwardedForHeader: false }, standardHeaders: "draft-7", legacyHeaders: false, message: { error: "Too many requests. Wait a few minutes and try again." } });
@@ -142,7 +178,7 @@ export function mountMukSocial(app, { db = service } = {}) {
         if (me.kind === "staff" && !last.has(s.user_id)) continue; // staff: only active conversations; new ones via contacts
         const peer = me.kind === "student" ? (names.get(s.counsellor_id) || { name: "MUK Talent", kind: "staff", role: "Counsellor" }) : (names.get(s.user_id) || { name: "Student", kind: "student" });
         const l = last.get(s.user_id);
-        threads.push({ id: `gp:${s.user_id}`, kind: "counsellor", title: peer.name, subtitle: me.kind === "student" ? "Counsellor · MUK Talent" : peer.role, peer_id: me.kind === "student" ? s.counsellor_id : s.user_id, pinned: me.kind === "student", last: l ? { body: l.audio_path ? null : l.body, audio: Boolean(l.audio_path), mine: me.kind === "student" ? l.sender_role === "student" : l.sender_role === "counsellor", at: l.created_at } : null, unread: unread.get(s.user_id) || 0 });
+        threads.push({ id: `gp_${s.user_id}`, kind: "counsellor", title: peer.name, subtitle: me.kind === "student" ? "Counsellor · MUK Talent" : peer.role, peer_id: me.kind === "student" ? s.counsellor_id : s.user_id, pinned: me.kind === "student", last: l ? { body: l.audio_path ? null : l.body, audio: Boolean(l.audio_path), mine: me.kind === "student" ? l.sender_role === "student" : l.sender_role === "counsellor", at: l.created_at } : null, unread: unread.get(s.user_id) || 0 });
       }
     }
     // Direct / group conversations
@@ -164,7 +200,7 @@ export function mountMukSocial(app, { db = service } = {}) {
       for (const c of ok(convs)) {
         const others = mem.filter(m => m.conversation_id === c.id && m.user_id !== me.id).map(m => names.get(m.user_id)).filter(Boolean);
         const peer = others[0]; const l = last.get(c.id);
-        threads.push({ id: `mk:${c.id}`, kind: c.kind, title: c.title || peer?.name || "MUK Talent", subtitle: peer ? (peer.kind === "staff" ? peer.role : "Student") : "", peer_id: peer?.user_id || null, last: l ? { body: l.audio_path ? null : l.body, audio: Boolean(l.audio_path), mine: l.sender_id === me.id, at: l.created_at } : null, unread: unread.get(c.id) || 0, created_at: c.created_at });
+        threads.push({ id: `mk_${c.id}`, kind: c.kind, title: c.title || peer?.name || "MUK Talent", subtitle: peer ? (peer.kind === "staff" ? peer.role : "Student") : "", peer_id: peer?.user_id || null, last: l ? { body: l.audio_path ? null : l.body, audio: Boolean(l.audio_path), mine: l.sender_id === me.id, at: l.created_at } : null, unread: unread.get(c.id) || 0, created_at: c.created_at });
       }
     }
     threads.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || String(b.last?.at || b.created_at || "").localeCompare(String(a.last?.at || a.created_at || "")));
@@ -229,12 +265,12 @@ export function mountMukSocial(app, { db = service } = {}) {
     const staff = ok(await client.from("crm_staff").select("user_id,full_name,role,active").eq("active", true).limit(300));
     if (me.kind === "student") {
       const st = ok(await client.from("gp_students").select("user_id,full_name,country_residence").neq("user_id", me.id).neq("chat_visible", false).order("created_at", { ascending: false }).limit(400));
-      if (me.counsellor_id) { const c = staff.find(s => s.user_id === me.counsellor_id); if (c) out.push({ user_id: c.user_id, name: c.full_name, kind: "staff", role: "Counsellor", thread_id: `gp:${me.id}` }); }
+      if (me.counsellor_id) { const c = staff.find(s => s.user_id === me.counsellor_id); if (c) out.push({ user_id: c.user_id, name: c.full_name, kind: "staff", role: "Counsellor", thread_id: `gp_${me.id}` }); }
       for (const s of st) out.push({ user_id: s.user_id, name: shortName(s.full_name), kind: "student", role: s.country_residence || "Student" });
     } else {
       for (const s of staff) if (s.user_id !== me.id) out.push({ user_id: s.user_id, name: s.full_name, kind: "staff", role: s.role === "admin" ? "Admin · MUK Talent" : "Counsellor" });
       let q = client.from("gp_students").select("user_id,full_name,reference").order("updated_at", { ascending: false }).limit(400); if (!me.admin) q = q.eq("counsellor_id", me.id);
-      for (const s of ok(await q)) out.push({ user_id: s.user_id, name: s.full_name, kind: "student", role: s.reference, thread_id: `gp:${s.user_id}` });
+      for (const s of ok(await q)) out.push({ user_id: s.user_id, name: s.full_name, kind: "student", role: s.reference, thread_id: `gp_${s.user_id}` });
     }
     res.json({ data: out });
   }));
@@ -246,11 +282,11 @@ export function mountMukSocial(app, { db = service } = {}) {
     if (!tStaff && !tStudent) throw new SocialError("Person not found.", 404);
     if (tStaff && !tStaff.active) throw new SocialError("This account is inactive.", 403);
     if (me.kind === "student") {
-      if (tStaff) { if (tStaff.user_id === me.counsellor_id) return res.json({ data: { id: `gp:${me.id}` } }); throw new SocialError("Write to your counsellor from your counsellor chat.", 403); }
+      if (tStaff) { if (tStaff.user_id === me.counsellor_id) return res.json({ data: { id: `gp_${me.id}` } }); throw new SocialError("Write to your counsellor from your counsellor chat.", 403); }
       if (tStudent.chat_visible === false || !me.chat_visible) throw new SocialError("This student does not receive messages.", 403);
     } else if (tStudent) {
       if (!me.admin && tStudent.counsellor_id !== me.id) throw new SocialError("This student is assigned to another counsellor.", 403);
-      return res.json({ data: { id: `gp:${target}` } });
+      return res.json({ data: { id: `gp_${target}` } });
     }
     const key = directKey(me.id, target);
     let conv = ok(await client.from("mk_conversations").select("id").eq("direct_key", key).maybeSingle());
@@ -259,7 +295,7 @@ export function mountMukSocial(app, { db = service } = {}) {
       if (ins.error?.code === "23505") conv = ok(await client.from("mk_conversations").select("id").eq("direct_key", key).single());
       else { conv = ok(ins); ok(await client.from("mk_members").insert([{ conversation_id: conv.id, user_id: me.id }, { conversation_id: conv.id, user_id: target }])); }
     }
-    res.json({ data: { id: `mk:${conv.id}` } });
+    res.json({ data: { id: `mk_${conv.id}` } });
   }));
 
   app.post("/api/chat/audio/start", limiter(120), route(async (req, res, me) => {
@@ -285,9 +321,10 @@ export function mountMukSocial(app, { db = service } = {}) {
       let url = p.media_url, poster = p.poster_url;
       if (p.media_id && mmap.get(p.media_id)) { const m = mmap.get(p.media_id); url = url || m.url; poster = poster || m.poster_url; }
       if (p.asset_id && amap.get(p.asset_id)) url = (await client.storage.from("mt-employee-private").createSignedUrl(amap.get(p.asset_id).object_path, 7200)).data?.signedUrl || url;
-      if (!poster && url) poster = cloudinaryPoster(url);
+      const em = url && !p.asset_id ? embedInfo(url) : null;
+      if (!poster && url) poster = cloudinaryPoster(url) || em?.poster || null;
       const a = authors.get(p.author_id);
-      return { id: p.id, kind: p.kind, title: p.title, body: p.body, url, poster, play: url ? (p.asset_id ? "video" : videoKind(url)) : null, live_at: p.live_at, audience: p.audience, author: a?.name || "MUK Talent", author_id: p.author_id, at: p.created_at, read: read.has(p.id), mine: p.author_id === me.id };
+      return { id: p.id, kind: p.kind, title: p.title, body: p.body, url, poster, embed: em?.src || null, play: url ? (p.asset_id ? "video" : videoKind(url)) : null, live_at: p.live_at, audience: p.audience, author: a?.name || "MUK Talent", author_id: p.author_id, at: p.created_at, read: read.has(p.id), mine: p.author_id === me.id };
     }));
   }
   app.get("/api/feed", limiter(600), route(async (req, res, me) => {
@@ -298,6 +335,7 @@ export function mountMukSocial(app, { db = service } = {}) {
   app.post("/api/feed", limiter(60, 60), route(async (req, res, me) => {
     const { client } = me; if (me.kind !== "staff") throw new SocialError("Only the MUK Talent team can publish.", 403);
     const v = postSchema.parse(req.body);
+    if (v.media_url && embedInfo(v.media_url)) { const e = embedInfo(v.media_url); v.media_url = e.url; if (!v.poster_url) { const meta = await vimeoMeta(e.url).catch(() => null); if (meta?.poster && /^https:\/\//.test(meta.poster)) v.poster_url = meta.poster; } }
     if (v.asset_id) { const a = ok(await client.from("mt_employee_assets").select("id,owner_id,mime,state").eq("id", v.asset_id).maybeSingle()); if (!a || a.state !== "uploaded" || (!me.admin && a.owner_id !== me.id) || !/^video\//.test(a.mime || "")) throw new SocialError("Video not found in your library.", 404); }
     if (v.media_id) { const m = ok(await client.from("mk_media").select("id,owner_id").eq("id", v.media_id).maybeSingle()); if (!m || (!me.admin && m.owner_id !== me.id)) throw new SocialError("Video not found in your library.", 404); }
     const row = ok(await client.from("mk_posts").insert({ ...v, author_id: me.id }).select("*").single(), "Unable to publish.");
@@ -330,6 +368,22 @@ export function mountMukSocial(app, { db = service } = {}) {
   }));
 
   // ---------- Video library (Cloudinary + links) ----------
+  app.get("/api/media/vimeo", limiter(120), route(async (req, res, me) => {
+    if (me.kind !== "staff") throw new SocialError("Not allowed.", 403);
+    const url = String(req.query.url || "").slice(0, 2000);
+    res.json({ data: await vimeoMeta(url) });
+  }));
+  app.get("/api/media/vimeo/list", limiter(120), route(async (req, res, me) => {
+    if (me.kind !== "staff") throw new SocialError("Not allowed.", 403);
+    const token = process.env.VIMEO_ACCESS_TOKEN;
+    if (!token) throw new SocialError("Vimeo is not connected yet. Add VIMEO_ACCESS_TOKEN in Vercel. You can still paste a Vimeo link.", 503);
+    const page = Math.max(1, Math.min(50, Number(req.query.page) || 1));
+    const r = await fetch(`https://api.vimeo.com/me/videos?per_page=24&page=${page}&sort=date&fields=uri,name,duration,pictures.sizes,player_embed_url,created_time`, { headers: { authorization: `bearer ${token}`, accept: "application/vnd.vimeo.*+json;version=3.4" }, signal: AbortSignal.timeout(8000) }).catch(() => null);
+    if (!r || !r.ok) throw new SocialError(r && (r.status === 401 || r.status === 403) ? "Vimeo rejected the token. Generate a new one with the Public, Private and Video files scopes." : "Vimeo is not responding. Try again.", 503);
+    const j = await r.json();
+    const data = (j.data || []).map(v => { const id = String(v.uri || "").split("/").pop(); const h = /[?&]h=([0-9a-f]+)/i.exec(v.player_embed_url || "")?.[1]; const e = embedInfo(`https://player.vimeo.com/video/${id}${h ? `?h=${h}` : ""}`); const sizes = v.pictures?.sizes || []; return e && { ...e, title: v.name, duration: v.duration, poster: sizes.filter(x => x.width >= 640).sort((a, b) => a.width - b.width)[0]?.link || sizes.at(-1)?.link || null, at: v.created_time }; }).filter(Boolean);
+    res.json({ data, more: Boolean(j.paging?.next) });
+  }));
   app.post("/api/media/cloudinary-sign", limiter(60), route(async (req, res, me) => {
     if (me.kind !== "staff") throw new SocialError("Not allowed.", 403);
     const { CLOUDINARY_CLOUD_NAME: cloud, CLOUDINARY_API_KEY: key, CLOUDINARY_API_SECRET: secret } = process.env;
@@ -340,13 +394,14 @@ export function mountMukSocial(app, { db = service } = {}) {
   app.get("/api/media", limiter(300), route(async (req, res, me) => {
     if (me.kind !== "staff") throw new SocialError("Not allowed.", 403);
     let q = me.client.from("mk_media").select("*").order("created_at", { ascending: false }).limit(200); if (!me.admin) q = q.eq("owner_id", me.id);
-    res.json({ data: ok(await q).map(m => ({ ...m, poster_url: m.poster_url || cloudinaryPoster(m.url), play: videoKind(m.url) })) });
+    res.json({ data: ok(await q).map(m => ({ ...m, poster_url: m.poster_url || cloudinaryPoster(m.url) || embedInfo(m.url)?.poster || null, embed: embedInfo(m.url)?.src || null, play: videoKind(m.url) })) });
   }));
   app.post("/api/media", limiter(60), route(async (req, res, me) => {
     if (me.kind !== "staff") throw new SocialError("Not allowed.", 403);
     const v = mediaSchema.parse(req.body);
+    const em = embedInfo(v.url); if (em) { v.url = em.url; if (!v.poster_url) { const meta = await vimeoMeta(em.url).catch(() => null); if (meta?.poster && /^https:\/\//.test(meta.poster)) v.poster_url = meta.poster; if (meta?.duration && !v.duration) v.duration = meta.duration; } }
     const row = ok(await me.client.from("mk_media").insert({ ...v, poster_url: v.poster_url || cloudinaryPoster(v.url), owner_id: me.id, kind: videoKind(v.url) }).select("*").single());
-    res.status(201).json({ data: { ...row, play: videoKind(row.url) } });
+    res.status(201).json({ data: { ...row, embed: embedInfo(row.url)?.src || null, play: videoKind(row.url) } });
   }));
   app.delete("/api/media/:id", limiter(60), route(async (req, res, me) => {
     if (me.kind !== "staff") throw new SocialError("Not allowed.", 403);

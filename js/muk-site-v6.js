@@ -29,7 +29,7 @@ matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change",e=>{if(!s
 
 /* ---------------- i18n engine ---------------- */
 const SKIP=new Set(["SCRIPT","STYLE","NOSCRIPT","TEXTAREA","CODE","PRE","svg","SVG","TEMPLATE"]);
-const ATTRS=["placeholder","aria-label","title","alt"];
+const ATTRS=["placeholder","aria-label","title","alt","label"];
 const originals=new WeakMap(),attrOriginals=new WeakMap(),lastSet=new WeakMap(),lastAttr=new WeakMap();
 const missing=window.__mukI18nMissing=new Set();
 let applying=false,packPromises={};
@@ -43,7 +43,7 @@ function loadPack(l){
  packPromises[l]=new Promise(res=>{
   const done=()=>res(pack(l));
   if(existing){if(pack(l))return done();existing.addEventListener("load",done,{once:true});existing.addEventListener("error",()=>res(null),{once:true});setTimeout(done,4000);return;}
-  const s=document.createElement("script");s.src=`/i18n/${l}.js?v=6.0.0`;s.onload=done;s.onerror=()=>res(null);document.head.append(s);
+  const s=document.createElement("script");s.src=`/i18n/${l}.js?v=13.0.0`;s.onload=done;s.onerror=()=>res(null);document.head.append(s);
  });
  return packPromises[l];
 }

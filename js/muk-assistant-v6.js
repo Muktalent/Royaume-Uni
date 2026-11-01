@@ -34,24 +34,44 @@ let KB=null,kbPromise=null,aiEnabled=null,busy=false;
 function loadKB(){
  if(KB)return Promise.resolve(KB);
  if(window.MUK_ASSISTANT_KB){KB=prepare(window.MUK_ASSISTANT_KB);return Promise.resolve(KB);}
- if(!kbPromise)kbPromise=new Promise((res,rej)=>{const s=document.createElement("script");s.src=`/js/muk-assistant-kb-v6.js?v=${V}`;s.async=true;s.onload=()=>{KB=prepare(window.MUK_ASSISTANT_KB);res(KB);};s.onerror=()=>{kbPromise=null;rej(new Error("kb"));};document.head.append(s);});
+ if(!kbPromise)kbPromise=new Promise((res,rej)=>{const s=document.createElement("script");s.src=`/js/muk-assistant-kb-v6.js?v=13.0.0`;s.async=true;s.onload=()=>{KB=prepare(window.MUK_ASSISTANT_KB);res(KB);};s.onerror=()=>{kbPromise=null;rej(new Error("kb"));};document.head.append(s);});
  return kbPromise;
 }
 const norm=s=>String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[\u064B-\u065F\u0670\u0640]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي").replace(/[’'`´]/g," ").replace(/[^\p{L}\p{N}\s-]/gu," ").replace(/\s+/g," ").trim();
-function prepare(kb){for(const i of kb.intents)i._kw=[...new Set(i.kw.map(norm).filter(Boolean))];return kb;}
-function match(text){
- const t=` ${norm(text)} `;let best=null,bestScore=0;const scores={};
- for(const i of KB.intents){let s=0;for(const k of i._kw){const hit=k.length<=3?t.includes(` ${k} `):t.includes(k);if(hit)s+=1+k.length/8;}scores[i.id]=s;if(s>bestScore){bestScore=s;best=i;}}
- if(best&&(best.id==="greet"||best.id==="thanks")){
-  const other=KB.intents.filter(i=>i.id!=="greet"&&i.id!=="thanks"&&scores[i.id]>0).sort((a,b)=>scores[b.id]-scores[a.id])[0];
-  if(other)best=other;
- }
- return best;
+const STOP=new Set("le la les un une des de du d l au aux et ou en a est ce que qui quoi pour par sur avec dans je j me mon ma mes tu te ton vous votre vos il elle on nous ils y ne pas plus faut faire peux puis the a an of to in on for and or is are do does i my me you your it can how what which be el los las del al y o es son que para por con en mi mis tu se lo como cual un una unos unas me te nos hay".split(" "));
+const stem=w=>w.length>4?w.replace(/(ements|ement|ments|ment|ations|ation|iones|cion|ions|ings|ing|ies|es|s|e)$/,""):w;
+const words=s=>norm(s).split(" ").filter(w=>w&&!STOP.has(w));
+function lev(a,b,max){if(Math.abs(a.length-b.length)>max)return max+1;let p=Array.from({length:b.length+1},(_,i)=>i);for(let i=1;i<=a.length;i++){const c=[i];let m=i;for(let j=1;j<=b.length;j++){c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));if(c[j]<m)m=c[j];}if(m>max)return max+1;p=c;}return p[b.length];}
+function prepare(kb){for(const i of kb.intents){const k=[...new Set(i.kw.map(norm).filter(Boolean))];i._ph=k.filter(x=>x.includes(" "));i._w=[...new Set(k.filter(x=>!x.includes(" ")).map(stem))];}return kb;}
+function scoreAll(text){
+ const t=` ${norm(text)} `,toks=words(text),st=toks.map(stem),scores={};
+ for(const i of KB.intents){let s=0;
+  for(const k of i._ph)if(t.includes(` ${k}`)||t.includes(k)&&k.length>7)s+=1.4+k.length/10;
+  for(const k of i._w){if(st.includes(k)){s+=1+k.length/8;continue;}
+   if(k.length>=5&&st.some(w=>w.length>=4&&(w.startsWith(k)||k.startsWith(w)&&w.length>=5))){s+=.8+k.length/12;continue;}
+   if(k.length>=4){const max=k.length>=9?2:1;if(st.some(w=>w.length>=4&&lev(w,k,max)<=max))s+=k.length>=7?1:.6;}}
+  scores[i.id]=s;}
+ return scores;
 }
+function match(text){
+ const scores=scoreAll(text);
+ const ranked=KB.intents.filter(i=>scores[i.id]>0).sort((a,b)=>scores[b.id]-scores[a.id]);
+ let best=ranked[0]||null;
+ if(best&&(best.id==="greet"||best.id==="thanks")){const o=ranked.find(i=>i.id!=="greet"&&i.id!=="thanks");if(o)best=o;}
+ match.score=best?scores[best.id]:0;
+ match.related=ranked.filter(i=>(i!==best||match.score<1)&&i.id!=="greet"&&i.id!=="thanks").slice(0,3).map(i=>i.id);
+ match.score=best?scores[best.id]:0;
+ return best&&match.score>=1?best:null;
+}
+let misses=0;
 function localAnswer(text){
  const l=lang(),i=match(text);
- if(!i)return{t:KB.fallback.a[l],links:KB.fallback.links,next:KB.fallback.next,id:"fallback"};
- return{t:i.a[l]||i.a.fr,links:i.links||[],next:i.next||[],id:i.id};
+ if(!i){misses++;const rel=match.related||[];const F=KB.fallback;
+  if(misses>=2&&KB.fallback2)return{t:KB.fallback2[l]||KB.fallback2.fr,links:["contact"],next:["talk",...rel.slice(0,2),"how"],id:"fallback"};
+  const next=[...new Set([...rel,...F.next])].slice(0,10);
+  return{t:F.a[l]||F.a.fr,links:F.links,next,id:"fallback"};}
+ misses=0;
+ return{t:i.a[l]||i.a.fr,links:i.links||[],next:i.next||[],id:i.id,talk:(KB.handoff||[]).includes(i.id)};
 }
 async function aiStatus(){
  if(aiEnabled!==null)return aiEnabled;
@@ -71,7 +91,7 @@ async function aiAnswer(){
 async function answer(text){
  await loadKB();
  const local=localAnswer(text);
- if(local.id!=="greet"&&local.id!=="thanks"&&await aiStatus()){
+ if(local.id!=="greet"&&local.id!=="thanks"&&!local.talk&&await aiStatus()){
   try{const a=await aiAnswer();a.links=local.id==="fallback"?["eval"]:local.links.slice(0,2);a.next=local.next;return a;}catch{}
  }
  return local;
@@ -160,10 +180,16 @@ function renderMsg(m){
  row.append(bub);log.append(row);
  return row;
 }
+function talkToTeam(){
+ const msgs=state.msgs.filter(m=>(m.r==="u"||m.r==="a")&&!m.w).slice(-12).map(m=>({from:m.r==="u"?"user":"bot",text:String(m.t).slice(0,600)}));
+ const lastQ=[...state.msgs].reverse().find(m=>{if(m.r!=="u")return false;const i=KB&&match(m.t);return !(i&&(KB.handoff||[]).includes(i.id));});
+ if(window.MUKTalk){window.MUKTalk.open({source:"assistant",message:lastQ?lastQ.t:"",transcript:msgs});}
+ else location.href="/contact/";
+}
 function renderChips(ids){
  chips.textContent="";if(!KB)return;
- const l=lang(),list=(ids&&ids.length?ids:KB.chips).slice(0,ids&&ids.length?4:10);
- for(const id of list){const lab=KB.chipLabels[id];if(!lab)continue;const b=el("button",{type:"button",class:"v6a-chip",text:lab[l]||lab.fr});b.addEventListener("click",()=>ask(lab[l]||lab.fr,id));chips.append(b);}
+ const l=lang(),list=(ids&&ids.length?ids:KB.chips).slice(0,ids&&ids.length?(ids.length>5?10:4):10);
+ for(const id of list){const lab=KB.chipLabels[id];if(!lab)continue;const b=el("button",{type:"button",class:id==="talk"?"v6a-chip v6a-chip-talk":"v6a-chip",text:lab[l]||lab.fr});b.addEventListener("click",()=>id==="talk"?talkToTeam():ask(lab[l]||lab.fr,id));chips.append(b);}
  chips.hidden=!chips.children.length;
 }
 function scrollEnd(){requestAnimationFrame(()=>{log.scrollTop=log.scrollHeight;});}
@@ -183,12 +209,12 @@ async function ask(text,chipId){
  log.append(typing);scrollEnd();
  let res;
  try{
-  if(chipId){const i=KB.intents.find(x=>x.id===chipId);res=i?{t:i.a[lang()]||i.a.fr,links:i.links||[],next:i.next||[]}:await answer(text);}
+  if(chipId){const i=KB.intents.find(x=>x.id===chipId);res=i?{t:i.a[lang()]||i.a.fr,links:i.links||[],next:i.next||[],talk:(KB.handoff||[]).includes(i.id)}:await answer(text);}
   else res=await answer(text);
  }catch{res={t:KB.fallback.a[lang()],links:KB.fallback.links,next:KB.fallback.next};}
  await new Promise(r=>setTimeout(r,res.ai?0:380));
  typing.remove();
- const m={r:"a",t:res.t,links:res.links,next:res.next,ai:!!res.ai};push(m);renderChips(m.next);
+ const m={r:"a",t:res.t,links:res.links,next:res.next,ai:!!res.ai};push(m);renderChips(m.next);if(res.talk)setTimeout(talkToTeam,450);
  busy=false;return m;
 }
 

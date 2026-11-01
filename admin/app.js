@@ -22106,9 +22106,9 @@ var ibtn = (name, label2, cls = "mkc-ib") => {
   return b;
 };
 var TX = {
-  en: { chats: "Chats", search: "Search", newChat: "New chat", write: "Message", send: "Send", record: "Hold to record a voice note", recording: "Recording\u2026", cancel: "Cancel", voice: "Voice message", empty: "No conversations yet. Start one with the + button.", emptyThread: "Say hello. Messages are private between the people in this chat.", counsellor: "Your counsellor", students: "Students", team: "MUK Talent team", you: "You", today: "Today", yesterday: "Yesterday", online: "MUK Talent", micDenied: "Microphone access is blocked. Allow it in your browser settings.", noMic: "Voice notes are not supported in this browser.", notif: "Notifications", messages: "Messages", unread: "{n} unread", allRead: "You are up to date", news: "News", live: "Live", video: "Video", noFeed: "No news yet. The MUK Talent team will post updates, lives and videos here.", watch: "Watch", ago: "ago", share: "Share", save: "Save", saved: "Saved", copied: "Link copied", openLink: "Open video", liveOn: "Live on {d}", publish: "Publish to students", title: "Title", description: "Description", kind: "Type", when: "Date and time", audience: "Audience", all: "All students", mine: "My students", videoSrc: "Video", upload: "Upload to Cloudinary", paste: "Paste a link", urlPh: "https://res.cloudinary.com/\u2026 or YouTube / Drive link", uploading: "Uploading\u2026 {p}%", published: "Published. Students will see it in their notifications.", remove: "Delete", close: "Close", fromLib: "From your library", retry: "Try again", loading: "Loading\u2026", hours: { s: "Just now", m: "{n} min ago", h: "{n} hours ago", h1: "1 hour ago", d: "{n} days ago", d1: "Yesterday" } },
-  fr: { chats: "Discussions", search: "Rechercher", newChat: "Nouvelle discussion", write: "Message", send: "Envoyer", record: "Maintenez pour enregistrer un vocal", recording: "Enregistrement\u2026", cancel: "Annuler", voice: "Message vocal", empty: "Aucune discussion. Commencez avec le bouton +.", emptyThread: "Dites bonjour. Les messages restent priv\xE9s entre les participants.", counsellor: "Votre conseill\xE8re", students: "\xC9tudiants", team: "\xC9quipe MUK Talent", you: "Vous", today: "Aujourd\u2019hui", yesterday: "Hier", online: "MUK Talent", micDenied: "Le micro est bloqu\xE9. Autorisez-le dans les r\xE9glages du navigateur.", noMic: "Les vocaux ne sont pas pris en charge par ce navigateur.", notif: "Notifications", messages: "Messages", unread: "{n} non lus", allRead: "Vous \xEAtes \xE0 jour", news: "Actualit\xE9", live: "Direct", video: "Vid\xE9o", noFeed: "Pas encore d\u2019actualit\xE9s. L\u2019\xE9quipe MUK Talent publiera ici infos, directs et vid\xE9os.", watch: "Regarder", ago: "", share: "Partager", save: "Enregistrer", saved: "Enregistr\xE9", copied: "Lien copi\xE9", openLink: "Ouvrir la vid\xE9o", liveOn: "En direct le {d}", publish: "Publier aux \xE9tudiants", title: "Titre", description: "Description", kind: "Type", when: "Date et heure", audience: "Public", all: "Tous les \xE9tudiants", mine: "Mes \xE9tudiants", videoSrc: "Vid\xE9o", upload: "Envoyer sur Cloudinary", paste: "Coller un lien", urlPh: "https://res.cloudinary.com/\u2026 ou lien YouTube / Drive", uploading: "Envoi\u2026 {p} %", published: "Publi\xE9. Les \xE9tudiants le verront dans leurs notifications.", remove: "Supprimer", close: "Fermer", fromLib: "Depuis votre biblioth\xE8que", retry: "R\xE9essayer", loading: "Chargement\u2026", hours: { s: "\xC0 l\u2019instant", m: "Il y a {n} min", h: "Il y a {n} heures", h1: "Il y a 1 heure", d: "Il y a {n} jours", d1: "Hier" } },
-  es: { chats: "Chats", search: "Buscar", newChat: "Nuevo chat", write: "Mensaje", send: "Enviar", record: "Mant\xE9n pulsado para grabar un audio", recording: "Grabando\u2026", cancel: "Cancelar", voice: "Mensaje de voz", empty: "A\xFAn no hay chats. Empieza uno con el bot\xF3n +.", emptyThread: "Saluda. Los mensajes son privados entre los participantes.", counsellor: "Tu counsellor", students: "Estudiantes", team: "Equipo MUK Talent", you: "T\xFA", today: "Hoy", yesterday: "Ayer", online: "MUK Talent", micDenied: "El micr\xF3fono est\xE1 bloqueado. Perm\xEDtelo en los ajustes del navegador.", noMic: "Este navegador no permite grabar audios.", notif: "Notificaciones", messages: "Mensajes", unread: "{n} sin leer", allRead: "Est\xE1s al d\xEDa", news: "Noticia", live: "Directo", video: "V\xEDdeo", noFeed: "A\xFAn no hay novedades. El equipo publicar\xE1 aqu\xED noticias, directos y v\xEDdeos.", watch: "Ver", ago: "", share: "Compartir", save: "Guardar", saved: "Guardado", copied: "Enlace copiado", openLink: "Abrir v\xEDdeo", liveOn: "En directo el {d}", publish: "Publicar a estudiantes", title: "T\xEDtulo", description: "Descripci\xF3n", kind: "Tipo", when: "Fecha y hora", audience: "P\xFAblico", all: "Todos los estudiantes", mine: "Mis estudiantes", videoSrc: "V\xEDdeo", upload: "Subir a Cloudinary", paste: "Pegar enlace", urlPh: "https://res.cloudinary.com/\u2026 o enlace de YouTube / Drive", uploading: "Subiendo\u2026 {p} %", published: "Publicado. Los estudiantes lo ver\xE1n en sus notificaciones.", remove: "Eliminar", close: "Cerrar", fromLib: "De tu biblioteca", retry: "Reintentar", loading: "Cargando\u2026", hours: { s: "Ahora", m: "Hace {n} min", h: "Hace {n} horas", h1: "Hace 1 hora", d: "Hace {n} d\xEDas", d1: "Ayer" } }
+  en: { chats: "Chats", search: "Search", newChat: "New chat", write: "Message", send: "Send", record: "Hold to record a voice note", recording: "Recording\u2026", cancel: "Cancel", voice: "Voice message", empty: "No conversations yet. Start one with the + button.", emptyThread: "Say hello. Messages are private between the people in this chat.", counsellor: "Your counsellor", students: "Students", team: "MUK Talent team", you: "You", today: "Today", yesterday: "Yesterday", online: "MUK Talent", micDenied: "Microphone access is blocked. Allow it in your browser settings.", noMic: "Voice notes are not supported in this browser.", notif: "Notifications", messages: "Messages", unread: "{n} unread", allRead: "You are up to date", news: "News", live: "Live", video: "Video", noFeed: "No news yet. The MUK Talent team will post updates, lives and videos here.", watch: "Watch", ago: "ago", share: "Share", save: "Save", saved: "Saved", copied: "Link copied", openLink: "Open video", liveOn: "Live on {d}", publish: "Publish to students", title: "Title", description: "Description", kind: "Type", when: "Date and time", audience: "Audience", all: "All students", mine: "My students", videoSrc: "Video", upload: "Upload to Cloudinary", paste: "Paste a link", urlPh: "Vimeo, YouTube or Cloudinary link (or Vimeo embed code)", uploading: "Uploading\u2026 {p}%", published: "Published. Students will see it in their notifications.", remove: "Delete", close: "Close", fromLib: "From your library", retry: "Try again", loading: "Loading\u2026", vimeo: "Choose from Vimeo", vimeoEmpty: "No videos found in your Vimeo account.", vimeoMore: "Load more", vimeoReady: "Vimeo video ready", resolving: "Reading the video\u2026", hours: { s: "Just now", m: "{n} min ago", h: "{n} hours ago", h1: "1 hour ago", d: "{n} days ago", d1: "Yesterday" } },
+  fr: { chats: "Discussions", search: "Rechercher", newChat: "Nouvelle discussion", write: "Message", send: "Envoyer", record: "Maintenez pour enregistrer un vocal", recording: "Enregistrement\u2026", cancel: "Annuler", voice: "Message vocal", empty: "Aucune discussion. Commencez avec le bouton +.", emptyThread: "Dites bonjour. Les messages restent priv\xE9s entre les participants.", counsellor: "Votre conseill\xE8re", students: "\xC9tudiants", team: "\xC9quipe MUK Talent", you: "Vous", today: "Aujourd\u2019hui", yesterday: "Hier", online: "MUK Talent", micDenied: "Le micro est bloqu\xE9. Autorisez-le dans les r\xE9glages du navigateur.", noMic: "Les vocaux ne sont pas pris en charge par ce navigateur.", notif: "Notifications", messages: "Messages", unread: "{n} non lus", allRead: "Vous \xEAtes \xE0 jour", news: "Actualit\xE9", live: "Direct", video: "Vid\xE9o", noFeed: "Pas encore d\u2019actualit\xE9s. L\u2019\xE9quipe MUK Talent publiera ici infos, directs et vid\xE9os.", watch: "Regarder", ago: "", share: "Partager", save: "Enregistrer", saved: "Enregistr\xE9", copied: "Lien copi\xE9", openLink: "Ouvrir la vid\xE9o", liveOn: "En direct le {d}", publish: "Publier aux \xE9tudiants", title: "Titre", description: "Description", kind: "Type", when: "Date et heure", audience: "Public", all: "Tous les \xE9tudiants", mine: "Mes \xE9tudiants", videoSrc: "Vid\xE9o", upload: "Envoyer sur Cloudinary", paste: "Coller un lien", urlPh: "Lien Vimeo, YouTube ou Cloudinary (ou code d\u2019int\xE9gration Vimeo)", uploading: "Envoi\u2026 {p} %", published: "Publi\xE9. Les \xE9tudiants le verront dans leurs notifications.", remove: "Supprimer", close: "Fermer", fromLib: "Depuis votre biblioth\xE8que", retry: "R\xE9essayer", loading: "Chargement\u2026", vimeo: "Choisir sur Vimeo", vimeoEmpty: "Aucune vid\xE9o dans votre compte Vimeo.", vimeoMore: "Voir plus", vimeoReady: "Vid\xE9o Vimeo pr\xEAte", resolving: "Lecture de la vid\xE9o\u2026", hours: { s: "\xC0 l\u2019instant", m: "Il y a {n} min", h: "Il y a {n} heures", h1: "Il y a 1 heure", d: "Il y a {n} jours", d1: "Hier" } },
+  es: { chats: "Chats", search: "Buscar", newChat: "Nuevo chat", write: "Mensaje", send: "Enviar", record: "Mant\xE9n pulsado para grabar un audio", recording: "Grabando\u2026", cancel: "Cancelar", voice: "Mensaje de voz", empty: "A\xFAn no hay chats. Empieza uno con el bot\xF3n +.", emptyThread: "Saluda. Los mensajes son privados entre los participantes.", counsellor: "Tu counsellor", students: "Estudiantes", team: "Equipo MUK Talent", you: "T\xFA", today: "Hoy", yesterday: "Ayer", online: "MUK Talent", micDenied: "El micr\xF3fono est\xE1 bloqueado. Perm\xEDtelo en los ajustes del navegador.", noMic: "Este navegador no permite grabar audios.", notif: "Notificaciones", messages: "Mensajes", unread: "{n} sin leer", allRead: "Est\xE1s al d\xEDa", news: "Noticia", live: "Directo", video: "V\xEDdeo", noFeed: "A\xFAn no hay novedades. El equipo publicar\xE1 aqu\xED noticias, directos y v\xEDdeos.", watch: "Ver", ago: "", share: "Compartir", save: "Guardar", saved: "Guardado", copied: "Enlace copiado", openLink: "Abrir v\xEDdeo", liveOn: "En directo el {d}", publish: "Publicar a estudiantes", title: "T\xEDtulo", description: "Descripci\xF3n", kind: "Tipo", when: "Fecha y hora", audience: "P\xFAblico", all: "Todos los estudiantes", mine: "Mis estudiantes", videoSrc: "V\xEDdeo", upload: "Subir a Cloudinary", paste: "Pegar enlace", urlPh: "Enlace de Vimeo, YouTube o Cloudinary (o c\xF3digo embed de Vimeo)", uploading: "Subiendo\u2026 {p} %", published: "Publicado. Los estudiantes lo ver\xE1n en sus notificaciones.", remove: "Eliminar", close: "Cerrar", fromLib: "De tu biblioteca", retry: "Reintentar", loading: "Cargando\u2026", vimeo: "Elegir de Vimeo", vimeoEmpty: "No hay v\xEDdeos en tu cuenta de Vimeo.", vimeoMore: "Ver m\xE1s", vimeoReady: "V\xEDdeo de Vimeo listo", resolving: "Leyendo el v\xEDdeo\u2026", hours: { s: "Ahora", m: "Hace {n} min", h: "Hace {n} horas", h1: "Hace 1 hora", d: "Hace {n} d\xEDas", d1: "Ayer" } }
 };
 var tx = (lang2) => TX[lang2] || TX.en;
 var fill = (s, v) => String(s).replace(/\{(\w+)\}/g, (_, k) => v[k] ?? "");
@@ -22854,6 +22854,20 @@ function openPost(p, { lang: lang2 = "en", api: api2 = null, onDelete = null } =
       (vid.requestFullscreen || vid.webkitEnterFullscreen)?.call(vid);
     };
     stage.append(fs);
+  } else if (p.url && p.embed) {
+    stage.classList.add("is-embed");
+    prog.hidden = true;
+    play.onclick = () => {
+      const f = E4("iframe", void 0, "mkc-vframe");
+      f.src = p.embed + (p.embed.includes("?") ? "&" : "?") + "autoplay=1";
+      f.title = p.title;
+      f.allow = "autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share";
+      f.allowFullscreen = true;
+      f.referrerPolicy = "strict-origin-when-cross-origin";
+      stage.classList.add("is-playing", "has-frame");
+      stage.append(f);
+      play.remove();
+    };
   } else if (p.url) {
     play.onclick = () => window.open(p.url, "_blank", "noopener");
     prog.hidden = true;
@@ -22888,7 +22902,7 @@ function openPost(p, { lang: lang2 = "en", api: api2 = null, onDelete = null } =
   };
   const sh = ibtn("share", L.share, "mkc-round");
   sh.onclick = async () => {
-    const url = p.url && p.play !== "video" ? p.url : location.origin + "/portal";
+    const url = p.url && p.play !== "video" && !p.embed ? p.url : location.origin + "/portal";
     try {
       if (navigator.share) await navigator.share({ title: p.title, text: p.body || p.title, url });
       else {
@@ -22903,7 +22917,7 @@ function openPost(p, { lang: lang2 = "en", api: api2 = null, onDelete = null } =
   const d = E4("p", p.body || "", "mkc-vdesc");
   const scroll = E4("div", void 0, "mkc-vscroll");
   scroll.append(stage, prog, actions, h, d);
-  if (p.url && p.play !== "video") {
+  if (p.url && p.play !== "video" && !p.embed) {
     const a = E4("a", L.openLink, "mkc-vlink");
     a.href = p.url;
     a.target = "_blank";
@@ -22965,14 +22979,18 @@ function openComposer({ api: api2, lang: lang2 = "en", preset = {}, onDone = () 
   const src = E4("div", void 0, "mkc-src");
   const lib = E4("p", "", "mkc-libnote");
   const url = E4("input");
-  url.type = "url";
+  url.type = "text";
+  url.inputMode = "url";
+  url.autocomplete = "off";
   url.placeholder = L.urlPh;
   url.value = v.media_url;
   url.oninput = () => {
     v.media_url = url.value.trim();
     v.media_id = null;
     v.asset_id = null;
+    v.poster_url = "";
     lib.hidden = true;
+    resolveSoon();
   };
   const up = E4("label", void 0, "mkc-upbtn");
   up.append(icon2("upload"), E4("span", L.upload));
@@ -22988,7 +23006,94 @@ function openComposer({ api: api2, lang: lang2 = "en", preset = {}, onDone = () 
   if (v.asset_id || v.media_id) {
     lib.textContent = L.fromLib + ": " + (preset.title || "");
   } else lib.hidden = true;
-  src.append(lib, up, bar, field2(L.paste, url));
+  const vm = E4("button", void 0, "mkc-upbtn mkc-vimeobtn");
+  vm.type = "button";
+  vm.append(icon2("video"), E4("span", L.vimeo));
+  const grid = E4("div", void 0, "mkc-vmgrid");
+  grid.hidden = true;
+  let vmPage = 1;
+  const pickVimeo = (it) => {
+    v.media_url = it.url;
+    v.media_id = null;
+    v.asset_id = null;
+    v.poster_url = it.poster || "";
+    url.value = it.url;
+    lib.hidden = false;
+    lib.textContent = L.vimeoReady + ": " + (it.title || it.id);
+    if (!v.title && it.title) {
+      v.title = it.title.slice(0, 140);
+      title.value = v.title;
+    }
+    grid.hidden = true;
+  };
+  async function loadVimeo(more) {
+    vm.classList.add("is-busy");
+    if (!more) {
+      grid.replaceChildren(E4("p", L.loading, "mkc-vmnote"));
+      vmPage = 1;
+    }
+    grid.hidden = false;
+    try {
+      const r = await api2("/api/media/vimeo/list?page=" + vmPage);
+      if (!more) grid.replaceChildren();
+      grid.querySelector(".mkc-vmmore")?.remove();
+      if (!r.data.length && !more) grid.append(E4("p", L.vimeoEmpty, "mkc-vmnote"));
+      for (const it of r.data) {
+        const b = E4("button", void 0, "mkc-vmitem");
+        b.type = "button";
+        if (it.poster) {
+          const im = E4("img");
+          im.src = it.poster;
+          im.alt = "";
+          im.loading = "lazy";
+          im.referrerPolicy = "no-referrer";
+          b.append(im);
+        }
+        b.append(E4("span", it.title || it.id, "mkc-vmtitle"), E4("small", it.duration ? mmss(it.duration * 1e3) : "", "mkc-vmdur"));
+        b.onclick = () => pickVimeo(it);
+        grid.append(b);
+      }
+      if (r.more) {
+        const m = E4("button", L.vimeoMore, "mkc-vmmore");
+        m.type = "button";
+        m.onclick = () => {
+          vmPage++;
+          loadVimeo(true);
+        };
+        grid.append(m);
+      }
+    } catch (e) {
+      grid.replaceChildren(E4("p", e.message, "mkc-vmnote is-error"));
+    } finally {
+      vm.classList.remove("is-busy");
+    }
+  }
+  vm.onclick = () => grid.hidden && !grid.childElementCount ? loadVimeo(false) : grid.hidden = !grid.hidden;
+  let rt = 0;
+  function resolveSoon() {
+    clearTimeout(rt);
+    const raw = url.value.trim();
+    if (!/vimeo\.com|youtu\.?be/i.test(raw)) return;
+    rt = setTimeout(async () => {
+      lib.hidden = false;
+      lib.textContent = L.resolving;
+      try {
+        const m = (await api2("/api/media/vimeo?url=" + encodeURIComponent(raw))).data;
+        if (url.value.trim() !== raw) return;
+        v.media_url = m.url;
+        v.poster_url = m.poster || "";
+        if (/<iframe/i.test(raw)) url.value = m.url;
+        lib.textContent = (m.provider === "vimeo" ? L.vimeoReady : "YouTube") + (m.title ? ": " + m.title : "");
+        if (!v.title && m.title) {
+          v.title = m.title.slice(0, 140);
+          title.value = v.title;
+        }
+      } catch (e) {
+        lib.textContent = e.message;
+      }
+    }, 450);
+  }
+  src.append(lib, up, bar, vm, grid, field2(L.paste, url));
   file.onchange = async () => {
     const fl = file.files?.[0];
     if (!fl) return;
@@ -25084,11 +25189,11 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
             im.onerror = () => im.remove();
             cv.append(im);
           }
-          cv.append(E8("span", m.play === "video" ? "Cloudinary" : "Link", "lx-cover-tag"));
+          cv.append(E8("span", m.play === "video" ? "Cloudinary" : m.play === "vimeo" ? "Vimeo" : m.play === "youtube" ? "YouTube" : "Link", "lx-cover-tag"));
           open.append(cv);
-          open.onclick = () => openPost({ id: m.id, kind: "video", title: m.title, url: m.url, poster: m.poster_url, play: m.play, at: m.created_at, author: "Library" }, { lang: "en" });
+          open.onclick = () => openPost({ id: m.id, kind: "video", title: m.title, url: m.url, poster: m.poster_url, play: m.play, embed: m.embed, at: m.created_at, author: "Library" }, { lang: "en" });
           const cap = E8("figcaption");
-          cap.append(E8("strong", m.title), E8("small", (m.play === "video" ? "Cloudinary video" : "Video link") + (m.bytes ? " \xB7 " + sizeText(m.bytes) : "")));
+          cap.append(E8("strong", m.title), E8("small", (m.play === "video" ? "Cloudinary video" : m.play === "vimeo" ? "Vimeo video" : m.play === "youtube" ? "YouTube video" : "Video link") + (m.bytes ? " \xB7 " + sizeText(m.bytes) : "")));
           const pb = E8("button", void 0, "lx-tile-pubbtn");
           pb.type = "button";
           pb.append(icon2("send"), E8("span", "Publish"));
@@ -27332,28 +27437,33 @@ function nav() {
     d.addEventListener("click", () => navigate(sections[0]));
     dock.append(d);
   }
-  if (!document.getElementById("adminChatNav")) {
+  {
     linkChatCss();
     const open = () => openMessenger({ api, lang: "es", onChange: () => adminWatch?.refresh() });
     const c = el2("button", void 0, "nav-button nav-chat");
     c.id = "adminChatNav";
     c.type = "button";
-    const ic = icon2("chat", "nav-icon");
-    c.append(ic, el2("span", "Mensajes"), el2("i", void 0, "nav-chat-badge"));
+    c.append(icon2("chat", "nav-icon"), el2("span", "Mensajes"), el2("i", void 0, "nav-chat-badge"));
     c.addEventListener("click", open);
-    nav2.after(c);
-    const h = heartButton("es", open);
-    h.id = "adminChatTop";
-    h.classList.add("admin-heart");
-    h.setAttribute("aria-label", "Mensajes");
-    h.title = "Mensajes";
-    document.querySelector("#appShell .page-header").append(h);
-    adminWatch = watchNotifications(api, (x) => {
-      setDot(h, { chat_unread: x.chat_unread });
-      const b = c.querySelector(".nav-chat-badge");
-      b.textContent = x.chat_unread ? String(x.chat_unread > 99 ? "99+" : x.chat_unread) : "";
-      b.hidden = !x.chat_unread;
+    nav2.append(c);
+    if (!document.getElementById("adminChatTop")) {
+      const h = heartButton("es", open);
+      h.id = "adminChatTop";
+      h.classList.add("admin-heart");
+      h.setAttribute("aria-label", "Mensajes");
+      h.title = "Mensajes";
+      document.querySelector("#appShell .page-header").append(h);
+    }
+    if (!adminWatch) adminWatch = watchNotifications(api, (x) => {
+      const h = document.getElementById("adminChatTop");
+      if (h) setDot(h, { chat_unread: x.chat_unread });
+      const b = document.querySelector("#adminChatNav .nav-chat-badge");
+      if (b) {
+        b.textContent = x.chat_unread ? String(x.chat_unread > 99 ? "99+" : x.chat_unread) : "";
+        b.hidden = !x.chat_unread;
+      }
     });
+    else adminWatch.refresh();
   }
   if (!document.getElementById("mobileLogout")) {
     const o = el2("button", void 0, "mobile-logout");

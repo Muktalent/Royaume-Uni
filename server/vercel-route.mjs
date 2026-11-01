@@ -5,7 +5,7 @@ export function apiUrl(raw, query = {}) {
     ? query?.__crm_route
     : routes.length === 1 ? routes[0] : null;
 
-  const allowed = /^[a-z0-9_-]+(?:\/[a-z0-9_-]+)*(?:\.(?:png|pkpass))?$/i;
+  const allowed = /^[a-z0-9_-]+(?:\/[a-z0-9_:-]+)*(?:\.(?:png|pkpass))?$/i;
   if (typeof route !== "string" || !route || route.length > 250 || !allowed.test(route)) {
     throw new Error("Invalid API route");
   }
@@ -14,3 +14,5 @@ export function apiUrl(raw, query = {}) {
   const search = url.searchParams.toString();
   return `/api/${route}${search ? `?${search}` : ""}`;
 }
+
+
