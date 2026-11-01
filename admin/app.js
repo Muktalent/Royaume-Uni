@@ -22929,306 +22929,6 @@ function openPost(p, { lang: lang2 = "en", api: api2 = null, onDelete = null } =
   bk.focus();
   return { close };
 }
-function openComposer({ api: api2, lang: lang2 = "en", preset = {}, mode = "publish", onDone = () => {
-} }) {
-  const L = tx(lang2), prod = mode === "production", heading = prod ? L.newProd : L.publish;
-  const { o, close } = overlay("mkc-compose", heading);
-  o.lang = lang2;
-  const f = E4("form", void 0, "mkc-cform");
-  const hd = E4("header", void 0, "mkc-bar");
-  const x = ibtn("close", L.close);
-  x.onclick = close;
-  hd.append(x, E4("h2", heading), E4("span"));
-  f.append(hd);
-  const v = { kind: preset.kind || "video", title: preset.title || "", body: "", media_url: preset.url || "", asset_id: preset.asset_id || null, media_id: preset.media_id || null, poster_url: preset.poster_url || "", live_at: "", audience: preset.audience || "all" };
-  const field2 = (label2, ctl) => {
-    const w = E4("label", void 0, "mkc-field");
-    w.append(E4("span", label2), ctl);
-    return w;
-  };
-  const seg = E4("div", void 0, "mkc-seg");
-  seg.setAttribute("role", "radiogroup");
-  seg.setAttribute("aria-label", L.kind);
-  for (const [k, lab, ic] of [["video", L.video, "video"], ["news", L.news, "news"], ["live", L.live, "live"]]) {
-    const b = E4("button", void 0, "");
-    b.type = "button";
-    b.setAttribute("role", "radio");
-    b.append(icon2(ic), E4("span", lab));
-    b.onclick = () => {
-      v.kind = k;
-      draw();
-    };
-    b.dataset.k = k;
-    seg.append(b);
-  }
-  const title = E4("input");
-  title.maxLength = 140;
-  title.required = true;
-  title.value = v.title;
-  title.oninput = () => v.title = title.value;
-  const desc = E4("textarea");
-  desc.rows = 3;
-  desc.maxLength = 2e3;
-  desc.oninput = () => v.body = desc.value;
-  const when = E4("input");
-  when.type = "datetime-local";
-  when.oninput = () => v.live_at = when.value;
-  let go = null;
-  const aud = E4("select");
-  aud.append(new Option(L.all, "all"), new Option(L.mine, "mine"), new Option(L.web, "web"));
-  aud.value = v.audience;
-  const audNote = E4("small", L.webNote, "mkc-audnote");
-  aud.onchange = () => {
-    v.audience = aud.value;
-    audNote.hidden = aud.value !== "web";
-    const sp = go?.querySelector("span");
-    if (sp && !prod) sp.textContent = aud.value === "web" ? L.pubWeb || L.publish : L.publish;
-  };
-  audNote.hidden = v.audience !== "web";
-  const src = E4("div", void 0, "mkc-src");
-  const lib = E4("p", "", "mkc-libnote");
-  const url = E4("input");
-  url.type = "text";
-  url.inputMode = "url";
-  url.autocomplete = "off";
-  url.placeholder = L.urlPh;
-  url.value = v.media_url;
-  url.oninput = () => {
-    v.media_url = url.value.trim();
-    v.media_id = null;
-    v.asset_id = null;
-    v.poster_url = "";
-    lib.hidden = true;
-    resolveSoon();
-  };
-  const up = E4("label", void 0, "mkc-upbtn");
-  up.append(icon2("upload"), E4("span", L.upload));
-  const file = E4("input");
-  file.type = "file";
-  file.accept = "video/*";
-  up.append(file);
-  const bar = E4("div", void 0, "mkc-upbar");
-  bar.hidden = true;
-  const fillEl = E4("i");
-  const pct = E4("small");
-  bar.append(fillEl, pct);
-  if (v.asset_id || v.media_id) {
-    lib.textContent = L.fromLib + ": " + (preset.title || "");
-  } else lib.hidden = true;
-  const vm = E4("button", void 0, "mkc-upbtn mkc-vimeobtn");
-  vm.type = "button";
-  vm.append(icon2("video"), E4("span", L.vimeo));
-  const grid = E4("div", void 0, "mkc-vmgrid");
-  grid.hidden = true;
-  let vmPage = 1;
-  const pickVimeo = (it) => {
-    v.media_url = it.url;
-    v.media_id = null;
-    v.asset_id = null;
-    v.poster_url = it.poster || "";
-    url.value = it.url;
-    lib.hidden = false;
-    lib.textContent = L.vimeoReady + ": " + (it.title || it.id);
-    if (!v.title && it.title) {
-      v.title = it.title.slice(0, 140);
-      title.value = v.title;
-    }
-    grid.hidden = true;
-  };
-  async function loadVimeo(more) {
-    vm.classList.add("is-busy");
-    if (!more) {
-      grid.replaceChildren(E4("p", L.loading, "mkc-vmnote"));
-      vmPage = 1;
-    }
-    grid.hidden = false;
-    try {
-      const r = await api2("/api/media/vimeo/list?page=" + vmPage);
-      if (!more) grid.replaceChildren();
-      grid.querySelector(".mkc-vmmore")?.remove();
-      if (!r.data.length && !more) grid.append(E4("p", L.vimeoEmpty, "mkc-vmnote"));
-      for (const it of r.data) {
-        const b = E4("button", void 0, "mkc-vmitem");
-        b.type = "button";
-        if (it.poster) {
-          const im = E4("img");
-          im.src = it.poster;
-          im.alt = "";
-          im.loading = "lazy";
-          im.referrerPolicy = "no-referrer";
-          b.append(im);
-        }
-        b.append(E4("span", it.title || it.id, "mkc-vmtitle"), E4("small", it.duration ? mmss(it.duration * 1e3) : "", "mkc-vmdur"));
-        b.onclick = () => pickVimeo(it);
-        grid.append(b);
-      }
-      if (r.more) {
-        const m = E4("button", L.vimeoMore, "mkc-vmmore");
-        m.type = "button";
-        m.onclick = () => {
-          vmPage++;
-          loadVimeo(true);
-        };
-        grid.append(m);
-      }
-    } catch (e) {
-      grid.replaceChildren(E4("p", e.message, "mkc-vmnote is-error"));
-    } finally {
-      vm.classList.remove("is-busy");
-    }
-  }
-  vm.onclick = () => grid.hidden && !grid.childElementCount ? loadVimeo(false) : grid.hidden = !grid.hidden;
-  let rt = 0;
-  function resolveSoon() {
-    clearTimeout(rt);
-    const raw = url.value.trim();
-    if (!/vimeo\.com|youtu\.?be/i.test(raw)) return;
-    rt = setTimeout(async () => {
-      lib.hidden = false;
-      lib.textContent = L.resolving;
-      try {
-        const m = (await api2("/api/media/vimeo?url=" + encodeURIComponent(raw))).data;
-        if (url.value.trim() !== raw) return;
-        v.media_url = m.url;
-        v.poster_url = m.poster || "";
-        if (/<iframe/i.test(raw)) url.value = m.url;
-        lib.textContent = (m.provider === "vimeo" ? L.vimeoReady : "YouTube") + (m.title ? ": " + m.title : "");
-        if (!v.title && m.title) {
-          v.title = m.title.slice(0, 140);
-          title.value = v.title;
-        }
-      } catch (e) {
-        lib.textContent = e.message;
-      }
-    }, 450);
-  }
-  src.append(lib, up, bar, vm, grid, field2(L.paste, url));
-  file.onchange = async () => {
-    const fl = file.files?.[0];
-    if (!fl) return;
-    bar.hidden = false;
-    up.classList.add("is-busy");
-    try {
-      const s = (await api2("/api/media/cloudinary-sign", { method: "POST", body: "{}" })).data;
-      const res = await new Promise((resolve, reject) => {
-        const fd = new FormData();
-        fd.append("file", fl);
-        fd.append("api_key", s.api_key);
-        fd.append("timestamp", s.timestamp);
-        fd.append("folder", s.folder);
-        fd.append("signature", s.signature);
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", s.upload_url);
-        xhr.upload.onprogress = (e) => {
-          if (e.lengthComputable) {
-            const p = Math.round(e.loaded / e.total * 100);
-            fillEl.style.width = p + "%";
-            pct.textContent = fill(L.uploading, { p });
-          }
-        };
-        xhr.onload = () => {
-          let j = {};
-          try {
-            j = JSON.parse(xhr.responseText);
-          } catch {
-          }
-          xhr.status < 300 ? resolve(j) : reject(new Error(j.error?.message || "Cloudinary error"));
-        };
-        xhr.onerror = () => reject(new Error("Network error"));
-        xhr.send(fd);
-      });
-      const m = (await api2("/api/media", { method: "POST", body: JSON.stringify({ url: res.secure_url, title: (v.title || fl.name).slice(0, 140), bytes: res.bytes || fl.size, duration: res.duration || 0 }) })).data;
-      v.media_id = m.id;
-      v.media_url = "";
-      v.asset_id = null;
-      url.value = "";
-      lib.hidden = false;
-      lib.textContent = L.fromLib + ": " + m.title;
-      if (!v.title) {
-        v.title = fl.name.replace(/\.[^.]+$/, "").slice(0, 140);
-        title.value = v.title;
-      }
-      pct.textContent = "100%";
-    } catch (e) {
-      toast(e.message);
-      bar.hidden = true;
-    } finally {
-      up.classList.remove("is-busy");
-      file.value = "";
-    }
-  };
-  const wTitle = field2(L.title, title), wDesc = field2(L.description, desc), wWhen = field2(L.when, when), wAud = field2(L.audience, aud), wSrc = field2(L.videoSrc, src);
-  wAud.append(audNote);
-  const msg = E4("p", "", "mkc-fmsg");
-  msg.setAttribute("role", "status");
-  go = E4("button", void 0, "mkc-primary");
-  go.type = "submit";
-  go.append(icon2(prod ? "upload" : "send"), E4("span", prod ? L.saveProd : v.audience === "web" ? L.pubWeb : L.publish));
-  const fixed = Boolean(preset.media_id || preset.asset_id) && !prod;
-  const scroll = E4("div", void 0, "mkc-cscroll");
-  scroll.append(...prod ? [wSrc, wTitle, msg, go] : [seg, wSrc, wTitle, wDesc, wWhen, wAud, msg, go]);
-  f.append(scroll);
-  if (fixed) {
-    seg.hidden = true;
-    up.hidden = vm.hidden = true;
-    url.closest(".mkc-field").hidden = true;
-  }
-  function draw() {
-    for (const b of seg.children) b.setAttribute("aria-checked", String(b.dataset.k === v.kind));
-    wSrc.hidden = v.kind === "news" && !fixed;
-    wWhen.hidden = v.kind !== "live";
-    when.required = v.kind === "live";
-    [...aud.options].find((op) => op.value === "web").disabled = v.kind !== "video";
-    if (v.kind !== "video" && aud.value === "web") {
-      aud.value = "all";
-      v.audience = "all";
-      audNote.hidden = true;
-    }
-  }
-  draw();
-  f.onsubmit = async (e) => {
-    e.preventDefault();
-    if (!f.reportValidity()) return;
-    go.disabled = true;
-    msg.textContent = "";
-    msg.className = "mkc-fmsg";
-    if (prod) {
-      try {
-        let m = null;
-        if (v.media_id) m = { id: v.media_id };
-        else if (v.media_url) m = (await api2("/api/media", { method: "POST", body: JSON.stringify({ url: v.media_url, title: v.title.trim().slice(0, 140), poster_url: v.poster_url || null }) })).data;
-        else {
-          msg.textContent = L.needVideo;
-          msg.classList.add("error");
-          go.disabled = false;
-          return;
-        }
-        toast(L.prodSaved);
-        close();
-        onDone(m);
-      } catch (err2) {
-        msg.textContent = err2.message;
-        msg.classList.add("error");
-        go.disabled = false;
-      }
-      return;
-    }
-    const payload = { kind: v.kind, title: v.title.trim(), body: v.body.trim() || null, audience: v.audience, media_url: v.kind === "news" ? v.media_url || null : v.media_id || v.asset_id ? null : v.media_url || null, asset_id: v.kind === "news" && !fixed ? null : v.asset_id, media_id: v.kind === "news" && !fixed ? null : v.media_id, poster_url: v.poster_url || null, live_at: v.live_at ? new Date(v.live_at).toISOString() : null };
-    try {
-      const r = await api2("/api/feed", { method: "POST", body: JSON.stringify(payload) });
-      toast(L.published);
-      close();
-      onDone(r.data);
-    } catch (err2) {
-      msg.textContent = err2.message;
-      msg.classList.add("error");
-      go.disabled = false;
-    }
-  };
-  o.append(f);
-  title.focus();
-  return { close };
-}
 async function listMedia(api2, owner = null) {
   try {
     return (await api2("/api/media" + (owner ? "?owner=" + encodeURIComponent(owner) : ""))).data || [];
@@ -24493,7 +24193,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   let data = { records: [], leads: [], appointments: [], activity: [] }, directory = null, assets = [], section = "overview", busy = false, dialogBusy = false, loadVersion = 0;
   let payroll = {}, payrollBusy = {};
   let selectedDay = dateKey(), month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1), studioTab = "productions";
-  const groups = [["home", "Home", "home", [["overview", "Home"]]], ["students", "Students", "users", [["students", "Control centre"]]], ["pipeline", "Pipeline", "pipeline", [["leads", "Leads"], ["partner", "Partners"]]], ["planner", "Planner", "planner", [["calendar", "Calendar & reports"], ["task", "Tasks"]]], ["studio", "Studio", "studio", [["content", "Productions"], ["library", "Media library"]]], ["me", "My card", "card", [["card", "Card"], ["social", "Socials"], ["profile", "Profile"], ["account", "Account"]]]];
+  const groups = [["home", "Home", "home", [["overview", "Home"]]], ["students", "Students", "users", [["students", "Control centre"]]], ["pipeline", "Pipeline", "pipeline", [["leads", "Leads"], ["partner", "Partners"]]], ["planner", "Planner", "planner", [["calendar", "Calendar & reports"], ["task", "Tasks"]]], ["studio", "Studio", "studio", [["content", "Gallery"]]], ["me", "My card", "card", [["card", "Card"], ["social", "Socials"], ["profile", "Profile"], ["account", "Account"]]]];
   const pages = groups.flatMap((g) => g[3].map(([id, label2]) => [id, label2, g[0]]));
   const tabs = Object.fromEntries(groups.map((g) => [g[0], g[3][0][0]]));
   let group = "home";
@@ -24579,7 +24279,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       refresh.disabled = false;
     }
   }
-  const groupText = { home: "Your people, your priorities, your impact.", pipeline: "Leads and partners with clear next steps.", planner: "Appointments, daily reports and tasks in one place.", studio: "Your productions and your media library, in one place.", me: "Your digital introduction, ready to share.", students: "Global Passport \xB7 every student file, document and message." };
+  const groupText = { home: "Your people, your priorities, your impact.", pipeline: "Leads and partners with clear next steps.", planner: "Appointments, daily reports and tasks in one place.", studio: "Your gallery. Tap a photo or video to publish it.", me: "Your digital introduction, ready to share.", students: "Global Passport \xB7 every student file, document and message." };
   function render() {
     if (!root.isConnected) return;
     root.dataset.section = section;
@@ -24612,7 +24312,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       };
       tabBar.append(t2);
     }
-    const actionsFor = { leads: ["Add lead", () => edit("lead")], partner: ["Add partner", () => edit("partner")], task: ["Add task", () => edit("task")], content: ["New production", () => newProduction()], library: ["Add from phone", () => pickFromPhone()], calendar: ["Today\u2019s report", () => edit("report", records("report").find((r) => r.record_date === dateKey()), dateKey())] };
+    const actionsFor = { leads: ["Add lead", () => edit("lead")], partner: ["Add partner", () => edit("partner")], task: ["Add task", () => edit("task")], calendar: ["Today\u2019s report", () => edit("report", records("report").find((r) => r.record_date === dateKey()), dateKey())] };
     const act = actionsFor[section];
     add.hidden = readOnly || !act;
     if (act) {
@@ -24750,10 +24450,10 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     const d = directory || {}, items = [["Profile photo", Boolean(d.avatar_url), "profile"], ["Work contact details", Boolean(d.contact_phone || d.contact_email), "profile"], ["Short link", Boolean(d.card?.handle), "card"], ["Social links", Boolean(d.socials?.length), "social"], ["Card published", Boolean(d.card?.published), "card"]], done = items.filter((i) => i[1]).length, pct = Math.round(done / items.length * 100);
     const p = panel();
     p.classList.add("lx-strength");
-    const top = E8("div", void 0, "lx-strength-top"), svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("viewBox", "0 0 44 44");
-    svg.setAttribute("class", "lx-ring");
-    svg.setAttribute("aria-hidden", "true");
+    const top = E8("div", void 0, "lx-strength-top"), svg2 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg2.setAttribute("viewBox", "0 0 44 44");
+    svg2.setAttribute("class", "lx-ring");
+    svg2.setAttribute("aria-hidden", "true");
     for (const [cls, dash] of [["lx-ring-bg", "100 100"], ["lx-ring-fg", pct + " 100"]]) {
       const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
       c.setAttribute("cx", "22");
@@ -24762,10 +24462,10 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       c.setAttribute("pathLength", "100");
       c.setAttribute("stroke-dasharray", dash);
       c.setAttribute("class", cls);
-      svg.append(c);
+      svg2.append(c);
     }
     const ring2 = E8("div", void 0, "lx-ring-wrap");
-    ring2.append(svg, E8("strong", pct + "%"));
+    ring2.append(svg2, E8("strong", pct + "%"));
     const txt = E8("div");
     txt.append(E8("h2", "Card strength"), E8("p", done === items.length ? "Complete. Your card is ready to impress." : items.length - done + " quick wins left.", "lx-muted"));
     top.append(ring2, txt);
@@ -25145,224 +24845,467 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     if (!b) return "";
     return b >= 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB";
   }
-  const SRC_TAG = { vimeo: "Vimeo", youtube: "YouTube", cloudinary: "Cloudinary", file: "Library", link: "Link" }, AUD_TAG = { all: "All students", mine: "My students", web: "Website" };
-  let prodCache = null;
-  function prodItem(m) {
-    return { name: m.title, url: m.url, download: m.download_url || null, kind: m.play === "image" ? "image" : m.play === "video" ? "video" : m.embed ? "embed" : "link", embed: m.embed, bytes: m.bytes, poster: m.poster_url, media: m };
+  const AUD_LABEL = { web: "Website", all: "All students", mine: "My students" };
+  const SVG4 = { plus: '<path d="M12 5v14M5 12h14"/>', device: '<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>', link: '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>', vimeo: '<path d="M3 8.5c1.6-1.3 3-2.6 4.1-2.7 1.6-.2 2 1.1 2.3 3.1.4 2.6.8 4.6 1.4 4.6.5 0 1.6-1.6 2.6-3.6 1-2.1-.2-3.2-2-2.1.9-3.1 5.7-4 5.8-.6.1 2.3-1.7 5.6-4.3 8.7-2.3 2.8-3.9 3.5-5 1.6-.8-1.5-1.6-6.6-2.4-7.6-.4-.5-1-.1-1.6.4z"/>', globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z"/>', users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M15.5 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c1.9.7 3 2.4 3.5 5.2"/>', user: '<circle cx="12" cy="8" r="4"/><path d="M4 20.5c1-4 4-6 8-6s7 2 8 6"/>', down: '<path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M5 19.5h14"/>', trash: '<path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/>', close: '<path d="M6 6l12 12M18 6 6 18"/>', check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>' };
+  const svg = (n, c = "") => {
+    const sp = E8("span", void 0, "lx-svg " + c);
+    sp.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + SVG4[n] + "</svg>";
+    return sp;
+  };
+  let prodCache = null, galFilter = "all", galDraw = null;
+  function galleryItems(media) {
+    const linked = new Set(media.filter((m) => m.asset_id).map((m) => m.asset_id)), out = [];
+    for (const m of media) {
+      const a = m.asset_id ? assets.find((x) => x.id === m.asset_id) : null;
+      out.push({ key: "m" + m.id, media: m, asset: a, title: m.title || "Untitled", kind: m.play === "image" ? "image" : m.play === "video" ? "video" : m.embed ? "embed" : "link", url: m.url, embed: m.embed, poster: m.poster_url || null, download: m.download_url || null, source: m.source, at: m.created_at });
+    }
+    for (const a of assets) if (a.category === "content" && !linked.has(a.id)) {
+      const k = kindOf(a);
+      out.push({ key: "a" + a.id, media: null, asset: a, title: String(a.original_name || "File").replace(/\.[^.]+$/, ""), kind: k, url: a.url, embed: null, poster: k === "image" ? a.url : null, download: a.download_url || a.url, source: "file", at: a.created_at });
+    }
+    return out.sort((x, y) => String(y.at || "").localeCompare(String(x.at || "")));
   }
-  function assetItem(a) {
-    return { name: a.original_name, url: a.url, download: a.download_url || a.url, kind: kindOf(a), bytes: a.bytes, asset: a };
-  }
-  function dlIcon(href, name) {
-    const a = E8("a", void 0, "lx-tile-dl");
-    a.href = href;
-    a.setAttribute("download", name || "");
-    a.setAttribute("aria-label", "Download " + (name || ""));
-    a.title = "Download";
-    a.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M5 19h14"/></svg>';
-    a.onclick = (e) => e.stopPropagation();
-    return a;
-  }
-  function publish(m) {
-    const image = m.play === "image";
-    openComposer({ api: api2, lang: "en", preset: { kind: image ? "news" : "video", media_id: m.id, title: m.title, audience: "all" }, onDone: () => {
-      prodCache = null;
-      if (section === "content") render();
-    } });
-  }
+  const pubs = (it) => it.media?.published || [];
+  const isVideo = (it) => it.kind === "video" || it.kind === "embed" || it.kind === "link";
+  const SIZES = [[1, 2], [2, 4], [1, 2], [2, 2], [1, 3], [1, 3], [1, 2], [1, 2], [2, 3], [1, 2], [1, 2], [1, 2]];
   function studio() {
-    const bar = E8("div", void 0, "lx-studio-bar"), gallery = E8("div", void 0, "lx-gallery lx-gallery-grid");
-    body.append(bar, gallery);
-    if (section === "library") {
-      libraryView(bar, gallery);
-      return;
+    const wrap = E8("section", void 0, "lx-gal");
+    wrap.setAttribute("aria-label", "Studio gallery");
+    body.append(wrap);
+    const chips = E8("div", void 0, "lx-gal-chips"), grid = E8("div", void 0, "lx-gal-grid");
+    chips.setAttribute("role", "toolbar");
+    chips.setAttribute("aria-label", "Filter");
+    for (const [id, label2] of [["all", "All"], ["video", "#videos"], ["image", "#photos"], ["web", "#website"], ["students", "#students"]]) {
+      const c = E8("button", label2, "lx-gal-chip");
+      c.type = "button";
+      c.dataset.f = id;
+      c.setAttribute("aria-pressed", String(galFilter === id));
+      c.onclick = () => {
+        galFilter = id;
+        chips.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.f === id)));
+        draw();
+      };
+      chips.append(c);
     }
-    bar.append(E8("p", readOnly ? "Videos and photos saved in this counsellor\u2019s Productions. Use \u2193 to download." : "Your videos (link, Vimeo, upload) and photos added from the Media library. Publish each one to all students, your students or the website.", "lx-muted"));
+    wrap.append(chips, grid);
     if (!readOnly) {
-      const sent = button2("Published posts", () => openNotifications({ api: api2, lang: "en", onOpenChat: openChat, onChange: () => {
-        prodCache = null;
-        watcher2?.refresh();
-      } }));
-      sent.classList.add("lx-studio-sent");
-      bar.append(sent);
-      const add2 = E8("button", void 0, "lx-tile lx-tile-add");
-      add2.type = "button";
-      add2.append(E8("b", "+"), E8("strong", "New production"), E8("small", "Paste a link, choose from Vimeo or upload a video"));
-      add2.onclick = newProduction;
-      gallery.append(add2);
+      const fab = E8("button", void 0, "lx-gal-fab");
+      fab.type = "button";
+      fab.setAttribute("aria-label", "Add to the gallery");
+      fab.append(svg("plus"));
+      fab.onclick = addSheet;
+      wrap.append(fab);
     }
-    const wait = E8("p", "Loading productions\u2026", "lx-muted lx-prod-wait");
-    gallery.append(wait);
-    listMedia(api2, owner).then((list) => {
-      prodCache = list;
-      if (!gallery.isConnected) return;
-      wait.remove();
-      const items = list.map(prodItem);
-      list.forEach((m, i) => {
-        const c = E8("figure", void 0, "lx-tile lx-tile-prod lx-tile-cloud"), open = E8("button", void 0, "lx-tile-open");
-        open.type = "button";
-        open.setAttribute("aria-label", "Open " + m.title);
-        const cv = E8("div", void 0, "lx-media-cover lx-cover-" + (m.play === "image" ? "image" : "video"));
-        if (m.poster_url) {
+    grid.append(E8("p", "Loading gallery\u2026", "lx-gal-note"));
+    function draw() {
+      if (!grid.isConnected) return;
+      let items = galleryItems(prodCache || []);
+      if (galFilter === "video") items = items.filter(isVideo);
+      else if (galFilter === "image") items = items.filter((it) => it.kind === "image");
+      else if (galFilter === "web") items = items.filter((it) => pubs(it).some((p) => p.audience === "web"));
+      else if (galFilter === "students") items = items.filter((it) => pubs(it).some((p) => p.audience !== "web"));
+      grid.replaceChildren();
+      if (!items.length) {
+        grid.append(E8("p", galFilter !== "all" ? "Nothing here yet." : readOnly ? "This gallery is empty." : "Your gallery is empty. Tap + to add photos and videos from your phone, a link or Vimeo.", "lx-gal-note"));
+        return;
+      }
+      items.forEach((it, i) => {
+        const [c, r] = SIZES[i % SIZES.length], t2 = E8("button", void 0, "lx-gal-tile");
+        t2.type = "button";
+        t2.style.gridColumn = "span " + c;
+        t2.style.gridRow = "span " + r;
+        t2.setAttribute("aria-label", (isVideo(it) ? "Video: " : "Photo: ") + it.title);
+        if (it.poster) {
           const im = E8("img");
-          im.src = m.poster_url;
+          im.src = it.poster;
           im.alt = "";
           im.loading = "lazy";
+          im.decoding = "async";
           im.referrerPolicy = "no-referrer";
           im.onerror = () => im.remove();
-          cv.append(im);
-        } else if (m.play === "video" && m.url) {
+          t2.append(im);
+        } else if (it.kind === "video" && it.url) {
           const v = E8("video");
-          v.src = m.url + "#t=0.5";
+          v.src = it.url + "#t=0.6";
           v.muted = true;
           v.playsInline = true;
           v.preload = "metadata";
           v.setAttribute("aria-hidden", "true");
-          cv.append(v);
-        }
-        if (m.play !== "image") cv.append(E8("span", "\u25B6", "lx-play"));
-        cv.append(E8("span", SRC_TAG[m.source] || "Video", "lx-cover-tag"));
-        open.append(cv);
-        open.onclick = () => viewer(items, i);
-        const cap = E8("figcaption");
-        cap.append(E8("strong", m.title));
-        const pubs = [...new Set((m.published || []).map((p) => p.audience))];
-        if (pubs.length) {
-          const row = E8("span", void 0, "lx-pub-row");
-          for (const a of pubs) row.append(E8("em", AUD_TAG[a] || a, "lx-pub lx-pub-" + a));
-          cap.append(row);
-        } else cap.append(E8("small", (m.play === "image" ? "Photo" : "Video") + " \xB7 not published yet"));
-        c.append(open, cap);
-        if (!readOnly) {
-          const pb = E8("button", void 0, "lx-tile-pubbtn");
-          pb.type = "button";
-          pb.append(icon2("send"), E8("span", "Publish"));
-          pb.setAttribute("aria-label", "Publish " + m.title);
-          pb.onclick = (ev) => {
-            ev.stopPropagation();
-            publish(m);
-          };
-          c.append(pb);
-          const del = E8("button", "\xD7", "lx-tile-del");
-          del.type = "button";
-          del.setAttribute("aria-label", "Remove " + m.title);
-          del.onclick = async (ev) => {
-            ev.stopPropagation();
-            if (!confirm("Remove from Productions? Published posts stay until you delete them in \u201CPublished posts\u201D. The original file is not deleted.")) return;
-            try {
-              await api2("/api/media/" + m.id, { method: "DELETE" });
-              prodCache = null;
-              render();
-            } catch (error) {
-              notice(error.message, true);
-            }
-          };
-          c.append(del);
-        }
-        if (m.download_url) c.append(dlIcon(m.download_url, m.title));
-        gallery.append(c);
+          v.tabIndex = -1;
+          t2.append(v);
+        } else if (it.kind === "pdf" || it.kind === "file") t2.classList.add("is-doc");
+        t2.onclick = () => gview(items, i);
+        grid.append(t2);
       });
-      if (!list.length) empty(gallery, readOnly ? "No productions yet." : "No productions yet. Add a video link or a Vimeo video, or send files from the Media library.");
-    }).catch((e) => {
-      wait.textContent = e.message;
+    }
+    galDraw = draw;
+    (prodCache ? Promise.resolve(prodCache) : listMedia(api2, owner)).then((list) => {
+      prodCache = list;
+      draw();
     });
   }
-  function newProduction() {
-    if (readOnly) return;
-    openComposer({ api: api2, lang: "en", mode: "production", onDone: () => {
-      prodCache = null;
-      section = "content";
-      render();
-    } });
+  function redraw() {
+    galDraw && galDraw();
   }
-  async function addToProductions(a, btn3) {
-    if (btn3) btn3.disabled = true;
-    try {
-      const r = await api2("/api/media/from-asset", { method: "POST", body: JSON.stringify({ asset_id: a.id }) });
-      prodCache = null;
-      notice(r.existing ? "Already in Productions." : "Added to Productions. Open Productions to publish it.");
-      return r.data;
-    } catch (e) {
-      notice(e.message, true);
-      if (btn3) btn3.disabled = false;
-      return null;
+  function sheet(title2, opts) {
+    const d = E8("dialog", void 0, "lx-sheet");
+    d.lang = "en";
+    const h = E8("div", void 0, "lx-sheet-head");
+    h.append(E8("strong", title2));
+    const x = E8("button", void 0, "lx-sheet-x");
+    x.type = "button";
+    x.setAttribute("aria-label", "Close");
+    x.append(svg("close"));
+    x.onclick = () => d.close();
+    h.append(x);
+    d.append(h);
+    for (const [ic, label2, sub, fn] of opts) {
+      const b = E8("button", void 0, "lx-sheet-opt");
+      b.type = "button";
+      b.append(svg(ic, "lx-sheet-ic"));
+      const tx2 = E8("span");
+      tx2.append(E8("b", label2), E8("small", sub));
+      b.append(tx2);
+      b.onclick = () => {
+        d.close();
+        fn();
+      };
+      d.append(b);
     }
+    d.onclick = (e) => {
+      if (e.target === d) d.close();
+    };
+    d.onclose = () => d.remove();
+    root.append(d);
+    d.showModal();
   }
-  function libraryView(bar, gallery) {
-    const media = assets.filter((a) => a.category === "content");
-    bar.append(E8("p", readOnly ? "Files this counsellor uploaded. Use \u2193 to download." : "Your phone gallery for MUK Talent. Tap a file to view it and add it to Productions.", "lx-muted"));
-    if (!readOnly) {
-      const drop = E8("button", void 0, "lx-tile lx-tile-add");
-      drop.type = "button";
-      drop.append(E8("b", "+"), E8("strong", "Add from your phone"), E8("small", "Select several photos and videos at once from your gallery"));
-      drop.onclick = () => pickFromPhone();
-      drop.ondragover = (e) => {
-        e.preventDefault();
-        drop.classList.add("is-over");
-      };
-      drop.ondragleave = () => drop.classList.remove("is-over");
-      drop.ondrop = (e) => {
-        e.preventDefault();
-        drop.classList.remove("is-over");
-        const fl = [...e.dataTransfer?.files || []];
-        if (fl.length) uploadMany(fl);
-      };
-      gallery.append(drop);
-    }
-    const items = media.map(assetItem), tiles = /* @__PURE__ */ new Map();
-    media.forEach((a, i) => {
-      const c = E8("figure", void 0, "lx-tile lx-tile-" + kindOf(a)), open = E8("button", void 0, "lx-tile-open");
-      open.type = "button";
-      open.setAttribute("aria-label", "Open " + a.original_name);
-      open.append(mediaCover(a));
-      open.onclick = () => viewer(items, i);
-      const cap = E8("figcaption");
-      cap.append(E8("strong", a.original_name), E8("small", [{ video: "Video", image: "Photo", pdf: "PDF", file: "File" }[kindOf(a)], sizeText(a.bytes)].filter(Boolean).join(" \xB7 ")));
-      c.append(open, cap);
-      if (!readOnly && ["video", "image"].includes(kindOf(a))) {
-        const pb = E8("button", void 0, "lx-tile-pubbtn");
-        pb.type = "button";
-        pb.append(E8("span", "+ Productions"));
-        pb.setAttribute("aria-label", "Add " + a.original_name + " to Productions");
-        pb.onclick = async (ev) => {
-          ev.stopPropagation();
-          if (await addToProductions(a, pb)) {
-            pb.replaceChildren(E8("span", "In Productions"));
-            pb.classList.add("is-done");
+  function addSheet() {
+    sheet("Add to the gallery", [["device", "From this device", "Photos and videos from your phone or computer", () => pickFromPhone()], ["link", "Paste a link", "YouTube, Vimeo or Cloudinary video link", linkDialog], ["vimeo", "Import from Vimeo", "Choose videos already in your Vimeo account", vimeoImport]]);
+  }
+  function formDialog(title2) {
+    const d = E8("dialog", void 0, "lx-dialog lx-gform");
+    d.lang = "en";
+    const f = E8("form");
+    const top = E8("div", void 0, "lx-sheet-head");
+    top.append(E8("strong", title2));
+    const x = E8("button", void 0, "lx-sheet-x");
+    x.type = "button";
+    x.setAttribute("aria-label", "Close");
+    x.append(svg("close"));
+    x.onclick = () => d.close();
+    top.append(x);
+    f.append(top);
+    d.append(f);
+    d.onclose = () => d.remove();
+    root.append(d);
+    return { d, f };
+  }
+  function linkDialog() {
+    const { d, f } = formDialog("Paste a link"), u = E8("input"), t2 = E8("input"), msg = E8("p", "", "lx-muted"), go = E8("button", "Add to gallery", "lx-button lx-primary");
+    u.type = "url";
+    u.required = true;
+    u.placeholder = "https://vimeo.com/\u2026 or https://youtu.be/\u2026";
+    u.autocomplete = "off";
+    t2.maxLength = 140;
+    t2.placeholder = "Title (optional)";
+    go.type = "submit";
+    const l1 = E8("label", "Video link"), l2 = E8("label", "Title");
+    f.append(l1, u, l2, t2, msg, go);
+    d.showModal();
+    u.focus();
+    f.onsubmit = async (e) => {
+      e.preventDefault();
+      if (!f.reportValidity()) return;
+      go.disabled = true;
+      msg.textContent = "Saving\u2026";
+      try {
+        let title2 = t2.value.trim();
+        if (title2.length < 1) {
+          try {
+            title2 = new URL(u.value).hostname.replace(/^www\./, "") + " video";
+          } catch {
+            title2 = "Video";
           }
-        };
-        c.append(pb);
-        tiles.set(a.id, pb);
+        }
+        const r = await api2("/api/media", { method: "POST", body: JSON.stringify({ url: u.value.trim(), title: title2 }) });
+        prodCache = prodCache || [];
+        if (!prodCache.some((m) => m.id === r.data.id)) prodCache.unshift(r.data);
+        d.close();
+        notice(r.existing ? "This link is already in your gallery." : "Added to your gallery.");
+        redraw();
+      } catch (err2) {
+        msg.textContent = err2.message;
+        go.disabled = false;
+      }
+    };
+  }
+  function vimeoImport() {
+    const { d, f } = formDialog("Import from Vimeo");
+    d.classList.add("lx-vimeo");
+    const grid = E8("div", void 0, "lx-vm-grid"), msg = E8("p", "Loading your Vimeo videos\u2026", "lx-muted"), more = E8("button", "Load more", "lx-button"), go = E8("button", "Import", "lx-button lx-primary"), pick = /* @__PURE__ */ new Map();
+    let page = 1;
+    more.type = "button";
+    more.hidden = true;
+    go.type = "submit";
+    go.disabled = true;
+    const row = E8("div", void 0, "lx-vm-row");
+    row.append(more, go);
+    f.append(msg, grid, row);
+    d.showModal();
+    const have = new Set((prodCache || []).map((m) => String(m.url || "").replace(/\/$/, "")));
+    const upd = () => {
+      go.textContent = pick.size ? "Import " + pick.size + " video" + (pick.size > 1 ? "s" : "") : "Import";
+      go.disabled = !pick.size;
+    };
+    async function loadPage() {
+      more.disabled = true;
+      try {
+        const r = await api2("/api/media/vimeo/list?page=" + page);
+        msg.textContent = r.data.length || page > 1 ? "Tap the videos you want to add." : "There are no videos in your Vimeo account yet.";
+        for (const v of r.data) {
+          const b = E8("button", void 0, "lx-vm-item");
+          b.type = "button";
+          if (v.poster) {
+            const im = E8("img");
+            im.src = v.poster;
+            im.alt = "";
+            im.loading = "lazy";
+            im.referrerPolicy = "no-referrer";
+            b.append(im);
+          }
+          b.append(E8("span", v.title || "Vimeo video"));
+          if (have.has(String(v.url).replace(/\/$/, ""))) {
+            b.disabled = true;
+            b.classList.add("is-in");
+            b.append(E8("em", "In gallery"));
+          }
+          b.onclick = () => {
+            if (pick.has(v.url)) pick.delete(v.url);
+            else pick.set(v.url, v);
+            b.classList.toggle("is-on", pick.has(v.url));
+            b.setAttribute("aria-pressed", String(pick.has(v.url)));
+            upd();
+          };
+          grid.append(b);
+        }
+        more.hidden = !r.more;
+        page++;
+      } catch (e) {
+        msg.textContent = e.message;
+      } finally {
+        more.disabled = false;
+      }
+    }
+    more.onclick = loadPage;
+    loadPage();
+    f.onsubmit = async (e) => {
+      e.preventDefault();
+      if (!pick.size) return;
+      go.disabled = more.disabled = true;
+      let n = 0;
+      prodCache = prodCache || [];
+      for (const v of pick.values()) {
+        msg.textContent = "Importing " + ++n + " of " + pick.size + "\u2026";
+        try {
+          const r = await api2("/api/media", { method: "POST", body: JSON.stringify({ url: v.url, title: String(v.title || "Vimeo video").slice(0, 140), poster_url: v.poster || null }) });
+          if (!prodCache.some((m) => m.id === r.data.id)) prodCache.unshift(r.data);
+        } catch (err2) {
+          msg.textContent = err2.message;
+        }
+      }
+      d.close();
+      notice(n + " video" + (n > 1 ? "s" : "") + " imported from Vimeo.");
+      redraw();
+    };
+  }
+  async function ensureMedia(it) {
+    if (it.media) return it.media;
+    const r = await api2("/api/media/from-asset", { method: "POST", body: JSON.stringify({ asset_id: it.asset.id }) });
+    it.media = { ...r.data, published: r.data.published || [] };
+    prodCache = prodCache || [];
+    if (!prodCache.some((m) => m.id === it.media.id)) prodCache.unshift(it.media);
+    return it.media;
+  }
+  async function togglePub(it, aud) {
+    const cur = pubs(it).find((p) => p.audience === aud);
+    if (cur) {
+      await api2("/api/feed/" + cur.id, { method: "DELETE" });
+      it.media.published = pubs(it).filter((p) => p !== cur);
+      return false;
+    }
+    const m = await ensureMedia(it);
+    let title2 = String(it.title || "").trim();
+    if (title2.length < 2) title2 = "MUK Talent " + (isVideo(it) ? "video" : "photo");
+    const r = await api2("/api/feed", { method: "POST", body: JSON.stringify({ kind: it.kind === "image" ? "news" : "video", title: title2.slice(0, 140), media_id: m.id, audience: aud }) });
+    m.published = [...m.published || [], { id: r.data.id, audience: aud }];
+    return true;
+  }
+  async function removeItem(it) {
+    const n = pubs(it).length;
+    if (!confirm(n ? "Delete from the gallery? It will also be removed from the website and from students (" + n + " publication" + (n > 1 ? "s" : "") + ")." : "Delete from the gallery?")) return false;
+    for (const p of pubs(it)) await api2("/api/feed/" + p.id, { method: "DELETE" }).catch(() => {
+    });
+    if (it.asset) await api2("/api/workspace/assets/" + it.asset.id, { method: "DELETE" });
+    else if (it.media) await api2("/api/media/" + it.media.id, { method: "DELETE" });
+    prodCache = (prodCache || []).filter((m) => m.id !== it.media?.id);
+    if (it.asset) assets = assets.filter((a) => a.id !== it.asset.id);
+    return true;
+  }
+  function gview(items, start) {
+    let i = start;
+    const d = E8("dialog", void 0, "lx-gview");
+    d.lang = "en";
+    const top = E8("div", void 0, "lx-gv-top"), x = E8("button", void 0, "lx-gv-x");
+    x.type = "button";
+    x.setAttribute("aria-label", "Close");
+    x.append(svg("close"));
+    x.onclick = () => d.close();
+    const count = E8("span", "", "lx-gv-count");
+    top.append(count, x);
+    const stage = E8("div", void 0, "lx-gv-stage"), panel2 = E8("div", void 0, "lx-gv-panel"), ttl = E8("strong", "", "lx-gv-title"), meta = E8("small", "", "lx-gv-meta"), acts = E8("div", void 0, "lx-gv-acts"), tools = E8("div", void 0, "lx-gv-tools"), msg = E8("p", "", "lx-gv-msg");
+    msg.setAttribute("role", "status");
+    panel2.append(ttl, meta, acts, tools, msg);
+    d.append(top, stage, panel2);
+    const fmt = (v) => {
+      try {
+        return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(v));
+      } catch {
+        return "";
+      }
+    };
+    function actBtn(it, aud, ic, label2) {
+      const b = E8("button", void 0, "lx-gv-act");
+      b.type = "button";
+      const on = pubs(it).some((p) => p.audience === aud);
+      b.setAttribute("aria-pressed", String(on));
+      b.append(svg(on ? "check" : ic), E8("b", aud === "web" ? on ? "On the website" : "Publish on web" : on ? "Sent \xB7 " + AUD_LABEL[aud] : AUD_LABEL[aud]));
+      if (aud === "web" && !isVideo(it)) {
+        b.disabled = true;
+        b.title = "Only videos can be published on the website";
+      }
+      if (readOnly) b.disabled = true;
+      b.onclick = async () => {
+        b.disabled = true;
+        msg.textContent = "";
+        try {
+          const now = await togglePub(it, aud);
+          show();
+          redraw();
+          msg.textContent = aud === "web" ? now ? "Published on muktalent.com. Tap again to unpublish." : "Removed from the website." : now ? "Sent to " + AUD_LABEL[aud].toLowerCase() + "." : "Removed from " + AUD_LABEL[aud].toLowerCase() + ".";
+        } catch (e) {
+          msg.textContent = e.message;
+          b.disabled = false;
+        }
+      };
+      return b;
+    }
+    function show() {
+      const it = items[i];
+      stage.querySelectorAll("video").forEach((v) => v.pause());
+      stage.replaceChildren();
+      if (it.kind === "video") {
+        const v = E8("video");
+        v.src = it.url;
+        v.controls = true;
+        v.playsInline = true;
+        v.autoplay = true;
+        v.preload = "auto";
+        if (it.poster) v.poster = it.poster;
+        stage.append(v);
+      } else if (it.kind === "image") {
+        const im = E8("img");
+        im.src = it.url;
+        im.alt = it.title;
+        stage.append(im);
+      } else if (it.kind === "embed") {
+        const fr = E8("iframe");
+        fr.src = it.embed;
+        fr.title = it.title;
+        fr.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
+        fr.allowFullscreen = true;
+        fr.referrerPolicy = "strict-origin-when-cross-origin";
+        stage.append(fr);
+      } else {
+        const box = E8("div", void 0, "lx-gv-file");
+        const o = E8("a", it.kind === "pdf" ? "Open document" : "Open link", "lx-button lx-primary");
+        o.href = it.url;
+        o.target = "_blank";
+        o.rel = "noopener noreferrer";
+        box.append(E8("p", it.title), o);
+        stage.append(box);
+      }
+      ttl.textContent = it.title;
+      meta.textContent = [{ vimeo: "Vimeo", youtube: "YouTube", cloudinary: "Cloudinary", file: isVideo(it) ? "Video" : "Photo", link: "Link" }[it.source] || "", fmt(it.at), sizeText(it.asset?.bytes || it.media?.bytes)].filter(Boolean).join(" \xB7 ");
+      count.textContent = items.length > 1 ? i + 1 + " / " + items.length : "";
+      acts.replaceChildren(actBtn(it, "web", "globe"), actBtn(it, "all", "users"), actBtn(it, "mine", "user"));
+      acts.hidden = readOnly && !pubs(it).length;
+      tools.replaceChildren();
+      if (it.download) {
+        const a = E8("a", void 0, "lx-gv-tool");
+        a.href = it.download;
+        a.setAttribute("download", it.title || "");
+        a.append(svg("down"), E8("span", "Download"));
+        tools.append(a);
+      } else if (it.kind === "embed" || it.kind === "link") {
+        const a = E8("a", void 0, "lx-gv-tool");
+        a.href = it.media?.url || it.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.append(svg("link"), E8("span", it.source === "vimeo" ? "Open on Vimeo" : it.source === "youtube" ? "Open on YouTube" : "Open link"));
+        tools.append(a);
       }
       if (!readOnly) {
-        const del = E8("button", "\xD7", "lx-tile-del");
+        const del = E8("button", void 0, "lx-gv-tool lx-gv-del");
         del.type = "button";
-        del.setAttribute("aria-label", "Delete " + a.original_name);
-        del.onclick = async (ev) => {
-          ev.stopPropagation();
-          if (!confirm("Delete this file from your library?")) return;
+        del.append(svg("trash"), E8("span", "Delete"));
+        del.onclick = async () => {
           try {
-            await api2("/api/workspace/assets/" + a.id, { method: "DELETE" });
-            await load();
-          } catch (error) {
-            notice(error.message, true);
+            if (await removeItem(it)) {
+              items.splice(i, 1);
+              redraw();
+              if (!items.length) {
+                d.close();
+                return;
+              }
+              i = Math.min(i, items.length - 1);
+              show();
+            }
+          } catch (e) {
+            msg.textContent = e.message;
           }
         };
-        c.append(del);
+        tools.append(del);
       }
-      if (a.download_url || a.url) c.append(dlIcon(a.download_url || a.url, a.original_name));
-      gallery.append(c);
-    });
-    if (!readOnly && tiles.size) (prodCache ? Promise.resolve(prodCache) : listMedia(api2)).then((list) => {
-      prodCache = list;
-      for (const m of list) if (m.asset_id && tiles.has(m.asset_id)) {
-        const b = tiles.get(m.asset_id);
-        b.replaceChildren(E8("span", "In Productions"));
-        b.classList.add("is-done");
-        b.disabled = true;
-      }
-    });
-    if (!media.length) empty(gallery, readOnly ? "No media uploaded yet." : "Your library is empty. Add photos and videos from your phone.");
+      msg.textContent = "";
+    }
+    const go = (n) => {
+      if (items.length < 2) return;
+      i = (i + n + items.length) % items.length;
+      show();
+    };
+    d.onkeydown = (e) => {
+      if (e.key === "ArrowLeft") go(-1);
+      if (e.key === "ArrowRight") go(1);
+    };
+    let sx = null, sy = null;
+    stage.ontouchstart = (e) => {
+      sx = e.touches[0].clientX;
+      sy = e.touches[0].clientY;
+    };
+    stage.ontouchend = (e) => {
+      if (sx === null) return;
+      const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+      sx = null;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) go(dx > 0 ? -1 : 1);
+      else if (dy > 110) d.close();
+    };
+    d.onclose = () => {
+      d.querySelectorAll("video").forEach((v) => v.pause());
+      d.remove();
+    };
+    root.append(d);
+    show();
+    d.showModal();
   }
   function pickFromPhone() {
     if (readOnly) return;
@@ -25453,7 +25396,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       dialogBusy = false;
       close.disabled = false;
       msg.textContent = ok + " of " + rows.length + " uploaded.";
-      section = "library";
+      section = "content";
       await load();
       if (ok === rows.length) setTimeout(() => d.isConnected && d.close(), 900);
       notice(ok ? "Added to your library." : "Nothing was uploaded.", !ok);
@@ -25542,31 +25485,6 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         o.rel = "noopener noreferrer";
         box.append(o);
         stage.append(box);
-      }
-      if (!readOnly && a.asset && ["video", "image"].includes(k)) {
-        const add2 = E8("button", "+ Add to Productions", "lx-lb-dl lx-lb-add");
-        add2.type = "button";
-        const inProd = (prodCache || []).some((m) => m.asset_id === a.asset.id);
-        if (inProd) {
-          add2.textContent = "In Productions";
-          add2.disabled = true;
-        }
-        add2.onclick = async () => {
-          if (await addToProductions(a.asset, add2)) {
-            add2.textContent = "In Productions \u2713";
-            add2.disabled = true;
-          }
-        };
-        acts.append(add2);
-      }
-      if (!readOnly && a.media) {
-        const pb = E8("button", "Publish", "lx-lb-dl lx-lb-add");
-        pb.type = "button";
-        pb.onclick = () => {
-          d.close();
-          publish(a.media);
-        };
-        acts.append(pb);
       }
       if (a.download) {
         const dl = E8("a", "Download", "lx-lb-dl");
@@ -25822,11 +25740,13 @@ var GATE_TEXT = {
     roleStudentSub: "Global Passport",
     roleTeam: "Team",
     roleTeamSub: "MUK Talent staff",
-    welcomeStudent: "Welcome to your Global Passport",
-    welcomeStudentText: "Track your application, documents and counsellor messages in one place.",
-    welcomeTeam: "MUK Talent team access",
-    welcomeTeamText: "Private workspace for MUK Talent staff. Use the email given by the administration.",
-    remember: "Keep me signed in on this device today",
+    welcomeStudent: "Welcome back",
+    welcomeStudentText: "Sign in to access your MUK Talent account",
+    welcomeTeam: "Welcome back",
+    welcomeTeamText: "Sign in to your MUK Talent team workspace",
+    motto: "Study \xB7 Connect \xB7 Belong",
+    tagline: "Your global education partner",
+    remember: "Keep me signed in today",
     noAccount: "New student?",
     createFree: "Create your free account",
     haveAccount: "Already have an account?",
@@ -25879,11 +25799,13 @@ var GATE_TEXT = {
     roleStudentSub: "Global Passport",
     roleTeam: "\xC9quipe",
     roleTeamSub: "Personnel MUK",
-    welcomeStudent: "Bienvenue dans votre Global Passport",
-    welcomeStudentText: "Suivez votre candidature, vos documents et les messages de votre conseiller au m\xEAme endroit.",
-    welcomeTeam: "Acc\xE8s \xE9quipe MUK Talent",
-    welcomeTeamText: "Espace priv\xE9 du personnel MUK Talent. Utilisez l\u2019e-mail fourni par l\u2019administration.",
-    remember: "Rester connect\xE9 sur cet appareil aujourd\u2019hui",
+    welcomeStudent: "Bon retour",
+    welcomeStudentText: "Connectez-vous pour acc\xE9der \xE0 votre compte MUK Talent",
+    welcomeTeam: "Bon retour",
+    welcomeTeamText: "Connectez-vous \xE0 votre espace \xE9quipe MUK Talent",
+    motto: "\xC9tudier \xB7 Connecter \xB7 Appartenir",
+    tagline: "Votre partenaire \xE9ducatif international",
+    remember: "Rester connect\xE9 aujourd\u2019hui",
     noAccount: "Nouvel \xE9tudiant ?",
     createFree: "Cr\xE9ez votre compte gratuit",
     haveAccount: "Vous avez d\xE9j\xE0 un compte ?",

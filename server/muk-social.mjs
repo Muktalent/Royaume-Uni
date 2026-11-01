@@ -438,6 +438,8 @@ export function mountMukSocial(app, { db = service } = {}) {
     if (me.kind !== "staff") throw new SocialError("Not allowed.", 403);
     const v = mediaSchema.parse(req.body);
     const em = embedInfo(v.url); if (em) { v.url = em.url; if (!v.poster_url) { const meta = await vimeoMeta(em.url).catch(() => null); if (meta?.poster && /^https:\/\//.test(meta.poster)) v.poster_url = meta.poster; if (meta?.duration && !v.duration) v.duration = meta.duration; } }
+    const dup = ok(await me.client.from("mk_media").select("*").eq("owner_id", me.id).eq("url", v.url).limit(1))?.[0];
+    if (dup) return res.json({ data: (await mediaRows(me.client, [dup]))[0], existing: true });
     const row = ok(await me.client.from("mk_media").insert({ ...v, poster_url: v.poster_url || cloudinaryPoster(v.url), owner_id: me.id, kind: videoKind(v.url) }).select("*").single());
     res.status(201).json({ data: (await mediaRows(me.client, [row]))[0] });
   }));

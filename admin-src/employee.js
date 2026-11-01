@@ -25,7 +25,7 @@ export async function mountEmployee({staff,api,onLogout,owner=null,onBack=null})
  let data={records:[],leads:[],appointments:[],activity:[]},directory=null,assets=[],section='overview',busy=false,dialogBusy=false,loadVersion=0;
  let payroll={},payrollBusy={};
  let selectedDay=dateKey(),month=new Date(Number(selectedDay.slice(0,4)),Number(selectedDay.slice(5,7))-1,1),studioTab='productions';
- const groups=[['home','Home','home',[['overview','Home']]],['students','Students','users',[['students','Control centre']]],['pipeline','Pipeline','pipeline',[['leads','Leads'],['partner','Partners']]],['planner','Planner','planner',[['calendar','Calendar & reports'],['task','Tasks']]],['studio','Studio','studio',[['content','Productions'],['library','Media library']]],['me','My card','card',[['card','Card'],['social','Socials'],['profile','Profile'],['account','Account']]]];
+ const groups=[['home','Home','home',[['overview','Home']]],['students','Students','users',[['students','Control centre']]],['pipeline','Pipeline','pipeline',[['leads','Leads'],['partner','Partners']]],['planner','Planner','planner',[['calendar','Calendar & reports'],['task','Tasks']]],['studio','Studio','studio',[['content','Gallery']]],['me','My card','card',[['card','Card'],['social','Socials'],['profile','Profile'],['account','Account']]]];
  const pages=groups.flatMap(g=>g[3].map(([id,label])=>[id,label,g[0]]));const tabs=Object.fromEntries(groups.map(g=>[g[0],g[3][0][0]]));let group='home';const navButtons={},dockButtons={};
  for(const [id,label,symbol]of groups){const b=E('button',undefined,'lx-nav');b.type='button';b.append(icon(symbol,'lx-nav-icon'),E('span',label));b.onclick=()=>navigate(tabs[id]);navButtons[id]=b;nav.append(b);}
  const dock=E('nav',undefined,'lx-dock');dock.setAttribute('aria-label','Workspace sections');for(const [id,label,symbol]of groups){const b=E('button');b.type='button';b.append(icon(symbol,'lx-dock-icon'),E('small',label));b.onclick=()=>navigate(tabs[id]);dockButtons[id]=b;dock.append(b);}root.append(dock);
@@ -38,11 +38,11 @@ export async function mountEmployee({staff,api,onLogout,owner=null,onBack=null})
  function navigate(id){if(dialogBusy)return;if(id==='home')id='overview';const page=pages.find(p=>p[0]===id);if(!page)return;section=id;group=page[2];tabs[group]=id;render();window.scrollTo({top:0,behavior:'auto'});}
  async function refreshDirectory(){try{directory=(await api('/api/team-directory'+(owner?'?owner='+encodeURIComponent(owner):''))).data;}catch{}}
  async function load(){if(busy)return;const version=++loadVersion;busy=true;refresh.disabled=true;notice('Updating your workspace…');try{const query=owner?'?owner='+encodeURIComponent(owner):'';const results=await Promise.all([api('/api/workspace'+query),api('/api/team-directory'+query),api('/api/workspace/assets'+query)]);if(version!==loadVersion||!root.isConnected)return;[data,{data:directory},{data:assets}]=results;render();notice('Updated · '+time(new Date().toISOString())+' · Morocco time');}catch(error){notice('Unable to load the workspace. Sign in again or contact your administrator. '+error.message,true);}finally{busy=false;refresh.disabled=false;}}
- const groupText={home:'Your people, your priorities, your impact.',pipeline:'Leads and partners with clear next steps.',planner:'Appointments, daily reports and tasks in one place.',studio:'Your productions and your media library, in one place.',me:'Your digital introduction, ready to share.',students:'Global Passport · every student file, document and message.'};
+ const groupText={home:'Your people, your priorities, your impact.',pipeline:'Leads and partners with clear next steps.',planner:'Appointments, daily reports and tasks in one place.',studio:'Your gallery. Tap a photo or video to publish it.',me:'Your digital introduction, ready to share.',students:'Global Passport · every student file, document and message.'};
  function render(){if(!root.isConnected)return;root.dataset.section=section;root.dataset.group=group;root.querySelectorAll('.ws-member-banner').forEach(n=>n.remove());body.replaceChildren();const g=groups.find(x=>x[0]===group);title.textContent=group==='home'?'Hello, '+(directory?.full_name||staff.full_name).split(' ')[0]:g[1];subtitle.textContent=readOnly?'Read-only employee workspace.':groupText[group];
  for(const [id,b]of [...Object.entries(navButtons),...Object.entries(dockButtons)]){b.classList.toggle('active',id===group);if(id===group)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current');}
  tabBar.replaceChildren();tabBar.hidden=g[3].length<2;for(const [id,label]of g[3]){if(readOnly&&id==='account')continue;const t=E('button',label,'lx-tab');t.type='button';t.setAttribute('role','tab');t.setAttribute('aria-selected',String(id===section));t.tabIndex=id===section?0:-1;t.onclick=()=>navigate(id);t.onkeydown=e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;const list=[...tabBar.children],i=list.indexOf(t),next=list[(i+(e.key==='ArrowRight'?1:list.length-1))%list.length];next.click();tabBar.querySelector('[aria-selected=true]')?.focus();};tabBar.append(t);}
- const actionsFor={leads:['Add lead',()=>edit('lead')],partner:['Add partner',()=>edit('partner')],task:['Add task',()=>edit('task')],content:['New production',()=>newProduction()],library:['Add from phone',()=>pickFromPhone()],calendar:['Today’s report',()=>edit('report',records('report').find(r=>r.record_date===dateKey()),dateKey())]};const act=actionsFor[section];add.hidden=readOnly||!act;if(act){add.textContent=act[0];add.onclick=act[1];}
+ const actionsFor={leads:['Add lead',()=>edit('lead')],partner:['Add partner',()=>edit('partner')],task:['Add task',()=>edit('task')],calendar:['Today’s report',()=>edit('report',records('report').find(r=>r.record_date===dateKey()),dateKey())]};const act=actionsFor[section];add.hidden=readOnly||!act;if(act){add.textContent=act[0];add.onclick=act[1];}
  const ctx={host:body,api,owner,readOnly,staff};
  if(section==='overview')overview();else if(section==='leads')leads();else if(section==='partner'||section==='task')listRecords(section);else if(section==='calendar')calendarPage();else if(section==='content'||section==='library')studio();
  else if(section==='profile')renderMyProfile({...ctx,root});
@@ -123,48 +123,93 @@ export async function mountEmployee({staff,api,onLogout,owner=null,onBack=null})
  function softChrome(){let m=document.querySelector('meta[name=theme-color]');if(!m){m=E('meta');m.name='theme-color';document.head.append(m);}m.dataset.previous=m.dataset.previous||m.content;m.content='#efe8dc';for(const [n,c]of [['apple-mobile-web-app-capable','yes'],['mobile-web-app-capable','yes'],['apple-mobile-web-app-status-bar-style','black-translucent']])if(!document.querySelector('meta[name='+n+']')){const x=E('meta');x.name=n;x.content=c;document.head.append(x);}document.documentElement.classList.add('mt-soft');}
  function kindOf(a){const m=a?.mime||'';return m.startsWith('video/')?'video':m.startsWith('image/')?'image':m==='application/pdf'?'pdf':'file';}
  function sizeText(b){if(!b)return '';return b>=1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';}
- /* ---------- v14 Studio: Productions (video gallery + publish) and Media library (phone gallery) ---------- */
- const SRC_TAG={vimeo:'Vimeo',youtube:'YouTube',cloudinary:'Cloudinary',file:'Library',link:'Link'},AUD_TAG={all:'All students',mine:'My students',web:'Website'};
- let prodCache=null;
- function prodItem(m){return {name:m.title,url:m.url,download:m.download_url||null,kind:m.play==='image'?'image':m.play==='video'?'video':m.embed?'embed':'link',embed:m.embed,bytes:m.bytes,poster:m.poster_url,media:m};}
- function assetItem(a){return {name:a.original_name,url:a.url,download:a.download_url||a.url,kind:kindOf(a),bytes:a.bytes,asset:a};}
- function dlIcon(href,name){const a=E('a',undefined,'lx-tile-dl');a.href=href;a.setAttribute('download',name||'');a.setAttribute('aria-label','Download '+(name||''));a.title='Download';a.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M5 19h14"/></svg>';a.onclick=e=>e.stopPropagation();return a;}
- function publish(m){const image=m.play==='image';openComposer({api,lang:'en',preset:{kind:image?'news':'video',media_id:m.id,title:m.title,audience:'all'},onDone:()=>{prodCache=null;if(section==='content')render();}});}
- function studio(){const bar=E('div',undefined,'lx-studio-bar'),gallery=E('div',undefined,'lx-gallery lx-gallery-grid');body.append(bar,gallery);
-  if(section==='library'){libraryView(bar,gallery);return;}
-  bar.append(E('p',readOnly?'Videos and photos saved in this counsellor’s Productions. Use ↓ to download.':'Your videos (link, Vimeo, upload) and photos added from the Media library. Publish each one to all students, your students or the website.','lx-muted'));
-  if(!readOnly){const sent=button('Published posts',()=>openNotifications({api,lang:'en',onOpenChat:openChat,onChange:()=>{prodCache=null;watcher?.refresh();}}));sent.classList.add('lx-studio-sent');bar.append(sent);
-   const add=E('button',undefined,'lx-tile lx-tile-add');add.type='button';add.append(E('b','+'),E('strong','New production'),E('small','Paste a link, choose from Vimeo or upload a video'));add.onclick=newProduction;gallery.append(add);}
-  const wait=E('p','Loading productions…','lx-muted lx-prod-wait');gallery.append(wait);
-  listMedia(api,owner).then(list=>{prodCache=list;if(!gallery.isConnected)return;wait.remove();const items=list.map(prodItem);
-   list.forEach((m,i)=>{const c=E('figure',undefined,'lx-tile lx-tile-prod lx-tile-cloud'),open=E('button',undefined,'lx-tile-open');open.type='button';open.setAttribute('aria-label','Open '+m.title);
-    const cv=E('div',undefined,'lx-media-cover lx-cover-'+(m.play==='image'?'image':'video'));
-    if(m.poster_url){const im=E('img');im.src=m.poster_url;im.alt='';im.loading='lazy';im.referrerPolicy='no-referrer';im.onerror=()=>im.remove();cv.append(im);}
-    else if(m.play==='video'&&m.url){const v=E('video');v.src=m.url+'#t=0.5';v.muted=true;v.playsInline=true;v.preload='metadata';v.setAttribute('aria-hidden','true');cv.append(v);}
-    if(m.play!=='image')cv.append(E('span','\u25b6','lx-play'));cv.append(E('span',SRC_TAG[m.source]||'Video','lx-cover-tag'));open.append(cv);open.onclick=()=>viewer(items,i);
-    const cap=E('figcaption');cap.append(E('strong',m.title));const pubs=[...new Set((m.published||[]).map(p=>p.audience))];
-    if(pubs.length){const row=E('span',undefined,'lx-pub-row');for(const a of pubs)row.append(E('em',AUD_TAG[a]||a,'lx-pub lx-pub-'+a));cap.append(row);}else cap.append(E('small',(m.play==='image'?'Photo':'Video')+' · not published yet'));
-    c.append(open,cap);
-    if(!readOnly){const pb=E('button',undefined,'lx-tile-pubbtn');pb.type='button';pb.append(mkIcon('send'),E('span','Publish'));pb.setAttribute('aria-label','Publish '+m.title);pb.onclick=ev=>{ev.stopPropagation();publish(m);};c.append(pb);
-     const del=E('button','\u00d7','lx-tile-del');del.type='button';del.setAttribute('aria-label','Remove '+m.title);del.onclick=async ev=>{ev.stopPropagation();if(!confirm('Remove from Productions? Published posts stay until you delete them in “Published posts”. The original file is not deleted.'))return;try{await api('/api/media/'+m.id,{method:'DELETE'});prodCache=null;render();}catch(error){notice(error.message,true);}};c.append(del);}
-    if(m.download_url)c.append(dlIcon(m.download_url,m.title));
-    gallery.append(c);});
-   if(!list.length)empty(gallery,readOnly?'No productions yet.':'No productions yet. Add a video link or a Vimeo video, or send files from the Media library.');}).catch(e=>{wait.textContent=e.message;});}
- function newProduction(){if(readOnly)return;openComposer({api,lang:'en',mode:'production',onDone:()=>{prodCache=null;section='content';render();}});}
- async function addToProductions(a,btn){if(btn)btn.disabled=true;try{const r=await api('/api/media/from-asset',{method:'POST',body:JSON.stringify({asset_id:a.id})});prodCache=null;notice(r.existing?'Already in Productions.':'Added to Productions. Open Productions to publish it.');return r.data;}catch(e){notice(e.message,true);if(btn)btn.disabled=false;return null;}}
- function libraryView(bar,gallery){const media=assets.filter(a=>a.category==='content');
-  bar.append(E('p',readOnly?'Files this counsellor uploaded. Use ↓ to download.':'Your phone gallery for MUK Talent. Tap a file to view it and add it to Productions.','lx-muted'));
-  if(!readOnly){const drop=E('button',undefined,'lx-tile lx-tile-add');drop.type='button';drop.append(E('b','+'),E('strong','Add from your phone'),E('small','Select several photos and videos at once from your gallery'));drop.onclick=()=>pickFromPhone();
-   drop.ondragover=e=>{e.preventDefault();drop.classList.add('is-over');};drop.ondragleave=()=>drop.classList.remove('is-over');drop.ondrop=e=>{e.preventDefault();drop.classList.remove('is-over');const fl=[...(e.dataTransfer?.files||[])];if(fl.length)uploadMany(fl);};gallery.append(drop);}
-  const items=media.map(assetItem),tiles=new Map();
-  media.forEach((a,i)=>{const c=E('figure',undefined,'lx-tile lx-tile-'+kindOf(a)),open=E('button',undefined,'lx-tile-open');open.type='button';open.setAttribute('aria-label','Open '+a.original_name);open.append(mediaCover(a));open.onclick=()=>viewer(items,i);
-   const cap=E('figcaption');cap.append(E('strong',a.original_name),E('small',[{video:'Video',image:'Photo',pdf:'PDF',file:'File'}[kindOf(a)],sizeText(a.bytes)].filter(Boolean).join(' · ')));c.append(open,cap);
-   if(!readOnly&&['video','image'].includes(kindOf(a))){const pb=E('button',undefined,'lx-tile-pubbtn');pb.type='button';pb.append(E('span','+ Productions'));pb.setAttribute('aria-label','Add '+a.original_name+' to Productions');pb.onclick=async ev=>{ev.stopPropagation();if(await addToProductions(a,pb)){pb.replaceChildren(E('span','In Productions'));pb.classList.add('is-done');}};c.append(pb);tiles.set(a.id,pb);}
-   if(!readOnly){const del=E('button','\u00d7','lx-tile-del');del.type='button';del.setAttribute('aria-label','Delete '+a.original_name);del.onclick=async ev=>{ev.stopPropagation();if(!confirm('Delete this file from your library?'))return;try{await api('/api/workspace/assets/'+a.id,{method:'DELETE'});await load();}catch(error){notice(error.message,true);}};c.append(del);}
-   if(a.download_url||a.url)c.append(dlIcon(a.download_url||a.url,a.original_name));
-   gallery.append(c);});
-  if(!readOnly&&tiles.size)(prodCache?Promise.resolve(prodCache):listMedia(api)).then(list=>{prodCache=list;for(const m of list)if(m.asset_id&&tiles.has(m.asset_id)){const b=tiles.get(m.asset_id);b.replaceChildren(E('span','In Productions'));b.classList.add('is-done');b.disabled=true;}});
-  if(!media.length)empty(gallery,readOnly?'No media uploaded yet.':'Your library is empty. Add photos and videos from your phone.');}
+ /* ---------- v15 Studio: one gallery (files, links, Vimeo) · publish from the viewer ---------- */
+ const AUD_LABEL={web:'Website',all:'All students',mine:'My students'};
+ const SVG={plus:'<path d="M12 5v14M5 12h14"/>',device:'<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>',link:'<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>',vimeo:'<path d="M3 8.5c1.6-1.3 3-2.6 4.1-2.7 1.6-.2 2 1.1 2.3 3.1.4 2.6.8 4.6 1.4 4.6.5 0 1.6-1.6 2.6-3.6 1-2.1-.2-3.2-2-2.1.9-3.1 5.7-4 5.8-.6.1 2.3-1.7 5.6-4.3 8.7-2.3 2.8-3.9 3.5-5 1.6-.8-1.5-1.6-6.6-2.4-7.6-.4-.5-1-.1-1.6.4z"/>',globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M15.5 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c1.9.7 3 2.4 3.5 5.2"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 20.5c1-4 4-6 8-6s7 2 8 6"/>',down:'<path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M5 19.5h14"/>',trash:'<path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/>',close:'<path d="M6 6l12 12M18 6 6 18"/>',check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>'};
+ const svg=(n,c='')=>{const sp=E('span',undefined,'lx-svg '+c);sp.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true">'+SVG[n]+'</svg>';return sp;};
+ let prodCache=null,galFilter='all',galDraw=null;
+ function galleryItems(media){const linked=new Set(media.filter(m=>m.asset_id).map(m=>m.asset_id)),out=[];
+  for(const m of media){const a=m.asset_id?assets.find(x=>x.id===m.asset_id):null;out.push({key:'m'+m.id,media:m,asset:a,title:m.title||'Untitled',kind:m.play==='image'?'image':m.play==='video'?'video':m.embed?'embed':'link',url:m.url,embed:m.embed,poster:m.poster_url||null,download:m.download_url||null,source:m.source,at:m.created_at});}
+  for(const a of assets)if(a.category==='content'&&!linked.has(a.id)){const k=kindOf(a);out.push({key:'a'+a.id,media:null,asset:a,title:String(a.original_name||'File').replace(/\.[^.]+$/,''),kind:k,url:a.url,embed:null,poster:k==='image'?a.url:null,download:a.download_url||a.url,source:'file',at:a.created_at});}
+  return out.sort((x,y)=>String(y.at||'').localeCompare(String(x.at||'')));}
+ const pubs=it=>it.media?.published||[];
+ const isVideo=it=>it.kind==='video'||it.kind==='embed'||it.kind==='link';
+ const SIZES=[[1,2],[2,4],[1,2],[2,2],[1,3],[1,3],[1,2],[1,2],[2,3],[1,2],[1,2],[1,2]];
+ function studio(){const wrap=E('section',undefined,'lx-gal');wrap.setAttribute('aria-label','Studio gallery');body.append(wrap);
+  const chips=E('div',undefined,'lx-gal-chips'),grid=E('div',undefined,'lx-gal-grid');chips.setAttribute('role','toolbar');chips.setAttribute('aria-label','Filter');
+  for(const [id,label] of [['all','All'],['video','#videos'],['image','#photos'],['web','#website'],['students','#students']]){const c=E('button',label,'lx-gal-chip');c.type='button';c.dataset.f=id;c.setAttribute('aria-pressed',String(galFilter===id));c.onclick=()=>{galFilter=id;chips.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.f===id)));draw();};chips.append(c);}
+  wrap.append(chips,grid);
+  if(!readOnly){const fab=E('button',undefined,'lx-gal-fab');fab.type='button';fab.setAttribute('aria-label','Add to the gallery');fab.append(svg('plus'));fab.onclick=addSheet;wrap.append(fab);}
+  grid.append(E('p','Loading gallery…','lx-gal-note'));
+  function draw(){if(!grid.isConnected)return;let items=galleryItems(prodCache||[]);
+   if(galFilter==='video')items=items.filter(isVideo);else if(galFilter==='image')items=items.filter(it=>it.kind==='image');else if(galFilter==='web')items=items.filter(it=>pubs(it).some(p=>p.audience==='web'));else if(galFilter==='students')items=items.filter(it=>pubs(it).some(p=>p.audience!=='web'));
+   grid.replaceChildren();
+   if(!items.length){grid.append(E('p',galFilter!=='all'?'Nothing here yet.':readOnly?'This gallery is empty.':'Your gallery is empty. Tap + to add photos and videos from your phone, a link or Vimeo.','lx-gal-note'));return;}
+   items.forEach((it,i)=>{const [c,r]=SIZES[i%SIZES.length],t=E('button',undefined,'lx-gal-tile');t.type='button';t.style.gridColumn='span '+c;t.style.gridRow='span '+r;t.setAttribute('aria-label',(isVideo(it)?'Video: ':'Photo: ')+it.title);
+    if(it.poster){const im=E('img');im.src=it.poster;im.alt='';im.loading='lazy';im.decoding='async';im.referrerPolicy='no-referrer';im.onerror=()=>im.remove();t.append(im);}
+    else if(it.kind==='video'&&it.url){const v=E('video');v.src=it.url+'#t=0.6';v.muted=true;v.playsInline=true;v.preload='metadata';v.setAttribute('aria-hidden','true');v.tabIndex=-1;t.append(v);}
+    else if(it.kind==='pdf'||it.kind==='file')t.classList.add('is-doc');
+    t.onclick=()=>gview(items,i);grid.append(t);});}
+  galDraw=draw;
+  (prodCache?Promise.resolve(prodCache):listMedia(api,owner)).then(list=>{prodCache=list;draw();});}
+ function redraw(){galDraw&&galDraw();}
+ function sheet(title,opts){const d=E('dialog',undefined,'lx-sheet');d.lang='en';const h=E('div',undefined,'lx-sheet-head');h.append(E('strong',title));const x=E('button',undefined,'lx-sheet-x');x.type='button';x.setAttribute('aria-label','Close');x.append(svg('close'));x.onclick=()=>d.close();h.append(x);d.append(h);
+  for(const [ic,label,sub,fn] of opts){const b=E('button',undefined,'lx-sheet-opt');b.type='button';b.append(svg(ic,'lx-sheet-ic'));const tx=E('span');tx.append(E('b',label),E('small',sub));b.append(tx);b.onclick=()=>{d.close();fn();};d.append(b);}
+  d.onclick=e=>{if(e.target===d)d.close();};d.onclose=()=>d.remove();root.append(d);d.showModal();}
+ function addSheet(){sheet('Add to the gallery',[['device','From this device','Photos and videos from your phone or computer',()=>pickFromPhone()],['link','Paste a link','YouTube, Vimeo or Cloudinary video link',linkDialog],['vimeo','Import from Vimeo','Choose videos already in your Vimeo account',vimeoImport]]);}
+ function formDialog(title){const d=E('dialog',undefined,'lx-dialog lx-gform');d.lang='en';const f=E('form');const top=E('div',undefined,'lx-sheet-head');top.append(E('strong',title));const x=E('button',undefined,'lx-sheet-x');x.type='button';x.setAttribute('aria-label','Close');x.append(svg('close'));x.onclick=()=>d.close();top.append(x);f.append(top);d.append(f);d.onclose=()=>d.remove();root.append(d);return {d,f};}
+ function linkDialog(){const {d,f}=formDialog('Paste a link'),u=E('input'),t=E('input'),msg=E('p','','lx-muted'),go=E('button','Add to gallery','lx-button lx-primary');u.type='url';u.required=true;u.placeholder='https://vimeo.com/… or https://youtu.be/…';u.autocomplete='off';t.maxLength=140;t.placeholder='Title (optional)';go.type='submit';
+  const l1=E('label','Video link'),l2=E('label','Title');f.append(l1,u,l2,t,msg,go);d.showModal();u.focus();
+  f.onsubmit=async e=>{e.preventDefault();if(!f.reportValidity())return;go.disabled=true;msg.textContent='Saving…';try{let title=t.value.trim();if(title.length<1){try{title=new URL(u.value).hostname.replace(/^www\./,'')+' video';}catch{title='Video';}}const r=await api('/api/media',{method:'POST',body:JSON.stringify({url:u.value.trim(),title})});prodCache=prodCache||[];if(!prodCache.some(m=>m.id===r.data.id))prodCache.unshift(r.data);d.close();notice(r.existing?'This link is already in your gallery.':'Added to your gallery.');redraw();}catch(err){msg.textContent=err.message;go.disabled=false;}};}
+ function vimeoImport(){const {d,f}=formDialog('Import from Vimeo');d.classList.add('lx-vimeo');const grid=E('div',undefined,'lx-vm-grid'),msg=E('p','Loading your Vimeo videos…','lx-muted'),more=E('button','Load more','lx-button'),go=E('button','Import','lx-button lx-primary'),pick=new Map();let page=1;more.type='button';more.hidden=true;go.type='submit';go.disabled=true;
+  const row=E('div',undefined,'lx-vm-row');row.append(more,go);f.append(msg,grid,row);d.showModal();
+  const have=new Set((prodCache||[]).map(m=>String(m.url||'').replace(/\/$/,'')));
+  const upd=()=>{go.textContent=pick.size?'Import '+pick.size+' video'+(pick.size>1?'s':''):'Import';go.disabled=!pick.size;};
+  async function loadPage(){more.disabled=true;try{const r=await api('/api/media/vimeo/list?page='+page);msg.textContent=r.data.length||page>1?'Tap the videos you want to add.':'There are no videos in your Vimeo account yet.';
+    for(const v of r.data){const b=E('button',undefined,'lx-vm-item');b.type='button';if(v.poster){const im=E('img');im.src=v.poster;im.alt='';im.loading='lazy';im.referrerPolicy='no-referrer';b.append(im);}b.append(E('span',v.title||'Vimeo video'));
+     if(have.has(String(v.url).replace(/\/$/,''))){b.disabled=true;b.classList.add('is-in');b.append(E('em','In gallery'));}
+     b.onclick=()=>{if(pick.has(v.url))pick.delete(v.url);else pick.set(v.url,v);b.classList.toggle('is-on',pick.has(v.url));b.setAttribute('aria-pressed',String(pick.has(v.url)));upd();};grid.append(b);}
+    more.hidden=!r.more;page++;}catch(e){msg.textContent=e.message;}finally{more.disabled=false;}}
+  more.onclick=loadPage;loadPage();
+  f.onsubmit=async e=>{e.preventDefault();if(!pick.size)return;go.disabled=more.disabled=true;let n=0;prodCache=prodCache||[];
+   for(const v of pick.values()){msg.textContent='Importing '+(++n)+' of '+pick.size+'…';try{const r=await api('/api/media',{method:'POST',body:JSON.stringify({url:v.url,title:String(v.title||'Vimeo video').slice(0,140),poster_url:v.poster||null})});if(!prodCache.some(m=>m.id===r.data.id))prodCache.unshift(r.data);}catch(err){msg.textContent=err.message;}}
+   d.close();notice(n+' video'+(n>1?'s':'')+' imported from Vimeo.');redraw();};}
+ async function ensureMedia(it){if(it.media)return it.media;const r=await api('/api/media/from-asset',{method:'POST',body:JSON.stringify({asset_id:it.asset.id})});it.media={...r.data,published:r.data.published||[]};prodCache=prodCache||[];if(!prodCache.some(m=>m.id===it.media.id))prodCache.unshift(it.media);return it.media;}
+ async function togglePub(it,aud){const cur=pubs(it).find(p=>p.audience===aud);
+  if(cur){await api('/api/feed/'+cur.id,{method:'DELETE'});it.media.published=pubs(it).filter(p=>p!==cur);return false;}
+  const m=await ensureMedia(it);let title=String(it.title||'').trim();if(title.length<2)title='MUK Talent '+(isVideo(it)?'video':'photo');
+  const r=await api('/api/feed',{method:'POST',body:JSON.stringify({kind:it.kind==='image'?'news':'video',title:title.slice(0,140),media_id:m.id,audience:aud})});m.published=[...(m.published||[]),{id:r.data.id,audience:aud}];return true;}
+ async function removeItem(it){const n=pubs(it).length;if(!confirm(n?'Delete from the gallery? It will also be removed from the website and from students ('+n+' publication'+(n>1?'s':'')+').':'Delete from the gallery?'))return false;
+  for(const p of pubs(it))await api('/api/feed/'+p.id,{method:'DELETE'}).catch(()=>{});
+  if(it.asset)await api('/api/workspace/assets/'+it.asset.id,{method:'DELETE'});else if(it.media)await api('/api/media/'+it.media.id,{method:'DELETE'});
+  prodCache=(prodCache||[]).filter(m=>m.id!==it.media?.id);if(it.asset)assets=assets.filter(a=>a.id!==it.asset.id);return true;}
+ function gview(items,start){let i=start;const d=E('dialog',undefined,'lx-gview');d.lang='en';
+  const top=E('div',undefined,'lx-gv-top'),x=E('button',undefined,'lx-gv-x');x.type='button';x.setAttribute('aria-label','Close');x.append(svg('close'));x.onclick=()=>d.close();const count=E('span','','lx-gv-count');top.append(count,x);
+  const stage=E('div',undefined,'lx-gv-stage'),panel=E('div',undefined,'lx-gv-panel'),ttl=E('strong','','lx-gv-title'),meta=E('small','','lx-gv-meta'),acts=E('div',undefined,'lx-gv-acts'),tools=E('div',undefined,'lx-gv-tools'),msg=E('p','','lx-gv-msg');msg.setAttribute('role','status');
+  panel.append(ttl,meta,acts,tools,msg);d.append(top,stage,panel);
+  const fmt=v=>{try{return new Intl.DateTimeFormat('en-GB',{day:'numeric',month:'short',year:'numeric'}).format(new Date(v));}catch{return '';}};
+  function actBtn(it,aud,ic,label){const b=E('button',undefined,'lx-gv-act');b.type='button';const on=pubs(it).some(p=>p.audience===aud);b.setAttribute('aria-pressed',String(on));
+   b.append(svg(on?'check':ic),E('b',aud==='web'?(on?'On the website':'Publish on web'):(on?'Sent · '+AUD_LABEL[aud]:AUD_LABEL[aud])));
+   if(aud==='web'&&!isVideo(it)){b.disabled=true;b.title='Only videos can be published on the website';}
+   if(readOnly)b.disabled=true;
+   b.onclick=async()=>{b.disabled=true;msg.textContent='';try{const now=await togglePub(it,aud);show();redraw();msg.textContent=aud==='web'?(now?'Published on muktalent.com. Tap again to unpublish.':'Removed from the website.'):(now?'Sent to '+AUD_LABEL[aud].toLowerCase()+'.':'Removed from '+AUD_LABEL[aud].toLowerCase()+'.');}catch(e){msg.textContent=e.message;b.disabled=false;}};return b;}
+  function show(){const it=items[i];stage.querySelectorAll('video').forEach(v=>v.pause());stage.replaceChildren();
+   if(it.kind==='video'){const v=E('video');v.src=it.url;v.controls=true;v.playsInline=true;v.autoplay=true;v.preload='auto';if(it.poster)v.poster=it.poster;stage.append(v);}
+   else if(it.kind==='image'){const im=E('img');im.src=it.url;im.alt=it.title;stage.append(im);}
+   else if(it.kind==='embed'){const fr=E('iframe');fr.src=it.embed;fr.title=it.title;fr.allow='autoplay; fullscreen; picture-in-picture; encrypted-media';fr.allowFullscreen=true;fr.referrerPolicy='strict-origin-when-cross-origin';stage.append(fr);}
+   else{const box=E('div',undefined,'lx-gv-file');const o=E('a',it.kind==='pdf'?'Open document':'Open link','lx-button lx-primary');o.href=it.url;o.target='_blank';o.rel='noopener noreferrer';box.append(E('p',it.title),o);stage.append(box);}
+   ttl.textContent=it.title;meta.textContent=[{vimeo:'Vimeo',youtube:'YouTube',cloudinary:'Cloudinary',file:isVideo(it)?'Video':'Photo',link:'Link'}[it.source]||'',fmt(it.at),sizeText(it.asset?.bytes||it.media?.bytes)].filter(Boolean).join(' · ');
+   count.textContent=items.length>1?(i+1)+' / '+items.length:'';
+   acts.replaceChildren(actBtn(it,'web','globe'),actBtn(it,'all','users'),actBtn(it,'mine','user'));acts.hidden=readOnly&&!pubs(it).length;
+   tools.replaceChildren();
+   if(it.download){const a=E('a',undefined,'lx-gv-tool');a.href=it.download;a.setAttribute('download',it.title||'');a.append(svg('down'),E('span','Download'));tools.append(a);}
+   else if(it.kind==='embed'||it.kind==='link'){const a=E('a',undefined,'lx-gv-tool');a.href=it.media?.url||it.url;a.target='_blank';a.rel='noopener noreferrer';a.append(svg('link'),E('span',it.source==='vimeo'?'Open on Vimeo':it.source==='youtube'?'Open on YouTube':'Open link'));tools.append(a);}
+   if(!readOnly){const del=E('button',undefined,'lx-gv-tool lx-gv-del');del.type='button';del.append(svg('trash'),E('span','Delete'));del.onclick=async()=>{try{if(await removeItem(it)){items.splice(i,1);redraw();if(!items.length){d.close();return;}i=Math.min(i,items.length-1);show();}}catch(e){msg.textContent=e.message;}};tools.append(del);}
+   msg.textContent='';}
+  const go=n=>{if(items.length<2)return;i=(i+n+items.length)%items.length;show();};
+  d.onkeydown=e=>{if(e.key==='ArrowLeft')go(-1);if(e.key==='ArrowRight')go(1);};
+  let sx=null,sy=null;stage.ontouchstart=e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;};stage.ontouchend=e=>{if(sx===null)return;const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;sx=null;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))go(dx>0?-1:1);else if(dy>110)d.close();};
+  d.onclose=()=>{d.querySelectorAll('video').forEach(v=>v.pause());d.remove();};root.append(d);show();d.showModal();}
  /* Phone gallery: browsers only give access to the files the person selects, so we explain once, then open the native gallery picker (multi-select). */
  function pickFromPhone(){if(readOnly)return;const input=E('input');input.type='file';input.multiple=true;input.accept='image/*,video/*,application/pdf,.mov,.mp4,.webm';input.hidden=true;root.append(input);
   input.onchange=()=>{const fl=[...(input.files||[])];input.remove();if(fl.length)uploadMany(fl);};
@@ -180,7 +225,7 @@ export async function mountEmployee({staff,api,onLogout,owner=null,onBack=null})
   const rows=files.map(f=>{const li=E('li'),bar=E('div',undefined,'lx-progress'),fill=E('i'),st=E('small','Waiting');bar.append(fill);li.append(E('strong',f.name),st,bar);list.append(li);return {f,fill,st,li};});
   (async()=>{dialogBusy=true;close.disabled=true;let ok=0;
    for(const r of rows){try{await uploadOne(r.f,p=>{r.fill.style.width=Math.max(4,Math.round(p*100))+'%';r.st.textContent=Math.round(p*100)+'%';});r.fill.style.width='100%';r.st.textContent='Uploaded';r.li.classList.add('is-ok');ok++;}catch(e){r.st.textContent=e.message||'Upload interrupted.';r.li.classList.add('is-error');}}
-   dialogBusy=false;close.disabled=false;msg.textContent=ok+' of '+rows.length+' uploaded.';section='library';await load();if(ok===rows.length)setTimeout(()=>d.isConnected&&d.close(),900);notice(ok?'Added to your library.':'Nothing was uploaded.',!ok);})();}
+   dialogBusy=false;close.disabled=false;msg.textContent=ok+' of '+rows.length+' uploaded.';section='content';await load();if(ok===rows.length)setTimeout(()=>d.isConnected&&d.close(),900);notice(ok?'Added to your library.':'Nothing was uploaded.',!ok);})();}
  async function uploadOne(asset,onProgress){const mime=fileMime(asset);
   if(!ACCEPT.includes(mime))throw Error('Format not supported (use JPG, PNG, WebP, PDF, MP4, MOV or WebM).');
   const max=mime.startsWith('video/')?VIDEO_MAX:FILE_MAX;if(asset.size>max)throw Error(mime.startsWith('video/')?'Videos up to 50 MB. For longer videos use Vimeo in Productions.':'Files up to 10 MB.');
@@ -199,8 +244,6 @@ export async function mountEmployee({staff,api,onLogout,owner=null,onBack=null})
    else if(k==='image'){const im=E('img');im.src=a.url;im.alt=a.name;stage.append(im);}
    else if(k==='embed'){const fr=E('iframe',undefined,'lx-lb-embed');fr.src=a.embed;fr.title=a.name;fr.allow='autoplay; fullscreen; picture-in-picture; encrypted-media';fr.allowFullscreen=true;fr.referrerPolicy='strict-origin-when-cross-origin';stage.append(fr);}
    else{const box=E('div',undefined,'lx-lb-file');box.append(E('b',k==='pdf'?'PDF':k==='link'?'LINK':'FILE'),E('p',a.name));const o=E('a',k==='pdf'?'Open document':'Open','lx-button lx-primary');o.href=a.url;o.target='_blank';o.rel='noopener noreferrer';box.append(o);stage.append(box);}
-   if(!readOnly&&a.asset&&['video','image'].includes(k)){const add=E('button','+ Add to Productions','lx-lb-dl lx-lb-add');add.type='button';const inProd=(prodCache||[]).some(m=>m.asset_id===a.asset.id);if(inProd){add.textContent='In Productions';add.disabled=true;}add.onclick=async()=>{if(await addToProductions(a.asset,add)){add.textContent='In Productions ✓';add.disabled=true;}};acts.append(add);}
-   if(!readOnly&&a.media){const pb=E('button','Publish','lx-lb-dl lx-lb-add');pb.type='button';pb.onclick=()=>{d.close();publish(a.media);};acts.append(pb);}
    if(a.download){const dl=E('a','Download','lx-lb-dl');dl.href=a.download;dl.setAttribute('download',a.name||'');acts.append(dl);}
    else if(k==='embed'||k==='link'){const op=E('a',a.media?.source==='vimeo'?'Open on Vimeo':a.media?.source==='youtube'?'Open on YouTube':'Open link','lx-lb-dl');op.href=a.media?.url||a.url;op.target='_blank';op.rel='noopener noreferrer';acts.append(op);}
    title.textContent=a.name;count.textContent=list.length>1?(i+1)+' / '+list.length:sizeText(a.bytes);prev.hidden=next.hidden=list.length<2;};

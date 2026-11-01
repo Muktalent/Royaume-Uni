@@ -20,19 +20,15 @@
 </head>
 <body>
 <section id="loginView" class="gp-gate" lang="en" data-role="student">
-  <div class="gp-bg" aria-hidden="true"><picture><source srcset="/assets/brand/login-bg.webp" type="image/webp"><img src="/assets/brand/login-bg.jpg" alt="" width="1672" height="941" decoding="async" fetchpriority="high"></picture></div>
+  <div class="gp-bg" aria-hidden="true"><picture><source srcset="/assets/brand/login-bg-v15.webp" type="image/webp"><img src="/assets/brand/login-bg-v15.jpg" alt="" width="1920" height="1080" decoding="async" fetchpriority="high"></picture></div>
   <header class="gp-bar">
-    <a class="gp-back" href="/"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 5l-7 7 7 7M8 12h13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="back">Back to website</span></a>
-    <div class="gp-lang" role="group" aria-label="Language"><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="fr" aria-pressed="false">FR</button></div>
+    <a class="gp-brand" href="/" aria-label="MUK Talent home"><img src="/assets/brand/logo-light.svg" alt="MUK Talent" width="374" height="72"><span data-i18n="motto">Study · Connect · Belong</span></a>
+    <div class="gp-bar-r"><a class="gp-back" href="/"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M15 5l-7 7 7 7M8 12h13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="back">Back to website</span></a>
+    <div class="gp-lang" role="group" aria-label="Language"><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="fr" aria-pressed="false">FR</button></div></div>
   </header>
+  <p class="gp-tagline" data-i18n="tagline">Your global education partner</p>
   <div class="gp-gate-inner">
     <div class="gp-card" id="gpCard" data-tab="signin">
-      <a class="gp-wordmark" href="/" aria-label="MUK Talent home"><img src="/assets/brand/logo.svg" alt="MUK Talent" width="374" height="72"></a>
-      <p class="gp-kicker" data-i18n="chooseRole">Who is signing in?</p>
-      <div class="gp-roles" role="radiogroup" aria-label="Account type">
-        <button type="button" id="roleStudent" class="gp-role" role="radio" aria-checked="true" data-role="student"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5zM6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><b data-i18n="roleStudent">Student</b><small data-i18n="roleStudentSub">Global Passport</small></button>
-        <button type="button" id="roleTeam" class="gp-role" role="radio" aria-checked="false" data-role="team"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v11H4zM9 8V5h6v3M4 13h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><b data-i18n="roleTeam">Team</b><small data-i18n="roleTeamSub">MUK Talent staff</small></button>
-      </div>
       <div class="gp-tabs" role="tablist" aria-label="Access">
         <button type="button" role="tab" id="tabSignin" aria-controls="loginForm" aria-selected="true" data-i18n="tabSignin">Sign in</button>
         <button type="button" role="tab" id="tabSignup" aria-controls="signupForm" aria-selected="false" tabindex="-1" data-i18n="tabSignup">Create account</button>
@@ -40,10 +36,14 @@
       <form id="loginForm" class="gp-form" role="tabpanel" aria-labelledby="tabSignin">
         <h1 class="gp-title" data-i18n="welcomeStudent">Welcome to your Global Passport</h1>
         <p class="gp-muted gp-lede-role" data-i18n="welcomeStudentText">Track your application, documents and counsellor messages in one place.</p>
+        <div class="gp-roles" role="radiogroup" aria-label="Account type">
+          <button type="button" id="roleStudent" class="gp-role" role="radio" aria-checked="true" data-role="student"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5zM6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><b data-i18n="roleStudent">Student</b><small data-i18n="roleStudentSub">Global Passport</small></button>
+          <button type="button" id="roleTeam" class="gp-role" role="radio" aria-checked="false" data-role="team"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16v11H4zM9 8V5h6v3M4 13h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><b data-i18n="roleTeam">Team</b><small data-i18n="roleTeamSub">MUK Talent staff</small></button>
+        </div>
         <label for="email" data-i18n="email">Email address</label>
         <input id="email" type="email" autocomplete="username" maxlength="320" required placeholder="name@example.com">
         <label for="password" data-i18n="password">Password</label>
-        <div class="gp-pass"><input id="password" type="password" autocomplete="current-password" required><button type="button" class="gp-eye" data-eye="password" aria-label="Show password"></button></div>
+        <div class="gp-pass"><input id="password" type="password" autocomplete="current-password" required placeholder="••••••••"><button type="button" class="gp-eye" data-eye="password" aria-label="Show password"></button></div>
         <div class="gp-row">
           <label class="gp-check gp-remember"><input id="rememberDevice" type="checkbox" checked> <span data-i18n="remember">Keep me signed in on this device today</span></label>
           <button id="forgotPassword" class="gp-link" type="button" data-i18n="forgot">Forgot password?</button>

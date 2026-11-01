@@ -437,3 +437,102 @@ html:has(#studentPortal){overscroll-behavior-y:none}
 #employeeWorkspace .lx-lb-bar>.lx-lb-acts{display:flex;flex:0 1 auto;min-width:0}
 @media(max-width:700px){#employeeWorkspace .lx-lb-bar>.lx-lb-acts{order:3;flex:1 1 100%}}
 #employeeWorkspace.lux.soft .lx-tile .lx-media-cover>.lx-cover-tag{right:10px;bottom:10px;letter-spacing:.04em}
+
+/* ===== v15 Studio · dark gallery ===== */
+#employeeWorkspace.lux.soft[data-group=studio]{--g-bg:#0b1516;background:#0b1516!important;color:#eef3f1}
+#employeeWorkspace.lux.soft[data-group=studio] .lx-main{background:#0b1516!important;color:#eef3f1}
+#employeeWorkspace.lux.soft[data-group=studio] .lx-header{background:transparent!important;border-color:rgba(255,255,255,.08)!important;color:#fff}
+#employeeWorkspace.lux.soft[data-group=studio] .lx-header :is(h1,h2,strong){color:#fff!important}
+#employeeWorkspace.lux.soft[data-group=studio] .lx-header :is(.lx-overline,.lx-muted,p){color:rgba(238,243,241,.62)!important}
+#employeeWorkspace.lux.soft[data-group=studio] .lx-header :is(button,.lx-button){background:rgba(255,255,255,.08)!important;color:#fff!important;border-color:rgba(255,255,255,.14)!important}
+#employeeWorkspace.lux.soft[data-group=studio] :is(.lx-status,.lx-tabs){display:none!important}
+#employeeWorkspace.lux.soft[data-group=studio] .lx-body{padding-left:8px!important;padding-right:8px!important;padding-bottom:110px!important;background:transparent!important}
+#employeeWorkspace.lux.soft[data-group=studio] .lx-dock{background:rgba(11,21,22,.38)!important;border-color:rgba(255,255,255,.12)!important;box-shadow:0 18px 40px -20px rgba(0,0,0,.7)!important;backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4)}
+#employeeWorkspace.lux.soft[data-group=studio] .lx-dock button{color:rgba(255,255,255,.72)!important}
+#employeeWorkspace.lux.soft[data-group=studio] .lx-dock button.active{background:rgba(255,255,255,.16)!important;color:#fff!important}
+#employeeWorkspace.lux.soft .lx-gal{position:relative;min-height:60vh}
+#employeeWorkspace.lux.soft .lx-gal-chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 12px;margin:0}
+#employeeWorkspace.lux.soft .lx-gal-chips::-webkit-scrollbar{display:none}
+#employeeWorkspace.lux.soft .lx-gal-chip{flex:none;height:34px;padding:0 15px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:rgba(238,243,241,.82);font:600 13px/1 var(--b-font,inherit);cursor:pointer}
+#employeeWorkspace.lux.soft .lx-gal-chip[aria-pressed=true]{background:#f7f1e3;color:#0d2224;border-color:#f7f1e3}
+#employeeWorkspace.lux.soft .lx-gal-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:clamp(54px,15vw,92px);grid-auto-flow:row dense;gap:5px}
+@media(min-width:701px){#employeeWorkspace.lux.soft .lx-gal-grid{grid-template-columns:repeat(5,minmax(0,1fr));grid-auto-rows:78px;gap:6px}}
+@media(min-width:1200px){#employeeWorkspace.lux.soft .lx-gal-grid{grid-template-columns:repeat(6,minmax(0,1fr));grid-auto-rows:86px}}
+#employeeWorkspace.lux.soft .lx-gal-tile{position:relative;display:block;padding:0;margin:0;border:0;border-radius:11px;overflow:hidden;cursor:pointer;background:linear-gradient(145deg,#16393a,#0d2224 60%,#1d4a45);min-width:0}
+#employeeWorkspace.lux.soft .lx-gal-tile :is(img,video){position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+#employeeWorkspace.lux.soft .lx-gal-tile:hover :is(img,video){transform:scale(1.035)}
+#employeeWorkspace.lux.soft .lx-gal-tile:focus-visible{outline:2px solid #c9a45c;outline-offset:2px}
+#employeeWorkspace.lux.soft .lx-gal-tile.is-doc{background:linear-gradient(160deg,#f7f1e3,#e4d8bd)}
+#employeeWorkspace.lux.soft .lx-gal-note{grid-column:1/-1;padding:48px 18px;text-align:center;color:rgba(238,243,241,.6);font-size:14px;line-height:1.5}
+#employeeWorkspace.lux.soft .lx-gal-fab{position:fixed;right:22px;bottom:28px;z-index:60;width:58px;height:58px;border-radius:50%;border:0;display:grid;place-items:center;background:#f7f1e3;color:#0d2224;box-shadow:0 14px 34px -10px rgba(0,0,0,.65),0 0 0 6px rgba(247,241,227,.08);cursor:pointer;transition:transform .2s}
+#employeeWorkspace.lux.soft .lx-gal-fab:hover{transform:scale(1.06)}
+@media(max-width:700px){#employeeWorkspace.lux.soft .lx-gal-fab{right:16px;bottom:calc(92px + env(safe-area-inset-bottom));width:54px;height:54px}}
+#employeeWorkspace.lux.soft .lx-svg{display:inline-grid;place-items:center;flex:none}
+#employeeWorkspace.lux.soft .lx-svg svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#employeeWorkspace.lux.soft .lx-gal-fab .lx-svg svg{width:26px;height:26px;stroke-width:2.2}
+/* add sheet + dialogs */
+#employeeWorkspace.lux.soft .lx-sheet{margin:auto auto 0;width:min(520px,100%);max-width:100%;border:0;padding:10px 14px calc(18px + env(safe-area-inset-bottom));border-radius:24px 24px 0 0;background:#12201f;color:#eef3f1;box-shadow:0 -20px 60px rgba(0,0,0,.5)}
+@media(min-width:701px){#employeeWorkspace.lux.soft .lx-sheet{margin:auto;border-radius:24px;padding:14px 16px 18px}}
+#employeeWorkspace.lux.soft :is(.lx-sheet,.lx-gform,.lx-gview)::backdrop{background:rgba(4,10,11,.72);backdrop-filter:blur(6px)}
+#employeeWorkspace.lux.soft .lx-sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:6px 4px 10px}
+#employeeWorkspace.lux.soft .lx-sheet-head strong{font:600 17px/1.2 var(--b-font,inherit);color:inherit}
+#employeeWorkspace.lux.soft .lx-sheet-x{width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.08);color:inherit;display:grid;place-items:center;cursor:pointer}
+#employeeWorkspace.lux.soft .lx-sheet-x svg{width:18px;height:18px}
+#employeeWorkspace.lux.soft .lx-sheet-opt{display:flex;align-items:center;gap:14px;width:100%;padding:14px 12px;margin:4px 0;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(255,255,255,.04);color:inherit;text-align:left;cursor:pointer}
+#employeeWorkspace.lux.soft .lx-sheet-opt:hover{background:rgba(255,255,255,.09)}
+#employeeWorkspace.lux.soft .lx-sheet-ic{width:44px;height:44px;border-radius:14px;background:#f7f1e3;color:#0d2224}
+#employeeWorkspace.lux.soft .lx-sheet-opt span:not(.lx-svg){display:grid;gap:3px;min-width:0}
+#employeeWorkspace.lux.soft .lx-sheet-opt b{font-size:15px;font-weight:600}
+#employeeWorkspace.lux.soft .lx-sheet-opt small{font-size:12.5px;color:rgba(238,243,241,.6)}
+#employeeWorkspace.lux.soft .lx-gform{width:min(520px,calc(100% - 24px));border:0;border-radius:22px;padding:14px 18px 20px;background:#12201f;color:#eef3f1}
+#employeeWorkspace.lux.soft .lx-gform form{display:grid;gap:8px}
+#employeeWorkspace.lux.soft .lx-gform label{font-size:12.5px;color:rgba(238,243,241,.7);margin-top:4px}
+#employeeWorkspace.lux.soft .lx-gform input{height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;padding:0 14px;font-size:16px;width:100%;box-sizing:border-box}
+#employeeWorkspace.lux.soft .lx-gform .lx-muted{color:rgba(238,243,241,.62)!important;font-size:13px;margin:4px 0}
+#employeeWorkspace.lux.soft .lx-gform .lx-button{height:46px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-weight:600;padding:0 18px;cursor:pointer}
+#employeeWorkspace.lux.soft .lx-gform .lx-primary{background:#f7f1e3;color:#0d2224;border-color:#f7f1e3}
+#employeeWorkspace.lux.soft .lx-gform .lx-button:disabled{opacity:.45;cursor:default}
+#employeeWorkspace.lux.soft .lx-vimeo{width:min(760px,calc(100% - 24px))}
+#employeeWorkspace.lux.soft .lx-vm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-height:56vh;overflow:auto;padding:2px}
+#employeeWorkspace.lux.soft .lx-vm-item{position:relative;display:grid;align-content:end;aspect-ratio:16/10;border-radius:12px;overflow:hidden;border:2px solid transparent;background:#0d2224;color:#fff;padding:0;cursor:pointer;text-align:left}
+#employeeWorkspace.lux.soft .lx-vm-item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+#employeeWorkspace.lux.soft .lx-vm-item span{position:relative;padding:22px 9px 7px;font-size:12px;line-height:1.25;background:linear-gradient(transparent,rgba(0,0,0,.75));display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#employeeWorkspace.lux.soft .lx-vm-item em{position:absolute;top:7px;left:7px;font:600 10.5px/1 inherit;font-style:normal;padding:5px 8px;border-radius:999px;background:rgba(0,0,0,.6)}
+#employeeWorkspace.lux.soft .lx-vm-item.is-on{border-color:#c9a45c;box-shadow:0 0 0 3px rgba(201,164,92,.35)}
+#employeeWorkspace.lux.soft .lx-vm-item.is-on::after{content:"✓";position:absolute;top:7px;right:7px;width:24px;height:24px;border-radius:50%;background:#c9a45c;color:#0d2224;display:grid;place-items:center;font-weight:700;font-size:13px}
+#employeeWorkspace.lux.soft .lx-vm-item.is-in{opacity:.45;cursor:default}
+#employeeWorkspace.lux.soft .lx-vm-row{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+/* viewer */
+#employeeWorkspace.lux.soft .lx-gview{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:#050b0c;color:#eef3f1;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}
+#employeeWorkspace.lux.soft .lx-gview:not([open]){display:none}
+#employeeWorkspace.lux.soft .lx-gv-top{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top)) 14px 8px}
+#employeeWorkspace.lux.soft .lx-gv-count{font-size:13px;color:rgba(238,243,241,.6)}
+#employeeWorkspace.lux.soft .lx-gv-x{width:42px;height:42px;border-radius:50%;border:0;background:rgba(255,255,255,.1);color:#fff;display:grid;place-items:center;cursor:pointer}
+#employeeWorkspace.lux.soft .lx-gv-stage{display:grid;place-items:center;min-height:0;padding:0 8px;touch-action:pan-y}
+#employeeWorkspace.lux.soft .lx-gv-stage :is(img,video){max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:10px;background:#000}
+#employeeWorkspace.lux.soft .lx-gv-stage iframe{width:min(100%,calc((100dvh - 300px)*16/9));aspect-ratio:16/9;border:0;border-radius:10px;background:#000}
+#employeeWorkspace.lux.soft .lx-gv-file{text-align:center;display:grid;gap:14px;justify-items:center}
+#employeeWorkspace.lux.soft .lx-gv-file .lx-button{height:46px;padding:0 22px;border-radius:999px;background:#f7f1e3;color:#0d2224;display:inline-flex;align-items:center;text-decoration:none;font-weight:600}
+#employeeWorkspace.lux.soft .lx-gv-panel{display:grid;gap:6px;padding:14px 16px calc(16px + env(safe-area-inset-bottom));width:min(760px,100%);margin:0 auto;box-sizing:border-box}
+#employeeWorkspace.lux.soft .lx-gv-title{font:600 16px/1.3 var(--b-font,inherit);color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#employeeWorkspace.lux.soft .lx-gv-meta{font-size:12.5px;color:rgba(238,243,241,.55)}
+#employeeWorkspace.lux.soft .lx-gv-acts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+#employeeWorkspace.lux.soft .lx-gv-act{display:grid;justify-items:center;gap:6px;padding:11px 6px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;min-width:0}
+#employeeWorkspace.lux.soft .lx-gv-act b{font-size:12px;font-weight:600;line-height:1.2;text-align:center}
+#employeeWorkspace.lux.soft .lx-gv-act[aria-pressed=true]{background:#f7f1e3;color:#0d2224;border-color:#f7f1e3}
+#employeeWorkspace.lux.soft .lx-gv-act[aria-pressed=true] .lx-svg{color:#2a7563}
+#employeeWorkspace.lux.soft .lx-gv-act:disabled{opacity:.4;cursor:default}
+#employeeWorkspace.lux.soft .lx-gv-tools{display:flex;gap:8px;justify-content:center;margin-top:4px}
+#employeeWorkspace.lux.soft .lx-gv-tool{display:inline-flex;align-items:center;gap:7px;height:40px;padding:0 15px;border-radius:999px;border:0;background:transparent;color:rgba(238,243,241,.8);font:600 13px/1 inherit;text-decoration:none;cursor:pointer}
+#employeeWorkspace.lux.soft .lx-gv-tool:hover{background:rgba(255,255,255,.08)}
+#employeeWorkspace.lux.soft .lx-gv-tool svg{width:18px;height:18px}
+#employeeWorkspace.lux.soft .lx-gv-del{color:#f0a49a}
+#employeeWorkspace.lux.soft .lx-gv-msg{min-height:1em;margin:2px 0 0;text-align:center;font-size:12.5px;color:#c9a45c}
+#employeeWorkspace.lux.soft :is(.lx-sheet,.lx-gform,.lx-gview) :is(b,strong,span,label,h2,h3){color:inherit}
+#employeeWorkspace.lux.soft .lx-sheet-opt b,#employeeWorkspace.lux.soft .lx-sheet-head strong,#employeeWorkspace.lux.soft .lx-gform .lx-sheet-head strong,#employeeWorkspace.lux.soft .lx-gv-title{color:#fff!important}
+#employeeWorkspace.lux.soft .lx-gv-act b{color:inherit!important}
+#employeeWorkspace.lux.soft .lx-gv-act:not([aria-pressed=true]){color:#fff!important}
+#employeeWorkspace.lux.soft .lx-gv-act[aria-pressed=true]{color:#0d2224!important}
+#employeeWorkspace.lux.soft .lx-gform label{color:rgba(238,243,241,.7)!important}
+#employeeWorkspace.lux.soft[data-group=studio] .lx-dock{background:rgba(11,21,22,.22)!important}
+#employeeWorkspace.lux.soft .lx-sheet-opt .lx-sheet-ic{color:#0d2224!important}
