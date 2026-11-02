@@ -6,6 +6,8 @@ import {linkHrCss} from './hr-common.js';
 const E = (t, v, c) => { const n = document.createElement(t); if (v !== undefined) n.textContent = String(v); if (c) n.className = c; return n; };
 const btn = (t, fn, cls = 'th-btn') => { const b = E('button', t, cls); b.type = 'button'; if (fn) b.onclick = fn; return b; };
 const fmt = v => v ? new Intl.DateTimeFormat('es-ES', {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'}).format(new Date(v)) : '—';
+const COUNTRY_ES = (() => { try { return new Intl.DisplayNames(['es'], {type: 'region'}); } catch { return null; } })();
+const countryEs = c => /^[A-Z]{2}$/.test(String(c || '')) ? (COUNTRY_ES?.of(c) || c) : '—';
 const STATUS_ES = {New: 'Nuevo', 'In progress': 'En curso', Submitted: 'Enviado', Ready: 'Oferta', 'Action needed': 'Acción requerida', Completed: 'Matriculado', 'On hold': 'En pausa', Closed: 'Cerrado'};
 const STAGE_ES = {'Assessment': 'Evaluación', 'Documents pending': 'Documentos pendientes', 'Application preparation': 'Preparando solicitud', 'Application submitted': 'Solicitud enviada', 'Offer received': 'Oferta recibida', 'Deposit pending': 'Depósito pendiente', 'Enrolled': 'Matriculado', 'On hold': 'En pausa', 'Closed': 'Cerrado'};
 
@@ -13,7 +15,7 @@ export async function renderAdminPipeline({api, getState, openRecord, host}) {
   linkHrCss();
   let page = 1, query = '', stage = '', result = null, busy = false, demo = false, step = 'pipeline', loadEpoch = 0;
   const selected = new Set();
-  const report = {audience: 'partners', scope: 'filter', recipient: '', title: 'Student recruitment pipeline', days: 14};
+  const report = {source: 'real', audience: 'partners', scope: 'filter', recipient: '', title: 'Student recruitment pipeline', days: 14};
   host.replaceChildren(); host.className = 'admin-report-view th-root pr-root'; host.lang = 'es';
 
   const notice = E('p', '', 'th-msg'); notice.setAttribute('role', 'status');
@@ -71,7 +73,7 @@ export async function renderAdminPipeline({api, getState, openRecord, host}) {
     if (demo) view.append(E('p', 'EJEMPLO · datos ficticios para presentaciones. No se exportan ni se comparten.', 'admin-demo-banner'));
     // Tabla
     const rows = demo ? demoRows(result.stages) : result.data;
-    const cols = [['reference', 'Referencia'], ['__name', 'Estudiante'], ['stage', 'Etapa'], ['target_study_level', 'Nivel'], ['target_university', 'Institución objetivo'], ['target_course', 'Curso'], ['intended_intake', 'Convocatoria'], ['owner_name', 'Responsable'], ['last_updated', 'Actualizado']];
+    const cols = [['reference', 'Referencia'], ['__name', 'Estudiante'], ['stage', 'Etapa'], ['target_study_level', 'Nivel'], ['target_university', 'Institución objetivo'], ['target_course', 'Curso'], ['intended_intake', 'Convocatoria'], ['__country', 'País'], ['last_updated', 'Actualizado']];
     const wrap = E('div', undefined, 'admin-sheet-wrap pr-sheet'), table = E('table', undefined, 'admin-sheet'), head = E('thead'), tr = E('tr');
     const all = E('input'); all.type = 'checkbox'; all.setAttribute('aria-label', 'Seleccionar esta página'); all.disabled = demo || !rows.length; all.checked = !demo && rows.length > 0 && rows.every(r => selected.has(r.candidate_id));
     all.onchange = () => { for (const r of rows) { if (all.checked) { if (selected.size < 300) selected.add(r.candidate_id); } else selected.delete(r.candidate_id); } paint(); };
@@ -88,6 +90,7 @@ export async function renderAdminPipeline({api, getState, openRecord, host}) {
         const td = E('td');
         if (k === 'stage') { const b = E('span', STAGE_ES[row.stage] || row.stage, 'admin-stage-badge'); b.dataset.tone = tone(row.stage); td.append(b); }
         else if (k === '__name') td.textContent = [row.first_name, row.last_name].filter(Boolean).join(' ') || '—';
+        else if (k === '__country') td.textContent = countryEs(row.residence_country_code);
         else { td.textContent = k === 'last_updated' ? (row[k] ? new Date(row[k]).toLocaleDateString('es-ES') : '—') : display(row[k], k); if (k === 'reference') td.className = 'admin-col-ref'; }
         line.append(td);
       }
@@ -117,9 +120,10 @@ export async function renderAdminPipeline({api, getState, openRecord, host}) {
       for (const [v, t, s] of options) { const l = E('label', undefined, 'pr-choice'), r = E('input'); r.type = 'radio'; r.name = name; r.value = v; r.checked = v === current; r.onchange = () => { onChange(v); paint(); }; const tx = E('span'); tx.append(E('b', t), E('small', s)); l.append(r, tx); g.append(l); }
       return g;
     };
-    left.append(E('p', 'Destino', 'pr-label'), choice('aud', [['partners', 'Universidad o partner', 'Sin nombres, teléfonos, emails ni notas internas. Listo para buscar partnerships.'], ['internal', 'Uso interno', 'Incluye datos personales y responsable. Solo para el equipo.']], report.audience, v => { report.audience = v; }));
+    left.append(E('p', 'Datos del informe', 'pr-label'), choice('src', [['real', 'Cartera real', `Casos aceptados de la pipeline (${result.total}).`], ['sample', 'Cartera de muestra · 15 estudiantes', 'Perfiles del Magreb (Marruecos, Argelia, Túnez) en todas las etapas, listos para presentar a una universidad.']], report.source, v => { report.source = v; }));
+    left.append(E('p', 'Destino', 'pr-label'), choice('aud', [['partners', 'Universidad o partner', 'Sin nombres, teléfonos, emails ni notas internas. Listo para buscar partnerships.'], ['internal', 'Uso interno', 'Incluye contacto del estudiante y próxima acción interna. Solo para el equipo.']], report.audience, v => { report.audience = v; }));
     const filtTxt = (stage ? `etapa «${STAGE_ES[stage] || stage}»` : 'todas las etapas') + (query ? `, búsqueda «${query}»` : '');
-    left.append(E('p', 'Casos incluidos', 'pr-label'), choice('scope', [['filter', `Todos los del filtro actual (${result.total})`, 'Filtro: ' + filtTxt + '. Máx. 300 casos.'], ['selected', `Solo los seleccionados (${selected.size})`, selected.size ? 'Seleccionados en el paso 1.' : 'Vuelve al paso 1 para marcar casos.']], selected.size ? report.scope : 'filter', v => { report.scope = v; }));
+    if (report.source !== 'sample') left.append(E('p', 'Casos incluidos', 'pr-label'), choice('scope', [['filter', `Todos los del filtro actual (${result.total})`, 'Filtro: ' + filtTxt + '. Máx. 300 casos.'], ['selected', `Solo los seleccionados (${selected.size})`, selected.size ? 'Seleccionados en el paso 1.' : 'Vuelve al paso 1 para marcar casos.']], selected.size ? report.scope : 'filter', v => { report.scope = v; }));
     if (!selected.size) report.scope = 'filter';
     const form = E('div', undefined, 'th-grid');
     const recipient = field(form, 'pr_recipient', report.audience === 'partners' ? 'Universidad / institución destinataria' : 'Destinatario (opcional)', 'text', null, report.recipient); recipient.maxLength = 200; recipient.placeholder = 'Ej. University of Leeds · International Office'; recipient.oninput = () => { report.recipient = recipient.value; };
@@ -136,16 +140,21 @@ export async function renderAdminPipeline({api, getState, openRecord, host}) {
     const ul = E('ul', undefined, 'pr-sheets');
     const items = report.audience === 'partners'
       ? [['Summary', 'Portada con KPIs, embudo por etapa y perfil de los estudiantes (nivel, área, convocatoria, país).'], ['Case pipeline', 'Una fila por caso, agrupada por etapa, con código de colores, semáforos de preparación, filtros y paneles fijos.'], ['Stage × level', 'Mapa de calor de etapas por nivel de estudios.'], ['Guide', 'Leyenda de colores, definiciones y nota de privacidad.']]
-      : [['Summary', 'KPIs y embudo por etapa.'], ['Case pipeline', 'Datos completos de contacto, responsable y próxima acción interna, con colores por etapa.'], ['Stage × level', 'Mapa de calor.'], ['Guide', 'Leyenda y definiciones.']];
+      : [['Summary', 'KPIs y embudo por etapa.'], ['Case pipeline', 'Datos de contacto del estudiante y próxima acción interna, con colores por etapa.'], ['Stage × level', 'Mapa de calor.'], ['Guide', 'Leyenda y definiciones.']];
     for (const [t, d] of items) { const li = E('li'); li.append(E('b', t), E('span', d)); ul.append(li); }
     right.append(ul);
     const legend = E('div', undefined, 'admin-legend');
     for (const st of result.stages) { const i = E('span', undefined, 'admin-legend-item'); i.dataset.tone = tone(st); i.append(E('i', undefined, 'admin-dot'), E('span', STAGE_ES[st] || st)); legend.append(i); }
     right.append(E('p', 'Código de colores por etapa', 'pr-label'), legend);
-    if (report.audience === 'partners') right.append(E('p', 'Las referencias son seudónimos. Revisa los textos de curso y próximo paso antes de enviar.', 'th-hint'));
+    if (report.audience === 'partners') right.append(E('p', 'Todo el Excel se genera en inglés (convocatorias, materias y estados se traducen automáticamente). Las referencias son seudónimos; revisa los textos de curso y próximo paso antes de enviar.', 'th-hint'));
     grid.append(left, right); view.append(grid);
   }
 
+  // Cuerpo común: cartera de muestra o casos reales seleccionados.
+  async function payload() {
+    if (report.source === 'sample') return {body: {sample: true}, count: 15};
+    const ids = await caseIds(); return {body: {ids}, count: ids.length};
+  }
   async function caseIds() {
     if (demo) throw Error('El ejemplo no se exporta. Sal del ejemplo en el paso 1.');
     if (report.scope === 'selected' && selected.size) return [...selected];
@@ -158,16 +167,17 @@ export async function renderAdminPipeline({api, getState, openRecord, host}) {
   async function download() {
     try {
       message('Preparando el Excel…');
-      const ids = await caseIds();
-      await binary(getState, '/api/admin-pipeline/export', {method: 'POST', body: JSON.stringify({ids, mode: report.audience, title: (report.title || '').trim() || undefined, recipient: (report.recipient || '').trim() || undefined})});
-      message(`Excel descargado con ${ids.length} caso(s).`);
+      const {body, count} = await payload();
+      await binary(getState, '/api/admin-pipeline/export', {method: 'POST', body: JSON.stringify({...body, mode: report.audience, title: (report.title || '').trim() || undefined, recipient: (report.recipient || '').trim() || undefined})});
+      message(`Excel descargado con ${count} caso(s).`);
     } catch (e) { message(e.message, true); }
   }
   async function createLink() {
     const recipient = (report.recipient || '').trim(), title = (report.title || '').trim();
     if (!recipient) { message('Indica la universidad o institución destinataria.', true); view.querySelector('#report-field-pr_recipient')?.focus(); return; }
     if (!title) { message('Indica un título.', true); return; }
-    let ids; try { ids = await caseIds(); } catch (e) { message(e.message, true); return; }
+    let pl; try { pl = await payload(); } catch (e) { message(e.message, true); return; }
+    const ids = {length: pl.count};
     const modal = dialog('Crear enlace para ' + recipient), form = E('form');
     const days = field(form, 'days', 'El enlace caduca en', 'select', [['7', '7 días'], ['14', '14 días'], ['30', '30 días']], String(report.days));
     const l = E('label', undefined, 'th-check'), ck = E('input'); ck.type = 'checkbox'; ck.required = true; l.append(ck, E('span', `He revisado los ${ids.length} casos y estoy autorizado a compartir esta información con ${recipient}.`));
@@ -177,7 +187,7 @@ export async function renderAdminPipeline({api, getState, openRecord, host}) {
       e.preventDefault(); if (!form.reportValidity()) return;
       report.days = Number(days.value); modal.lock(true); save.disabled = true;
       try {
-        const r = await api('/api/admin-pipeline/shares', {method: 'POST', body: JSON.stringify({ids, title, recipient, days: report.days, review_confirmed: true})});
+        const r = await api('/api/admin-pipeline/shares', {method: 'POST', body: JSON.stringify({...pl.body, title, recipient, days: report.days, review_confirmed: true})});
         const link = E('input', undefined, 'pr-link'); link.readOnly = true; link.value = r.url; link.setAttribute('aria-label', 'Enlace del informe');
         const copy = btn('Copiar enlace', async () => { try { await navigator.clipboard.writeText(r.url); copy.textContent = 'Copiado'; } catch { link.select(); } }, 'th-btn th-primary');
         const mail = E('a', 'Abrir en el correo', 'th-btn'); mail.href = 'mailto:?subject=' + encodeURIComponent(title + ' · MUK Talent') + '&body=' + encodeURIComponent('Dear colleagues,\n\nPlease find our current student recruitment pipeline here:\n' + r.url + '\n\nThe link expires on ' + new Date(r.expires_at).toLocaleDateString('en-GB') + '.\n\nKind regards,\nMUK Talent');

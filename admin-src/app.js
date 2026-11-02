@@ -12,6 +12,7 @@ import { AUTH_OPTIONS, watchDayEnd, stopWatch, setRememberDevice } from "./sessi
 import { mountAdminSoft } from "./admin-soft.js";
 import { renderTeamAdmin, mountTeamBadge } from "./team-admin.js";
 import { offerInstall } from "./install-app.js";
+import { applyV17, mountUpdates, messageNotifier } from "./muk-v17.js";
 const $ = id => document.getElementById(id);
 const state = {client:null,session:null,staff:null,config:null,section:"overview",page:1,total:0,epoch:0,listRequest:0,detailRequest:0,relatedRequest:0,busy:false,loading:false,detail:null,dirty:false,related:"notes",relatedPage:1,staffOptions:[]};
 const titles={overview:"Resumen",passport:"Global Passport",candidates:"Leads y casos",enquiries:"Consultas",appointments:"Citas",staff:"Equipo",documents:"Documentos",intelligence:"Pipeline e informes","team-create":"Crear colaborador","team-people":"Equipo","team-list":"Empleados","team-docs":"Documentos"};
@@ -55,7 +56,7 @@ function resource(){return state.config.resources[state.section];}
 const GROUPS=[["home","Inicio","home",["overview"]],["students","Estudiantes","users",["candidates","enquiries","passport"]],["agenda","Agenda","calendar",["appointments"]],["team","Equipo","card",["team-people","team-create","team-list","team-docs"]],["reports","Informes","chart",["intelligence"]]];
 const groupOf=name=>GROUPS.find(g=>g[3].includes(name))||GROUPS[0];
 function navIcon(name){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("aria-hidden","true");s.setAttribute("class","nav-icon");s.setAttribute("fill","none");s.setAttribute("stroke","currentColor");s.setAttribute("stroke-width","1.7");s.setAttribute("stroke-linecap","round");s.setAttribute("stroke-linejoin","round");for(const d of UI_PATHS[name]||[]){const p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d",d);s.append(p);}return s;}
-let adminWatch=null;
+let adminWatch=null,adminUpdates=null,adminMsgNotify=null;
 function nav(){
  const nav=$("navigation");nav.replaceChildren();
  let dock=document.getElementById("adminDock");if(!dock){dock=el("nav",undefined,"admin-dock");dock.id="adminDock";dock.setAttribute("aria-label","Secciones");$("appShell").append(dock);}dock.replaceChildren();
@@ -65,7 +66,7 @@ function nav(){
  }
  {linkChatCss();const open=()=>openMessenger({api,lang:"es",onChange:()=>adminWatch?.refresh()});const c=el("button",undefined,"nav-button nav-chat");c.id="adminChatNav";c.type="button";c.append(mkIcon("chat","nav-icon"),el("span","Mensajes"),el("i",undefined,"nav-chat-badge"));c.addEventListener("click",open);nav.append(c);
   if(!document.getElementById("adminChatTop")){const h=heartButton("es",open);h.id="adminChatTop";h.classList.add("admin-heart");h.setAttribute("aria-label","Mensajes");h.title="Mensajes";document.querySelector("#appShell .page-header").append(h);}
-  if(!adminWatch)adminWatch=watchNotifications(api,x=>{const h=document.getElementById("adminChatTop");if(h)setDot(h,{chat_unread:x.chat_unread});const b=document.querySelector("#adminChatNav .nav-chat-badge");if(b){b.textContent=x.chat_unread?String(x.chat_unread>99?"99+":x.chat_unread):"";b.hidden=!x.chat_unread;}});else adminWatch.refresh();}
+  if(!adminMsgNotify)adminMsgNotify=messageNotifier({lang:"es",onOpen:open});if(!adminWatch)adminWatch=watchNotifications(api,x=>{adminMsgNotify(x);const h=document.getElementById("adminChatTop");if(h)setDot(h,{chat_unread:x.chat_unread});const b=document.querySelector("#adminChatNav .nav-chat-badge");if(b){b.textContent=x.chat_unread?String(x.chat_unread>99?"99+":x.chat_unread):"";b.hidden=!x.chat_unread;}});else adminWatch.refresh();}
  if(!document.getElementById("mobileLogout")){const o=el("button",undefined,"mobile-logout");o.id="mobileLogout";o.type="button";o.setAttribute("aria-label","Cerrar sesión");o.append(navIcon("logout"));o.addEventListener("click",()=>$("logout").click());document.querySelector("#appShell .page-header").append(o);}
  if(!document.getElementById("mobileWeb")){const w=el("a",undefined,"mobile-web");w.id="mobileWeb";w.href="/";w.setAttribute("aria-label","Volver a la web");w.textContent="\u2190";document.querySelector("#appShell .page-header").append(w);}
  if(!document.getElementById("adminTabs")){const t=el("div",undefined,"admin-tabs");t.id="adminTabs";t.setAttribute("role","tablist");$("globalMessage").before(t);}
@@ -133,6 +134,9 @@ async function loadOverview(){
    const meter=el("progress");meter.max=Math.max(data.candidates,1);meter.value=count;meter.setAttribute("aria-label",valueText("status",status));row.append(info,meter);$("pipeline").append(row);
   }
   $("asOf").textContent=`Actualizado: ${valueText("created_at",data.asOf)} · Africa/Casablanca`;message("globalMessage");
+  {const total=Number(data.candidates)||0,od=Number(data.overdue)||0;const prog=total?{label:"Seguimientos al día",value:Math.max(0,total-od),max:total,text:`${Math.max(0,total-od)} / ${total}`}:null;
+   if(!adminUpdates){const PAGE={candidate:"candidates",stage:"candidates",enquiry:"enquiries",document:"passport",hrdoc:"team-docs",task:"appointments",event:"appointments"};adminUpdates=mountUpdates({api,title:"activity",userKey:"admin:"+(state.staff?.id||state.staff?.email||"me"),lang:"es",name:state.staff?.full_name,progress:prog,onOpen:it=>{if(it.type==="message")document.getElementById("adminChatNav")?.click();else if(PAGE[it.type])navigate(PAGE[it.type]);}});}else{adminUpdates.setProgress(prog);adminUpdates.refresh();}
+   $("overview").insertBefore(adminUpdates.el,$("metrics"));}
  }catch(e){if(epoch===state.epoch&&request===state.listRequest)message("globalMessage",e.message,true);}
 }
 async function loadList(){
@@ -332,9 +336,11 @@ async function enter(session){
   $("staffName").textContent = state.staff.full_name;
   $("loginView").hidden = true;
   $("appShell").hidden = false;
+  applyV17({ role: "admin", lang: "es" });
   await navigate("overview");
+  offerInstall({ lang: "es" });
 }
-$("logout").addEventListener("click",async()=>{if(state.busy)return;if(state.dirty&&!window.confirm("¿Descartar los cambios y cerrar sesión?"))return;adminWatch?.stop();adminWatch=null;document.getElementById("adminChatNav")?.remove();document.getElementById("adminChatTop")?.remove();resetLogin();await state.client.auth.signOut({scope:"local"}).catch(()=>{});});
+$("logout").addEventListener("click",async()=>{if(state.busy)return;if(state.dirty&&!window.confirm("¿Descartar los cambios y cerrar sesión?"))return;adminWatch?.stop();adminWatch=null;adminUpdates?.stop();adminUpdates?.el.remove();adminUpdates=null;adminMsgNotify=null;document.getElementById("adminChatNav")?.remove();document.getElementById("adminChatTop")?.remove();resetLogin();await state.client.auth.signOut({scope:"local"}).catch(()=>{});});
 $("filters").addEventListener("submit",event=>{event.preventDefault();state.page=1;loadList();});
 $("refresh").addEventListener("click",()=>loadList());
 $("previous").addEventListener("click",()=>{if(!state.loading&&state.page>1){state.page--;loadList();}});

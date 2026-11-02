@@ -75,7 +75,7 @@ function localAnswer(text){
 }
 async function aiStatus(){
  if(aiEnabled!==null)return aiEnabled;
- try{const r=await fetch("/api/assistant/status",{headers:{accept:"application/json"},cache:"no-store"});aiEnabled=r.ok&&!!(await r.json()).enabled;}catch{aiEnabled=false;}
+ try{const r=await fetch("/api/assistant/status",{headers:{accept:"application/json"},cache:"no-store"});const j=r.ok?await r.json():{};aiEnabled=!!j.enabled;voiceSrv=!!j.voice;}catch{aiEnabled=false;voiceSrv=false;}
  return aiEnabled;
 }
 async function aiAnswer(){
@@ -116,8 +116,10 @@ const $=s=>panel.querySelector(s);
 const log=$(".v6a-log"),chips=$(".v6a-chips"),form=$(".v6a-form"),input=$("#v6a-input"),micBtn=$(".v6a-mic"),callBox=$(".v6a-call");
 
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const CAN_REC=!!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder);
+let voiceSrv=null;
 const TTS="speechSynthesis" in window&&"SpeechSynthesisUtterance" in window;
-if(!SR)micBtn.hidden=true;
+if(!SR&&!CAN_REC)micBtn.hidden=true;
 
 function labels(){
  const l=lang();
@@ -173,7 +175,7 @@ function renderMsg(m){
  }
  if(m.r==="a"){
   const foot=el("div",{class:"v6a-meta"});
-  if(TTS){const say=el("button",{type:"button",class:"v6a-say","aria-label":ui("listen")},icon("speaker"));say.addEventListener("click",()=>{if(say.classList.contains("is-on")){stopSpeak();}else speak(m.t,m.l||lang(),say);});foot.append(say);}
+  if(TTS||MOBILE){const say=el("button",{type:"button",class:"v6a-say","aria-label":ui("listen")},icon("speaker"));say.addEventListener("click",()=>{if(say.classList.contains("is-on")){stopSpeak();}else speak(m.t,m.l||lang(),say);});foot.append(say);}
   if(m.ai)foot.append(el("span",{class:"v6a-ai",text:ui("live")}));
   bub.append(foot);
  }
@@ -225,28 +227,116 @@ function clean(t){return String(t).replace(/https?:\/\/\S+/g,"").replace(/[•�
 /* Mobile: iOS only plays speech started from a tap, so we "unlock" the engine on the first tap. Android reports speaking=false before the
    voice starts, which used to end the turn early and start the microphone on top of the voice (cutting it). */
 let ttsUnlocked=false;
-function unlockTTS(){if(!TTS||ttsUnlocked)return;ttsUnlocked=true;try{const u=new SpeechSynthesisUtterance(" ");u.volume=0;speechSynthesis.speak(u);}catch{}}
+function unlockTTS(){unlockAudio();if(!TTS||ttsUnlocked)return;ttsUnlocked=true;try{const u=new SpeechSynthesisUtterance("\u00a0");u.volume=0.01;u.rate=10;speechSynthesis.speak(u);}catch{}}
+/* v17 · Mobile voice: the browser's own speech engines are unreliable on phones (iOS Chrome / in-app browsers have no
+   recognition, iOS drops speech not started from a tap, Android cuts the mic). On phones we record with MediaRecorder and
+   play server-generated audio through one <audio> element unlocked on the first tap. Desktop keeps the native engines. */
+const MOBILE=(matchMedia("(pointer:coarse)").matches&&matchMedia("(max-width:1024px)").matches)||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+const useSrvSpeak=()=>voiceSrv===true&&(MOBILE||!TTS);
+const useSrvListen=()=>voiceSrv===true&&CAN_REC&&(MOBILE||!SR);
+let player=null,audioCtx=null,silentURL="",playerURL="";
+function silentWav(){const n=800,b=new ArrayBuffer(44+n*2),v=new DataView(b),w=(o,t)=>{for(let i=0;i<t.length;i++)v.setUint8(o+i,t.charCodeAt(i));};w(0,"RIFF");v.setUint32(4,36+n*2,true);w(8,"WAVE");w(12,"fmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,8000,true);v.setUint32(28,16000,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,"data");v.setUint32(40,n*2,true);return URL.createObjectURL(new Blob([b],{type:"audio/wav"}));}
+function unlockAudio(){
+ try{if(!player){player=new Audio();player.setAttribute("playsinline","");player.preload="auto";silentURL=silentWav();}
+  if(player.paused&&!playerURL){player.src=silentURL;player.muted=false;const p=player.play();p&&p.catch(()=>{});}}catch{}
+ try{const AC=window.AudioContext||window.webkitAudioContext;if(AC){audioCtx=audioCtx||new AC();if(audioCtx.state==="suspended")audioCtx.resume().catch(()=>{});}}catch{}
+}
+let speakSeq=0;
 function speak(text,l,btn,onend){
+ if(useSrvSpeak())return speakServer(text,l,btn,onend);
+ return speakNative(text,l,btn,onend);
+}
+function speakNative(text,l,btn,onend){
  if(!TTS){onend&&onend();return;}
+ const busyNow=speechSynthesis.speaking||speechSynthesis.pending;
  stopSpeak();
  const txt=clean(text);const u=new SpeechSynthesisUtterance(txt);u.lang=VOICE[l]||"fr-FR";const v=pickVoice(l);if(v)u.voice=v;u.rate=1.02;u.pitch=1;u.volume=1;
  if(btn){speakingBtn=btn;btn.classList.add("is-on");btn.innerHTML=icon("stop");btn.setAttribute("aria-label",ui("stop"));}
  let started=false,finished=false,guard=0,limit=0;
  const done=()=>{if(finished)return;finished=true;clearInterval(guard);clearTimeout(limit);if(btn){btn.classList.remove("is-on");btn.innerHTML=icon("speaker");btn.setAttribute("aria-label",ui("listen"));}if(speakingBtn===btn)speakingBtn=null;const f=onend;onend=null;f&&f();};
  u.onstart=()=>{started=true;};u.onend=done;u.onerror=done;
- // iOS drops an utterance queued in the same tick as cancel().
- setTimeout(()=>{try{speechSynthesis.resume();speechSynthesis.speak(u);}catch{done();}},60);
- // Chrome sometimes never fires onend: finish only once the voice has really started and stopped.
+ // Speak in the same tick as the tap (iOS needs it). Only after cancelling a running voice do we wait one tick.
+ const go=()=>{try{speechSynthesis.resume();speechSynthesis.speak(u);}catch{done();}};
+ if(busyNow)setTimeout(go,60);else go();
  guard=setInterval(()=>{if(started&&!speechSynthesis.speaking&&!speechSynthesis.pending)done();},700);
  limit=setTimeout(done,Math.min(120000,5000+txt.length*90));
 }
-function stopSpeak(){if(TTS){speechSynthesis.cancel();}if(speakingBtn){speakingBtn.classList.remove("is-on");speakingBtn.innerHTML=icon("speaker");speakingBtn.setAttribute("aria-label",ui("listen"));speakingBtn=null;}}
+async function speakServer(text,l,btn,onend){
+ stopSpeak();unlockAudio();
+ const my=++speakSeq,txt=clean(text).slice(0,1500);
+ if(btn){speakingBtn=btn;btn.classList.add("is-on");btn.innerHTML=icon("stop");btn.setAttribute("aria-label",ui("stop"));}
+ let finished=false;
+ const done=()=>{if(finished)return;finished=true;if(btn){btn.classList.remove("is-on");btn.innerHTML=icon("speaker");btn.setAttribute("aria-label",ui("listen"));}if(speakingBtn===btn)speakingBtn=null;const f=onend;onend=null;f&&f();};
+ try{
+  const r=await fetch("/api/assistant/speech",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({text:txt,lang:l})});
+  if(!r.ok)throw new Error(String(r.status));
+  const blob=await r.blob();if(my!==speakSeq){done();return;}
+  if(playerURL)URL.revokeObjectURL(playerURL);playerURL=URL.createObjectURL(blob);
+  player.onended=()=>{if(my===speakSeq)done();};player.onerror=()=>{if(my===speakSeq)done();};
+  player.src=playerURL;await player.play();
+ }catch{
+  if(my!==speakSeq)return done();
+  // Fallback: the phone's own voice.
+  if(TTS){finished=true;speakNative(text,l,btn,onend);}else done();
+ }
+}
+function stopSpeak(){speakSeq++;if(TTS){try{speechSynthesis.cancel();}catch{}}if(player&&!player.paused&&player.src!==silentURL){try{player.pause();}catch{}}if(speakingBtn){speakingBtn.classList.remove("is-on");speakingBtn.innerHTML=icon("speaker");speakingBtn.setAttribute("aria-label",ui("listen"));speakingBtn=null;}}
+
+/* ---------- server recording (mobile) ---------- */
+const CAN_REC_TYPES=["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg;codecs=opus","audio/aac"];
+let srvRec=null;
+// Records one utterance. Ends on silence after speech, on stop(), or at maxMs. Resolves {blob,heard} or null if aborted.
+function recordOnce({maxMs=15000,silenceMs=1300,quietMs=8000,onLevel}={}){
+ let stopFn=()=>{},abortFn=()=>{};
+ const pr=(async()=>{
+  const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+  const type=CAN_REC_TYPES.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||"";
+  const mr=new MediaRecorder(stream,type?{mimeType:type}:undefined),chunks=[];
+  let heard=false,aborted=false,timer=0,raf=0,src=null,an=null,t0=Date.now(),loud=0;
+  const vad=!!(audioCtx&&audioCtx.state==="running");
+  if(vad){try{src=audioCtx.createMediaStreamSource(stream);an=audioCtx.createAnalyser();an.fftSize=1024;src.connect(an);}catch{an=null;}}
+  if(!an)heard=true;
+  const buf=an?new Uint8Array(an.fftSize):null;
+  const tick=()=>{if(!an)return;an.getByteTimeDomainData(buf);let sum=0;for(let i=0;i<buf.length;i++){const x=(buf[i]-128)/128;sum+=x*x;}const rms=Math.sqrt(sum/buf.length);onLevel&&onLevel(rms);const now=Date.now();
+   if(rms>0.035){heard=true;loud=now;}
+   if(heard&&loud&&now-loud>silenceMs)finish();else if(!heard&&now-t0>quietMs)finish();};
+  const finish=()=>{clearInterval(raf);clearTimeout(timer);if(mr.state!=="inactive")mr.stop();};
+  stopFn=finish;abortFn=()=>{aborted=true;finish();};
+  const out=new Promise(res=>{mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};mr.onstop=()=>{stream.getTracks().forEach(t=>t.stop());try{src&&src.disconnect();}catch{}res(aborted?null:{blob:new Blob(chunks,{type:mr.mimeType||type||"audio/webm"}),heard});};});
+  mr.start(250);timer=setTimeout(finish,maxMs);raf=setInterval(tick,90);
+  return out;
+ })();
+ return {promise:pr,stop:()=>stopFn(),abort:()=>abortFn()};
+}
+async function transcribe(blob){
+ const r=await fetch("/api/assistant/transcribe?lang="+lang(),{method:"POST",headers:{"content-type":blob.type||"audio/webm"},body:blob});
+ if(!r.ok)throw new Error(String(r.status));const j=await r.json();return String(j.text||"").replace(/\s+/g," ").trim();
+}
+const micErr=e=>e&&(e.name==="NotAllowedError"||e.name==="SecurityError"||e.name==="NotFoundError");
 
 /* ---------- dictation ---------- */
 let rec=null,listening=false;
-function startDictation(){
- if(!SR)return;if(listening){rec&&rec.stop();return;}
- unlockTTS();stopSpeak();rec=new SR();rec.lang=REC[lang()];rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1;
+function micState(on){micBtn.classList.toggle("is-on",on);micBtn.innerHTML=icon(on?"micOff":"mic");micBtn.setAttribute("aria-label",on?ui("micStop"):ui("mic"));}
+async function startDictationServer(){
+ if(listening){srvRec&&srvRec.stop();return;}
+ listening=true;micState(true);
+ const h=recordOnce({maxMs:30000,silenceMs:1600,quietMs:9000});srvRec=h;let res=null;
+ try{res=await h.promise;}catch(e){srvRec=null;listening=false;micState(false);notice(micErr(e)?ui("micDenied"):ui("noHear"));return;}
+ srvRec=null;listening=false;micState(false);if(!res)return;
+ if(!res.heard||res.blob.size<1200){notice(ui("noHear"));return;}
+ const ph=input.placeholder;input.placeholder=ui("callThinking");input.disabled=true;
+ let q="";try{q=await transcribe(res.blob);}catch{}
+ input.placeholder=ph;input.disabled=false;
+ if(q)ask(q);else notice(ui("noHear"));
+}
+async function startDictation(){
+ unlockTTS();
+ if(listening&&srvRec){srvRec.stop();return;}
+ if(listening){rec&&rec.stop();return;}
+ if(voiceSrv===null)await aiStatus();
+ if(useSrvListen()){stopSpeak();return startDictationServer();}
+ if(!SR){notice(ui("callUnsupported"));return;}
+ stopSpeak();rec=new SR();rec.lang=REC[lang()];rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=1;
  let finalText="",interim="",failed="";
  rec.onresult=e=>{interim="";for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];if(r.isFinal)finalText+=r[0].transcript+" ";else interim+=r[0].transcript;}input.value=(finalText+interim).trim();autosize();};
  rec.onerror=e=>{failed=e.error;if(e.error==="not-allowed"||e.error==="service-not-allowed"||e.error==="audio-capture")notice(ui("micDenied"));};
@@ -260,16 +350,38 @@ function notice(t){const n=el("p",{class:"v6a-notice",role:"status",text:t});log
 let inCall=false,callMuted=false,callRec=null;
 const callStatus=$(".v6a-call-status"),callText=$(".v6a-call-text"),orb=$(".v6a-orb");
 function setCall(stateName,text){callBox.dataset.state=stateName;callStatus.textContent=text||"";}
-function startCall(){
+async function startCall(){
  inCall=true;callMuted=false;callBox.hidden=false;panel.classList.add("v6a-in-call");callText.textContent="";
  labels();unlockTTS();
- if(!SR||!TTS){setCall("idle",ui("callUnsupported"));return;}
+ if(voiceSrv===null)await aiStatus();if(!inCall)return;
+ const srv=useSrvListen();
+ if(!srv&&(!SR||!TTS)&&!(useSrvSpeak()&&SR)){setCall("idle",ui("callUnsupported"));return;}
  setCall("speaking",ui("callSpeaking"));
  speak(ui("callHello"),lang(),null,()=>{if(inCall)callListen();});
  setTimeout(()=>panel.querySelector('[data-a="hang"]').focus(),60);
 }
 let callMisses=0;
+async function callListenServer(){
+ if(!inCall||callMuted||srvRec)return;
+ setCall("listening",ui("callListening"));callText.textContent="";
+ const h=recordOnce({maxMs:20000,silenceMs:1200,quietMs:7000,onLevel:v=>{orb.style.setProperty("--lvl",Math.min(1,v*9).toFixed(2));}});srvRec=h;let res=null;
+ try{res=await h.promise;}catch(e){srvRec=null;setCall("idle",micErr(e)?ui("micDenied"):ui("callTap"));callMuted=true;callBox.classList.add("v6a-tap");return;}
+ srvRec=null;orb.style.removeProperty("--lvl");
+ if(!res||!inCall||callMuted)return;
+ if(!res.heard||res.blob.size<1200){callMisses++;if(callMisses>=3){callMuted=true;callBox.classList.add("v6a-tap");setCall("idle",ui("callTap"));return;}setTimeout(callListenServer,250);return;}
+ setCall("thinking",ui("callThinking"));
+ let q="";try{q=await transcribe(res.blob);}catch{}
+ if(!inCall)return;
+ if(!q){callMisses++;if(callMisses>=3){callMuted=true;callBox.classList.add("v6a-tap");setCall("idle",ui("callTap"));return;}setTimeout(callListenServer,250);return;}
+ callMisses=0;callText.textContent=q;
+ const m=await ask(q);if(!inCall)return;
+ if(!m){callListenServer();return;}
+ callText.textContent=clean(m.t).slice(0,220)+(m.t.length>220?"…":"");
+ setCall("speaking",ui("callSpeaking"));
+ speak(m.t,lang(),null,()=>{if(inCall)setTimeout(callListenServer,200);});
+}
 function callListen(){
+ if(useSrvListen())return callListenServer();
  if(!inCall||callMuted||callRec)return;
  if(TTS&&(speechSynthesis.speaking||speechSynthesis.pending)){setTimeout(callListen,300);return;}
  setCall("listening",ui("callListening"));
@@ -291,18 +403,18 @@ function callListen(){
  try{r.start();}catch{callRec=null;setTimeout(callListen,500);}
 }
 // Tap the orb to talk again (needed on iPhone after a pause).
-orb.addEventListener("click",()=>{if(!inCall)return;unlockTTS();callBox.classList.remove("v6a-tap");callMisses=0;if(callMuted){callMuted=false;const b=panel.querySelector('[data-a="mute"]');b.classList.remove("is-off");b.innerHTML=icon("mic");b.setAttribute("aria-label",ui("callMute"));}stopSpeak();callRec&&callRec.abort();callRec=null;callListen();});
+orb.addEventListener("click",()=>{if(!inCall)return;unlockTTS();callBox.classList.remove("v6a-tap");callMisses=0;if(callMuted){callMuted=false;const b=panel.querySelector('[data-a="mute"]');b.classList.remove("is-off");b.innerHTML=icon("mic");b.setAttribute("aria-label",ui("callMute"));}stopSpeak();srvRec&&srvRec.abort();srvRec=null;callRec&&callRec.abort();callRec=null;callListen();});
 function toggleMute(){
  callMuted=!callMuted;const b=panel.querySelector('[data-a="mute"]');b.classList.toggle("is-off",callMuted);b.innerHTML=icon(callMuted?"micOff":"mic");
  b.setAttribute("aria-label",callMuted?ui("callUnmute"):ui("callMute"));
- if(callMuted){callRec&&callRec.abort();stopSpeak();setCall("idle",ui("callPaused"));}else{callBox.classList.remove("v6a-tap");callMisses=0;callListen();}
+ if(callMuted){srvRec&&srvRec.abort();srvRec=null;callRec&&callRec.abort();stopSpeak();setCall("idle",ui("callPaused"));}else{callBox.classList.remove("v6a-tap");callMisses=0;callListen();}
 }
-function endCall(){inCall=false;callBox.classList.remove("v6a-tap");callRec&&callRec.abort();callRec=null;stopSpeak();callBox.hidden=true;panel.classList.remove("v6a-in-call");panel.querySelector('[data-a="call"]').focus();}
+function endCall(){inCall=false;callBox.classList.remove("v6a-tap");srvRec&&srvRec.abort();srvRec=null;callRec&&callRec.abort();callRec=null;stopSpeak();callBox.hidden=true;panel.classList.remove("v6a-in-call");panel.querySelector('[data-a="call"]').focus();}
 
 /* ---------- open / close ---------- */
 let opened=false;
 async function open(){
- hideTeaser(true);
+ hideTeaser(true);unlockAudio();
  try{await loadKB();}catch{}
  if(!opened){opened=true;labels();if(KB)renderAll();}
  panel.hidden=false;requestAnimationFrame(()=>panel.classList.add("is-open"));
@@ -312,7 +424,7 @@ async function open(){
  aiStatus();
 }
 function close(){
- if(inCall)endCall();if(listening&&rec)rec.abort();stopSpeak();
+ if(inCall)endCall();if(listening&&srvRec){srvRec.abort();srvRec=null;listening=false;micState(false);}if(listening&&rec)rec.abort();stopSpeak();
  panel.classList.remove("is-open");root.classList.remove("is-open");launch.setAttribute("aria-expanded","false");d.classList.remove("v6a-lock");
  setTimeout(()=>{if(!panel.classList.contains("is-open"))panel.hidden=true;},260);
  launch.focus();

@@ -1,6 +1,7 @@
 // student-portal-v1 · GLOBAL PASSPORT — MY GLOBAL JOURNEY (student side).
 import {E,gi,btn,ring,avatar,countrySelect,countryName,iso,fmtDate,ago,daysUntil,linkCss,idleLogout,reducedMotion} from './gp-ui.js';
 import {gateLang} from './gateway.js';
+import {applyV17,mountUpdates,messageNotifier} from './muk-v17.js';
 import {openMessenger,openNotifications,heartButton,watchNotifications,setDot,hideOnScroll,linkChatCss} from './muk-chat.js';
 
 const TX={
@@ -38,7 +39,7 @@ export async function mountStudentPortal({api,client,who,onLogout}){
  document.getElementById('studentPortal')?.remove();
  let lang=gateLang();const tx=()=>TX[lang]||TX.en;const L=k=>k.split('.').reduce((o,p)=>o?.[p],tx())??k.split('.').reduce((o,p)=>o?.[p],TX.en)??k;const fill=(s,v)=>String(s).replace(/\{(\w+)\}/g,(_,k)=>v[k]??'');
  const root=E('div',undefined,'gp-app');root.id='studentPortal';root.lang=lang;document.body.append(root);
- const theme=document.querySelector('meta[name=theme-color]');if(theme)theme.content='#070a0f';
+ applyV17({role:'student',lang});let updates=null,updatesLang=null,msgNotify=null;
  const logout=async()=>{watcher?.stop();root.remove();await onLogout();};
  idleLogout(root,logout);linkChatCss();
  let summary=null,watcher=null,dockEl=null;
@@ -53,7 +54,7 @@ export async function mountStudentPortal({api,client,who,onLogout}){
  if(who.kind==='new'){onboarding();return;}
  await load();
 
- async function load(silent){try{data=(await api('/api/passport/me')).data;render();if(!watcher)watcher=watchNotifications(api,x=>{summary=x;paintDots();});}catch(e){if(!silent){root.replaceChildren(errorView(e.message));}}}
+ async function load(silent){try{data=(await api('/api/passport/me')).data;render();if(!watcher){msgNotify=messageNotifier({lang,onOpen:()=>openChat()});watcher=watchNotifications(api,x=>{summary=x;paintDots();msgNotify(x);});}}catch(e){if(!silent){root.replaceChildren(errorView(e.message));}}}
  function errorView(text){const w=E('div',undefined,'gp-error');w.append(gi('alert'),E('h2','Global Passport'),E('p',text),btn(L('refresh'),()=>load(),'gp-btn gp-primary','refresh'),btn(L('signOut'),logout,'gp-btn gp-ghost','logout'));return w;}
 
  // ---------------- Onboarding ----------------
@@ -102,7 +103,7 @@ export async function mountStudentPortal({api,client,who,onLogout}){
  // mainEl declared at mount start
  function render(dir){
   const s=data.student;root.replaceChildren();root.lang=lang;
-  const top=E('header',undefined,'gp-top gp-top-ig');const brand=E('a',undefined,'gp-top-brand');brand.href='/';brand.setAttribute('aria-label',L('website'));const wm=E('img',undefined,'gp-logo');wm.src='/assets/brand/logo.svg';wm.alt='MUK Talent';wm.width=374;wm.height=72;brand.append(wm);
+  const top=E('header',undefined,'gp-top gp-top-ig');const brand=E('a',undefined,'gp-top-brand');brand.href='/';brand.setAttribute('aria-label',L('website'));const wm=E('img',undefined,'gp-logo');wm.src='/assets/brand/logo-ivory.svg';wm.alt='MUK Talent';wm.width=374;wm.height=72;brand.append(wm);
   const right=E('div',undefined,'gp-top-right');const heart=heartButton(lang,openNotif);heart.classList.add('gp-heart');right.append(langMenu(()=>render()),heart);top.append(brand,right);hideOnScroll(top);
   const side=E('nav',undefined,'gp-side');side.setAttribute('aria-label','Global Passport');for(const [id,label]of pages()){const b=btn(label,()=>go(id),'gp-side-btn',{journey:'globe',documents:'doc',plan:'calendar',messages:'chat',profile:'user'}[id]);if(id===page)b.setAttribute('aria-current','page');if(id==='messages')b.dataset.gpMsg='1';side.append(b);}
   const webSide=E('a','\u2190 '+L('website'),'gp-side-btn gp-side-web');webSide.href='/';side.append(webSide);const out=btn(L('signOut'),logout,'gp-side-btn gp-side-out','logout');side.append(out);
@@ -124,6 +125,9 @@ export async function mountStudentPortal({api,client,who,onLogout}){
   const pass=passportPage(s);
   const ready=E('article',undefined,'gp-ready');ready.append(E('p',L('readiness'),'gp-kicker'),ring(data.readiness,'xl'));const done=data.documents.filter(d=>d.required&&d.status==='approved').length,req=data.documents.filter(d=>d.required).length;ready.append(E('p',fill(L('docsDone'),{a:done,b:req}),'gp-muted'),statusPill(s.application_status));
   hero.append(pass,ready);mainEl.append(hero);
+  {const st=data.stages||[],sd=st.filter(x=>x.status==='done').length;const prog=st.length?{label:lang==='fr'?'Étapes terminées':'Stages completed',value:sd,max:st.length,text:sd+' / '+st.length}:null;
+   if(!updates||updatesLang!==lang){updates?.stop();updatesLang=lang;updates=mountUpdates({api,userKey:'student:'+(s.reference||s.id||'me'),lang,name:s.first_name||who.name,progress:prog,labels:{stage:stageName},onOpen:it=>{if(it.type==='message')openChat();else if(it.type==='document')go('documents');else if(it.type==='task'||it.type==='event')go('plan');else if(it.type==='stage'){openStage=it.key;go('plan');}}});}else{updates.setProgress(prog);updates.refresh();}
+   mainEl.append(updates.el);}
   const facts=E('section',undefined,'gp-facts');
   facts.append(fact('globe',L('destination'),destName(s.destination)),fact('cap',L('university'),s.university||L('toChoose'),!s.university),fact('book',L('programme'),s.programme||s.subject||L('toChoose'),!s.programme),fact('calendar',L('intake'),s.intake||'—'));
   mainEl.append(facts);

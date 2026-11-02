@@ -2,6 +2,7 @@
 // Hojas: Summary · Case pipeline · Stage x level · Guide. Un único código de colores (pipeline-stages.mjs).
 import ExcelJS from 'exceljs';
 import {STAGE_META, STATUS_LEGEND, stageMeta} from './pipeline-stages.mjs';
+import {englishRow} from './pipeline-english.mjs';
 
 export const STAGES = ['Assessment', 'Documents pending', 'Application preparation', 'Application submitted', 'Offer received', 'Deposit pending', 'Enrolled', 'On hold', 'Closed'];
 const ADVANCED = ['Application submitted', 'Offer received', 'Deposit pending', 'Enrolled'];
@@ -56,7 +57,6 @@ const INTERNAL_EXTRA = [
   ['email', 'Email', 28, 'Contact (internal)', 'text'],
   ['whatsapp_phone_e164', 'Phone / WhatsApp', 17, 'Contact (internal)', 'text'],
   ['residence_city', 'City', 15, 'Contact (internal)', 'text'],
-  ['owner_name', 'Responsible', 20, 'Internal follow-up', 'text'],
   ['next_action', 'Internal next action', 32, 'Internal follow-up', 'wrap'],
   ['next_action_at', 'Follow-up date', 14, 'Internal follow-up', 'date'],
   ['budget_amount', 'Budget', 12, 'Internal follow-up', 'money'],
@@ -66,7 +66,8 @@ export const columnsFor = mode => mode === 'partners' ? PARTNER_COLUMNS : [...PA
 const GROUP_FILL = {'Case': C.ink, 'Student profile': 'FF2F5D58', 'Application': 'FF4B3A86', 'Readiness (declared)': 'FF7A5410', 'Dates': 'FF55524B', 'Contact (internal)': C.red, 'Internal follow-up': 'FF8A3F12'};
 
 // Fila "pública" (lo que ve una universidad). También es el snapshot del enlace compartido.
-export function partnerRow(row) {
+export function partnerRow(input) {
+  const row = englishRow(input);
   return {
     reference: row.reference || '', stage: row.stage || '', status: stageMeta(row.stage).status,
     country: row.residence_country_code !== undefined ? countryName(row.residence_country_code) : (row.country || 'Not specified'), target_study_level: levelName(row.target_study_level),
@@ -123,9 +124,11 @@ function smallTable(ws, top, left, title, entries, total, {limit = 8, color = C.
   return r;
 }
 
-export async function buildPipelineWorkbook(rawRows, {mode = 'partners', title = 'Student recruitment pipeline', recipient = '', asOf = new Date().toISOString(), preparedBy = 'MUK Talent'} = {}) {
+export async function buildPipelineWorkbook(rawRows, {mode = 'partners', title = 'Student recruitment pipeline', recipient = '', asOf = new Date().toISOString(), sample = false} = {}) {
+  const preparedBy = 'MUK Talent';
   const partners = mode === 'partners';
-  const rows = sortRows(rawRows.map(r => ({...r, ...partnerRow(r)})));
+  // Sólo datos de estudiantes: se descartan campos del personal (responsable, creador, etc.).
+  const rows = sortRows(rawRows.map(r => { const {owner_name, owner_id, assigned_to, created_by, ...rest} = englishRow(r); return {...rest, ...partnerRow(r)}; }));
   const total = rows.length, when = fmtDate(new Date(asOf));
   const wb = new ExcelJS.Workbook();
   wb.creator = preparedBy; wb.company = 'MUK Talent'; wb.created = new Date(asOf); wb.modified = new Date(asOf);
@@ -303,7 +306,7 @@ export async function buildPipelineWorkbook(rawRows, {mode = 'partners', title =
   for (const [key, header, , group] of cols) line(header, group, defs[key] || '');
   gr++;
   section('About this report');
-  for (const t of [`Prepared by ${preparedBy} on ${when}${recipient ? ' for ' + recipient : ''}.`, 'Only cases accepted by MUK Talent and not archived are included.', 'Stages and readiness are a progress indicator, not a guarantee of admission or enrolment.', partners ? 'Direct identifiers are excluded. The report is pseudonymised, not guaranteed anonymous.' : 'Contains personal data: confidential, internal use only.', 'Questions: agents@muktalent.com · muktalent.com']) { g.mergeCells(gr, 1, gr, 3); g.getCell(gr, 1).value = t; g.getCell(gr, 1).font = font({color: {argb: C.muted}}); g.getCell(gr, 1).alignment = {wrapText: true}; gr++; }
+  for (const t of [`Prepared by ${preparedBy} on ${when}${recipient ? ' for ' + recipient : ''}.`, sample ? 'Illustrative portfolio prepared for partnership presentations.' : 'Only cases accepted by MUK Talent and not archived are included.', 'Stages and readiness are a progress indicator, not a guarantee of admission or enrolment.', partners ? 'Direct identifiers are excluded. The report is pseudonymised, not guaranteed anonymous.' : 'Contains personal data: confidential, internal use only.', 'Questions: agents@muktalent.com · muktalent.com']) { g.mergeCells(gr, 1, gr, 3); g.getCell(gr, 1).value = t; g.getCell(gr, 1).font = font({color: {argb: C.muted}}); g.getCell(gr, 1).alignment = {wrapText: true}; gr++; }
   g.pageSetup = {paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0};
 
   for (const sheet of wb.worksheets) {

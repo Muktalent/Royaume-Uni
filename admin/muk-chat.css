@@ -203,3 +203,106 @@ html.mkc-lock,html.mkc-lock body{overflow:hidden!important;overscroll-behavior:n
 .mkc-vmnote.is-error{background:#fbe9e7;color:#9b2c1f}
 .mkc-vmmore{grid-column:1/-1;min-height:42px;border:1px solid #cfd9d4;border-radius:12px;background:#fff;font:inherit;font-weight:650;color:#16393a;cursor:pointer}
 .mkc-audnote{display:block;margin-top:6px;color:#5d6f69;font-size:12.5px;line-height:1.45}.mkc-audnote[hidden]{display:none}
+
+/* ==========================================================================
+   v17 · Messenger a pantalla completa, con el aspecto y el comportamiento de WhatsApp
+   (lista + conversación en dos paneles en ordenador; una vista cada vez en el móvil).
+   ========================================================================== */
+.mkc-wa{--wa-bg:#fff;--wa-panel:#f0f2f5;--wa-line:#e9edef;--wa-text:#111b21;--wa-sub:#667781;--wa-green:#00a884;--wa-green-d:#008069;--wa-badge:#25d366;--wa-out:#d9fdd3;--wa-in:#fff;--wa-wall:#efeae2;--wa-read:#53bdeb;--wa-hover:#f5f6f6;--wa-active:#f0f2f5;
+ inset:0!important;width:auto!important;border-radius:0!important;box-shadow:none!important;background:var(--wa-bg);color:var(--wa-text);font:15px/1.38 "Segoe UI","Helvetica Neue",Helvetica,"Lucida Grande",Arial,Ubuntu,Cantarell,"Fira Sans",sans-serif}
+.mkc-wa .mkc-bar{background:var(--wa-bg);color:var(--wa-text);min-height:59px;padding:calc(6px + env(safe-area-inset-top)) 10px 6px 12px}
+.mkc-wa .mkc-list>.mkc-bar h2{font-size:22px;font-weight:700;color:var(--wa-green-d);letter-spacing:0}
+.mkc-wa .mkc-ib{width:40px;height:40px;color:#54656f}
+.mkc-wa .mkc-ib:hover,.mkc-wa .mkc-ib:focus-visible{background:rgba(11,20,26,.06)}
+.mkc-wa .mkc-search{margin:4px 12px 6px;height:38px;border-radius:10px;background:var(--wa-panel);color:var(--wa-sub)}
+.mkc-wa .mkc-search input{font-size:15px;color:var(--wa-text)}
+.mkc-wa .mkc-search input::placeholder{color:var(--wa-sub)}
+.mkc-filters{display:flex;gap:8px;padding:2px 12px 8px;overflow-x:auto;scrollbar-width:none}
+.mkc-filters::-webkit-scrollbar{display:none}
+.mkc-fchip{flex:none;padding:6px 13px;border:0;border-radius:999px;background:var(--wa-panel);color:var(--wa-sub)!important;font-size:14px!important;font-weight:500}
+.mkc-fchip[aria-selected="true"]{background:#e7fce3;color:var(--wa-green-d)!important;font-weight:600}
+.mkc-wa .mkc-threads{background:var(--wa-bg)}
+.mkc-wa .mkc-trow{padding:0 0 0 13px;gap:13px;min-height:72px;transition:background .15s}
+.mkc-wa .mkc-trow:hover,.mkc-wa .mkc-trow:focus-visible{background:var(--wa-hover)}
+.mkc-wa .mkc-trow.is-active{background:var(--wa-active)}
+.mkc-wa .mkc-trow .mkc-av{width:49px;height:49px}
+.mkc-wa .mkc-tmid{align-self:stretch;justify-content:center;padding:10px 15px 10px 0;border-bottom:1px solid var(--wa-line)}
+.mkc-wa .mkc-tmid strong{font-weight:500;font-size:17px;color:var(--wa-text)}
+.mkc-wa .has-unread .mkc-tmid strong{font-weight:600}
+.mkc-wa .mkc-ttop small{color:var(--wa-sub)}
+.mkc-wa .mkc-ttop small.is-new{color:var(--wa-badge);font-weight:600}
+.mkc-wa .mkc-prev{color:var(--wa-sub);font-size:14px}
+.mkc-wa .has-unread .mkc-prev{color:var(--wa-text)}
+.mkc-wa .mkc-badge{background:var(--wa-badge);color:#fff;min-width:20px;height:20px;font-size:12px;animation:mkc-pop .3s cubic-bezier(.3,1.6,.5,1)}
+@keyframes mkc-pop{from{transform:scale(.4)}to{transform:scale(1)}}
+.mkc-wa .mkc-tick{color:#8696a0}.mkc-wa .mkc-tick.is-read{color:var(--wa-read)}
+/* conversación */
+.mkc-wa .mkc-cbar{background:var(--wa-panel);border-left:1px solid var(--wa-line);gap:6px}
+.mkc-wa .mkc-who strong{font-weight:500;color:var(--wa-text)}
+.mkc-wa .mkc-who small{color:var(--wa-sub);font-size:13px}
+.mkc-wallwrap{position:relative;flex:1;min-height:0;display:flex;flex-direction:column}
+.mkc-wa .mkc-wall{background-color:var(--wa-wall);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120' fill='none' stroke='%23e0d9cd' stroke-width='1.1' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 14h18v12H20l-6 5z'/%3E%3Cpath d='M78 10l10 5-10 5-10-5z M72 18v5c4 3 8 3 12 0v-5'/%3E%3Ccircle cx='100' cy='60' r='7'/%3E%3Cpath d='M20 70l6 3 6-9 6 14 4-6'/%3E%3Cpath d='M58 92l14-6-5 14-3-5z'/%3E%3Cpath d='M48 44l3 6 6 1-4 4 1 6-6-3-6 3 1-6-4-4 6-1z'/%3E%3Cpath d='M92 96h14v10H92z M95 96v-3h8v3'/%3E%3C/svg%3E");background-size:180px 180px;background-position:0 0}
+.mkc-wa .mkc-msgs{padding:14px 6% 18px;max-width:none;gap:1px}
+@media(max-width:899px){.mkc-wa .mkc-msgs{padding:10px 12px 14px}}
+.mkc-wa .mkc-day{background:#fff;color:#54656f;font-size:12.5px;font-weight:500;text-transform:uppercase;border-radius:7.5px;padding:5px 12px;box-shadow:0 1px .5px rgba(11,20,26,.13);margin:12px 0 8px;position:sticky;top:8px;z-index:2}
+.mkc-wa .mkc-sys{background:#ffeecd;color:#54656f;border-radius:7.5px;box-shadow:0 1px .5px rgba(11,20,26,.13);font-size:12.5px}
+.mkc-wa .mkc-msg{max-width:min(65%,560px);padding:6px 7px 8px 9px;border-radius:7.5px;box-shadow:0 1px .5px rgba(11,20,26,.13);margin-top:2px;color:var(--wa-text);animation:mkc-msg-in .18s ease-out}
+@media(max-width:899px){.mkc-wa .mkc-msg{max-width:84%}}
+@keyframes mkc-msg-in{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
+.mkc-wa .mkc-msg.tail{margin-top:10px}
+.mkc-wa .mkc-msg.in{background:var(--wa-in);border-radius:7.5px}
+.mkc-wa .mkc-msg.out{background:var(--wa-out);border-radius:7.5px}
+.mkc-wa .mkc-msg.tail.in{border-top-left-radius:0}
+.mkc-wa .mkc-msg.tail.out{border-top-right-radius:0}
+.mkc-wa .mkc-msg.tail::before{content:"";position:absolute;top:0;width:8px;height:13px}
+.mkc-wa .mkc-msg.tail.in::before{left:-8px;background:var(--wa-in);clip-path:polygon(0 0,100% 0,100% 100%)}
+.mkc-wa .mkc-msg.tail.out::before{right:-8px;background:var(--wa-out);clip-path:polygon(0 0,100% 0,0 100%)}
+.mkc-wa .mkc-msg p{font-size:14.6px;line-height:19px;padding-right:0}
+.mkc-wa .mkc-msg p::after{content:"";display:inline-block;width:62px;height:1px}
+.mkc-wa .mkc-msg.in p::after{width:44px}
+.mkc-wa .mkc-msg a{color:#027eb5;text-decoration:none;word-break:break-all}
+.mkc-wa .mkc-msg a:hover{text-decoration:underline}
+.mkc-wa .mkc-meta{right:7px;bottom:4px;font-size:11px;color:#667781}
+.mkc-wa .mkc-sender{color:#06cf9c;font-weight:500;font-size:12.8px}
+.mkc-wa .mkc-vplay{background:transparent;color:#54656f;width:34px;height:34px}
+.mkc-wa .mkc-vbars i{background:#b5bec4}.mkc-wa .mkc-vbars i.on{background:var(--wa-green)}
+.mkc-down{position:absolute;right:18px;bottom:14px;z-index:3;display:grid;place-items:center;width:42px;height:42px;border:0;border-radius:50%;background:#fff;color:#54656f;box-shadow:0 1px 3px rgba(11,20,26,.25);animation:mkc-pop .2s}
+.mkc-down[hidden]{display:none}
+/* composer */
+.mkc-wa .mkc-comp{position:relative;background:var(--wa-panel);padding:6px 10px calc(6px + env(safe-area-inset-bottom));gap:8px;align-items:flex-end}
+.mkc-wa .mkc-pill{min-height:44px;padding:2px 12px 2px 4px;border-radius:22px;box-shadow:none;align-items:flex-end;gap:2px}
+.mkc-wa .mkc-pill textarea{font-size:15px;padding:11px 0;color:var(--wa-text)}
+.mkc-wa .mkc-pill textarea::placeholder{color:var(--wa-sub)}
+.mkc-wa .mkc-emo{width:38px;height:40px;flex:none}
+.mkc-wa .mkc-emo.is-on{color:var(--wa-green)}
+.mkc-wa .mkc-act{width:44px;height:44px;background:var(--wa-green);box-shadow:none;transition:transform .15s}
+.mkc-wa .mkc-act:active{transform:scale(.92)}
+.mkc-wa .mkc-act[data-mode="rec"]{background:var(--wa-green)}
+.mkc-wa .mkc-rec{min-height:44px;border-radius:22px}
+.mkc-emoji{position:absolute;left:10px;bottom:calc(100% + 6px);z-index:4;display:grid;grid-template-columns:repeat(8,1fr);gap:2px;width:min(340px,calc(100vw - 20px));padding:10px;border-radius:14px;background:#fff;box-shadow:0 8px 28px rgba(11,20,26,.22);animation:mkc-pop .18s}
+.mkc-emoji[hidden]{display:none}
+.mkc-emoji button{border:0;background:transparent;font-size:22px;line-height:1;padding:6px 0;border-radius:8px}
+.mkc-emoji button:hover{background:var(--wa-panel)}
+/* panel vacío (ordenador) */
+.mkc-intro{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:40px;text-align:center;background:var(--wa-panel);border-left:1px solid var(--wa-line);border-bottom:6px solid var(--wa-badge)}
+.mkc-intro-art{display:grid;place-items:center;width:120px;height:120px;border-radius:50%;background:#e1f5ee;color:var(--wa-green-d);margin-bottom:18px}
+.mkc-intro-art .mkc-i{width:56px;height:56px;stroke-width:1.4}
+.mkc-intro h3{margin:0;font-size:30px;font-weight:300;color:#41525d}
+.mkc-intro p{margin:0;max-width:460px;color:var(--wa-sub);font-size:14px;line-height:20px}
+.mkc-intro .mkc-intro-foot{position:absolute;bottom:34px;font-size:13px;color:#8696a0;display:flex;align-items:center;gap:4px}
+.mkc-wa .mkc-conv{position:relative}
+.mkc-wa .mkc-sheet{background:#fff}
+.mkc-wa .mkc-contacts h3{color:var(--wa-green-d);letter-spacing:.04em;text-transform:none;font-size:15px;font-weight:500}
+@media(min-width:900px){
+ .mkc-wa{flex-direction:row}
+ .mkc-wa .mkc-list{flex:0 0 clamp(340px,32vw,460px);max-width:none;border-right:0;display:flex!important}
+ .mkc-wa .mkc-conv{display:flex}
+ .mkc-wa:not(.is-conv) .mkc-conv{background:var(--wa-panel)}
+ .mkc-wa .mkc-sheet{right:auto;width:clamp(340px,32vw,460px)}
+}
+@media(max-width:899px){
+ .mkc-wa .mkc-intro{display:none}
+ .mkc-wa .mkc-cbar{border-left:0;background:#fff;box-shadow:0 1px 0 var(--wa-line)}
+ .mkc-wa .mkc-list>.mkc-bar h2{font-size:24px}
+}
+@media(prefers-reduced-motion:reduce){.mkc-wa .mkc-msg,.mkc-wa .mkc-badge,.mkc-down,.mkc-emoji{animation:none}}

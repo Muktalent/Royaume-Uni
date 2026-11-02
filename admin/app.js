@@ -10,13 +10,13 @@ function __rest(s, e) {
     }
   return t2;
 }
-function __awaiter(thisArg, _arguments, P3, generator) {
+function __awaiter(thisArg, _arguments, P4, generator) {
   function adopt(value) {
-    return value instanceof P3 ? value : new P3(function(resolve) {
+    return value instanceof P4 ? value : new P4(function(resolve) {
       resolve(value);
     });
   }
-  return new (P3 || (P3 = Promise))(function(resolve, reject) {
+  return new (P4 || (P4 = Promise))(function(resolve, reject) {
     function fulfilled(value) {
       try {
         step(generator.next(value));
@@ -8555,26 +8555,26 @@ var CONNECTION_TIMEOUTS = {
 var RECONNECT_INTERVALS = [1e3, 2e3, 5e3, 1e4];
 var DEFAULT_RECONNECT_FALLBACK = 1e4;
 function createMemorySessionStorage() {
-  const store = /* @__PURE__ */ new Map();
+  const store2 = /* @__PURE__ */ new Map();
   return {
     get length() {
-      return store.size;
+      return store2.size;
     },
     clear() {
-      store.clear();
+      store2.clear();
     },
     getItem(key) {
-      return store.has(key) ? store.get(key) : null;
+      return store2.has(key) ? store2.get(key) : null;
     },
     key(index) {
       var _a;
-      return (_a = Array.from(store.keys())[index]) !== null && _a !== void 0 ? _a : null;
+      return (_a = Array.from(store2.keys())[index]) !== null && _a !== void 0 ? _a : null;
     },
     removeItem(key) {
-      store.delete(key);
+      store2.delete(key);
     },
     setItem(key, value) {
-      store.set(key, String(value));
+      store2.set(key, String(value));
     }
   };
 }
@@ -14212,16 +14212,16 @@ var GoTrueAdminApi = class {
 };
 
 // node_modules/@supabase/auth-js/dist/module/lib/local-storage.js
-function memoryLocalStorageAdapter(store = {}) {
+function memoryLocalStorageAdapter(store2 = {}) {
   return {
     getItem: (key) => {
-      return store[key] || null;
+      return store2[key] || null;
     },
     setItem: (key, value) => {
-      store[key] = value;
+      store2[key] = value;
     },
     removeItem: (key) => {
-      delete store[key];
+      delete store2[key];
     }
   };
 }
@@ -21005,13 +21005,21 @@ var btn2 = (t2, fn, cls = "th-btn") => {
   return b;
 };
 var fmt = (v) => v ? new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(v)) : "\u2014";
+var COUNTRY_ES = (() => {
+  try {
+    return new Intl.DisplayNames(["es"], { type: "region" });
+  } catch {
+    return null;
+  }
+})();
+var countryEs = (c) => /^[A-Z]{2}$/.test(String(c || "")) ? COUNTRY_ES?.of(c) || c : "\u2014";
 var STATUS_ES = { New: "Nuevo", "In progress": "En curso", Submitted: "Enviado", Ready: "Oferta", "Action needed": "Acci\xF3n requerida", Completed: "Matriculado", "On hold": "En pausa", Closed: "Cerrado" };
 var STAGE_ES = { "Assessment": "Evaluaci\xF3n", "Documents pending": "Documentos pendientes", "Application preparation": "Preparando solicitud", "Application submitted": "Solicitud enviada", "Offer received": "Oferta recibida", "Deposit pending": "Dep\xF3sito pendiente", "Enrolled": "Matriculado", "On hold": "En pausa", "Closed": "Cerrado" };
 async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord2, host }) {
   linkHrCss();
   let page = 1, query = "", stage = "", result = null, busy = false, demo = false, step = "pipeline", loadEpoch = 0;
   const selected = /* @__PURE__ */ new Set();
-  const report = { audience: "partners", scope: "filter", recipient: "", title: "Student recruitment pipeline", days: 14 };
+  const report = { source: "real", audience: "partners", scope: "filter", recipient: "", title: "Student recruitment pipeline", days: 14 };
   host.replaceChildren();
   host.className = "admin-report-view th-root pr-root";
   host.lang = "es";
@@ -21149,7 +21157,7 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
     view.append(board, tools, filterNote);
     if (demo) view.append(E2("p", "EJEMPLO \xB7 datos ficticios para presentaciones. No se exportan ni se comparten.", "admin-demo-banner"));
     const rows = demo ? demoRows(result.stages) : result.data;
-    const cols = [["reference", "Referencia"], ["__name", "Estudiante"], ["stage", "Etapa"], ["target_study_level", "Nivel"], ["target_university", "Instituci\xF3n objetivo"], ["target_course", "Curso"], ["intended_intake", "Convocatoria"], ["owner_name", "Responsable"], ["last_updated", "Actualizado"]];
+    const cols = [["reference", "Referencia"], ["__name", "Estudiante"], ["stage", "Etapa"], ["target_study_level", "Nivel"], ["target_university", "Instituci\xF3n objetivo"], ["target_course", "Curso"], ["intended_intake", "Convocatoria"], ["__country", "Pa\xEDs"], ["last_updated", "Actualizado"]];
     const wrap = E2("div", void 0, "admin-sheet-wrap pr-sheet"), table = E2("table", void 0, "admin-sheet"), head2 = E2("thead"), tr = E2("tr");
     const all = E2("input");
     all.type = "checkbox";
@@ -21202,6 +21210,7 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
           b.dataset.tone = tone(row.stage);
           td.append(b);
         } else if (k === "__name") td.textContent = [row.first_name, row.last_name].filter(Boolean).join(" ") || "\u2014";
+        else if (k === "__country") td.textContent = countryEs(row.residence_country_code);
         else {
           td.textContent = k === "last_updated" ? row[k] ? new Date(row[k]).toLocaleDateString("es-ES") : "\u2014" : display(row[k], k);
           if (k === "reference") td.className = "admin-col-ref";
@@ -21265,18 +21274,21 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
           onChange(v);
           paint2();
         };
-        const tx2 = E2("span");
-        tx2.append(E2("b", t2), E2("small", s));
-        l.append(r, tx2);
+        const tx3 = E2("span");
+        tx3.append(E2("b", t2), E2("small", s));
+        l.append(r, tx3);
         g.append(l);
       }
       return g;
     };
-    left.append(E2("p", "Destino", "pr-label"), choice("aud", [["partners", "Universidad o partner", "Sin nombres, tel\xE9fonos, emails ni notas internas. Listo para buscar partnerships."], ["internal", "Uso interno", "Incluye datos personales y responsable. Solo para el equipo."]], report.audience, (v) => {
+    left.append(E2("p", "Datos del informe", "pr-label"), choice("src", [["real", "Cartera real", `Casos aceptados de la pipeline (${result.total}).`], ["sample", "Cartera de muestra \xB7 15 estudiantes", "Perfiles del Magreb (Marruecos, Argelia, T\xFAnez) en todas las etapas, listos para presentar a una universidad."]], report.source, (v) => {
+      report.source = v;
+    }));
+    left.append(E2("p", "Destino", "pr-label"), choice("aud", [["partners", "Universidad o partner", "Sin nombres, tel\xE9fonos, emails ni notas internas. Listo para buscar partnerships."], ["internal", "Uso interno", "Incluye contacto del estudiante y pr\xF3xima acci\xF3n interna. Solo para el equipo."]], report.audience, (v) => {
       report.audience = v;
     }));
     const filtTxt = (stage ? `etapa \xAB${STAGE_ES[stage] || stage}\xBB` : "todas las etapas") + (query ? `, b\xFAsqueda \xAB${query}\xBB` : "");
-    left.append(E2("p", "Casos incluidos", "pr-label"), choice("scope", [["filter", `Todos los del filtro actual (${result.total})`, "Filtro: " + filtTxt + ". M\xE1x. 300 casos."], ["selected", `Solo los seleccionados (${selected.size})`, selected.size ? "Seleccionados en el paso 1." : "Vuelve al paso 1 para marcar casos."]], selected.size ? report.scope : "filter", (v) => {
+    if (report.source !== "sample") left.append(E2("p", "Casos incluidos", "pr-label"), choice("scope", [["filter", `Todos los del filtro actual (${result.total})`, "Filtro: " + filtTxt + ". M\xE1x. 300 casos."], ["selected", `Solo los seleccionados (${selected.size})`, selected.size ? "Seleccionados en el paso 1." : "Vuelve al paso 1 para marcar casos."]], selected.size ? report.scope : "filter", (v) => {
       report.scope = v;
     }));
     if (!selected.size) report.scope = "filter";
@@ -21302,7 +21314,7 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
     const right = E2("section", void 0, "th-card pr-preview");
     right.append(E2("h3", "Qu\xE9 contiene el Excel"));
     const ul = E2("ul", void 0, "pr-sheets");
-    const items = report.audience === "partners" ? [["Summary", "Portada con KPIs, embudo por etapa y perfil de los estudiantes (nivel, \xE1rea, convocatoria, pa\xEDs)."], ["Case pipeline", "Una fila por caso, agrupada por etapa, con c\xF3digo de colores, sem\xE1foros de preparaci\xF3n, filtros y paneles fijos."], ["Stage \xD7 level", "Mapa de calor de etapas por nivel de estudios."], ["Guide", "Leyenda de colores, definiciones y nota de privacidad."]] : [["Summary", "KPIs y embudo por etapa."], ["Case pipeline", "Datos completos de contacto, responsable y pr\xF3xima acci\xF3n interna, con colores por etapa."], ["Stage \xD7 level", "Mapa de calor."], ["Guide", "Leyenda y definiciones."]];
+    const items = report.audience === "partners" ? [["Summary", "Portada con KPIs, embudo por etapa y perfil de los estudiantes (nivel, \xE1rea, convocatoria, pa\xEDs)."], ["Case pipeline", "Una fila por caso, agrupada por etapa, con c\xF3digo de colores, sem\xE1foros de preparaci\xF3n, filtros y paneles fijos."], ["Stage \xD7 level", "Mapa de calor de etapas por nivel de estudios."], ["Guide", "Leyenda de colores, definiciones y nota de privacidad."]] : [["Summary", "KPIs y embudo por etapa."], ["Case pipeline", "Datos de contacto del estudiante y pr\xF3xima acci\xF3n interna, con colores por etapa."], ["Stage \xD7 level", "Mapa de calor."], ["Guide", "Leyenda y definiciones."]];
     for (const [t2, d] of items) {
       const li = E2("li");
       li.append(E2("b", t2), E2("span", d));
@@ -21317,9 +21329,14 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
       legend.append(i);
     }
     right.append(E2("p", "C\xF3digo de colores por etapa", "pr-label"), legend);
-    if (report.audience === "partners") right.append(E2("p", "Las referencias son seud\xF3nimos. Revisa los textos de curso y pr\xF3ximo paso antes de enviar.", "th-hint"));
+    if (report.audience === "partners") right.append(E2("p", "Todo el Excel se genera en ingl\xE9s (convocatorias, materias y estados se traducen autom\xE1ticamente). Las referencias son seud\xF3nimos; revisa los textos de curso y pr\xF3ximo paso antes de enviar.", "th-hint"));
     grid.append(left, right);
     view.append(grid);
+  }
+  async function payload() {
+    if (report.source === "sample") return { body: { sample: true }, count: 15 };
+    const ids = await caseIds();
+    return { body: { ids }, count: ids.length };
   }
   async function caseIds() {
     if (demo) throw Error("El ejemplo no se exporta. Sal del ejemplo en el paso 1.");
@@ -21335,9 +21352,9 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
   async function download2() {
     try {
       message2("Preparando el Excel\u2026");
-      const ids = await caseIds();
-      await binary(getState, "/api/admin-pipeline/export", { method: "POST", body: JSON.stringify({ ids, mode: report.audience, title: (report.title || "").trim() || void 0, recipient: (report.recipient || "").trim() || void 0 }) });
-      message2(`Excel descargado con ${ids.length} caso(s).`);
+      const { body, count } = await payload();
+      await binary(getState, "/api/admin-pipeline/export", { method: "POST", body: JSON.stringify({ ...body, mode: report.audience, title: (report.title || "").trim() || void 0, recipient: (report.recipient || "").trim() || void 0 }) });
+      message2(`Excel descargado con ${count} caso(s).`);
     } catch (e) {
       message2(e.message, true);
     }
@@ -21353,13 +21370,14 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
       message2("Indica un t\xEDtulo.", true);
       return;
     }
-    let ids;
+    let pl;
     try {
-      ids = await caseIds();
+      pl = await payload();
     } catch (e) {
       message2(e.message, true);
       return;
     }
+    const ids = { length: pl.count };
     const modal = dialog("Crear enlace para " + recipient), form = E2("form");
     const days = field(form, "days", "El enlace caduca en", "select", [["7", "7 d\xEDas"], ["14", "14 d\xEDas"], ["30", "30 d\xEDas"]], String(report.days));
     const l = E2("label", void 0, "th-check"), ck = E2("input");
@@ -21377,7 +21395,7 @@ async function renderAdminPipeline({ api: api2, getState, openRecord: openRecord
       modal.lock(true);
       save.disabled = true;
       try {
-        const r = await api2("/api/admin-pipeline/shares", { method: "POST", body: JSON.stringify({ ids, title, recipient, days: report.days, review_confirmed: true }) });
+        const r = await api2("/api/admin-pipeline/shares", { method: "POST", body: JSON.stringify({ ...pl.body, title, recipient, days: report.days, review_confirmed: true }) });
         const link = E2("input", void 0, "pr-link");
         link.readOnly = true;
         link.value = r.url;
@@ -21724,7 +21742,7 @@ function demoRows(stages) {
   const now = Date.now();
   return names.map(([f, l], i) => {
     const st = stages[i % stages.length];
-    return { candidate_id: "demo-" + i, reference: "MT-DEMO-" + String(101 + i), first_name: f, last_name: l, email: "\u2014", whatsapp_phone_e164: "\u2014", owner_name: ["Laura M.", "Yassine B.", "Kenza A."][i % 3], residence_city: ["Casablanca", "Rabat", "Marrakech", "F\xE8s", "Tanger", "Agadir"][i % 6], next_action: steps[i % steps.length], next_action_at: new Date(now + (i + 1) * 864e5 * 2).toISOString(), budget_amount: [12e3, 15e3, 18e3, 22e3][i % 4], budget_currency: "GBP", stage: st, target_study_level: levels[i], subject_interest: courses[i].replace(/^(MSc|BSc|LLM|BEng|BA|MA|MBA) ?/, "") || "Business", intended_intake: ["September 2027", "January 2027", "September 2027"][i % 3], target_university: unis[i], target_course: courses[i], english_test: ["IELTS", "IELTS", "Duolingo", "PTE"][i % 4], english_score: ["6.5", "7.0", "6.0", "6.5"][i % 4], passport: i % 3 ? "Ready" : "In progress", school_status: i % 4 ? "Completed" : "Final year", funding: ["Family funded", "Scholarship applied", "Self funded", "Loan in progress"][i % 4], external_next_step: steps[i % steps.length], case_accepted_at: new Date(now - (i + 3) * 864e5 * 4).toISOString(), last_updated: new Date(now - i * 864e5).toISOString() };
+    return { candidate_id: "demo-" + i, reference: "MT-DEMO-" + String(101 + i), first_name: f, last_name: l, email: "\u2014", whatsapp_phone_e164: "\u2014", residence_country_code: ["MA", "DZ", "TN"][i % 3], residence_city: ["Casablanca", "Rabat", "Marrakech", "F\xE8s", "Tanger", "Agadir"][i % 6], next_action: steps[i % steps.length], next_action_at: new Date(now + (i + 1) * 864e5 * 2).toISOString(), budget_amount: [12e3, 15e3, 18e3, 22e3][i % 4], budget_currency: "GBP", stage: st, target_study_level: levels[i], subject_interest: courses[i].replace(/^(MSc|BSc|LLM|BEng|BA|MA|MBA) ?/, "") || "Business", intended_intake: ["September 2027", "January 2027", "September 2027"][i % 3], target_university: unis[i], target_course: courses[i], english_test: ["IELTS", "IELTS", "Duolingo", "PTE"][i % 4], english_score: ["6.5", "7.0", "6.0", "6.5"][i % 4], passport: i % 3 ? "Ready" : "In progress", school_status: i % 4 ? "Completed" : "Final year", funding: ["Family funded", "Scholarship applied", "Self funded", "Loan in progress"][i % 4], external_next_step: steps[i % steps.length], case_accepted_at: new Date(now - (i + 3) * 864e5 * 4).toISOString(), last_updated: new Date(now - i * 864e5).toISOString() };
   });
 }
 
@@ -21853,6 +21871,9 @@ var P2 = {
   video: ["M4 6h11v12H4z", "m15 10 5-3v10l-5-3"],
   share: ["M12 3v12", "m7 8 5-5 5 5", "M5 13v6h14v-6"],
   bookmark: ["M7 4h10v16l-5-4-5 4V4Z"],
+  smile: ["M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z", "M8.5 14a4.5 4.5 0 0 0 7 0", "M9 9.5h.01M15 9.5h.01"],
+  down: ["m6 9 6 6 6-6"],
+  lockc: ["M7 11V8a5 5 0 0 1 10 0v3", "M5 11h14v10H5z"],
   check: ["m5 12 4 4 10-10"],
   checks: ["m2 12 4 4 9-9", "m10 15 1 1 9-9"],
   upload: ["M12 16V4", "m7 9 5-5 5 5", "M5 20h14"],
@@ -21886,6 +21907,30 @@ var TX = {
   es: { chats: "Chats", search: "Buscar", newChat: "Nuevo chat", write: "Mensaje", send: "Enviar", record: "Mant\xE9n pulsado para grabar un audio", recording: "Grabando\u2026", cancel: "Cancelar", voice: "Mensaje de voz", empty: "A\xFAn no hay chats. Empieza uno con el bot\xF3n +.", emptyThread: "Saluda. Los mensajes son privados entre los participantes.", counsellor: "Tu counsellor", students: "Estudiantes", team: "Equipo MUK Talent", you: "T\xFA", today: "Hoy", yesterday: "Ayer", online: "MUK Talent", micDenied: "El micr\xF3fono est\xE1 bloqueado. Perm\xEDtelo en los ajustes del navegador.", noMic: "Este navegador no permite grabar audios.", notif: "Notificaciones", messages: "Mensajes", unread: "{n} sin leer", allRead: "Est\xE1s al d\xEDa", news: "Noticia", live: "Directo", video: "V\xEDdeo", noFeed: "A\xFAn no hay novedades. El equipo publicar\xE1 aqu\xED noticias, directos y v\xEDdeos.", watch: "Ver", ago: "", share: "Compartir", save: "Guardar", saved: "Guardado", copied: "Enlace copiado", openLink: "Abrir v\xEDdeo", liveOn: "En directo el {d}", publish: "Publicar a estudiantes", title: "T\xEDtulo", description: "Descripci\xF3n", kind: "Tipo", when: "Fecha y hora", audience: "P\xFAblico", all: "Todos los estudiantes", mine: "Mis estudiantes", web: "Web (p\xFAblica, p\xE1gina de inicio)", pubWeb: "Publicar en la web", newProd: "Nueva producci\xF3n", saveProd: "Guardar en Productions", prodSaved: "Guardado en Productions", needVideo: "Pega un enlace, elige un v\xEDdeo de Vimeo o sube un archivo.", webNote: "Visible para todos en muktalent.com en \xABNuestros \xFAltimos v\xEDdeos\xBB. Los estudiantes tambi\xE9n lo ven.", videoSrc: "V\xEDdeo", upload: "Subir a Cloudinary", paste: "Pegar enlace", urlPh: "Enlace de Vimeo, YouTube o Cloudinary (o c\xF3digo embed de Vimeo)", uploading: "Subiendo\u2026 {p} %", published: "Publicado. Los estudiantes lo ver\xE1n en sus notificaciones.", remove: "Eliminar", close: "Cerrar", fromLib: "De tu biblioteca", retry: "Reintentar", loading: "Cargando\u2026", vimeo: "Elegir de Vimeo", vimeoEmpty: "No hay v\xEDdeos en tu cuenta de Vimeo.", vimeoMore: "Ver m\xE1s", vimeoReady: "V\xEDdeo de Vimeo listo", resolving: "Leyendo el v\xEDdeo\u2026", hours: { s: "Ahora", m: "Hace {n} min", h: "Hace {n} horas", h1: "Hace 1 hora", d: "Hace {n} d\xEDas", d1: "Ayer" } }
 };
 var tx = (lang2) => TX[lang2] || TX.en;
+var WA = {
+  es: { all: "Todos", unread: "No le\xEDdos", groups: "Grupos", introT: "MUK Talent Messenger", introP: "Env\xEDa y recibe mensajes y notas de voz con tu equipo y tus estudiantes. Elige un chat para empezar.", priv: "Mensajes privados dentro de MUK Talent", emoji: "Emojis", down: "Ir al \xFAltimo mensaje", noUnread: "No tienes chats sin leer." },
+  en: { all: "All", unread: "Unread", groups: "Groups", introT: "MUK Talent Messenger", introP: "Send and receive messages and voice notes with your team and students. Pick a chat to start.", priv: "Private messages inside MUK Talent", emoji: "Emoji", down: "Jump to latest message", noUnread: "No unread chats." },
+  fr: { all: "Tous", unread: "Non lus", groups: "Groupes", introT: "MUK Talent Messenger", introP: "Envoyez et recevez des messages et des notes vocales avec votre \xE9quipe et vos \xE9tudiants. Choisissez une discussion.", priv: "Messages priv\xE9s dans MUK Talent", emoji: "\xC9mojis", down: "Aller au dernier message", noUnread: "Aucune discussion non lue." }
+};
+var wa = (lang2) => WA[lang2] || WA.en;
+var EMOJI = "\u{1F600} \u{1F602} \u{1F60A} \u{1F60D} \u{1F64F} \u{1F44D} \u{1F44F} \u{1F64C} \u{1F4AA} \u{1F389} \u{1F393} \u{1F4DA} \u270D\uFE0F \u{1F4DD} \u{1F4C4} \u{1F4CE} \u2705 \u274C \u23F0 \u{1F4C5} \u{1F4DE} \u{1F4AC} \u2764\uFE0F \u{1F525} \u2B50 \u{1F91D} \u{1F44B} \u{1F605} \u{1F914} \u{1F622} \u{1F62E} \u{1F1EC}\u{1F1E7} \u{1F1F2}\u{1F1E6} \u{1F1E9}\u{1F1FF} \u{1F1F9}\u{1F1F3} \u2708\uFE0F \u{1F3E0} \u{1F4B7} \u{1F3C6} \u{1F44C}".split(" ");
+function linkify(text) {
+  const p = E4("p");
+  const re = /(https?:\/\/[^\s<]+[^\s<.,;:!?)\]'"])/g;
+  let last = 0, m;
+  const s = String(text || "");
+  while (m = re.exec(s)) {
+    if (m.index > last) p.append(document.createTextNode(s.slice(last, m.index)));
+    const a = E4("a", m[0]);
+    a.href = m[0];
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    p.append(a);
+    last = m.index + m[0].length;
+  }
+  if (last < s.length) p.append(document.createTextNode(s.slice(last)));
+  return p;
+}
 var fill = (s, v) => String(s).replace(/\{(\w+)\}/g, (_, k) => v[k] ?? "");
 var loc = (lang2) => ({ fr: "fr-FR", es: "es-ES" })[lang2] || "en-GB";
 function since(iso2, lang2) {
@@ -21937,7 +21982,7 @@ function linkChatCss() {
   const l = E4("link");
   l.id = "mukChatCss";
   l.rel = "stylesheet";
-  l.href = "/admin/muk-chat.css?v=12";
+  l.href = "/admin/muk-chat.css?v=17.0.0";
   document.head.append(l);
 }
 function toast(text) {
@@ -22042,15 +22087,15 @@ function setDot(btn5, s) {
 }
 function openMessenger({ api: api2, lang: lang2 = "en", threadId = null, onChange = () => {
 } }) {
-  const L = tx(lang2);
-  const { o, close: closeLayer } = overlay("mkc-chat", L.chats);
+  const L = tx(lang2), W = wa(lang2);
+  const { o, close: closeLayer } = overlay("mkc-chat mkc-wa", L.chats);
   o.lang = lang2;
   const close = () => {
     stopPoll();
     closeLayer();
     onChange();
   };
-  let threads = [], me = null, current = null, poll = null;
+  let threads = [], me = null, current = null, poll = null, filter = "all";
   const stopPoll = () => {
     clearInterval(poll);
     poll = null;
@@ -22073,8 +22118,33 @@ function openMessenger({ api: api2, lang: lang2 = "en", threadId = null, onChang
   q2.setAttribute("aria-label", L.search);
   sbox.append(q2);
   q2.oninput = () => drawList();
+  const chipsBar = E4("div", void 0, "mkc-filters");
+  chipsBar.setAttribute("role", "tablist");
+  for (const [k, t2] of [["all", W.all], ["unread", W.unread], ["group", W.groups]]) {
+    const c = E4("button", t2, "mkc-fchip");
+    c.type = "button";
+    c.setAttribute("role", "tab");
+    c.dataset.f = k;
+    c.setAttribute("aria-selected", String(k === filter));
+    c.onclick = () => {
+      filter = k;
+      chipsBar.querySelectorAll(".mkc-fchip").forEach((x) => x.setAttribute("aria-selected", String(x.dataset.f === k)));
+      drawList();
+    };
+    chipsBar.append(c);
+  }
   const ul = E4("ul", void 0, "mkc-threads");
-  listView.append(lh, sbox, ul);
+  listView.append(lh, sbox, chipsBar, ul);
+  const intro = () => {
+    const w = E4("div", void 0, "mkc-intro");
+    const art = E4("div", void 0, "mkc-intro-art");
+    art.append(icon("chat"));
+    const foot = E4("p", void 0, "mkc-intro-foot");
+    foot.append(icon("lockc", "mkc-i mkc-mini"), document.createTextNode(" " + W.priv));
+    w.append(art, E4("h3", W.introT), E4("p", W.introP), foot);
+    return w;
+  };
+  convView.append(intro());
   async function loadThreads() {
     try {
       const r = await api2("/api/chat/threads");
@@ -22088,14 +22158,14 @@ function openMessenger({ api: api2, lang: lang2 = "en", threadId = null, onChang
   function drawList() {
     ul.replaceChildren();
     const term = q2.value.trim().toLowerCase();
-    const rows = threads.filter((t2) => !term || t2.title.toLowerCase().includes(term));
+    const rows = threads.filter((t2) => (!term || t2.title.toLowerCase().includes(term)) && (filter === "all" || (filter === "unread" ? t2.unread > 0 : t2.kind === "group")));
     if (!rows.length) {
-      ul.append(E4("li", L.empty, "mkc-empty"));
+      ul.append(E4("li", filter === "unread" ? W.noUnread : L.empty, "mkc-empty"));
       return;
     }
     for (const t2 of rows) {
       const li = E4("li");
-      const b = E4("button", void 0, "mkc-trow");
+      const b = E4("button", void 0, "mkc-trow" + (current?.id === t2.id ? " is-active" : "") + (t2.unread ? " has-unread" : ""));
       b.type = "button";
       b.append(avatar2(t2.title, t2.avatar_url));
       const mid = E4("span", void 0, "mkc-tmid");
@@ -22121,12 +22191,14 @@ function openMessenger({ api: api2, lang: lang2 = "en", threadId = null, onChang
     current = t2;
     o.classList.add("is-conv");
     convView.replaceChildren();
+    drawList();
     const bar = E4("header", void 0, "mkc-bar mkc-cbar");
     const bk = ibtn("back", L.chats);
     bk.onclick = () => {
       stopPoll();
       o.classList.remove("is-conv");
       current = null;
+      convView.replaceChildren(intro());
       loadThreads();
       onChange();
     };
@@ -22143,7 +22215,19 @@ function openMessenger({ api: api2, lang: lang2 = "en", threadId = null, onChang
     const comp = composer(t2, async () => {
       await refresh(true);
     });
-    convView.append(bar, scroller, comp);
+    const downB = E4("button", void 0, "mkc-down");
+    downB.type = "button";
+    downB.setAttribute("aria-label", W.down);
+    downB.title = W.down;
+    downB.append(icon("down"));
+    downB.hidden = true;
+    downB.onclick = () => scroller.scrollTo({ top: scroller.scrollHeight, behavior: "smooth" });
+    scroller.addEventListener("scroll", () => {
+      downB.hidden = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 160;
+    }, { passive: true });
+    const wallWrap = E4("div", void 0, "mkc-wallwrap");
+    wallWrap.append(scroller, downB);
+    convView.append(bar, wallWrap, comp);
     let sig = "";
     async function refresh(force) {
       try {
@@ -22193,8 +22277,9 @@ function openMessenger({ api: api2, lang: lang2 = "en", threadId = null, onChang
       const b = E4("div", void 0, "mkc-msg " + (m.mine ? "out" : "in") + (prevMine === m.mine ? " cont" : ""));
       prevMine = m.mine;
       if (!m.mine && current?.kind === "group") b.append(E4("span", m.sender, "mkc-sender"));
+      if (!b.classList.contains("cont")) b.classList.add("tail");
       if (m.audio) b.append(voicePlayer(m.audio));
-      else b.append(E4("p", m.body));
+      else b.append(linkify(m.body));
       const meta = E4("span", void 0, "mkc-meta");
       meta.append(document.createTextNode(clock(m.at, lang2)));
       if (m.mine) meta.append(icon(m.read ? "checks" : "check", "mkc-i mkc-tick" + (m.read ? " is-read" : "")));
@@ -22255,7 +22340,28 @@ function openMessenger({ api: api2, lang: lang2 = "en", threadId = null, onChang
     ta.maxLength = 2e3;
     ta.placeholder = L.write;
     ta.setAttribute("aria-label", L.write);
-    pill.append(ta);
+    const emo = ibtn("smile", W.emoji, "mkc-ib mkc-emo");
+    const pick = E4("div", void 0, "mkc-emoji");
+    pick.hidden = true;
+    pick.setAttribute("role", "listbox");
+    pick.setAttribute("aria-label", W.emoji);
+    for (const ch of EMOJI) {
+      const eb = E4("button", ch);
+      eb.type = "button";
+      eb.onclick = () => {
+        const a = ta.selectionStart ?? ta.value.length, z = ta.selectionEnd ?? a;
+        ta.value = ta.value.slice(0, a) + ch + ta.value.slice(z);
+        ta.selectionStart = ta.selectionEnd = a + ch.length;
+        ta.dispatchEvent(new Event("input"));
+        ta.focus({ preventScroll: true });
+      };
+      pick.append(eb);
+    }
+    emo.onclick = () => {
+      pick.hidden = !pick.hidden;
+      emo.classList.toggle("is-on", !pick.hidden);
+    };
+    pill.append(emo, ta);
     const act = E4("button", void 0, "mkc-act");
     act.type = "button";
     const setMode = () => {
@@ -22284,7 +22390,7 @@ function openMessenger({ api: api2, lang: lang2 = "en", threadId = null, onChang
     const recCancel = E4("button", L.cancel, "mkc-reccancel");
     recCancel.type = "button";
     rec.append(recDot, recT, E4("small", L.recording), recCancel);
-    f.append(rec, pill, act);
+    f.append(pick, rec, pill, act);
     async function sendText() {
       const body = ta.value.trim();
       if (!body) return;
@@ -22293,6 +22399,8 @@ function openMessenger({ api: api2, lang: lang2 = "en", threadId = null, onChang
         await api2("/api/chat/threads/" + t2.id + "/messages", { method: "POST", body: JSON.stringify({ body }) });
         ta.value = "";
         ta.style.height = "auto";
+        pick.hidden = true;
+        emo.classList.remove("is-on");
         setMode();
         await after();
       } catch (e) {
@@ -24119,13 +24227,13 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
         cb.checked = t2.status === "done";
         cb.setAttribute("aria-label", "Done");
         cb.onchange = () => act(() => api2("/api/gp/tasks/" + t2.id, { method: "PATCH", body: JSON.stringify({ status: cb.checked ? "done" : "open" }) }));
-        const tx2 = E("div");
-        tx2.append(E("strong", t2.title), E("small", (f.stage_titles[t2.stage_key] || "") + (t2.due_date ? " \xB7 due " + fmtDate(t2.due_date) : ""), t2.due_date && t2.status === "open" && daysUntil(t2.due_date) < 0 ? "cc-bad" : "cc-muted"));
+        const tx3 = E("div");
+        tx3.append(E("strong", t2.title), E("small", (f.stage_titles[t2.stage_key] || "") + (t2.due_date ? " \xB7 due " + fmtDate(t2.due_date) : ""), t2.due_date && t2.status === "open" && daysUntil(t2.due_date) < 0 ? "cc-bad" : "cc-muted"));
         const del = btn("", () => {
           if (confirm("Delete this task?")) act(() => api2("/api/gp/tasks/" + t2.id, { method: "PATCH", body: JSON.stringify({ remove: true }) }));
         }, "cc-icon", "trash");
         del.setAttribute("aria-label", "Delete task");
-        r.append(cb, tx2, del);
+        r.append(cb, tx3, del);
         body.append(r);
       }
       const form = E("form", void 0, "cc-inline");
@@ -24151,13 +24259,13 @@ async function renderControlCentre({ host, api: api2, admin = false, notice = ()
       body.append(E("h3", "Assign task"), form, E("h3", "Important dates"));
       for (const ev of f.events) {
         const r = E("div", void 0, "cc-task");
-        const tx2 = E("div");
-        tx2.append(E("strong", ev.title), E("small", fmtDate(ev.starts_on) + " \xB7 " + ev.kind, "cc-muted"));
+        const tx3 = E("div");
+        tx3.append(E("strong", ev.title), E("small", fmtDate(ev.starts_on) + " \xB7 " + ev.kind, "cc-muted"));
         const del = btn("", () => {
           if (confirm("Remove this date?")) act(() => api2("/api/gp/events/" + ev.id, { method: "DELETE" }));
         }, "cc-icon", "trash");
         del.setAttribute("aria-label", "Remove date");
-        r.append(gi("calendar"), tx2, del);
+        r.append(gi("calendar"), tx3, del);
         body.append(r);
       }
       const ef = E("form", void 0, "cc-inline");
@@ -24492,8 +24600,527 @@ async function renderStaffDocs({ host, api: api2, readOnly = false, owner = null
   root.querySelector(":scope > .th-pad")?.remove();
 }
 
-// admin-src/employee.js
+// admin-src/muk-v17.js
 var E9 = (t2, v, c) => {
+  const n = document.createElement(t2);
+  if (v !== void 0 && v !== null) n.textContent = String(v);
+  if (c) n.className = c;
+  return n;
+};
+var NS = "http://www.w3.org/2000/svg";
+var P3 = {
+  user: ["M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z", "M4 21a8 8 0 0 1 16 0"],
+  flow: ["M4 6h10", "M4 12h16", "M4 18h7", "m17 3 3 3-3 3"],
+  doc: ["M7 3h7l5 5v13H7z", "M14 3v5h5", "M10 13h6M10 17h4"],
+  pen: ["M4 20h4L19 9l-4-4L4 16z", "m13 7 4 4"],
+  mail: ["M4 6h16v12H4z", "m4 7 8 6 8-6"],
+  chat: ["M4 5h16v11H8l-4 4V5Z"],
+  task: ["m5 12 4 4 10-10"],
+  cal: ["M7 3v3M17 3v3M4 8h16", "M5 5h14v15H5z"],
+  bell: ["M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z", "M10 20a2 2 0 0 0 4 0"],
+  more: ["M5 12h.01M12 12h.01M19 12h.01"],
+  close: ["M6 6l12 12M18 6 6 18"],
+  spark: ["M12 3v4M12 17v4M3 12h4M17 12h4", "m6 6 2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"]
+};
+function icon3(name, cls = "v17-i") {
+  const s = document.createElementNS(NS, "svg");
+  s.setAttribute("viewBox", "0 0 24 24");
+  s.setAttribute("aria-hidden", "true");
+  s.setAttribute("class", cls);
+  s.setAttribute("fill", "none");
+  s.setAttribute("stroke", "currentColor");
+  s.setAttribute("stroke-width", "1.7");
+  s.setAttribute("stroke-linecap", "round");
+  s.setAttribute("stroke-linejoin", "round");
+  for (const d of P3[name] || P3.spark) {
+    const p = document.createElementNS(NS, "path");
+    p.setAttribute("d", d);
+    s.append(p);
+  }
+  return s;
+}
+var reduced = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+var store = { get: (k) => {
+  try {
+    return localStorage.getItem(k);
+  } catch {
+    return null;
+  }
+}, set: (k, v) => {
+  try {
+    localStorage.setItem(k, v);
+  } catch {
+  }
+} };
+var TX2 = {
+  es: {
+    since: "Desde tu \xFAltima visita",
+    activity: "Actividad reciente",
+    first: "Novedades de los \xFAltimos 7 d\xEDas",
+    upToDate: "Todo al d\xEDa. No hay cambios desde tu \xFAltima visita.",
+    ago: "hace {t}",
+    now: "ahora mismo",
+    morning: "Buenos d\xEDas",
+    afternoon: "Buenas tardes",
+    evening: "Buenas noches",
+    alerts: "Activar avisos",
+    alertsOn: "Avisos activados",
+    more: "M\xE1s",
+    close: "Cerrar",
+    seeAll: "Ver todo",
+    fewer: "Ver menos",
+    t: { candidate: "Nuevo candidato", stage: "Cambio de etapa", enquiry: "Nueva consulta", hrdoc: "Documento de equipo", document: "Documento", task: "Nueva tarea", event: "Nueva fecha", message: "Mensajes nuevos" },
+    msgToast: (n) => n === 1 ? "Tienes 1 mensaje nuevo" : `Tienes ${n} mensajes nuevos`,
+    open: "Abrir",
+    st: { signed: "firmado", sent: "enviado", submitted: "recibido", approved: "aprobado", rejected: "rechazado", viewed: "visto", uploaded: "subido", requested: "solicitado", done: "completada", in_progress: "en curso", pending: "pendiente" }
+  },
+  en: {
+    since: "Since your last visit",
+    activity: "Recent activity",
+    first: "What changed in the last 7 days",
+    upToDate: "All caught up. Nothing has changed since your last visit.",
+    ago: "{t} ago",
+    now: "just now",
+    morning: "Good morning",
+    afternoon: "Good afternoon",
+    evening: "Good evening",
+    alerts: "Turn on alerts",
+    alertsOn: "Alerts on",
+    more: "More",
+    close: "Close",
+    seeAll: "See all",
+    fewer: "Show less",
+    t: { candidate: "New candidate", stage: "Stage update", enquiry: "New enquiry", hrdoc: "HR document", document: "Document", task: "New task", event: "New date", message: "New messages" },
+    msgToast: (n) => n === 1 ? "You have 1 new message" : `You have ${n} new messages`,
+    open: "Open",
+    st: { signed: "signed", sent: "sent", submitted: "received", approved: "approved", rejected: "needs changes", viewed: "viewed", uploaded: "uploaded", requested: "requested", done: "completed", in_progress: "in progress", pending: "pending" }
+  },
+  fr: {
+    since: "Depuis votre derni\xE8re visite",
+    activity: "Activit\xE9 r\xE9cente",
+    first: "Les nouveaut\xE9s des 7 derniers jours",
+    upToDate: "Tout est \xE0 jour. Rien n\u2019a chang\xE9 depuis votre derni\xE8re visite.",
+    ago: "il y a {t}",
+    now: "\xE0 l\u2019instant",
+    morning: "Bonjour",
+    afternoon: "Bon apr\xE8s-midi",
+    evening: "Bonsoir",
+    alerts: "Activer les alertes",
+    alertsOn: "Alertes activ\xE9es",
+    more: "Plus",
+    close: "Fermer",
+    seeAll: "Tout voir",
+    fewer: "Voir moins",
+    t: { candidate: "Nouveau candidat", stage: "\xC9tape mise \xE0 jour", enquiry: "Nouvelle demande", hrdoc: "Document RH", document: "Document", task: "Nouvelle t\xE2che", event: "Nouvelle date", message: "Nouveaux messages" },
+    msgToast: (n) => n === 1 ? "Vous avez 1 nouveau message" : `Vous avez ${n} nouveaux messages`,
+    open: "Ouvrir",
+    st: { signed: "sign\xE9", sent: "envoy\xE9", submitted: "re\xE7u", approved: "valid\xE9", rejected: "\xE0 corriger", viewed: "vu", uploaded: "d\xE9pos\xE9", requested: "demand\xE9", done: "termin\xE9e", in_progress: "en cours", pending: "\xE0 venir" }
+  }
+};
+var tx2 = (l) => TX2[l] || TX2.en;
+var ICON_OF = { candidate: "user", stage: "flow", enquiry: "mail", hrdoc: "pen", document: "doc", task: "task", event: "cal", message: "chat" };
+var TONE_OF = { candidate: "teal", stage: "sage", enquiry: "champ", hrdoc: "champ", document: "teal", task: "sage", event: "champ", message: "teal" };
+function greeting(lang2, name) {
+  const L = tx2(lang2), h = (/* @__PURE__ */ new Date()).getHours();
+  const g = h < 13 ? L.morning : h < 20 ? L.afternoon : L.evening;
+  const first = String(name || "").trim().split(/\s+/)[0];
+  return first ? `${g}, ${first}` : g;
+}
+function ago2(at, lang2) {
+  const L = tx2(lang2), s = Math.max(0, (Date.now() - new Date(at).getTime()) / 1e3);
+  if (s < 60) return L.now;
+  const rtf = new Intl.RelativeTimeFormat(lang2, { numeric: "auto", style: "short" });
+  if (s < 3600) return rtf.format(-Math.round(s / 60), "minute");
+  if (s < 86400) return rtf.format(-Math.round(s / 3600), "hour");
+  return rtf.format(-Math.round(s / 86400), "day");
+}
+var applied = false;
+function applyV17({ role: role2 = "admin", lang: lang2 = "es" } = {}) {
+  const html = document.documentElement;
+  html.classList.add("v17");
+  html.dataset.v17Role = role2;
+  if (!document.getElementById("mukV17Css")) {
+    const l = E9("link");
+    l.id = "mukV17Css";
+    l.rel = "stylesheet";
+    l.href = "/admin/muk-v17.css?v=17.0.0";
+    document.head.append(l);
+  } else document.head.append(document.getElementById("mukV17Css"));
+  let m = document.querySelector("meta[name=theme-color]");
+  if (!m) {
+    m = E9("meta");
+    m.name = "theme-color";
+    document.head.append(m);
+  }
+  m.content = "#15383D";
+  let mf = document.querySelector("link[rel=manifest]");
+  if (!mf) {
+    mf = E9("link");
+    mf.rel = "manifest";
+    document.head.append(mf);
+  }
+  mf.href = "/admin/team.webmanifest?v=17";
+  for (const [n, c] of [["apple-mobile-web-app-capable", "yes"], ["mobile-web-app-capable", "yes"], ["apple-mobile-web-app-status-bar-style", "black-translucent"], ["apple-mobile-web-app-title", "MUK Talent"]]) {
+    let x = document.querySelector(`meta[name="${n}"]`);
+    if (!x) {
+      x = E9("meta");
+      x.name = n;
+      document.head.append(x);
+    }
+    x.content = c;
+  }
+  if (!document.querySelector("link[rel=apple-touch-icon]")) {
+    const a = E9("link");
+    a.rel = "apple-touch-icon";
+    a.href = "/icon-192.png";
+    document.head.append(a);
+  }
+  if (applied) return;
+  applied = true;
+  if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {
+  });
+  countUp();
+}
+function countUp() {
+  if (reduced() || typeof MutationObserver === "undefined") return;
+  const seen = /* @__PURE__ */ new WeakSet();
+  const run = (el2) => {
+    if (seen.has(el2)) return;
+    const txt = el2.textContent.trim();
+    if (!/^\d{1,6}$/.test(txt)) return;
+    seen.add(el2);
+    const end = Number(txt);
+    if (end < 2) return;
+    const t0 = performance.now(), dur = Math.min(900, 300 + end * 12);
+    const step = (t2) => {
+      if (!el2.isConnected) return;
+      const p = Math.min(1, (t2 - t0) / dur), v = Math.round(end * (1 - Math.pow(1 - p, 3)));
+      el2.textContent = String(v);
+      if (p < 1) requestAnimationFrame(step);
+      else el2.textContent = txt;
+    };
+    requestAnimationFrame(step);
+  };
+  const scan = (root) => root.querySelectorAll?.(".metric strong, .lx-metric strong, .lx-metric .lx-value, .gp-ready strong").forEach(run);
+  new MutationObserver((ms) => {
+    for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1) {
+      if (n.matches?.(".metric strong,.lx-metric strong")) run(n);
+      scan(n);
+    }
+  }).observe(document.body, { childList: true, subtree: true });
+}
+function sheet(title, items, lang2 = "es") {
+  const L = tx2(lang2);
+  document.getElementById("v17Sheet")?.remove();
+  const o = E9("div", void 0, "v17-sheet");
+  o.id = "v17Sheet";
+  o.setAttribute("role", "dialog");
+  o.setAttribute("aria-modal", "true");
+  o.setAttribute("aria-label", title);
+  const card = E9("div", void 0, "v17-sheet-card");
+  const grip = E9("span", void 0, "v17-grip");
+  const h = E9("h2", title);
+  const list = E9("div", void 0, "v17-sheet-list");
+  const close = () => {
+    o.classList.remove("in");
+    setTimeout(() => o.remove(), reduced() ? 0 : 220);
+    document.removeEventListener("keydown", esc);
+  };
+  const esc = (e) => {
+    if (e.key === "Escape") close();
+  };
+  for (const it of items) {
+    const b = E9("button", void 0, "v17-sheet-btn");
+    b.type = "button";
+    b.append(it.icon?.cloneNode ? it.icon.cloneNode(true) : icon3(it.icon || "spark"), E9("span", it.label));
+    b.onclick = () => {
+      close();
+      it.onClick();
+    };
+    list.append(b);
+  }
+  const x = E9("button", L.close, "v17-sheet-close");
+  x.type = "button";
+  x.onclick = close;
+  card.append(grip, h, list, x);
+  o.append(card);
+  o.onclick = (e) => {
+    if (e.target === o) close();
+  };
+  document.body.append(o);
+  document.addEventListener("keydown", esc);
+  requestAnimationFrame(() => o.classList.add("in"));
+  list.querySelector("button")?.focus({ preventScroll: true });
+  return close;
+}
+function toastHost() {
+  let h = document.getElementById("v17Toasts");
+  if (!h) {
+    h = E9("div", void 0, "v17-toasts");
+    h.id = "v17Toasts";
+    h.setAttribute("role", "status");
+    h.setAttribute("aria-live", "polite");
+    document.body.append(h);
+  }
+  return h;
+}
+function toast2({ title, body = "", tone = "teal", iconName = "bell", action = null, actionLabel = "", ms = 6e3 }) {
+  const h = toastHost();
+  while (h.children.length >= 3) h.firstChild.remove();
+  const t2 = E9("div", void 0, "v17-toast v17-tone-" + tone);
+  const ic = E9("span", void 0, "v17-toast-ic");
+  ic.append(icon3(iconName));
+  const tx_ = E9("div", void 0, "v17-toast-tx");
+  tx_.append(E9("strong", title));
+  if (body) tx_.append(E9("span", body));
+  t2.append(ic, tx_);
+  if (action) {
+    const b = E9("button", actionLabel, "v17-toast-go");
+    b.type = "button";
+    b.onclick = () => {
+      dismiss();
+      action();
+    };
+    t2.append(b);
+  }
+  const x = E9("button", void 0, "v17-toast-x");
+  x.type = "button";
+  x.setAttribute("aria-label", "Cerrar");
+  x.append(icon3("close"));
+  x.onclick = () => dismiss();
+  t2.append(x);
+  h.append(t2);
+  requestAnimationFrame(() => t2.classList.add("in"));
+  let timer = setTimeout(() => dismiss(), ms);
+  t2.onmouseenter = () => clearTimeout(timer);
+  t2.onmouseleave = () => {
+    timer = setTimeout(() => dismiss(), 2500);
+  };
+  function dismiss() {
+    clearTimeout(timer);
+    t2.classList.remove("in");
+    t2.classList.add("out");
+    setTimeout(() => t2.remove(), reduced() ? 0 : 260);
+  }
+  return dismiss;
+}
+async function systemNotify(title, body) {
+  try {
+    if (!("Notification" in window) || Notification.permission !== "granted" || !document.hidden) return false;
+    const reg = await navigator.serviceWorker?.getRegistration?.();
+    if (reg) await reg.showNotification(title, { body, icon: "/icon-192.png", badge: "/icon-192.png", tag: "muk-" + title });
+    else new Notification(title, { body, icon: "/icon-192.png" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+var describe = (it, lang2, labels = {}) => {
+  const L = tx2(lang2), st = (s) => L.st[s] || s || "";
+  switch (it.type) {
+    case "candidate":
+      return [it.name, it.ref].filter(Boolean).join(" \xB7 ");
+    case "stage":
+      return [it.name || labels.stage?.(it.key) || it.key, labels.stageName?.(it.stage) || it.stage || st(it.status)].filter(Boolean).join(" \u2192 ");
+    case "enquiry":
+      return it.name || "";
+    case "hrdoc":
+      return [it.title, st(it.status), it.name].filter(Boolean).join(" \xB7 ");
+    case "document":
+      return [it.name, it.label, st(it.status)].filter(Boolean).join(" \xB7 ");
+    case "task":
+      return it.title || "";
+    case "event":
+      return [it.title, it.date].filter(Boolean).join(" \xB7 ");
+    case "message":
+      return L.msgToast(it.count || 1);
+    default:
+      return it.title || "";
+  }
+};
+function mountUpdates(opts) {
+  const { api: api2, userKey, lang: lang2 = "es" } = opts;
+  const L = tx2(lang2);
+  const KEY3 = "muk-lv:" + userKey, SKEY = "muk-lv-s:" + userKey;
+  let since2 = null;
+  try {
+    since2 = sessionStorage.getItem(SKEY);
+  } catch {
+  }
+  const prev = store.get(KEY3);
+  if (!since2) {
+    since2 = prev || "";
+    try {
+      sessionStorage.setItem(SKEY, since2 || "first");
+    } catch {
+    }
+  }
+  if (since2 === "first") since2 = "";
+  const first = !since2;
+  const markSeen = () => store.set(KEY3, (/* @__PURE__ */ new Date()).toISOString());
+  addEventListener("pagehide", markSeen);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) markSeen();
+  });
+  setTimeout(markSeen, 45e3);
+  const card = E9("section", void 0, "v17-updates");
+  card.id = "v17Updates";
+  card.setAttribute("aria-label", L.since);
+  const head2 = E9("header", void 0, "v17-up-head");
+  const hgroup = E9("div");
+  hgroup.append(E9("p", first ? L.first : L.since, "v17-overline"), E9("h2", opts.title === "activity" ? L.activity : opts.title || greeting(lang2, opts.name)));
+  const alertsB = E9("button", void 0, "v17-chip");
+  alertsB.type = "button";
+  const paintAlerts = () => {
+    const on = "Notification" in window && Notification.permission === "granted";
+    alertsB.replaceChildren(icon3("bell"), E9("span", on ? L.alertsOn : L.alerts));
+    alertsB.classList.toggle("is-on", on);
+    alertsB.disabled = on || !("Notification" in window) || Notification.permission === "denied";
+    alertsB.hidden = !("Notification" in window);
+  };
+  alertsB.onclick = async () => {
+    try {
+      await Notification.requestPermission();
+    } catch {
+    }
+    paintAlerts();
+  };
+  paintAlerts();
+  head2.append(hgroup, alertsB);
+  card.append(head2);
+  const prog = E9("div", void 0, "v17-progress");
+  card.append(prog);
+  const list = E9("ul", void 0, "v17-up-list");
+  card.append(list);
+  const toggle2 = E9("button", L.seeAll, "v17-link");
+  toggle2.type = "button";
+  toggle2.hidden = true;
+  card.append(toggle2);
+  let expanded = false;
+  toggle2.onclick = () => {
+    expanded = !expanded;
+    toggle2.textContent = expanded ? L.fewer : L.seeAll;
+    list.classList.toggle("is-open", expanded);
+  };
+  const setProgress = (p) => {
+    prog.replaceChildren();
+    prog.hidden = !p;
+    if (!p) return;
+    const pct = Math.max(0, Math.min(100, Math.round(p.value / Math.max(1, p.max) * 100)));
+    const top = E9("div", void 0, "v17-progress-top");
+    top.append(E9("span", p.label), E9("b", p.text || pct + "%"));
+    const bar = E9("div", void 0, "v17-bar");
+    bar.setAttribute("role", "progressbar");
+    bar.setAttribute("aria-valuemin", "0");
+    bar.setAttribute("aria-valuemax", "100");
+    bar.setAttribute("aria-valuenow", String(pct));
+    bar.setAttribute("aria-label", p.label);
+    const fill2 = E9("i");
+    bar.append(fill2);
+    prog.append(top, bar);
+    if (p.hint) prog.append(E9("small", p.hint));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      fill2.style.width = pct + "%";
+    }));
+  };
+  setProgress(opts.progress || null);
+  const draw = (items) => {
+    list.replaceChildren();
+    if (!items.length) {
+      const li = E9("li", void 0, "v17-up-empty");
+      li.append(icon3("task"), E9("span", L.upToDate));
+      list.append(li);
+      toggle2.hidden = true;
+      return;
+    }
+    items.forEach((it, i) => {
+      const li = E9("li", void 0, "v17-up-item v17-tone-" + (TONE_OF[it.type] || "teal"));
+      li.style.setProperty("--i", String(i));
+      const b = E9(opts.onOpen ? "button" : "div", void 0, "v17-up-row");
+      if (b.tagName === "BUTTON") {
+        b.type = "button";
+        b.onclick = () => opts.onOpen(it);
+      }
+      const ic = E9("span", void 0, "v17-up-ic");
+      ic.append(icon3(ICON_OF[it.type] || "spark"));
+      const tx_ = E9("span", void 0, "v17-up-tx");
+      tx_.append(E9("strong", L.t[it.type] || it.type), E9("span", describe(it, lang2, opts.labels)));
+      b.append(ic, tx_, E9("time", ago2(it.at, lang2)));
+      li.append(b);
+      list.append(li);
+    });
+    toggle2.hidden = items.length <= 4;
+  };
+  list.append(E9("li", "\u2026", "v17-up-empty"));
+  let known = /* @__PURE__ */ new Set();
+  const keyOf = (it) => [it.type, it.ref || it.name || it.key || it.title || it.label, it.stage || it.status || "", it.at].join("|");
+  async function fetchItems(from) {
+    const r = await api2("/api/updates" + (from ? "?since=" + encodeURIComponent(from) : ""));
+    return r.data?.items || [];
+  }
+  (async () => {
+    try {
+      const items = await fetchItems(since2);
+      items.forEach((i) => known.add(keyOf(i)));
+      draw(items);
+    } catch {
+      draw([]);
+    }
+  })();
+  const started = (/* @__PURE__ */ new Date()).toISOString();
+  let busy = false;
+  const poll = async () => {
+    if (busy || document.hidden && !("Notification" in window && Notification.permission === "granted")) return;
+    busy = true;
+    try {
+      const fresh = (await fetchItems(started)).filter((i) => !known.has(keyOf(i)) && i.type !== "message");
+      fresh.forEach((i) => known.add(keyOf(i)));
+      if (fresh.length) {
+        const all = await fetchItems(since2).catch(() => null);
+        if (all) draw(all);
+        if (fresh.length === 1) {
+          const it = fresh[0];
+          const t2 = L.t[it.type], d = describe(it, lang2, opts.labels);
+          if (!await systemNotify(t2, d)) toast2({ title: t2, body: d, tone: TONE_OF[it.type], iconName: ICON_OF[it.type], action: opts.onOpen ? () => opts.onOpen(it) : null, actionLabel: L.open });
+        } else {
+          const t2 = `${fresh.length} \xB7 ${L.since}`;
+          const d = fresh.slice(0, 3).map((i) => L.t[i.type]).join(" \xB7 ");
+          if (!await systemNotify(t2, d)) toast2({ title: t2, body: d, tone: "champ", iconName: "bell" });
+        }
+      }
+    } catch {
+    } finally {
+      busy = false;
+    }
+  };
+  const timer = setInterval(() => {
+    if (!card.isConnected && !document.getElementById("v17Updates")) return;
+    poll();
+  }, 9e4);
+  return { el: card, setProgress, refresh: async () => {
+    try {
+      draw(await fetchItems(since2));
+    } catch {
+    }
+  }, stop: () => clearInterval(timer) };
+}
+function messageNotifier({ lang: lang2 = "es", onOpen }) {
+  const L = tx2(lang2);
+  let last = null;
+  return (summary) => {
+    const n = summary?.chat_unread || 0;
+    if (last !== null && n > last) {
+      const t2 = L.msgToast(n);
+      systemNotify(L.t.message, t2).then((done) => {
+        if (!done) toast2({ title: L.t.message, body: t2, tone: "teal", iconName: "chat", action: onOpen, actionLabel: L.open });
+      });
+    }
+    last = n;
+  };
+}
+
+// admin-src/employee.js
+var E10 = (t2, v, c) => {
   const n = document.createElement(t2);
   if (v !== void 0) n.textContent = String(v);
   if (c) n.className = c;
@@ -24520,7 +25147,7 @@ function money2(v, c) {
 }
 function linkStyles() {
   for (const [id, href] of [["professionalStyles", "/admin/professional.css"], ["businessCardStyles", "/book/business-card.css"], ["luxuryWorkspaceStyles", "/admin/luxury-workspace.css"], ["mukSoftStyles", "/admin/muk-soft.css"], ["mukAppStyles", "/admin/muk-app.css"]]) if (!document.getElementById(id)) {
-    const l = E9("link");
+    const l = E10("link");
     l.id = id;
     l.rel = "stylesheet";
     l.href = href;
@@ -24532,20 +25159,20 @@ function linkStyles() {
 async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack = null }) {
   document.getElementById("employeeWorkspace")?.remove();
   linkStyles();
-  const readOnly = Boolean(owner), root = E9("div", void 0, "lux soft");
+  const readOnly = Boolean(owner), root = E10("div", void 0, "lux soft");
   root.id = "employeeWorkspace";
   root.lang = "en";
   softChrome();
-  const sidebar = E9("aside", void 0, "lx-sidebar"), brand = E9("a", "MUK TALENT", "lx-brand");
+  const sidebar = E10("aside", void 0, "lx-sidebar"), brand = E10("a", "MUK TALENT", "lx-brand");
   brand.href = "/";
-  const web = E9("a", "\u2190 Back to website", "muk-webback");
+  const web = E10("a", "\u2190 Back to website", "muk-webback");
   web.href = "/";
-  sidebar.append(brand, web, E9("p", "PRIVATE TEAM WORKSPACE", "lx-overline"));
-  const nav2 = E9("nav");
+  sidebar.append(brand, web, E10("p", "PRIVATE TEAM WORKSPACE", "lx-overline"));
+  const nav2 = E10("nav");
   nav2.setAttribute("aria-label", "Workspace");
   sidebar.append(nav2);
-  const footer = E9("div", void 0, "lx-sidebar-footer");
-  footer.append(E9("strong", staff.full_name), E9("small", readOnly ? "Administrator preview" : "MUK Talent team"));
+  const footer = E10("div", void 0, "lx-sidebar-footer");
+  footer.append(E10("strong", staff.full_name), E10("small", readOnly ? "Administrator preview" : "MUK Talent team"));
   const exit = button3(readOnly ? "Back to administration" : "Sign out", async () => {
     exit.disabled = true;
     try {
@@ -24568,16 +25195,17 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     if (changed) notice("Password changed.");
   }));
   sidebar.append(footer);
-  const main = E9("main", void 0, "lx-main"), header = E9("header", void 0, "lx-header"), intro = E9("div"), title = E9("h1"), subtitle = E9("p", void 0, "lx-muted");
-  intro.append(E9("p", "MUK TALENT / TEAM OPERATIONS", "lx-overline"), title, subtitle);
-  const actions = E9("div", void 0, "lx-actions"), refresh = button3("", () => load()), add = button3("Add record", () => {
+  const main = E10("main", void 0, "lx-main"), header = E10("header", void 0, "lx-header"), intro = E10("div"), title = E10("h1"), subtitle = E10("p", void 0, "lx-muted");
+  intro.append(E10("p", "MUK TALENT / TEAM OPERATIONS", "lx-overline"), title, subtitle);
+  const actions = E10("div", void 0, "lx-actions"), refresh = button3("", () => load()), add = button3("Add record", () => {
   });
   add.classList.add("lx-primary");
-  refresh.append(icon2("refresh", "lx-btn-icon"), E9("span", "Refresh", "lx-btn-label"));
+  refresh.append(icon2("refresh", "lx-btn-icon"), E10("span", "Refresh", "lx-btn-label"));
   refresh.setAttribute("aria-label", "Refresh");
   actions.append(refresh, add);
   linkChatCss();
   let summary = null;
+  const msgNotify = messageNotifier({ lang: "en", onOpen: () => openChat() });
   const openChat = () => openMessenger({ api: api2, lang: "en", onChange: () => watcher2?.refresh() });
   const hHeart = heartButton("en", openChat);
   hHeart.classList.add("lx-heart");
@@ -24586,19 +25214,23 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   const watcher2 = readOnly ? null : watchNotifications(api2, (x) => {
     summary = x;
     root.querySelectorAll(".mkc-heart").forEach((b) => setDot(b, { chat_unread: x.chat_unread }));
+    msgNotify(x);
   });
-  const mweb = E9("a", "\u2190 Website", "mobile-web lx-mweb");
+  const mweb = E10("a", "\u2190 Website", "mobile-web lx-mweb");
   mweb.href = "/";
   mweb.setAttribute("aria-label", "Back to website");
   intro.prepend(mweb);
   header.append(intro, actions);
-  const status = E9("p", "", "lx-status");
+  const status = E10("p", "", "lx-status");
   status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
-  const body = E9("div", void 0, "lx-body");
+  const body = E10("div", void 0, "lx-body");
   main.append(header, status, body);
   root.append(sidebar, main);
   document.body.append(root);
+  applyV17({ role: "staff", lang: "en" });
+  let updates = null;
+  const UPDATE_PAGE = { candidate: "students", stage: "students", document: "students", hrdoc: "documents", task: "task", event: "calendar", enquiry: "leads" };
   let data = { records: [], leads: [], appointments: [], activity: [] }, directory = null, assets = [], section = "overview", busy = false, dialogBusy = false, loadVersion = 0;
   let payroll = {}, payrollBusy = {}, payCurrency = "MAD";
   function setDocBadge(n) {
@@ -24606,7 +25238,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       if (!b) continue;
       let d = b.querySelector(".th-nav-badge");
       if (!d) {
-        d = E9("i", void 0, "th-nav-badge");
+        d = E10("i", void 0, "th-nav-badge");
         b.append(d);
       }
       d.textContent = n > 99 ? "99+" : String(n || 0);
@@ -24620,29 +25252,39 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   let group = "home";
   const navButtons = {}, dockButtons = {};
   for (const [id, label2, symbol] of groups) {
-    const b = E9("button", void 0, "lx-nav");
+    const b = E10("button", void 0, "lx-nav");
     b.type = "button";
-    b.append(icon2(symbol, "lx-nav-icon"), E9("span", label2));
+    b.append(icon2(symbol, "lx-nav-icon"), E10("span", label2));
     b.onclick = () => navigate2(tabs[id]);
     navButtons[id] = b;
     nav2.append(b);
   }
-  const dock = E9("nav", void 0, "lx-dock");
+  const dock = E10("nav", void 0, "lx-dock");
   dock.setAttribute("aria-label", "Workspace sections");
-  for (const [id, label2, symbol] of groups) {
-    const b = E9("button");
+  const DOCK_MAIN = ["home", "students", "pipeline", "planner"], moreGroups = groups.filter((g) => !DOCK_MAIN.includes(g[0]));
+  for (const [id, label2, symbol] of groups.filter((g) => DOCK_MAIN.includes(g[0]))) {
+    const b = E10("button");
     b.type = "button";
-    b.append(icon2(symbol, "lx-dock-icon"), E9("small", label2));
+    b.append(icon2(symbol, "lx-dock-icon"), E10("small", label2));
     b.onclick = () => navigate2(tabs[id]);
     dockButtons[id] = b;
     dock.append(b);
   }
+  {
+    const more = E10("button", void 0, "lx-dock-more");
+    more.type = "button";
+    more.setAttribute("aria-haspopup", "dialog");
+    more.append(icon3("more", "lx-dock-icon"), E10("small", "More"));
+    more.onclick = () => sheet("More", moreGroups.map(([id, label2, symbol]) => ({ label: label2, icon: icon2(symbol, "v17-i"), onClick: () => navigate2(tabs[id]) })), "en");
+    for (const g of moreGroups) dockButtons[g[0]] = more;
+    dock.append(more);
+  }
   root.append(dock);
-  const tabBar = E9("div", void 0, "lx-tabs");
+  const tabBar = E10("div", void 0, "lx-tabs");
   tabBar.setAttribute("role", "tablist");
   main.insertBefore(tabBar, status);
   function button3(text, fn) {
-    const b = E9("button", text, "lx-button");
+    const b = E10("button", text, "lx-button");
     b.type = "button";
     b.onclick = fn;
     return b;
@@ -24653,12 +25295,12 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     status.className = error ? "lx-status lx-error" : "lx-status";
   }
   function panel(text) {
-    const p = E9("section", void 0, "lx-panel");
-    if (text) p.append(E9("h2", text));
+    const p = E10("section", void 0, "lx-panel");
+    if (text) p.append(E10("h2", text));
     return p;
   }
   function empty(target, text) {
-    target.append(E9("p", text, "lx-empty"));
+    target.append(E10("p", text, "lx-empty"));
   }
   function records(kind) {
     return data.records.filter((r) => r.kind === kind);
@@ -24711,15 +25353,16 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     title.textContent = group === "home" ? "Hello, " + (directory?.full_name || staff.full_name).split(" ")[0] : g[1];
     subtitle.textContent = readOnly ? "Read-only employee workspace." : groupText[group];
     for (const [id, b] of [...Object.entries(navButtons), ...Object.entries(dockButtons)]) {
-      b.classList.toggle("active", id === group);
-      if (id === group) b.setAttribute("aria-current", "page");
+      const on = id === group || b.classList.contains("lx-dock-more") && dockButtons[group] === b;
+      b.classList.toggle("active", on);
+      if (on) b.setAttribute("aria-current", "page");
       else b.removeAttribute("aria-current");
     }
     tabBar.replaceChildren();
     tabBar.hidden = g[3].length < 2;
     for (const [id, label2] of g[3]) {
       if (readOnly && id === "account") continue;
-      const t2 = E9("button", label2, "lx-tab");
+      const t2 = E10("button", label2, "lx-tab");
       t2.type = "button";
       t2.setAttribute("role", "tab");
       t2.setAttribute("aria-selected", String(id === section));
@@ -24753,12 +25396,12 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         render();
         notice(text);
       } });
-      else body.append(E9("p", "Loading your card\u2026", "lx-empty"));
+      else body.append(E10("p", "Loading your card\u2026", "lx-empty"));
     } else if (section === "social") renderSocialEditor({ ...ctx, onSaved: () => refreshDirectory() });
     else if (section === "account") account();
     else if (section === "documents") renderStaffDocs({ ...ctx, notice, onChange: setDocBadge });
     else if (section === "students") {
-      if (readOnly) body.append(E9("p", "Open Global Passport \xB7 Control Centre from the administration to see every student.", "lx-empty"));
+      if (readOnly) body.append(E10("p", "Open Global Passport \xB7 Control Centre from the administration to see every student.", "lx-empty"));
       else renderControlCentre({ host: body, api: api2, admin: staff.role === "admin", notice }).then(() => {
         gpCache = null;
       });
@@ -24768,16 +25411,16 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   function passportWidget() {
     const p = panel();
     p.classList.add("lx-passport");
-    const head2 = E9("div", void 0, "lx-passport-head");
-    head2.append(E9("span", "GLOBAL PASSPORT", "lx-overline"), E9("span", "UK", "lx-passport-flag"));
-    p.append(head2, E9("h2", "Your students"));
-    const grid = E9("div", void 0, "lx-passport-grid");
+    const head2 = E10("div", void 0, "lx-passport-head");
+    head2.append(E10("span", "GLOBAL PASSPORT", "lx-overline"), E10("span", "UK", "lx-passport-flag"));
+    p.append(head2, E10("h2", "Your students"));
+    const grid = E10("div", void 0, "lx-passport-grid");
     p.append(grid);
     const paint2 = (m) => {
       grid.replaceChildren();
       for (const [k, l] of [["assigned", "Assigned"], ["documents_review", "Docs to review"], ["attention", "Need attention"]]) {
-        const c = E9("div", void 0, "lx-passport-stat" + (k === "attention" && m?.[k] ? " is-alert" : ""));
-        c.append(E9("strong", m ? String(m[k] ?? 0) : "\u2014"), E9("small", l));
+        const c = E10("div", void 0, "lx-passport-stat" + (k === "attention" && m?.[k] ? " is-alert" : ""));
+        c.append(E10("strong", m ? String(m[k] ?? 0) : "\u2014"), E10("small", l));
         grid.append(c);
       }
     };
@@ -24786,7 +25429,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       gpCache = r.metrics;
       if (p.isConnected) paint2(gpCache);
     }).catch(() => {
-      grid.replaceChildren(E9("p", "Global Passport is not active yet.", "lx-muted"));
+      grid.replaceChildren(E10("p", "Global Passport is not active yet.", "lx-muted"));
     });
     if (!readOnly) {
       const open = button3("Open Control Centre", () => navigate2("students"));
@@ -24796,49 +25439,62 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     return p;
   }
   function account() {
-    const wrap = E9("div", void 0, "lx-account"), sec = panel("Security");
-    sec.append(E9("p", "Protect access to your leads, appointments and documents.", "lx-muted"));
+    const wrap = E10("div", void 0, "lx-account"), sec = panel("Security");
+    sec.append(E10("p", "Protect access to your leads, appointments and documents.", "lx-muted"));
     const rows = [["lock", "Password", "Change it any time. Use at least 12 characters you do not use elsewhere.", button3("Change password", async () => {
       const changed = await requirePasswordChange({ api: api2, mandatory: false });
       if (changed) notice("Password changed.");
     })], ["refresh", "Automatic sign-out", "For your security you are signed out after 30 minutes without activity, with a warning first.", null], ["logout", "Sign out", "Ends your session on this device.", button3("Sign out", () => exit.click())]];
     for (const [ic, h, t2, b] of rows) {
-      const row = E9("div", void 0, "lx-account-row"), i = E9("span", void 0, "lx-account-icon"), txt = E9("div");
+      const row = E10("div", void 0, "lx-account-row"), i = E10("span", void 0, "lx-account-icon"), txt = E10("div");
       i.append(icon2(ic));
-      txt.append(E9("h3", h), E9("p", t2, "lx-muted"));
+      txt.append(E10("h3", h), E10("p", t2, "lx-muted"));
       row.append(i, txt);
       if (b) row.append(b);
       sec.append(row);
     }
     wrap.append(sec);
     const tips = panel("Good habits");
-    for (const t2 of ["Never share your password or sign-in links, even with colleagues.", "Sign out on shared or public computers.", "MUK Talent will never ask for your password by email or WhatsApp.", "Report anything unusual to your administrator straight away."]) tips.append(E9("p", t2, "lx-tip"));
+    for (const t2 of ["Never share your password or sign-in links, even with colleagues.", "Sign out on shared or public computers.", "MUK Talent will never ask for your password by email or WhatsApp.", "Report anything unusual to your administrator straight away."]) tips.append(E10("p", t2, "lx-tip"));
     wrap.append(tips);
     body.append(wrap);
   }
   function metric(label2, value, detail) {
     const c = panel();
     c.classList.add("lx-metric");
-    c.append(E9("p", label2, "lx-muted"), E9("strong", value), E9("small", detail));
+    c.append(E10("p", label2, "lx-muted"), E10("strong", value), E10("small", detail));
     return c;
   }
   function overview() {
     body.append(homeHero());
-    const metrics = E9("div", void 0, "lx-metrics");
+    if (!readOnly) {
+      const tk = records("task"), done = tk.filter((t2) => t2.status === "Done").length;
+      const prog = tk.length ? { label: "Tasks completed", value: done, max: tk.length, text: done + " / " + tk.length } : null;
+      if (!updates) updates = mountUpdates({ api: api2, title: "activity", userKey: "staff:" + (staff.id || staff.email || "me"), lang: "en", name: staff.full_name, progress: prog, onOpen: (it) => {
+        if (it.type === "message") openChat();
+        else if (UPDATE_PAGE[it.type]) navigate2(UPDATE_PAGE[it.type]);
+      } });
+      else {
+        updates.setProgress(prog);
+        updates.refresh();
+      }
+      body.append(updates.el);
+    }
+    const metrics = E10("div", void 0, "lx-metrics");
     metrics.append(metric("Assigned leads", data.leads.length, "Loaded non-archived records"), metric("Ready for review", directory?.ready_count || 0, "Attributed leads \xB7 exact count"), metric("Open tasks", records("task").filter((t2) => t2.status !== "Done").length, "In your workspace"), metric("Content in production", records("content").filter((c) => c.status !== "Published").length, "Ideas and work in progress"));
     body.append(metrics);
-    const board = E9("div", void 0, "lx-board"), left = E9("div", void 0, "lx-board-left"), centre = E9("div", void 0, "lx-board-centre"), right = E9("div", void 0, "lx-board-right");
+    const board = E10("div", void 0, "lx-board"), left = E10("div", void 0, "lx-board-left"), centre = E10("div", void 0, "lx-board-centre"), right = E10("div", void 0, "lx-board-right");
     left.append(passportWidget());
     const impact = panel("Your pipeline potential");
     impact.classList.add("lx-impact");
-    impact.append(E9("strong", directory?.ready_count || 0, "lx-impact-number"), E9("p", "Attributed leads ready for review", "lx-muted"));
-    if (directory?.potential_commission != null) impact.append(E9("b", money2(directory.potential_commission, directory.commission_currency) + " potential"));
-    impact.append(E9("small", directory?.potential_commission != null ? "Estimate only. Subject to approval and commission terms." : "Your administrator has not configured a commission rate."));
+    impact.append(E10("strong", directory?.ready_count || 0, "lx-impact-number"), E10("p", "Attributed leads ready for review", "lx-muted"));
+    if (directory?.potential_commission != null) impact.append(E10("b", money2(directory.potential_commission, directory.commission_currency) + " potential"));
+    impact.append(E10("small", directory?.potential_commission != null ? "Estimate only. Subject to approval and commission terms." : "Your administrator has not configured a commission rate."));
     left.append(impact);
     const tasks = panel("Your priorities"), open = records("task").filter((t2) => t2.status !== "Done").sort((a, b) => (a.record_date || "9999").localeCompare(b.record_date || "9999")).slice(0, 4);
     for (const t2 of open) {
-      const row = E9("div", void 0, "lx-row");
-      row.append(E9("span", t2.payload.priority || "Medium", "lx-tag"), E9("h3", t2.title), E9("p", t2.record_date || "No due date", "lx-muted"));
+      const row = E10("div", void 0, "lx-row");
+      row.append(E10("span", t2.payload.priority || "Medium", "lx-tag"), E10("h3", t2.title), E10("p", t2.record_date || "No due date", "lx-muted"));
       if (!readOnly) row.append(button3("Open task", () => edit("task", t2)));
       tasks.append(row);
     }
@@ -24846,8 +25502,8 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     centre.append(tasks);
     const follow = panel("Follow-ups that need attention"), overdue = data.leads.filter((l) => l.status !== "closed" && l.next_action_at && new Date(l.next_action_at) < /* @__PURE__ */ new Date()).slice(0, 3);
     for (const lead of overdue) {
-      const row = E9("div", void 0, "lx-row");
-      row.append(E9("h3", lead.first_name + " " + lead.last_name), E9("p", lead.next_action || "Follow-up required", "lx-muted"));
+      const row = E10("div", void 0, "lx-row");
+      row.append(E10("h3", lead.first_name + " " + lead.last_name), E10("p", lead.next_action || "Follow-up required", "lx-muted"));
       if (!readOnly) row.append(button3("Open lead", () => edit("lead", lead)));
       follow.append(row);
     }
@@ -24857,7 +25513,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     miniCalendar(day, true);
     right.append(day);
     const todayReport = records("report").find((r) => r.record_date === dateKey()), checkin = panel("Daily check-in");
-    checkin.append(E9("p", todayReport ? "Today\u2019s report \xB7 " + todayReport.status : "Capture the progress behind the numbers.", "lx-muted"), button3("Open today", () => {
+    checkin.append(E10("p", todayReport ? "Today\u2019s report \xB7 " + todayReport.status : "Capture the progress behind the numbers.", "lx-muted"), button3("Open today", () => {
       selectedDay = dateKey();
       month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
       navigate2("calendar");
@@ -24866,13 +25522,13 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     right.prepend(strength2());
     right.append(streak());
     board.append(left, centre, right);
-    body.append(board, E9("p", "Operational view: up to 100 leads, 500 workspace records, 200 appointments and 100 recent activity events. Ready-lead potential uses a separate exact count.", "lx-footnote"));
+    body.append(board, E10("p", "Operational view: up to 100 leads, 500 workspace records, 200 appointments and 100 recent activity events. Ready-lead potential uses a separate exact count.", "lx-footnote"));
   }
   function strength2() {
     const d = directory || {}, items = [["Profile photo", Boolean(d.avatar_url), "profile"], ["Work contact details", Boolean(d.contact_phone || d.contact_email), "profile"], ["Short link", Boolean(d.card?.handle), "card"], ["Social links", Boolean(d.socials?.length), "social"], ["Card published", Boolean(d.card?.published), "card"]], done = items.filter((i) => i[1]).length, pct = Math.round(done / items.length * 100);
     const p = panel();
     p.classList.add("lx-strength");
-    const top = E9("div", void 0, "lx-strength-top"), svg2 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const top = E10("div", void 0, "lx-strength-top"), svg2 = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg2.setAttribute("viewBox", "0 0 44 44");
     svg2.setAttribute("class", "lx-ring");
     svg2.setAttribute("aria-hidden", "true");
@@ -24886,24 +25542,24 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       c.setAttribute("class", cls);
       svg2.append(c);
     }
-    const ring2 = E9("div", void 0, "lx-ring-wrap");
-    ring2.append(svg2, E9("strong", pct + "%"));
-    const txt = E9("div");
-    txt.append(E9("h2", "Card strength"), E9("p", done === items.length ? "Complete. Your card is ready to impress." : items.length - done + " quick wins left.", "lx-muted"));
+    const ring2 = E10("div", void 0, "lx-ring-wrap");
+    ring2.append(svg2, E10("strong", pct + "%"));
+    const txt = E10("div");
+    txt.append(E10("h2", "Card strength"), E10("p", done === items.length ? "Complete. Your card is ready to impress." : items.length - done + " quick wins left.", "lx-muted"));
     top.append(ring2, txt);
     p.append(top);
-    const list = E9("ul", void 0, "lx-checklist");
+    const list = E10("ul", void 0, "lx-checklist");
     for (const [label2, ok, target] of items) {
-      const li = E9("li", void 0, ok ? "done" : "");
-      const mark2 = E9("span", void 0, "lx-check");
+      const li = E10("li", void 0, ok ? "done" : "");
+      const mark2 = E10("span", void 0, "lx-check");
       if (ok) mark2.append(icon2("check"));
       li.append(mark2);
       if (!ok && !readOnly && !(label2 === "Card published")) {
-        const b = E9("button", label2, "lx-check-link");
+        const b = E10("button", label2, "lx-check-link");
         b.type = "button";
         b.onclick = () => navigate2(target);
         li.append(b);
-      } else li.append(E9("span", label2 + (label2 === "Card published" && !ok ? " \xB7 by your administrator" : "")));
+      } else li.append(E10("span", label2 + (label2 === "Card published" && !ok ? " \xB7 by your administrator" : "")));
       list.append(li);
     }
     p.append(list);
@@ -24923,30 +25579,30 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       }
       day.setUTCDate(day.getUTCDate() - 1);
     }
-    const head2 = E9("div", void 0, "lx-streak-head");
-    head2.append(E9("strong", count, "lx-streak-number"), E9("span", count === 1 ? "working day in a row" : "working days in a row", "lx-muted"));
+    const head2 = E10("div", void 0, "lx-streak-head");
+    head2.append(E10("strong", count, "lx-streak-number"), E10("span", count === 1 ? "working day in a row" : "working days in a row", "lx-muted"));
     p.append(head2);
-    const week = E9("div", void 0, "lx-week"), today2 = /* @__PURE__ */ new Date(dateKey() + "T12:00:00Z"), monday = new Date(today2);
+    const week = E10("div", void 0, "lx-week"), today2 = /* @__PURE__ */ new Date(dateKey() + "T12:00:00Z"), monday = new Date(today2);
     monday.setUTCDate(today2.getUTCDate() - (today2.getUTCDay() + 6) % 7);
     for (let i = 0; i < 5; i++) {
       const d = new Date(monday);
       d.setUTCDate(monday.getUTCDate() + i);
-      const key = d.toISOString().slice(0, 10), cell = E9("span", ["M", "T", "W", "T", "F"][i], "lx-week-day");
+      const key = d.toISOString().slice(0, 10), cell = E10("span", ["M", "T", "W", "T", "F"][i], "lx-week-day");
       if (reports.has(key)) cell.classList.add("done");
       if (key === dateKey()) cell.classList.add("today");
       cell.setAttribute("aria-label", key + (reports.has(key) ? " \xB7 report sent" : " \xB7 no report"));
       week.append(cell);
     }
-    p.append(week, E9("small", count ? "Keep it going with today\u2019s report." : "Send today\u2019s report to start your streak.", "lx-footnote"));
+    p.append(week, E10("small", count ? "Keep it going with today\u2019s report." : "Send today\u2019s report to start your streak.", "lx-footnote"));
     return p;
   }
   function searchList(host, rows, draw) {
-    const input2 = E9("input");
+    const input2 = E10("input");
     input2.type = "search";
     input2.className = "lx-search";
     input2.placeholder = "Search loaded records";
     input2.setAttribute("aria-label", "Search loaded records");
-    const results = E9("div");
+    const results = E10("div");
     host.append(input2, results);
     const paint2 = () => {
       results.replaceChildren();
@@ -24960,10 +25616,10 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   function leads() {
     const host = panel();
     searchList(host, data.leads, (target, l) => {
-      const row = E9("article", void 0, "lx-row"), top = E9("div", void 0, "lx-row-top");
-      top.append(E9("h3", l.first_name + " " + l.last_name), E9("span", leadStates[l.status] || l.status, "lx-tag"));
-      row.append(top, E9("p", l.reference + " \xB7 " + (l.subject_interest || "Study interest not set"), "lx-muted"), E9("p", l.next_action || "No next action recorded."), E9("small", "Follow-up: " + time(l.next_action_at)));
-      const controls = E9("div", void 0, "lx-actions");
+      const row = E10("article", void 0, "lx-row"), top = E10("div", void 0, "lx-row-top");
+      top.append(E10("h3", l.first_name + " " + l.last_name), E10("span", leadStates[l.status] || l.status, "lx-tag"));
+      row.append(top, E10("p", l.reference + " \xB7 " + (l.subject_interest || "Study interest not set"), "lx-muted"), E10("p", l.next_action || "No next action recorded."), E10("small", "Follow-up: " + time(l.next_action_at)));
+      const controls = E10("div", void 0, "lx-actions");
       if (!readOnly) controls.append(button3("Open lead", () => edit("lead", l)));
       controls.append(button3("Qualification", () => editQualification({ lead: l, api: api2, readOnly, root })));
       row.append(controls);
@@ -24974,42 +25630,42 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   function listRecords(kind) {
     const host = panel();
     searchList(host, records(kind), (target, r) => {
-      const row = E9("article", void 0, "lx-row");
-      row.append(E9("div", r.status, "lx-tag"), E9("h3", r.title), E9("p", kind === "partner" ? [r.payload.type, r.payload.contact, r.payload.city].filter(Boolean).join(" \xB7 ") : [r.payload.priority, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E9("p", r.payload.next_action || r.payload.notes || ""));
+      const row = E10("article", void 0, "lx-row");
+      row.append(E10("div", r.status, "lx-tag"), E10("h3", r.title), E10("p", kind === "partner" ? [r.payload.type, r.payload.contact, r.payload.city].filter(Boolean).join(" \xB7 ") : [r.payload.priority, r.record_date].filter(Boolean).join(" \xB7 "), "lx-muted"), E10("p", r.payload.next_action || r.payload.notes || ""));
       if (!readOnly) row.append(button3("Open / edit", () => edit(kind, r)));
       target.append(row);
     });
     body.append(host);
   }
   function appointment(host, a) {
-    const row = E9("article", void 0, "lx-appointment");
-    row.append(E9("span", new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Casablanca", hour: "2-digit", minute: "2-digit" }).format(new Date(a.starts_at)), "lx-appointment-time"), E9("h3", a.full_name), E9("p", a.subject || "Student consultation"), E9("p", (a.institution || "") + (a.institution ? " \xB7 " : "") + (a.meeting_mode === "in_person" ? "In person \xB7 confirm location" : "Phone consultation"), "lx-muted"), E9("p", (a.whatsapp_phone_e164 || "No phone") + " \xB7 " + (a.email || "No email"), "lx-muted"), E9("small", "UK: " + time(a.starts_at, "Europe/London")), E9("span", a.status, "lx-tag"));
+    const row = E10("article", void 0, "lx-appointment");
+    row.append(E10("span", new Intl.DateTimeFormat("en-GB", { timeZone: "Africa/Casablanca", hour: "2-digit", minute: "2-digit" }).format(new Date(a.starts_at)), "lx-appointment-time"), E10("h3", a.full_name), E10("p", a.subject || "Student consultation"), E10("p", (a.institution || "") + (a.institution ? " \xB7 " : "") + (a.meeting_mode === "in_person" ? "In person \xB7 confirm location" : "Phone consultation"), "lx-muted"), E10("p", (a.whatsapp_phone_e164 || "No phone") + " \xB7 " + (a.email || "No email"), "lx-muted"), E10("small", "UK: " + time(a.starts_at, "Europe/London")), E10("span", a.status, "lx-tag"));
     if (!readOnly && a.status !== "cancelled") row.append(button3("Manage appointment", () => manageAppointment({ a, api: api2, root, onSaved: load })));
     host.append(row);
   }
   function miniCalendar(host, compact = false) {
-    const tools = E9("div", void 0, "lx-calendar-tools");
+    const tools = E10("div", void 0, "lx-calendar-tools");
     tools.append(button3("\u2039", () => {
       month = new Date(month.getFullYear(), month.getMonth() - 1, 1);
       render();
-    }), E9("strong", new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month)), button3("\u203A", () => {
+    }), E10("strong", new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month)), button3("\u203A", () => {
       month = new Date(month.getFullYear(), month.getMonth() + 1, 1);
       render();
     }));
     host.append(tools);
-    const grid = E9("div", void 0, "lx-calendar");
-    for (const day of ["M", "T", "W", "T", "F", "S", "S"]) grid.append(E9("span", day, "lx-weekday"));
-    for (let i = 0; i < (month.getDay() + 6) % 7; i++) grid.append(E9("span"));
+    const grid = E10("div", void 0, "lx-calendar");
+    for (const day of ["M", "T", "W", "T", "F", "S", "S"]) grid.append(E10("span", day, "lx-weekday"));
+    for (let i = 0; i < (month.getDay() + 6) % 7; i++) grid.append(E10("span"));
     for (let d = 1; d <= new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate(); d++) {
-      const key = month.getFullYear() + "-" + String(month.getMonth() + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"), cell = E9("button", void 0, "lx-date");
+      const key = month.getFullYear() + "-" + String(month.getMonth() + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0"), cell = E10("button", void 0, "lx-date");
       cell.type = "button";
-      cell.append(E9("span", d, "lx-date-num"));
+      cell.append(E10("span", d, "lx-date-num"));
       const wd = new Date(month.getFullYear(), month.getMonth(), d).getDay();
       if (wd === 0 || wd === 6) cell.classList.add("lx-weekend");
       const pay = payroll[monthKey()]?.days?.find((x) => x.date === key);
       if (pay?.verified) {
         cell.classList.add("lx-verified");
-        cell.append(E9("span", "+" + pay.verified * (payroll[monthKey()].per_verified_lead || 2e3) / 1e3 + "k", "lx-date-chip"));
+        cell.append(E10("span", "+" + pay.verified * (payroll[monthKey()].per_verified_lead || 2e3) / 1e3 + "k", "lx-date-chip"));
       }
       cell.classList.toggle("today", key === dateKey());
       cell.classList.toggle("selected", key === selectedDay);
@@ -25028,15 +25684,15 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     if (compact) {
       const upcoming = data.appointments.filter((a) => a.status === "confirmed" && new Date(a.starts_at) > /* @__PURE__ */ new Date()).sort((a, b) => a.starts_at.localeCompare(b.starts_at)).slice(0, 2);
       for (const a of upcoming) {
-        const row = E9("div", void 0, "lx-row");
-        row.append(E9("strong", a.full_name), E9("p", time(a.starts_at), "lx-muted"));
+        const row = E10("div", void 0, "lx-row");
+        row.append(E10("strong", a.full_name), E10("p", time(a.starts_at), "lx-muted"));
         host.append(row);
       }
     }
   }
   function calendarPage() {
     body.append(payrollHeader());
-    const grid = E9("div", void 0, "lx-day-layout"), calendar = panel("Plan your day");
+    const grid = E10("div", void 0, "lx-day-layout"), calendar = panel("Plan your day");
     calendar.append(button3("Today", () => {
       selectedDay = dateKey();
       month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
@@ -25044,31 +25700,31 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     }));
     miniCalendar(calendar);
     const day = panel(new Intl.DateTimeFormat("en-GB", { dateStyle: "full", timeZone: "UTC" }).format(/* @__PURE__ */ new Date(selectedDay + "T12:00:00Z"))), report = records("report").find((r) => r.record_date === selectedDay);
-    day.append(E9("span", selectedDay === dateKey() ? "TODAY" : "SELECTED DAY", "lx-overline"), dayPay());
-    const checkin = E9("section", void 0, "lx-day-report");
-    checkin.append(E9("h3", "Daily report"), E9("p", report ? "Status: " + report.status : "No daily report recorded.", "lx-muted"));
+    day.append(E10("span", selectedDay === dateKey() ? "TODAY" : "SELECTED DAY", "lx-overline"), dayPay());
+    const checkin = E10("section", void 0, "lx-day-report");
+    checkin.append(E10("h3", "Daily report"), E10("p", report ? "Status: " + report.status : "No daily report recorded.", "lx-muted"));
     if (report) {
-      for (const [key, label2] of fields.report) if (report.payload[key]) checkin.append(E9("strong", label2), E9("p", report.payload[key]));
+      for (const [key, label2] of fields.report) if (report.payload[key]) checkin.append(E10("strong", label2), E10("p", report.payload[key]));
     }
     if (!readOnly) checkin.append(button3(report ? "Edit daily report" : "Write daily report", () => edit("report", report, selectedDay)));
-    day.append(checkin, E9("h3", "Appointments"));
+    day.append(checkin, E10("h3", "Appointments"));
     const appointments = data.appointments.filter((a) => dateKey(a.starts_at) === selectedDay).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
     for (const a of appointments) appointment(day, a);
     if (!appointments.length) empty(day, "No appointments on this day among loaded records.");
-    day.append(E9("h3", "Tasks for this day"));
+    day.append(E10("h3", "Tasks for this day"));
     const tasks = records("task").filter((t2) => t2.record_date === selectedDay);
     for (const t2 of tasks) {
-      const row = E9("div", void 0, "lx-row");
-      row.append(E9("strong", t2.title), E9("span", t2.status, "lx-tag"));
+      const row = E10("div", void 0, "lx-row");
+      row.append(E10("strong", t2.title), E10("span", t2.status, "lx-tag"));
       if (!readOnly) row.append(button3("Open task", () => edit("task", t2)));
       day.append(row);
     }
     if (!tasks.length) empty(day, "No dated tasks.");
-    day.append(E9("h3", "Recorded workspace activity"));
+    day.append(E10("h3", "Recorded workspace activity"));
     const history2 = data.activity.filter((a) => dateKey(a.created_at) === selectedDay);
     for (const a of history2) {
-      const row = E9("div", void 0, "lx-history-line");
-      row.append(E9("strong", a.title), E9("small", a.kind + " \xB7 " + a.action + " \xB7 " + time(a.created_at)));
+      const row = E10("div", void 0, "lx-history-line");
+      row.append(E10("strong", a.title), E10("small", a.kind + " \xB7 " + a.action + " \xB7 " + time(a.created_at)));
       day.append(row);
     }
     if (!history2.length) empty(day, "No recorded workspace changes for this day among loaded activity.");
@@ -25096,24 +25752,24 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     return null;
   }
   function legend() {
-    const l = E9("div", void 0, "lx-legend");
+    const l = E10("div", void 0, "lx-legend");
     for (const [cls, text] of [["today", "Today"], ["events", "Report / appointment"], ["verified", "Verified lead \xB7 +commission"], ["weekend", "Weekend"]]) {
-      const i = E9("span", void 0, "lx-legend-item");
-      i.append(E9("i", void 0, "lx-legend-" + cls), E9("span", text));
+      const i = E10("span", void 0, "lx-legend-item");
+      i.append(E10("i", void 0, "lx-legend-" + cls), E10("span", text));
       l.append(i);
     }
     return l;
   }
   function pill(label2, value, tone) {
-    const p = E9("div", void 0, "lx-pill lx-pill-" + tone);
-    p.append(E9("span", label2), E9("strong", value));
+    const p = E10("div", void 0, "lx-pill lx-pill-" + tone);
+    p.append(E10("span", label2), E10("strong", value));
     return p;
   }
   function homeHero() {
-    const d = directory || {}, p = getPayroll(monthKey(/* @__PURE__ */ new Date())), name = d.full_name || staff.full_name, hero = E9("section", void 0, "lx-hero");
-    const photo = E9("figure", void 0, "lx-hero-photo");
+    const d = directory || {}, p = getPayroll(monthKey(/* @__PURE__ */ new Date())), name = d.full_name || staff.full_name, hero = E10("section", void 0, "lx-hero");
+    const photo = E10("figure", void 0, "lx-hero-photo");
     if (d.avatar_url) {
-      const img = E9("img");
+      const img = E10("img");
       img.src = d.avatar_url;
       img.alt = "Photo of " + name;
       img.decoding = "async";
@@ -25124,12 +25780,12 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       };
       photo.append(img);
     } else photo.classList.add("lx-no-photo");
-    const initials3 = E9("span", name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase(), "lx-hero-initials");
+    const initials3 = E10("span", name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase(), "lx-hero-initials");
     initials3.setAttribute("aria-hidden", "true");
-    const cap = E9("figcaption");
-    cap.append(E9("h2", name), E9("p", d.job_title || "MUK Talent team"));
+    const cap = E10("figcaption");
+    cap.append(E10("h2", name), E10("p", d.job_title || "MUK Talent team"));
     photo.append(initials3, cap);
-    const hb = E9("a", void 0, "lx-hero-back");
+    const hb = E10("a", void 0, "lx-hero-back");
     hb.href = "/";
     hb.setAttribute("aria-label", "Back to website");
     hb.title = "Back to website";
@@ -25142,71 +25798,71 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       setDot(hh, { chat_unread: summary?.chat_unread || 0 });
       photo.append(hh);
     }
-    const facts = E9("div", void 0, "lx-hero-facts");
-    const id = E9("article", void 0, "lx-fact lx-fact-gold");
-    id.append(E9("span", "Staff ID"), E9("strong", d.employee_code || "\u2014"), E9("small", d.assigned_city || "MUK Talent"));
-    const contact = E9("article", void 0, "lx-fact lx-fact-glass");
-    contact.append(E9("span", d.contact_phone ? "Phone number" : "Work email"), E9("strong", d.contact_phone || d.contact_email || "Add in Profile"));
+    const facts = E10("div", void 0, "lx-hero-facts");
+    const id = E10("article", void 0, "lx-fact lx-fact-gold");
+    id.append(E10("span", "Staff ID"), E10("strong", d.employee_code || "\u2014"), E10("small", d.assigned_city || "MUK Talent"));
+    const contact = E10("article", void 0, "lx-fact lx-fact-glass");
+    contact.append(E10("span", d.contact_phone ? "Phone number" : "Work email"), E10("strong", d.contact_phone || d.contact_email || "Add in Profile"));
     if (!d.contact_phone && !d.contact_email && !readOnly) {
       contact.classList.add("lx-clickable");
       contact.tabIndex = 0;
       contact.onclick = () => navigate2("profile");
     }
     facts.append(id, contact);
-    const chart = E9("article", void 0, "lx-chart");
-    const head2 = E9("div", void 0, "lx-chart-head");
-    head2.append(E9("span", "Verified leads"), E9("strong", p && !p.error ? String(p.verified_count) : "\u2014"));
+    const chart = E10("article", void 0, "lx-chart");
+    const head2 = E10("div", void 0, "lx-chart-head");
+    head2.append(E10("span", "Verified leads"), E10("strong", p && !p.error ? String(p.verified_count) : "\u2014"));
     chart.append(head2);
-    const bars = E9("div", void 0, "lx-bars");
+    const bars = E10("div", void 0, "lx-bars");
     const hist = p && !p.error ? p.history : Array.from({ length: 9 }, (_, i) => ({ month: monthKey(new Date((/* @__PURE__ */ new Date()).getFullYear(), (/* @__PURE__ */ new Date()).getMonth() - 8 + i, 1)), verified_count: 0, total: 0 }));
     const max = Math.max(1, ...hist.map((h) => h.total || 0));
     for (const h of hist) {
-      const b = E9("div", void 0, "lx-bar");
-      const fill2 = E9("i");
+      const b = E10("div", void 0, "lx-bar");
+      const fill2 = E10("i");
       fill2.style.setProperty("--h", Math.max(4, Math.round((h.total || 0) / max * 100)) + "%");
       if (h.month === monthKey(/* @__PURE__ */ new Date())) b.classList.add("current");
       b.title = h.month + " \xB7 " + mad2(h.total) + " \xB7 " + h.verified_count + " verified";
-      b.append(fill2, E9("small", new Intl.DateTimeFormat("en-GB", { month: "short" }).format(/* @__PURE__ */ new Date(h.month + "-15T12:00:00Z")).slice(0, 3)));
+      b.append(fill2, E10("small", new Intl.DateTimeFormat("en-GB", { month: "short" }).format(/* @__PURE__ */ new Date(h.month + "-15T12:00:00Z")).slice(0, 3)));
       bars.append(b);
     }
-    chart.append(bars, E9("p", "Monthly earnings \xB7 last 9 months", "lx-chart-note"));
-    const links = E9("div", void 0, "lx-hero-links"), cardBtn = button3("", () => navigate2("card")), rep = button3("", () => {
+    chart.append(bars, E10("p", "Monthly earnings \xB7 last 9 months", "lx-chart-note"));
+    const links = E10("div", void 0, "lx-hero-links"), cardBtn = button3("", () => navigate2("card")), rep = button3("", () => {
       selectedDay = dateKey();
       month = new Date(Number(selectedDay.slice(0, 4)), Number(selectedDay.slice(5, 7)) - 1, 1);
       navigate2("calendar");
     });
-    cardBtn.append(icon2("card", "lx-btn-icon"), E9("span", "My card"));
-    rep.append(icon2("planner", "lx-btn-icon"), E9("span", "Daily report"));
+    cardBtn.append(icon2("card", "lx-btn-icon"), E10("span", "My card"));
+    rep.append(icon2("planner", "lx-btn-icon"), E10("span", "Daily report"));
     cardBtn.classList.add("lx-chip-btn");
     rep.classList.add("lx-chip-btn");
     links.append(cardBtn, rep);
-    const side = E9("div", void 0, "lx-hero-side");
+    const side = E10("div", void 0, "lx-hero-side");
     side.append(facts, chart, links);
-    const pay = E9("article", void 0, "lx-hero-pay");
-    pay.append(E9("span", "This month \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long" }).format(/* @__PURE__ */ new Date()), "lx-overline"));
+    const pay = E10("article", void 0, "lx-hero-pay");
+    pay.append(E10("span", "This month \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long" }).format(/* @__PURE__ */ new Date()), "lx-overline"));
     if (p && !p.error) {
-      pay.append(E9("strong", mad2(p.earned_to_date)), E9("p", "Earned to date \xB7 projected " + mad2(p.projected_total), "lx-muted"));
-      const pills = E9("div", void 0, "lx-pills");
+      pay.append(E10("strong", mad2(p.earned_to_date)), E10("p", "Earned to date \xB7 projected " + mad2(p.projected_total), "lx-muted"));
+      const pills = E10("div", void 0, "lx-pills");
       pills.append(pill("Base", mad2(p.base_monthly), "gold"), pill("Leads", p.verified_count + " \xD7 " + mad2(p.per_verified_lead).replace(" " + payCurrency, ""), "dark"), pill("Days left", p.remaining_days, "grey"));
       pay.append(pills);
       const go = button3("Open salary calendar", () => navigate2("calendar"));
       go.classList.add("lx-link-btn");
       pay.append(go);
-    } else pay.append(E9("strong", p?.error ? "\u2014" : "\u2026"), E9("p", p?.error ? "Salary view unavailable. Refresh later." : "Loading your salary\u2026", "lx-muted"));
+    } else pay.append(E10("strong", p?.error ? "\u2014" : "\u2026"), E10("p", p?.error ? "Salary view unavailable. Refresh later." : "Loading your salary\u2026", "lx-muted"));
     side.append(pay);
     hero.append(photo, side);
     return hero;
   }
   function payrollHeader() {
-    const key = monthKey(), p = getPayroll(key), wrap = E9("section", void 0, "lx-payroll");
-    const top = E9("div", void 0, "lx-payroll-top"), left = E9("div");
-    left.append(E9("span", "Salary \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month), "lx-overline"));
-    const big = E9("div", void 0, "lx-payroll-big");
+    const key = monthKey(), p = getPayroll(key), wrap = E10("section", void 0, "lx-payroll");
+    const top = E10("div", void 0, "lx-payroll-top"), left = E10("div");
+    left.append(E10("span", "Salary \xB7 " + new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(month), "lx-overline"));
+    const big = E10("div", void 0, "lx-payroll-big");
     if (p && !p.error) {
-      big.append(E9("strong", p.elapsed_days + "/" + p.working_days + " days"), E9("b", mad2(key < dateKey().slice(0, 7) ? p.projected_total : p.earned_to_date)));
-    } else big.append(E9("strong", p?.error ? "Salary unavailable" : "Loading\u2026"));
+      big.append(E10("strong", p.elapsed_days + "/" + p.working_days + " days"), E10("b", mad2(key < dateKey().slice(0, 7) ? p.projected_total : p.earned_to_date)));
+    } else big.append(E10("strong", p?.error ? "Salary unavailable" : "Loading\u2026"));
     left.append(big);
-    const pick = E9("select", void 0, "lx-month-select");
+    const pick = E10("select", void 0, "lx-month-select");
     pick.setAttribute("aria-label", "Month");
     const now = /* @__PURE__ */ new Date();
     for (let i = -11; i <= 1; i++) {
@@ -25223,22 +25879,22 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     top.append(left, pick);
     wrap.append(top);
     if (p && !p.error) {
-      const pills = E9("div", void 0, "lx-pills");
+      const pills = E10("div", void 0, "lx-pills");
       pills.append(pill("Work days \xB7 base", mad2(p.base_accrued) + " / " + mad2(p.base_monthly), "gold"), pill("Verified leads", p.verified_count + " \xB7 " + mad2(p.commission), "dark"), pill("Projected month", mad2(p.projected_total), "grey"));
-      wrap.append(pills, E9("p", "Base " + mad2(p.base_monthly) + " per month, Monday to Friday (" + mad2(p.daily_rate) + " per working day), plus " + mad2(p.per_verified_lead) + " for each lead attributed to you and verified by administration. " + p.notice, "lx-footnote"));
+      wrap.append(pills, E10("p", "Base " + mad2(p.base_monthly) + " per month, Monday to Friday (" + mad2(p.daily_rate) + " per working day), plus " + mad2(p.per_verified_lead) + " for each lead attributed to you and verified by administration. " + p.notice, "lx-footnote"));
     }
     return wrap;
   }
   function dayPay() {
-    const p = payroll[monthKey(/* @__PURE__ */ new Date(selectedDay + "T12:00:00"))], info = p?.days?.find((x) => x.date === selectedDay), card = E9("article", void 0, "lx-day-pay");
+    const p = payroll[monthKey(/* @__PURE__ */ new Date(selectedDay + "T12:00:00"))], info = p?.days?.find((x) => x.date === selectedDay), card = E10("article", void 0, "lx-day-pay");
     if (!p || p.error || !info) return card;
     const w = (/* @__PURE__ */ new Date(selectedDay + "T12:00:00Z")).getUTCDay(), weekend = w === 0 || w === 6;
-    const txt = E9("div");
-    txt.append(E9("span", weekend ? "Weekend" : "Working day", "lx-day-pay-label"), E9("strong", weekend ? "No base accrual" : "+" + mad2(p.daily_rate) + " base"), E9("small", info.verified ? info.verified + " verified lead" + (info.verified > 1 ? "s" : "") + " \xB7 +" + mad2(info.verified * p.per_verified_lead) : "No verified leads on this day"));
+    const txt = E10("div");
+    txt.append(E10("span", weekend ? "Weekend" : "Working day", "lx-day-pay-label"), E10("strong", weekend ? "No base accrual" : "+" + mad2(p.daily_rate) + " base"), E10("small", info.verified ? info.verified + " verified lead" + (info.verified > 1 ? "s" : "") + " \xB7 +" + mad2(info.verified * p.per_verified_lead) : "No verified leads on this day"));
     const leadsHere = (p.leads || []).filter((l) => l.verified_on === selectedDay);
-    if (leadsHere.length) txt.append(E9("small", leadsHere.map((l) => l.reference).join(" \xB7 ")));
-    const amount = E9("b", (info.verified ? "+" : "") + mad2((weekend ? 0 : p.daily_rate) + info.verified * p.per_verified_lead), "lx-day-pay-amount");
-    const doc = E9("span", void 0, "lx-day-pay-doc");
+    if (leadsHere.length) txt.append(E10("small", leadsHere.map((l) => l.reference).join(" \xB7 ")));
+    const amount = E10("b", (info.verified ? "+" : "") + mad2((weekend ? 0 : p.daily_rate) + info.verified * p.per_verified_lead), "lx-day-pay-amount");
+    const doc = E10("span", void 0, "lx-day-pay-doc");
     doc.append(icon2(info.verified ? "check" : "calendar"));
     card.append(doc, txt, amount);
     return card;
@@ -25246,14 +25902,14 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   function softChrome() {
     let m = document.querySelector("meta[name=theme-color]");
     if (!m) {
-      m = E9("meta");
+      m = E10("meta");
       m.name = "theme-color";
       document.head.append(m);
     }
     m.dataset.previous = m.dataset.previous || m.content;
     m.content = "#efe8dc";
     for (const [n, c] of [["apple-mobile-web-app-capable", "yes"], ["mobile-web-app-capable", "yes"], ["apple-mobile-web-app-status-bar-style", "black-translucent"]]) if (!document.querySelector("meta[name=" + n + "]")) {
-      const x = E9("meta");
+      const x = E10("meta");
       x.name = n;
       x.content = c;
       document.head.append(x);
@@ -25271,7 +25927,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   const AUD_LABEL = { web: "Website", all: "All students", mine: "My students" };
   const SVG4 = { plus: '<path d="M12 5v14M5 12h14"/>', device: '<rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/>', link: '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>', vimeo: '<path d="M3 8.5c1.6-1.3 3-2.6 4.1-2.7 1.6-.2 2 1.1 2.3 3.1.4 2.6.8 4.6 1.4 4.6.5 0 1.6-1.6 2.6-3.6 1-2.1-.2-3.2-2-2.1.9-3.1 5.7-4 5.8-.6.1 2.3-1.7 5.6-4.3 8.7-2.3 2.8-3.9 3.5-5 1.6-.8-1.5-1.6-6.6-2.4-7.6-.4-.5-1-.1-1.6.4z"/>', globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z"/>', users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.3-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M15.5 4.8a3.5 3.5 0 0 1 0 6.4M18 14.8c1.9.7 3 2.4 3.5 5.2"/>', user: '<circle cx="12" cy="8" r="4"/><path d="M4 20.5c1-4 4-6 8-6s7 2 8 6"/>', down: '<path d="M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M5 19.5h14"/>', trash: '<path d="M4 7h16M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/>', close: '<path d="M6 6l12 12M18 6 6 18"/>', check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>' };
   const svg = (n, c = "") => {
-    const sp = E9("span", void 0, "lx-svg " + c);
+    const sp = E10("span", void 0, "lx-svg " + c);
     sp.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + SVG4[n] + "</svg>";
     return sp;
   };
@@ -25292,14 +25948,14 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   const isVideo = (it) => it.kind === "video" || it.kind === "embed" || it.kind === "link";
   const SIZES = [[1, 2], [2, 4], [1, 2], [2, 2], [1, 3], [1, 3], [1, 2], [1, 2], [2, 3], [1, 2], [1, 2], [1, 2]];
   function studio() {
-    const wrap = E9("section", void 0, "lx-gal");
+    const wrap = E10("section", void 0, "lx-gal");
     wrap.setAttribute("aria-label", "Studio gallery");
     body.append(wrap);
-    const chips = E9("div", void 0, "lx-gal-chips"), grid = E9("div", void 0, "lx-gal-grid");
+    const chips = E10("div", void 0, "lx-gal-chips"), grid = E10("div", void 0, "lx-gal-grid");
     chips.setAttribute("role", "toolbar");
     chips.setAttribute("aria-label", "Filter");
     for (const [id, label2] of [["all", "All"], ["video", "#videos"], ["image", "#photos"], ["web", "#website"], ["students", "#students"]]) {
-      const c = E9("button", label2, "lx-gal-chip");
+      const c = E10("button", label2, "lx-gal-chip");
       c.type = "button";
       c.dataset.f = id;
       c.setAttribute("aria-pressed", String(galFilter === id));
@@ -25312,14 +25968,14 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     }
     wrap.append(chips, grid);
     if (!readOnly) {
-      const fab = E9("button", void 0, "lx-gal-fab");
+      const fab = E10("button", void 0, "lx-gal-fab");
       fab.type = "button";
       fab.setAttribute("aria-label", "Add to the gallery");
       fab.append(svg("plus"));
       fab.onclick = addSheet;
       wrap.append(fab);
     }
-    grid.append(E9("p", "Loading gallery\u2026", "lx-gal-note"));
+    grid.append(E10("p", "Loading gallery\u2026", "lx-gal-note"));
     function draw() {
       if (!grid.isConnected) return;
       let items = galleryItems(prodCache || []);
@@ -25329,17 +25985,17 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       else if (galFilter === "students") items = items.filter((it) => pubs(it).some((p) => p.audience !== "web"));
       grid.replaceChildren();
       if (!items.length) {
-        grid.append(E9("p", galFilter !== "all" ? "Nothing here yet." : readOnly ? "This gallery is empty." : "Your gallery is empty. Tap + to add photos and videos from your phone, a link or Vimeo.", "lx-gal-note"));
+        grid.append(E10("p", galFilter !== "all" ? "Nothing here yet." : readOnly ? "This gallery is empty." : "Your gallery is empty. Tap + to add photos and videos from your phone, a link or Vimeo.", "lx-gal-note"));
         return;
       }
       items.forEach((it, i) => {
-        const [c, r] = SIZES[i % SIZES.length], t2 = E9("div", void 0, "lx-gal-tile"), open = E9("button", void 0, "lx-gal-open");
+        const [c, r] = SIZES[i % SIZES.length], t2 = E10("div", void 0, "lx-gal-tile"), open = E10("button", void 0, "lx-gal-open");
         open.type = "button";
         t2.style.gridColumn = "span " + c;
         t2.style.gridRow = "span " + r;
         open.setAttribute("aria-label", (isVideo(it) ? "Open video: " : "Open photo: ") + it.title);
         if (it.poster) {
-          const im = E9("img");
+          const im = E10("img");
           im.src = it.poster;
           im.alt = "";
           im.loading = "lazy";
@@ -25348,7 +26004,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
           im.onerror = () => im.remove();
           open.append(im);
         } else if (it.kind === "video" && it.url) {
-          const v = E9("video");
+          const v = E10("video");
           v.src = it.url + "#t=0.6";
           v.muted = true;
           v.playsInline = true;
@@ -25360,12 +26016,12 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         open.onclick = () => gview(items, i);
         t2.append(open);
         if (!readOnly) {
-          const pb = E9("button", void 0, "lx-gal-pub");
+          const pb = E10("button", void 0, "lx-gal-pub");
           pb.type = "button";
           pb.setAttribute("aria-haspopup", "menu");
           const lab = () => {
             const n = pubs(it).length;
-            pb.replaceChildren(svg(n ? "check" : "globe"), E9("span", n ? "Published \xB7 " + n : "Publish"));
+            pb.replaceChildren(svg(n ? "check" : "globe"), E10("span", n ? "Published \xB7 " + n : "Publish"));
             pb.classList.toggle("is-on", !!n);
           };
           lab();
@@ -25389,7 +26045,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   }
   function pubMenu(it, anchor, onChange) {
     root.querySelector(".lx-pubmenu")?.__close?.();
-    const m = E9("div", void 0, "lx-pubmenu");
+    const m = E10("div", void 0, "lx-pubmenu");
     m.setAttribute("role", "menu");
     m.lang = "en";
     let changed = false;
@@ -25401,16 +26057,16 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       m.style.top = y + "px";
     };
     function build(msg = "") {
-      m.replaceChildren(E9("strong", it.title, "lx-pm-title"));
+      m.replaceChildren(E10("strong", it.title, "lx-pm-title"));
       for (const [aud, ic, label2, sub] of [["web", "globe", "Website", "Publish on muktalent.com"], ["all", "users", "All students", "Every student in the app"], ["mine", "user", "My students", "Only students assigned to you"]]) {
-        const on = pubs(it).some((p) => p.audience === aud), b = E9("button", void 0, "lx-pm-opt");
+        const on = pubs(it).some((p) => p.audience === aud), b = E10("button", void 0, "lx-pm-opt");
         b.type = "button";
         b.setAttribute("role", "menuitemcheckbox");
         b.setAttribute("aria-checked", String(on));
         b.append(svg(ic, "lx-pm-ic"));
-        const tx2 = E9("span");
-        tx2.append(E9("b", label2), E9("small", aud === "web" && !isVideo(it) ? "Only videos can go on the website" : on ? "Published \xB7 click to remove" : sub));
-        b.append(tx2, svg("check", "lx-pm-tick"));
+        const tx3 = E10("span");
+        tx3.append(E10("b", label2), E10("small", aud === "web" && !isVideo(it) ? "Only videos can go on the website" : on ? "Published \xB7 click to remove" : sub));
+        b.append(tx3, svg("check", "lx-pm-tick"));
         if (aud === "web" && !isVideo(it)) b.disabled = true;
         b.onclick = async () => {
           m.querySelectorAll("button").forEach((x) => x.disabled = true);
@@ -25425,24 +26081,24 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         };
         m.append(b);
       }
-      const foot = E9("div", void 0, "lx-pm-foot");
+      const foot = E10("div", void 0, "lx-pm-foot");
       if (it.download) {
-        const a = E9("a", void 0, "lx-pm-tool");
+        const a = E10("a", void 0, "lx-pm-tool");
         a.href = it.download;
         a.setAttribute("download", it.title || "");
-        a.append(svg("down"), E9("span", "Download"));
+        a.append(svg("down"), E10("span", "Download"));
         foot.append(a);
       } else if (it.kind === "embed" || it.kind === "link") {
-        const a = E9("a", void 0, "lx-pm-tool");
+        const a = E10("a", void 0, "lx-pm-tool");
         a.href = it.media?.url || it.url;
         a.target = "_blank";
         a.rel = "noopener noreferrer";
-        a.append(svg("link"), E9("span", it.source === "vimeo" ? "Vimeo" : it.source === "youtube" ? "YouTube" : "Open"));
+        a.append(svg("link"), E10("span", it.source === "vimeo" ? "Vimeo" : it.source === "youtube" ? "YouTube" : "Open"));
         foot.append(a);
       }
-      const del = E9("button", void 0, "lx-pm-tool lx-pm-del");
+      const del = E10("button", void 0, "lx-pm-tool lx-pm-del");
       del.type = "button";
-      del.append(svg("trash"), E9("span", "Delete"));
+      del.append(svg("trash"), E10("span", "Delete"));
       del.onclick = async () => {
         try {
           if (await removeItem(it)) {
@@ -25455,7 +26111,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       };
       foot.append(del);
       m.append(foot);
-      const st = E9("p", msg, "lx-pm-msg");
+      const st = E10("p", msg, "lx-pm-msg");
       st.setAttribute("role", "status");
       st.hidden = !msg;
       m.append(st);
@@ -25485,12 +26141,12 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     }, 0);
     m.querySelector(".lx-pm-opt:not(:disabled)")?.focus();
   }
-  function sheet(title2, opts) {
-    const d = E9("dialog", void 0, "lx-sheet");
+  function sheet2(title2, opts) {
+    const d = E10("dialog", void 0, "lx-sheet");
     d.lang = "en";
-    const h = E9("div", void 0, "lx-sheet-head");
-    h.append(E9("strong", title2));
-    const x = E9("button", void 0, "lx-sheet-x");
+    const h = E10("div", void 0, "lx-sheet-head");
+    h.append(E10("strong", title2));
+    const x = E10("button", void 0, "lx-sheet-x");
     x.type = "button";
     x.setAttribute("aria-label", "Close");
     x.append(svg("close"));
@@ -25498,12 +26154,12 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     h.append(x);
     d.append(h);
     for (const [ic, label2, sub, fn] of opts) {
-      const b = E9("button", void 0, "lx-sheet-opt");
+      const b = E10("button", void 0, "lx-sheet-opt");
       b.type = "button";
       b.append(svg(ic, "lx-sheet-ic"));
-      const tx2 = E9("span");
-      tx2.append(E9("b", label2), E9("small", sub));
-      b.append(tx2);
+      const tx3 = E10("span");
+      tx3.append(E10("b", label2), E10("small", sub));
+      b.append(tx3);
       b.onclick = () => {
         d.close();
         fn();
@@ -25518,15 +26174,15 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     d.showModal();
   }
   function addSheet() {
-    sheet("Add to the gallery", [["device", "From this device", "Photos and videos from your phone or computer", () => pickFromPhone()], ["link", "Paste a link", "YouTube, Vimeo or Cloudinary video link", linkDialog], ["vimeo", "Import from Vimeo", "Choose videos already in your Vimeo account", vimeoImport]]);
+    sheet2("Add to the gallery", [["device", "From this device", "Photos and videos from your phone or computer", () => pickFromPhone()], ["link", "Paste a link", "YouTube, Vimeo or Cloudinary video link", linkDialog], ["vimeo", "Import from Vimeo", "Choose videos already in your Vimeo account", vimeoImport]]);
   }
   function formDialog(title2) {
-    const d = E9("dialog", void 0, "lx-dialog lx-gform");
+    const d = E10("dialog", void 0, "lx-dialog lx-gform");
     d.lang = "en";
-    const f = E9("form");
-    const top = E9("div", void 0, "lx-sheet-head");
-    top.append(E9("strong", title2));
-    const x = E9("button", void 0, "lx-sheet-x");
+    const f = E10("form");
+    const top = E10("div", void 0, "lx-sheet-head");
+    top.append(E10("strong", title2));
+    const x = E10("button", void 0, "lx-sheet-x");
     x.type = "button";
     x.setAttribute("aria-label", "Close");
     x.append(svg("close"));
@@ -25539,7 +26195,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     return { d, f };
   }
   function linkDialog() {
-    const { d, f } = formDialog("Paste a link"), u = E9("input"), t2 = E9("input"), msg = E9("p", "", "lx-muted"), go = E9("button", "Add to gallery", "lx-button lx-primary");
+    const { d, f } = formDialog("Paste a link"), u = E10("input"), t2 = E10("input"), msg = E10("p", "", "lx-muted"), go = E10("button", "Add to gallery", "lx-button lx-primary");
     u.type = "url";
     u.required = true;
     u.placeholder = "https://vimeo.com/\u2026 or https://youtu.be/\u2026";
@@ -25547,7 +26203,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     t2.maxLength = 140;
     t2.placeholder = "Title (optional)";
     go.type = "submit";
-    const l1 = E9("label", "Video link"), l2 = E9("label", "Title");
+    const l1 = E10("label", "Video link"), l2 = E10("label", "Title");
     f.append(l1, u, l2, t2, msg, go);
     d.showModal();
     u.focus();
@@ -25580,13 +26236,13 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   function vimeoImport() {
     const { d, f } = formDialog("Import from Vimeo");
     d.classList.add("lx-vimeo");
-    const grid = E9("div", void 0, "lx-vm-grid"), msg = E9("p", "Loading your Vimeo videos\u2026", "lx-muted"), more = E9("button", "Load more", "lx-button"), go = E9("button", "Import", "lx-button lx-primary"), pick = /* @__PURE__ */ new Map();
+    const grid = E10("div", void 0, "lx-vm-grid"), msg = E10("p", "Loading your Vimeo videos\u2026", "lx-muted"), more = E10("button", "Load more", "lx-button"), go = E10("button", "Import", "lx-button lx-primary"), pick = /* @__PURE__ */ new Map();
     let page = 1;
     more.type = "button";
     more.hidden = true;
     go.type = "submit";
     go.disabled = true;
-    const row = E9("div", void 0, "lx-vm-row");
+    const row = E10("div", void 0, "lx-vm-row");
     row.append(more, go);
     f.append(msg, grid, row);
     d.showModal();
@@ -25601,21 +26257,21 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         const r = await api2("/api/media/vimeo/list?page=" + page);
         msg.textContent = r.data.length || page > 1 ? "Tap the videos you want to add." : "There are no videos in your Vimeo account yet.";
         for (const v of r.data) {
-          const b = E9("button", void 0, "lx-vm-item");
+          const b = E10("button", void 0, "lx-vm-item");
           b.type = "button";
           if (v.poster) {
-            const im = E9("img");
+            const im = E10("img");
             im.src = v.poster;
             im.alt = "";
             im.loading = "lazy";
             im.referrerPolicy = "no-referrer";
             b.append(im);
           }
-          b.append(E9("span", v.title || "Vimeo video"));
+          b.append(E10("span", v.title || "Vimeo video"));
           if (have.has(String(v.url).replace(/\/$/, ""))) {
             b.disabled = true;
             b.classList.add("is-in");
-            b.append(E9("em", "In gallery"));
+            b.append(E10("em", "In gallery"));
           }
           b.onclick = () => {
             if (pick.has(v.url)) pick.delete(v.url);
@@ -25691,16 +26347,16 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   }
   function gview(items, start) {
     let i = start;
-    const d = E9("dialog", void 0, "lx-gview");
+    const d = E10("dialog", void 0, "lx-gview");
     d.lang = "en";
-    const top = E9("div", void 0, "lx-gv-top"), x = E9("button", void 0, "lx-gv-x");
+    const top = E10("div", void 0, "lx-gv-top"), x = E10("button", void 0, "lx-gv-x");
     x.type = "button";
     x.setAttribute("aria-label", "Close");
     x.append(svg("close"));
     x.onclick = () => d.close();
-    const count = E9("span", "", "lx-gv-count");
+    const count = E10("span", "", "lx-gv-count");
     top.append(count, x);
-    const stage = E9("div", void 0, "lx-gv-stage"), panel2 = E9("div", void 0, "lx-gv-panel"), ttl = E9("strong", "", "lx-gv-title"), meta = E9("small", "", "lx-gv-meta"), acts = E9("div", void 0, "lx-gv-acts"), tools = E9("div", void 0, "lx-gv-tools"), msg = E9("p", "", "lx-gv-msg");
+    const stage = E10("div", void 0, "lx-gv-stage"), panel2 = E10("div", void 0, "lx-gv-panel"), ttl = E10("strong", "", "lx-gv-title"), meta = E10("small", "", "lx-gv-meta"), acts = E10("div", void 0, "lx-gv-acts"), tools = E10("div", void 0, "lx-gv-tools"), msg = E10("p", "", "lx-gv-msg");
     msg.setAttribute("role", "status");
     panel2.append(ttl, meta, acts, tools, msg);
     d.append(top, stage, panel2);
@@ -25712,11 +26368,11 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       }
     };
     function actBtn(it, aud, ic, label2) {
-      const b = E9("button", void 0, "lx-gv-act");
+      const b = E10("button", void 0, "lx-gv-act");
       b.type = "button";
       const on = pubs(it).some((p) => p.audience === aud);
       b.setAttribute("aria-pressed", String(on));
-      b.append(svg(on ? "check" : ic), E9("b", aud === "web" ? on ? "On the website" : "Publish on web" : on ? "Sent \xB7 " + AUD_LABEL[aud] : AUD_LABEL[aud]));
+      b.append(svg(on ? "check" : ic), E10("b", aud === "web" ? on ? "On the website" : "Publish on web" : on ? "Sent \xB7 " + AUD_LABEL[aud] : AUD_LABEL[aud]));
       if (aud === "web" && !isVideo(it)) {
         b.disabled = true;
         b.title = "Only videos can be published on the website";
@@ -25742,7 +26398,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       stage.querySelectorAll("video").forEach((v) => v.pause());
       stage.replaceChildren();
       if (it.kind === "video") {
-        const v = E9("video");
+        const v = E10("video");
         v.src = it.url;
         v.controls = true;
         v.playsInline = true;
@@ -25751,12 +26407,12 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         if (it.poster) v.poster = it.poster;
         stage.append(v);
       } else if (it.kind === "image") {
-        const im = E9("img");
+        const im = E10("img");
         im.src = it.url;
         im.alt = it.title;
         stage.append(im);
       } else if (it.kind === "embed") {
-        const fr = E9("iframe");
+        const fr = E10("iframe");
         fr.src = it.embed;
         fr.title = it.title;
         fr.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
@@ -25764,12 +26420,12 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         fr.referrerPolicy = "strict-origin-when-cross-origin";
         stage.append(fr);
       } else {
-        const box = E9("div", void 0, "lx-gv-file");
-        const o = E9("a", it.kind === "pdf" ? "Open document" : "Open link", "lx-button lx-primary");
+        const box = E10("div", void 0, "lx-gv-file");
+        const o = E10("a", it.kind === "pdf" ? "Open document" : "Open link", "lx-button lx-primary");
         o.href = it.url;
         o.target = "_blank";
         o.rel = "noopener noreferrer";
-        box.append(E9("p", it.title), o);
+        box.append(E10("p", it.title), o);
         stage.append(box);
       }
       ttl.textContent = it.title;
@@ -25779,23 +26435,23 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       acts.hidden = readOnly && !pubs(it).length;
       tools.replaceChildren();
       if (it.download) {
-        const a = E9("a", void 0, "lx-gv-tool");
+        const a = E10("a", void 0, "lx-gv-tool");
         a.href = it.download;
         a.setAttribute("download", it.title || "");
-        a.append(svg("down"), E9("span", "Download"));
+        a.append(svg("down"), E10("span", "Download"));
         tools.append(a);
       } else if (it.kind === "embed" || it.kind === "link") {
-        const a = E9("a", void 0, "lx-gv-tool");
+        const a = E10("a", void 0, "lx-gv-tool");
         a.href = it.media?.url || it.url;
         a.target = "_blank";
         a.rel = "noopener noreferrer";
-        a.append(svg("link"), E9("span", it.source === "vimeo" ? "Open on Vimeo" : it.source === "youtube" ? "Open on YouTube" : "Open link"));
+        a.append(svg("link"), E10("span", it.source === "vimeo" ? "Open on Vimeo" : it.source === "youtube" ? "Open on YouTube" : "Open link"));
         tools.append(a);
       }
       if (!readOnly) {
-        const del = E9("button", void 0, "lx-gv-tool lx-gv-del");
+        const del = E10("button", void 0, "lx-gv-tool lx-gv-del");
         del.type = "button";
-        del.append(svg("trash"), E9("span", "Delete"));
+        del.append(svg("trash"), E10("span", "Delete"));
         del.onclick = async () => {
           try {
             if (await removeItem(it)) {
@@ -25847,7 +26503,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   }
   function pickFromPhone() {
     if (readOnly) return;
-    const input2 = E9("input");
+    const input2 = E10("input");
     input2.type = "file";
     input2.multiple = true;
     input2.accept = "image/*,video/*,application/pdf,.mov,.mp4,.webm";
@@ -25867,11 +26523,11 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       input2.click();
       return;
     }
-    const d = E9("dialog", void 0, "lx-dialog lx-perm");
+    const d = E10("dialog", void 0, "lx-dialog lx-perm");
     d.lang = "en";
-    const ic = E9("div", void 0, "lx-perm-ic");
+    const ic = E10("div", void 0, "lx-perm-ic");
     ic.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-8 8"/></svg>';
-    const ok = E9("button", "Allow access", "lx-button lx-primary"), no = button3("Not now", () => {
+    const ok = E10("button", "Allow access", "lx-button lx-primary"), no = button3("Not now", () => {
       d.close();
       input2.remove();
     });
@@ -25884,21 +26540,21 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       d.close();
       input2.click();
     };
-    const row = E9("div", void 0, "lx-perm-row");
+    const row = E10("div", void 0, "lx-perm-row");
     row.append(no, ok);
-    d.append(ic, E9("h2", "Access your photo gallery"), E9("p", "MUK Talent will open your phone\u2019s gallery so you can choose photos and videos for your library. Only the files you select are uploaded, privately, to your workspace. We ask only this once.", "lx-muted"), row);
+    d.append(ic, E10("h2", "Access your photo gallery"), E10("p", "MUK Talent will open your phone\u2019s gallery so you can choose photos and videos for your library. Only the files you select are uploaded, privately, to your workspace. We ask only this once.", "lx-muted"), row);
     d.onclose = () => d.remove();
     root.append(d);
     d.showModal();
   }
   function uploadMany(files) {
     if (readOnly || dialogBusy) return;
-    const d = E9("dialog", void 0, "lx-dialog lx-queue");
+    const d = E10("dialog", void 0, "lx-dialog lx-queue");
     d.lang = "en";
-    const list = E9("ol", void 0, "lx-queue-list"), msg = E9("p", "", "lx-muted"), close = button3("Close", () => {
+    const list = E10("ol", void 0, "lx-queue-list"), msg = E10("p", "", "lx-muted"), close = button3("Close", () => {
       if (!dialogBusy) d.close();
     });
-    d.append(E9("h2", "Uploading " + files.length + " file" + (files.length > 1 ? "s" : "")), list, msg, close);
+    d.append(E10("h2", "Uploading " + files.length + " file" + (files.length > 1 ? "s" : "")), list, msg, close);
     d.oncancel = (e) => {
       if (dialogBusy) e.preventDefault();
     };
@@ -25906,9 +26562,9 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     root.append(d);
     d.showModal();
     const rows = files.map((f) => {
-      const li = E9("li"), bar = E9("div", void 0, "lx-progress"), fill2 = E9("i"), st = E9("small", "Waiting");
+      const li = E10("li"), bar = E10("div", void 0, "lx-progress"), fill2 = E10("i"), st = E10("small", "Waiting");
       bar.append(fill2);
-      li.append(E9("strong", f.name), st, bar);
+      li.append(E10("strong", f.name), st, bar);
       list.append(li);
       return { f, fill: fill2, st, li };
     });
@@ -25950,23 +26606,23 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
     await api2("/api/workspace/assets/finish", { method: "POST", body: JSON.stringify({ id: started.id }) });
   }
   function mediaCover(asset, format = "Creative") {
-    const k = kindOf(asset), cover = E9("div", void 0, "lx-media-cover lx-cover-" + k);
+    const k = kindOf(asset), cover = E10("div", void 0, "lx-media-cover lx-cover-" + k);
     if (asset?.url && k === "image") {
-      const img = E9("img");
+      const img = E10("img");
       img.src = asset.url;
       img.alt = asset.original_name;
       img.loading = "lazy";
       img.decoding = "async";
       cover.append(img);
     } else if (asset?.url && k === "video") {
-      const v = E9("video");
+      const v = E10("video");
       v.src = asset.url + "#t=0.5";
       v.muted = true;
       v.playsInline = true;
       v.preload = "metadata";
       v.setAttribute("aria-hidden", "true");
-      cover.append(v, E9("span", "\u25B6", "lx-play"));
-    } else cover.append(E9("span", k === "pdf" ? "PDF" : asset ? format : format || "Creative"));
+      cover.append(v, E10("span", "\u25B6", "lx-play"));
+    } else cover.append(E10("span", k === "pdf" ? "PDF" : asset ? format : format || "Creative"));
     return cover;
   }
   function lightbox(list, start) {
@@ -25974,17 +26630,17 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   }
   function viewer(list, start) {
     let i = start;
-    const d = E9("dialog", void 0, "lx-lightbox");
+    const d = E10("dialog", void 0, "lx-lightbox");
     d.lang = "en";
-    const stage = E9("div", void 0, "lx-lb-stage"), bar = E9("div", void 0, "lx-lb-bar"), title2 = E9("strong"), count = E9("small"), close = E9("button", "\xD7", "lx-lb-close");
+    const stage = E10("div", void 0, "lx-lb-stage"), bar = E10("div", void 0, "lx-lb-bar"), title2 = E10("strong"), count = E10("small"), close = E10("button", "\xD7", "lx-lb-close");
     close.type = "button";
     close.setAttribute("aria-label", "Close");
     close.onclick = () => d.close();
-    const prev = E9("button", "\u2039", "lx-lb-nav lx-lb-prev"), next = E9("button", "\u203A", "lx-lb-nav lx-lb-next");
+    const prev = E10("button", "\u2039", "lx-lb-nav lx-lb-prev"), next = E10("button", "\u203A", "lx-lb-nav lx-lb-next");
     prev.type = next.type = "button";
     prev.setAttribute("aria-label", "Previous");
     next.setAttribute("aria-label", "Next");
-    const acts = E9("div", void 0, "lx-lb-acts"), info = E9("div");
+    const acts = E10("div", void 0, "lx-lb-acts"), info = E10("div");
     info.append(title2, count);
     bar.append(info, acts, close);
     const show = () => {
@@ -25993,7 +26649,7 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       stage.replaceChildren();
       acts.replaceChildren();
       if (k === "video") {
-        const v = E9("video");
+        const v = E10("video");
         v.src = a.url;
         v.controls = true;
         v.playsInline = true;
@@ -26002,12 +26658,12 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         if (a.poster) v.poster = a.poster;
         stage.append(v);
       } else if (k === "image") {
-        const im = E9("img");
+        const im = E10("img");
         im.src = a.url;
         im.alt = a.name;
         stage.append(im);
       } else if (k === "embed") {
-        const fr = E9("iframe", void 0, "lx-lb-embed");
+        const fr = E10("iframe", void 0, "lx-lb-embed");
         fr.src = a.embed;
         fr.title = a.name;
         fr.allow = "autoplay; fullscreen; picture-in-picture; encrypted-media";
@@ -26015,9 +26671,9 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         fr.referrerPolicy = "strict-origin-when-cross-origin";
         stage.append(fr);
       } else {
-        const box = E9("div", void 0, "lx-lb-file");
-        box.append(E9("b", k === "pdf" ? "PDF" : k === "link" ? "LINK" : "FILE"), E9("p", a.name));
-        const o = E9("a", k === "pdf" ? "Open document" : "Open", "lx-button lx-primary");
+        const box = E10("div", void 0, "lx-lb-file");
+        box.append(E10("b", k === "pdf" ? "PDF" : k === "link" ? "LINK" : "FILE"), E10("p", a.name));
+        const o = E10("a", k === "pdf" ? "Open document" : "Open", "lx-button lx-primary");
         o.href = a.url;
         o.target = "_blank";
         o.rel = "noopener noreferrer";
@@ -26025,12 +26681,12 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
         stage.append(box);
       }
       if (a.download) {
-        const dl = E9("a", "Download", "lx-lb-dl");
+        const dl = E10("a", "Download", "lx-lb-dl");
         dl.href = a.download;
         dl.setAttribute("download", a.name || "");
         acts.append(dl);
       } else if (k === "embed" || k === "link") {
-        const op = E9("a", a.media?.source === "vimeo" ? "Open on Vimeo" : a.media?.source === "youtube" ? "Open on YouTube" : "Open link", "lx-lb-dl");
+        const op = E10("a", a.media?.source === "vimeo" ? "Open on Vimeo" : a.media?.source === "youtube" ? "Open on YouTube" : "Open link", "lx-lb-dl");
         op.href = a.media?.url || a.url;
         op.target = "_blank";
         op.rel = "noopener noreferrer";
@@ -26105,27 +26761,27 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
   }
   function edit(kind, record = null, day = null) {
     if (readOnly || dialogBusy) return;
-    const d = E9("dialog", void 0, "lx-dialog");
+    const d = E10("dialog", void 0, "lx-dialog");
     d.lang = "en";
-    const form = E9("form"), top = E9("div", void 0, "lx-row-top");
-    top.append(E9("h2", (record ? "Edit " : "New ") + (kind === "content" ? "production" : kind)));
+    const form = E10("form"), top = E10("div", void 0, "lx-row-top");
+    top.append(E10("h2", (record ? "Edit " : "New ") + (kind === "content" ? "production" : kind)));
     const close = button3("Close", () => dismiss());
     top.append(close);
     form.append(top);
-    const grid = E9("div", void 0, "lx-form-grid"), inputs = {};
+    const grid = E10("div", void 0, "lx-form-grid"), inputs = {};
     let definitions = kind === "lead" ? fields.lead : [["title", "Title"], ["status", "Status", states[kind]], ["record_date", kind === "report" ? "Report date" : "Date / next action", "date"], ...fields[kind]];
     if (kind === "content") definitions = [...definitions, ["asset_id", "Media library asset", "asset-select"]];
     for (const [key, label2, type] of definitions) {
-      const wrap = E9("div", void 0, type === "textarea" ? "lx-field lx-wide" : "lx-field"), caption = E9("label", label2);
+      const wrap = E10("div", void 0, type === "textarea" ? "lx-field lx-wide" : "lx-field"), caption = E10("label", label2);
       let input2;
       if (Array.isArray(type) || type === "asset-select") {
-        input2 = E9("select");
+        input2 = E10("select");
         if (type === "asset-select") {
           input2.append(new Option("No library asset", ""));
           for (const a of assets.filter((a2) => a2.category === "content")) input2.append(new Option(a.original_name, a.id));
         } else for (const v of type) input2.append(new Option(kind === "lead" && key === "status" ? leadStates[v] : v || "Not specified", v));
       } else {
-        input2 = E9(type === "textarea" ? "textarea" : "input");
+        input2 = E10(type === "textarea" ? "textarea" : "input");
         if (input2.tagName === "INPUT") input2.type = type || "text";
       }
       input2.id = "lx-edit-" + key;
@@ -26150,9 +26806,9 @@ async function mountEmployee({ staff, api: api2, onLogout, owner = null, onBack 
       inputs[key] = input2;
     }
     form.append(grid);
-    const message2 = E9("p", "", "lx-status");
+    const message2 = E10("p", "", "lx-status");
     message2.setAttribute("role", "status");
-    const controls = E9("div", void 0, "lx-actions"), save = E9("button", "Save changes", "lx-button lx-primary");
+    const controls = E10("div", void 0, "lx-actions"), save = E10("button", "Save changes", "lx-button lx-primary");
     save.type = "submit";
     controls.append(save);
     let dirty = false;
@@ -26548,7 +27204,7 @@ function initGateway({ getClient, onSignedIn }) {
 }
 
 // admin-src/student-portal.js
-var TX2 = {
+var TX3 = {
   en: {
     photoAdd: "Add photo",
     photoChange: "Change photo",
@@ -26772,15 +27428,15 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
   let mainEl = null;
   document.getElementById("studentPortal")?.remove();
   let lang2 = gateLang();
-  const tx2 = () => TX2[lang2] || TX2.en;
-  const L = (k) => k.split(".").reduce((o, p) => o?.[p], tx2()) ?? k.split(".").reduce((o, p) => o?.[p], TX2.en) ?? k;
+  const tx3 = () => TX3[lang2] || TX3.en;
+  const L = (k) => k.split(".").reduce((o, p) => o?.[p], tx3()) ?? k.split(".").reduce((o, p) => o?.[p], TX3.en) ?? k;
   const fill2 = (s, v) => String(s).replace(/\{(\w+)\}/g, (_, k) => v[k] ?? "");
   const root = E("div", void 0, "gp-app");
   root.id = "studentPortal";
   root.lang = lang2;
   document.body.append(root);
-  const theme = document.querySelector("meta[name=theme-color]");
-  if (theme) theme.content = "#070a0f";
+  applyV17({ role: "student", lang: lang2 });
+  let updates = null, updatesLang = null, msgNotify = null;
   const logout = async () => {
     watcher2?.stop();
     root.remove();
@@ -26816,10 +27472,14 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     try {
       data = (await api2("/api/passport/me")).data;
       render();
-      if (!watcher2) watcher2 = watchNotifications(api2, (x) => {
-        summary = x;
-        paintDots();
-      });
+      if (!watcher2) {
+        msgNotify = messageNotifier({ lang: lang2, onOpen: () => openChat() });
+        watcher2 = watchNotifications(api2, (x) => {
+          summary = x;
+          paintDots();
+          msgNotify(x);
+        });
+      }
     } catch (e) {
       if (!silent) {
         root.replaceChildren(errorView(e.message));
@@ -27067,7 +27727,7 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     brand.href = "/";
     brand.setAttribute("aria-label", L("website"));
     const wm = E("img", void 0, "gp-logo");
-    wm.src = "/assets/brand/logo.svg";
+    wm.src = "/assets/brand/logo-ivory.svg";
     wm.alt = "MUK Talent";
     wm.width = 374;
     wm.height = 72;
@@ -27155,6 +27815,27 @@ async function mountStudentPortal({ api: api2, client, who, onLogout }) {
     ready.append(E("p", fill2(L("docsDone"), { a: done, b: req }), "gp-muted"), statusPill(s.application_status));
     hero.append(pass, ready);
     mainEl.append(hero);
+    {
+      const st = data.stages || [], sd = st.filter((x) => x.status === "done").length;
+      const prog = st.length ? { label: lang2 === "fr" ? "\xC9tapes termin\xE9es" : "Stages completed", value: sd, max: st.length, text: sd + " / " + st.length } : null;
+      if (!updates || updatesLang !== lang2) {
+        updates?.stop();
+        updatesLang = lang2;
+        updates = mountUpdates({ api: api2, userKey: "student:" + (s.reference || s.id || "me"), lang: lang2, name: s.first_name || who.name, progress: prog, labels: { stage: stageName }, onOpen: (it) => {
+          if (it.type === "message") openChat();
+          else if (it.type === "document") go("documents");
+          else if (it.type === "task" || it.type === "event") go("plan");
+          else if (it.type === "stage") {
+            openStage = it.key;
+            go("plan");
+          }
+        } });
+      } else {
+        updates.setProgress(prog);
+        updates.refresh();
+      }
+      mainEl.append(updates.el);
+    }
     const facts = E("section", void 0, "gp-facts");
     facts.append(fact("globe", L("destination"), destName(s.destination)), fact("cap", L("university"), s.university || L("toChoose"), !s.university), fact("book", L("programme"), s.programme || s.subject || L("toChoose"), !s.programme), fact("calendar", L("intake"), s.intake || "\u2014"));
     mainEl.append(facts);
@@ -27797,7 +28478,7 @@ function stopWatch() {
 }
 
 // admin-src/admin-soft.js
-var E10 = (t2, v, c) => {
+var E11 = (t2, v, c) => {
   const n = document.createElement(t2);
   if (v !== void 0 && v !== null) n.textContent = String(v);
   if (c) n.className = c;
@@ -27808,13 +28489,13 @@ function chrome() {
   document.documentElement.classList.add("mt-soft");
   let m = document.querySelector("meta[name=theme-color]");
   if (!m) {
-    m = E10("meta");
+    m = E11("meta");
     m.name = "theme-color";
     document.head.append(m);
   }
   m.content = "#f6f4ef";
   for (const [n, c] of [["apple-mobile-web-app-capable", "yes"], ["mobile-web-app-capable", "yes"], ["apple-mobile-web-app-status-bar-style", "default"]]) if (!document.querySelector("meta[name=" + n + "]")) {
-    const x = E10("meta");
+    const x = E11("meta");
     x.name = n;
     x.content = c;
     document.head.append(x);
@@ -27833,7 +28514,7 @@ function mountAdminSoft({ api: api2, getState, navigate: navigate2 }) {
   function hero() {
     let h = document.getElementById("adminSoftHero");
     if (h) return h;
-    h = E10("section", void 0, "as-hero");
+    h = E11("section", void 0, "as-hero");
     h.id = "adminSoftHero";
     h.setAttribute("aria-label", "Resumen del d\xEDa");
     overview.prepend(h);
@@ -27846,46 +28527,46 @@ function mountAdminSoft({ api: api2, getState, navigate: navigate2 }) {
     busy = true;
     const h = hero();
     const first = String(s.staff.full_name || "").split(/\s+/)[0] || "equipo";
-    const greet = E10("article", void 0, "as-greet");
-    greet.append(E10("p", "MUK TALENT \xB7 ADMINISTRACI\xD3N", "as-overline"), E10("h2", "Hola, " + first), E10("p", new Intl.DateTimeFormat("es-ES", { timeZone: "Africa/Casablanca", weekday: "long", day: "numeric", month: "long" }).format(/* @__PURE__ */ new Date()) + " \xB7 Africa/Casablanca", "as-muted"));
-    const quick = E10("div", void 0, "as-quick");
+    const greet = E11("article", void 0, "as-greet");
+    greet.append(E11("p", "MUK TALENT \xB7 ADMINISTRACI\xD3N", "as-overline"), E11("h2", "Hola, " + first), E11("p", new Intl.DateTimeFormat("es-ES", { timeZone: "Africa/Casablanca", weekday: "long", day: "numeric", month: "long" }).format(/* @__PURE__ */ new Date()) + " \xB7 Africa/Casablanca", "as-muted"));
+    const quick = E11("div", void 0, "as-quick");
     for (const [label2, section] of [["Leads y casos", "candidates"], ["Pipeline e informes", "intelligence"], ["Equipo", "team-people"], ["Citas", "appointments"]]) {
-      const b = E10("button", label2, "as-quick-btn");
+      const b = E11("button", label2, "as-quick-btn");
       b.type = "button";
       b.onclick = () => navigate2(section);
       quick.append(b);
     }
     greet.append(quick);
-    const pay = E10("article", void 0, "as-pay");
-    pay.append(E10("p", "N\xD3MINA DEL EQUIPO \xB7 " + new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(/* @__PURE__ */ new Date()).toUpperCase(), "as-overline"));
+    const pay = E11("article", void 0, "as-pay");
+    pay.append(E11("p", "N\xD3MINA DEL EQUIPO \xB7 " + new Intl.DateTimeFormat("es-ES", { month: "long", year: "numeric" }).format(/* @__PURE__ */ new Date()).toUpperCase(), "as-overline"));
     h.replaceChildren(greet, pay);
     try {
       const r = await api2("/api/admin/payroll?month=" + monthKey());
       if (id !== stamp) return;
-      const tot = E10("div", void 0, "as-pay-total");
+      const tot = E11("div", void 0, "as-pay-total");
       const byC = r.totals_by_currency?.length ? r.totals_by_currency : [{ currency: r.currency || "MAD", projected_total: r.totals.projected_total, commission: r.totals.commission }];
-      tot.append(E10("strong", byC.map((x) => mad(x.projected_total, x.currency)).join(" \xB7 ")), E10("span", "previsto este mes"));
+      tot.append(E11("strong", byC.map((x) => mad(x.projected_total, x.currency)).join(" \xB7 ")), E11("span", "previsto este mes"));
       pay.append(tot);
-      const pills = E10("div", void 0, "as-pills");
+      const pills = E11("div", void 0, "as-pills");
       for (const [label2, value, tone] of [["Colaboradores", String(r.data.length), "gold"], ["Leads verificados", String(r.totals.verified_count), "dark"], ["Comisiones", byC.map((x) => mad(x.commission, x.currency)).join(" \xB7 "), "grey"]]) {
-        const p = E10("span", void 0, "as-pill as-pill-" + tone);
-        p.append(E10("span", label2), E10("b", value));
+        const p = E11("span", void 0, "as-pill as-pill-" + tone);
+        p.append(E11("span", label2), E11("b", value));
         pills.append(p);
       }
       pay.append(pills);
-      const list = E10("div", void 0, "as-pay-list");
+      const list = E11("div", void 0, "as-pay-list");
       const max = Math.max(1, ...r.data.map((x) => x.projected_total));
       for (const row of r.data.slice(0, 6)) {
-        const line = E10("div", void 0, "as-pay-row"), bar = E10("i");
+        const line = E11("div", void 0, "as-pay-row"), bar = E11("i");
         bar.style.setProperty("--w", Math.round(row.projected_total / max * 100) + "%");
-        const name = E10("span", row.full_name, "as-pay-name");
-        line.append(name, E10("span", row.verified_count + " leads", "as-pay-leads"), E10("b", mad(row.projected_total, row.currency)), bar);
+        const name = E11("span", row.full_name, "as-pay-name");
+        line.append(name, E11("span", row.verified_count + " leads", "as-pay-leads"), E11("b", mad(row.projected_total, row.currency)), bar);
         list.append(line);
       }
-      if (!r.data.length) list.append(E10("p", "A\xFAn no hay colaboradores activos.", "as-muted"));
-      pay.append(list, E10("p", "Salario base de cada colaborador (lunes a viernes) + comisi\xF3n por lead verificado, en su moneda. Por defecto " + mad(r.base_monthly) + " + " + mad(r.per_verified_lead) + " por lead. Un lead cuenta cuando administraci\xF3n lo acepta como caso.", "as-foot"));
+      if (!r.data.length) list.append(E11("p", "A\xFAn no hay colaboradores activos.", "as-muted"));
+      pay.append(list, E11("p", "Salario base de cada colaborador (lunes a viernes) + comisi\xF3n por lead verificado, en su moneda. Por defecto " + mad(r.base_monthly) + " + " + mad(r.per_verified_lead) + " por lead. Un lead cuenta cuando administraci\xF3n lo acepta como caso.", "as-foot"));
     } catch (e) {
-      if (id === stamp) pay.append(E10("p", "N\xF3mina no disponible ahora mismo.", "as-muted"));
+      if (id === stamp) pay.append(E11("p", "N\xF3mina no disponible ahora mismo.", "as-muted"));
     } finally {
       busy = false;
     }
@@ -28559,8 +29240,8 @@ async function docsTab({ host, api: api2, notice }) {
     if (!rows.length) rowsBox.append(E("p", mode === "attention" ? "Nada pendiente. Los documentos nuevos y firmados aparecer\xE1n aqu\xED." : "No hay documentos con este filtro.", "th-muted th-pad"));
     for (const d of rows) {
       const row = E("article", void 0, "th-doc" + (d.needs_admin ? " is-new" : ""));
-      const icon3 = E("span", d.direction === "from_employee" ? "\u2193" : "\u2191", "th-doc-dir");
-      icon3.title = d.direction === "from_employee" ? "Recibido del empleado" : "Enviado al empleado";
+      const icon4 = E("span", d.direction === "from_employee" ? "\u2193" : "\u2191", "th-doc-dir");
+      icon4.title = d.direction === "from_employee" ? "Recibido del empleado" : "Enviado al empleado";
       const main = E("div", void 0, "th-doc-main");
       main.append(E("b", d.title), E("small", [DOC_KIND_ES[d.kind] || "Documento", d.owner_name, fmtWhen(d.created_at), fmtBytes(d.bytes)].join(" \xB7 ")));
       if (d.note) main.append(E("small", "\u201C" + d.note + "\u201D", "th-doc-note"));
@@ -28590,7 +29271,7 @@ async function docsTab({ host, api: api2, notice }) {
           notice(e.message, true);
         }
       }, "th-btn th-ghost"));
-      row.append(icon3, main, st, acts);
+      row.append(icon4, main, st, acts);
       rowsBox.append(row);
     }
   }
@@ -28714,13 +29395,13 @@ if (typeof window !== "undefined") {
     }
   }
 }
-var TX3 = {
+var TX4 = {
   en: { t: "Install the MUK Talent app", s: "Open your space in one tap, full screen, like any other app.", go: "Install app", later: "Not now", iosT: "Add MUK Talent to your Home Screen", ios1: "Tap the Share button", ios2: "Choose \u201CAdd to Home Screen\u201D", ios3: "Tap \u201CAdd\u201D", andT: "Install from your browser menu", and1: "Open the browser menu \u22EE", and2: "Choose \u201CInstall app\u201D or \u201CAdd to Home screen\u201D", ok: "Got it" },
   fr: { t: "Installez l\u2019application MUK Talent", s: "Ouvrez votre espace en un geste, en plein \xE9cran, comme une application.", go: "Installer l\u2019app", later: "Plus tard", iosT: "Ajoutez MUK Talent \xE0 l\u2019\xE9cran d\u2019accueil", ios1: "Touchez le bouton Partager", ios2: "Choisissez \xAB Sur l\u2019\xE9cran d\u2019accueil \xBB", ios3: "Touchez \xAB Ajouter \xBB", andT: "Installez depuis le menu du navigateur", and1: "Ouvrez le menu du navigateur \u22EE", and2: "Choisissez \xAB Installer l\u2019application \xBB ou \xAB Ajouter \xE0 l\u2019\xE9cran d\u2019accueil \xBB", ok: "Compris" },
   es: { t: "Instala la app de MUK Talent", s: "Abre tu espacio con un toque, a pantalla completa, como cualquier app.", go: "Instalar app", later: "Ahora no", iosT: "A\xF1ade MUK Talent a tu pantalla de inicio", ios1: "Toca el bot\xF3n Compartir", ios2: "Elige \xABA\xF1adir a pantalla de inicio\xBB", ios3: "Toca \xABA\xF1adir\xBB", andT: "Instala desde el men\xFA del navegador", and1: "Abre el men\xFA del navegador \u22EE", and2: "Elige \xABInstalar aplicaci\xF3n\xBB o \xABA\xF1adir a pantalla de inicio\xBB", ok: "Entendido" },
   ar: { t: "\u062B\u0628\u0651\u062A \u062A\u0637\u0628\u064A\u0642 MUK Talent", s: "\u0627\u0641\u062A\u062D \u0645\u0633\u0627\u062D\u062A\u0643 \u0628\u0644\u0645\u0633\u0629 \u0648\u0627\u062D\u062F\u0629 \u0648\u0628\u0645\u0644\u0621 \u0627\u0644\u0634\u0627\u0634\u0629 \u0645\u062B\u0644 \u0623\u064A \u062A\u0637\u0628\u064A\u0642.", go: "\u062A\u062B\u0628\u064A\u062A \u0627\u0644\u062A\u0637\u0628\u064A\u0642", later: "\u0644\u064A\u0633 \u0627\u0644\u0622\u0646", iosT: "\u0623\u0636\u0641 MUK Talent \u0625\u0644\u0649 \u0627\u0644\u0634\u0627\u0634\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629", ios1: "\u0627\u0644\u0645\u0633 \u0632\u0631 \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629", ios2: "\u0627\u062E\u062A\u0631 \xAB\u0625\u0636\u0627\u0641\u0629 \u0625\u0644\u0649 \u0627\u0644\u0634\u0627\u0634\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629\xBB", ios3: "\u0627\u0644\u0645\u0633 \xAB\u0625\u0636\u0627\u0641\u0629\xBB", andT: "\u062B\u0628\u0651\u062A \u0645\u0646 \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0645\u062A\u0635\u0641\u062D", and1: "\u0627\u0641\u062A\u062D \u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u0645\u062A\u0635\u0641\u062D \u22EE", and2: "\u0627\u062E\u062A\u0631 \xAB\u062A\u062B\u0628\u064A\u062A \u0627\u0644\u062A\u0637\u0628\u064A\u0642\xBB \u0623\u0648 \xAB\u0625\u0636\u0627\u0641\u0629 \u0625\u0644\u0649 \u0627\u0644\u0634\u0627\u0634\u0629 \u0627\u0644\u0631\u0626\u064A\u0633\u064A\u0629\xBB", ok: "\u062D\u0633\u0646\u064B\u0627" }
 };
-var E11 = (t2, v, c) => {
+var E12 = (t2, v, c) => {
   const n = document.createElement(t2);
   if (v !== void 0) n.textContent = String(v);
   if (c) n.className = c;
@@ -28728,15 +29409,15 @@ var E11 = (t2, v, c) => {
 };
 function css() {
   if (document.getElementById("mukInstallCss")) return;
-  const s = E11("style");
+  const s = E12("style");
   s.id = "mukInstallCss";
-  s.textContent = `.mki{position:fixed;z-index:9500;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));display:grid;gap:12px;padding:16px;border-radius:22px;background:#0d2224;color:#f7f1e3;border:1px solid rgba(201,164,92,.4);box-shadow:0 24px 60px -20px rgba(4,16,17,.7);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;transform:translateY(130%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+  s.textContent = `.mki{position:fixed;z-index:9500;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));display:grid;gap:12px;padding:16px;border-radius:22px;background:#15383D;color:#f7f1e3;border:1px solid rgba(193,164,116,.4);box-shadow:0 24px 60px -20px rgba(10,28,31,.6);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;transform:translateY(130%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
 .mki.in{transform:none}.mki-top{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center}.mki img{width:52px;height:52px;border-radius:14px;display:block}
 .mki strong{display:block;font-size:15.5px}.mki p{margin:2px 0 0;color:#a9bfb8;font-size:13px}.mki-x{width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#c9d8d2;font-size:20px;line-height:1;cursor:pointer}
 .mki-row{display:flex;gap:10px}.mki-row button{flex:1;min-height:46px;border-radius:14px;border:1px solid rgba(233,240,236,.18);background:transparent;color:#f7f1e3;font:inherit;font-weight:650;cursor:pointer}
-.mki-row .mki-go{background:#c9a45c;border-color:#c9a45c;color:#0d2224}.mki ol{margin:0;padding:0;list-style:none;display:grid;gap:8px}.mki li{display:flex;gap:10px;align-items:center;color:#e9f0ec}
-.mki li b{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(201,164,92,.18);color:#e2c07a;font-size:12px}.mki li svg{width:18px;height:18px;fill:none;stroke:#e2c07a;stroke-width:2;vertical-align:-3px}
-.mki button:focus-visible{outline:2px solid #c9a45c;outline-offset:2px}@media(min-width:700px){.mki{left:auto;right:20px;width:380px}}@media(prefers-reduced-motion:reduce){.mki{transition:none}}`;
+.mki-row .mki-go{background:#C1A474;border-color:#C1A474;color:#15383D}.mki ol{margin:0;padding:0;list-style:none;display:grid;gap:8px}.mki li{display:flex;gap:10px;align-items:center;color:#e9f0ec}
+.mki li b{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(193,164,116,.18);color:#D8C29A;font-size:12px}.mki li svg{width:18px;height:18px;fill:none;stroke:#D8C29A;stroke-width:2;vertical-align:-3px}
+.mki button:focus-visible{outline:2px solid #C1A474;outline-offset:2px}@media(min-width:700px){.mki{left:auto;right:20px;width:380px}}@media(prefers-reduced-motion:reduce){.mki{transition:none}}`;
   document.head.append(s);
 }
 function offerInstall({ lang: lang2 = "en" } = {}) {
@@ -28749,26 +29430,26 @@ function offerInstall({ lang: lang2 = "en" } = {}) {
   } catch {
     return;
   }
-  const L = TX3[lang2] || TX3.en;
+  const L = TX4[lang2] || TX4.en;
   const show = () => {
     css();
-    const box = E11("section", void 0, "mki");
+    const box = E12("section", void 0, "mki");
     box.id = "mukInstall";
     box.setAttribute("role", "dialog");
     box.setAttribute("aria-label", L.t);
     box.lang = lang2;
     if (lang2 === "ar") box.dir = "rtl";
-    const top = E11("div", void 0, "mki-top"), img = E11("img");
+    const top = E12("div", void 0, "mki-top"), img = E12("img");
     img.src = "/icon-192.png";
     img.alt = "";
-    const txt = E11("div");
-    txt.append(E11("strong", L.t), E11("p", L.s));
-    const x = E11("button", "\xD7", "mki-x");
+    const txt = E12("div");
+    txt.append(E12("strong", L.t), E12("p", L.s));
+    const x = E12("button", "\xD7", "mki-x");
     x.type = "button";
     x.setAttribute("aria-label", L.later);
     top.append(img, txt, x);
     box.append(top);
-    const row = E11("div", void 0, "mki-row"), later = E11("button", L.later), go = E11("button", L.go, "mki-go");
+    const row = E12("div", void 0, "mki-row"), later = E12("button", L.later), go = E12("button", L.go, "mki-go");
     later.type = go.type = "button";
     row.append(later, go);
     box.append(row);
@@ -28782,12 +29463,12 @@ function offerInstall({ lang: lang2 = "en" } = {}) {
     };
     x.onclick = later.onclick = close;
     const steps = (title, items) => {
-      txt.replaceChildren(E11("strong", title));
-      const ol = E11("ol");
+      txt.replaceChildren(E12("strong", title));
+      const ol = E12("ol");
       items.forEach((t2, i) => {
-        const li = E11("li");
-        li.append(E11("b", i + 1));
-        const sp = E11("span", t2);
+        const li = E12("li");
+        li.append(E12("b", i + 1));
+        const sp = E12("span", t2);
         if (i === 0 && ios()) sp.insertAdjacentHTML("beforeend", ' <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg>');
         li.append(sp);
         ol.append(li);
@@ -28934,6 +29615,8 @@ function navIcon(name) {
   return s;
 }
 var adminWatch = null;
+var adminUpdates = null;
+var adminMsgNotify = null;
 function nav() {
   const nav2 = $2("navigation");
   nav2.replaceChildren();
@@ -28976,7 +29659,9 @@ function nav() {
       h.title = "Mensajes";
       document.querySelector("#appShell .page-header").append(h);
     }
+    if (!adminMsgNotify) adminMsgNotify = messageNotifier({ lang: "es", onOpen: open });
     if (!adminWatch) adminWatch = watchNotifications(api, (x) => {
+      adminMsgNotify(x);
       const h = document.getElementById("adminChatTop");
       if (h) setDot(h, { chat_unread: x.chat_unread });
       const b = document.querySelector("#adminChatNav .nav-chat-badge");
@@ -29143,6 +29828,21 @@ async function loadOverview() {
     }
     $2("asOf").textContent = `Actualizado: ${valueText("created_at", data.asOf)} \xB7 Africa/Casablanca`;
     message("globalMessage");
+    {
+      const total = Number(data.candidates) || 0, od = Number(data.overdue) || 0;
+      const prog = total ? { label: "Seguimientos al d\xEDa", value: Math.max(0, total - od), max: total, text: `${Math.max(0, total - od)} / ${total}` } : null;
+      if (!adminUpdates) {
+        const PAGE = { candidate: "candidates", stage: "candidates", enquiry: "enquiries", document: "passport", hrdoc: "team-docs", task: "appointments", event: "appointments" };
+        adminUpdates = mountUpdates({ api, title: "activity", userKey: "admin:" + (state.staff?.id || state.staff?.email || "me"), lang: "es", name: state.staff?.full_name, progress: prog, onOpen: (it) => {
+          if (it.type === "message") document.getElementById("adminChatNav")?.click();
+          else if (PAGE[it.type]) navigate(PAGE[it.type]);
+        } });
+      } else {
+        adminUpdates.setProgress(prog);
+        adminUpdates.refresh();
+      }
+      $2("overview").insertBefore(adminUpdates.el, $2("metrics"));
+    }
   } catch (e) {
     if (epoch === state.epoch && request === state.listRequest) message("globalMessage", e.message, true);
   }
@@ -29532,13 +30232,19 @@ async function enter(session) {
   $2("staffName").textContent = state.staff.full_name;
   $2("loginView").hidden = true;
   $2("appShell").hidden = false;
+  applyV17({ role: "admin", lang: "es" });
   await navigate("overview");
+  offerInstall({ lang: "es" });
 }
 $2("logout").addEventListener("click", async () => {
   if (state.busy) return;
   if (state.dirty && !window.confirm("\xBFDescartar los cambios y cerrar sesi\xF3n?")) return;
   adminWatch?.stop();
   adminWatch = null;
+  adminUpdates?.stop();
+  adminUpdates?.el.remove();
+  adminUpdates = null;
+  adminMsgNotify = null;
   document.getElementById("adminChatNav")?.remove();
   document.getElementById("adminChatTop")?.remove();
   resetLogin();

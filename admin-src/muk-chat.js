@@ -10,6 +10,7 @@ const P = {
   chat: ['M4 5h16v11H8l-4 4V5Z'], news: ['M5 4h11v16H6a2 2 0 0 1-2-2V5a1 1 0 0 1 1-1Z', 'M16 8h3v10a2 2 0 0 1-2 2', 'M8 8h5M8 12h5M8 16h3'],
   live: ['M12 10a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z', 'M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4', 'M5 5a10 10 0 0 0 0 14M19 5a10 10 0 0 1 0 14'],
   video: ['M4 6h11v12H4z', 'm15 10 5-3v10l-5-3'], share: ['M12 3v12', 'm7 8 5-5 5 5', 'M5 13v6h14v-6'], bookmark: ['M7 4h10v16l-5-4-5 4V4Z'],
+  smile: ['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z', 'M8.5 14a4.5 4.5 0 0 0 7 0', 'M9 9.5h.01M15 9.5h.01'], down: ['m6 9 6 6 6-6'], lockc: ['M7 11V8a5 5 0 0 1 10 0v3', 'M5 11h14v10H5z'],
   check: ['m5 12 4 4 10-10'], checks: ['m2 12 4 4 9-9', 'm10 15 1 1 9-9'], upload: ['M12 16V4', 'm7 9 5-5 5 5', 'M5 20h14'], link: ['M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1', 'M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1'],
   calendar: ['M7 3v3M17 3v3M4 8h16', 'M5 5h14v15H5z'], globe: ['M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z', 'M3 12h18', 'M12 3c2.6 2.8 3.8 5.8 3.8 9s-1.2 6.2-3.8 9c-2.6-2.8-3.8-5.8-3.8-9S9.4 5.8 12 3Z']
 };
@@ -22,6 +23,15 @@ const TX = {
   es: { chats: 'Chats', search: 'Buscar', newChat: 'Nuevo chat', write: 'Mensaje', send: 'Enviar', record: 'Mantén pulsado para grabar un audio', recording: 'Grabando…', cancel: 'Cancelar', voice: 'Mensaje de voz', empty: 'Aún no hay chats. Empieza uno con el botón +.', emptyThread: 'Saluda. Los mensajes son privados entre los participantes.', counsellor: 'Tu counsellor', students: 'Estudiantes', team: 'Equipo MUK Talent', you: 'Tú', today: 'Hoy', yesterday: 'Ayer', online: 'MUK Talent', micDenied: 'El micrófono está bloqueado. Permítelo en los ajustes del navegador.', noMic: 'Este navegador no permite grabar audios.', notif: 'Notificaciones', messages: 'Mensajes', unread: '{n} sin leer', allRead: 'Estás al día', news: 'Noticia', live: 'Directo', video: 'Vídeo', noFeed: 'Aún no hay novedades. El equipo publicará aquí noticias, directos y vídeos.', watch: 'Ver', ago: '', share: 'Compartir', save: 'Guardar', saved: 'Guardado', copied: 'Enlace copiado', openLink: 'Abrir vídeo', liveOn: 'En directo el {d}', publish: 'Publicar a estudiantes', title: 'Título', description: 'Descripción', kind: 'Tipo', when: 'Fecha y hora', audience: 'Público', all: 'Todos los estudiantes', mine: 'Mis estudiantes', web: 'Web (pública, página de inicio)', pubWeb: 'Publicar en la web', newProd: 'Nueva producción', saveProd: 'Guardar en Productions', prodSaved: 'Guardado en Productions', needVideo: 'Pega un enlace, elige un vídeo de Vimeo o sube un archivo.', webNote: 'Visible para todos en muktalent.com en «Nuestros últimos vídeos». Los estudiantes también lo ven.', videoSrc: 'Vídeo', upload: 'Subir a Cloudinary', paste: 'Pegar enlace', urlPh: 'Enlace de Vimeo, YouTube o Cloudinary (o código embed de Vimeo)', uploading: 'Subiendo… {p} %', published: 'Publicado. Los estudiantes lo verán en sus notificaciones.', remove: 'Eliminar', close: 'Cerrar', fromLib: 'De tu biblioteca', retry: 'Reintentar', loading: 'Cargando…', vimeo: 'Elegir de Vimeo', vimeoEmpty: 'No hay vídeos en tu cuenta de Vimeo.', vimeoMore: 'Ver más', vimeoReady: 'Vídeo de Vimeo listo', resolving: 'Leyendo el vídeo…', hours: { s: 'Ahora', m: 'Hace {n} min', h: 'Hace {n} horas', h1: 'Hace 1 hora', d: 'Hace {n} días', d1: 'Ayer' } }
 };
 const tx = lang => TX[lang] || TX.en;
+// v17 · textos extra del chat estilo WhatsApp
+const WA = {
+  es: {all: 'Todos', unread: 'No leídos', groups: 'Grupos', introT: 'MUK Talent Messenger', introP: 'Envía y recibe mensajes y notas de voz con tu equipo y tus estudiantes. Elige un chat para empezar.', priv: 'Mensajes privados dentro de MUK Talent', emoji: 'Emojis', down: 'Ir al último mensaje', noUnread: 'No tienes chats sin leer.'},
+  en: {all: 'All', unread: 'Unread', groups: 'Groups', introT: 'MUK Talent Messenger', introP: 'Send and receive messages and voice notes with your team and students. Pick a chat to start.', priv: 'Private messages inside MUK Talent', emoji: 'Emoji', down: 'Jump to latest message', noUnread: 'No unread chats.'},
+  fr: {all: 'Tous', unread: 'Non lus', groups: 'Groupes', introT: 'MUK Talent Messenger', introP: 'Envoyez et recevez des messages et des notes vocales avec votre équipe et vos étudiants. Choisissez une discussion.', priv: 'Messages privés dans MUK Talent', emoji: 'Émojis', down: 'Aller au dernier message', noUnread: 'Aucune discussion non lue.'}
+};
+const wa = lang => WA[lang] || WA.en;
+const EMOJI = '😀 😂 😊 😍 🙏 👍 👏 🙌 💪 🎉 🎓 📚 ✍️ 📝 📄 📎 ✅ ❌ ⏰ 📅 📞 💬 ❤️ 🔥 ⭐ 🤝 👋 😅 🤔 😢 😮 🇬🇧 🇲🇦 🇩🇿 🇹🇳 ✈️ 🏠 💷 🏆 👌'.split(' ');
+function linkify(text) { const p = E('p'); const re = /(https?:\/\/[^\s<]+[^\s<.,;:!?)\]'"])/g; let last = 0, m; const s = String(text || ''); while ((m = re.exec(s))) { if (m.index > last) p.append(document.createTextNode(s.slice(last, m.index))); const a = E('a', m[0]); a.href = m[0]; a.target = '_blank'; a.rel = 'noopener noreferrer'; p.append(a); last = m.index + m[0].length; } if (last < s.length) p.append(document.createTextNode(s.slice(last))); return p; }
 const fill = (s, v) => String(s).replace(/\{(\w+)\}/g, (_, k) => v[k] ?? '');
 const loc = lang => ({ fr: 'fr-FR', es: 'es-ES' }[lang] || 'en-GB');
 export function since(iso, lang) { const L = tx(lang).hours, s = (Date.now() - new Date(iso).getTime()) / 1000; if (s < 60) return L.s; if (s < 3600) return fill(L.m, { n: Math.floor(s / 60) }); if (s < 7200) return L.h1; if (s < 86400) return fill(L.h, { n: Math.floor(s / 3600) }); if (s < 172800) return L.d1; return fill(L.d, { n: Math.floor(s / 86400) }); }
@@ -31,7 +41,7 @@ const listTime = (iso, lang) => { const d = new Date(iso); return d.toDateString
 const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
 const initials = n => String(n || 'M').split(/\s+/).filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase();
 function avatar(name, url, cls = 'mkc-av') { const a = E('span', undefined, cls); a.dataset.tone = String([...String(name || '')].reduce((x, c) => x + c.charCodeAt(0), 0) % 5); if (url) { const i = E('img'); i.src = url; i.alt = ''; i.referrerPolicy = 'no-referrer'; i.onerror = () => { i.remove(); a.textContent = initials(name); }; a.append(i); } else a.textContent = initials(name); return a; }
-export function linkChatCss() { if (document.getElementById('mukChatCss')) return; const l = E('link'); l.id = 'mukChatCss'; l.rel = 'stylesheet'; l.href = '/admin/muk-chat.css?v=12'; document.head.append(l); }
+export function linkChatCss() { if (document.getElementById('mukChatCss')) return; const l = E('link'); l.id = 'mukChatCss'; l.rel = 'stylesheet'; l.href = '/admin/muk-chat.css?v=17.0.0'; document.head.append(l); }
 function toast(text) { const t = E('div', text, 'mkc-toast'); t.setAttribute('role', 'status'); document.body.append(t); setTimeout(() => t.remove(), 2600); }
 function overlay(cls, label) { linkChatCss(); const o = E('div', undefined, 'mkc-layer ' + cls); o.setAttribute('role', 'dialog'); o.setAttribute('aria-modal', 'true'); o.setAttribute('aria-label', label); document.body.append(o); document.documentElement.classList.add('mkc-lock'); const prev = document.activeElement; const close = () => { o.remove(); if (!document.querySelector('.mkc-layer')) document.documentElement.classList.remove('mkc-lock'); prev?.focus?.(); }; o.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } }); return { o, close }; }
 
@@ -55,21 +65,25 @@ export function setDot(btn, s) { const n = (s?.chat_unread || 0) + (s?.feed_unre
 
 // ---------------- Messenger ----------------
 export function openMessenger({ api, lang = 'en', threadId = null, onChange = () => { } }) {
-  const L = tx(lang); const { o, close: closeLayer } = overlay('mkc-chat', L.chats); o.lang = lang;
+  const L = tx(lang), W = wa(lang); const { o, close: closeLayer } = overlay('mkc-chat mkc-wa', L.chats); o.lang = lang;
   const close = () => { stopPoll(); closeLayer(); onChange(); };
-  let threads = [], me = null, current = null, poll = null;
+  let threads = [], me = null, current = null, poll = null, filter = 'all';
   const stopPoll = () => { clearInterval(poll); poll = null; };
   const listView = E('section', undefined, 'mkc-list'); const convView = E('section', undefined, 'mkc-conv'); o.append(listView, convView);
   // list
   const lh = E('header', undefined, 'mkc-bar'); const back = ibtn('back', L.close); back.onclick = close; const h = E('h2', L.chats); const add = ibtn('plus', L.newChat); add.onclick = () => contacts(); lh.append(back, h, add);
   const sbox = E('label', undefined, 'mkc-search'); sbox.append(icon('search')); const q = E('input'); q.type = 'search'; q.placeholder = L.search; q.setAttribute('aria-label', L.search); sbox.append(q); q.oninput = () => drawList();
-  const ul = E('ul', undefined, 'mkc-threads'); listView.append(lh, sbox, ul);
+  const chipsBar = E('div', undefined, 'mkc-filters'); chipsBar.setAttribute('role', 'tablist');
+  for (const [k, t] of [['all', W.all], ['unread', W.unread], ['group', W.groups]]) { const c = E('button', t, 'mkc-fchip'); c.type = 'button'; c.setAttribute('role', 'tab'); c.dataset.f = k; c.setAttribute('aria-selected', String(k === filter)); c.onclick = () => { filter = k; chipsBar.querySelectorAll('.mkc-fchip').forEach(x => x.setAttribute('aria-selected', String(x.dataset.f === k))); drawList(); }; chipsBar.append(c); }
+  const ul = E('ul', undefined, 'mkc-threads'); listView.append(lh, sbox, chipsBar, ul);
+  const intro = () => { const w = E('div', undefined, 'mkc-intro'); const art = E('div', undefined, 'mkc-intro-art'); art.append(icon('chat')); const foot = E('p', undefined, 'mkc-intro-foot'); foot.append(icon('lockc', 'mkc-i mkc-mini'), document.createTextNode(' ' + W.priv)); w.append(art, E('h3', W.introT), E('p', W.introP), foot); return w; };
+  convView.append(intro());
   async function loadThreads() { try { const r = await api('/api/chat/threads'); threads = r.data; me = r.me; drawList(); } catch (e) { ul.replaceChildren(E('li', e.message, 'mkc-empty')); } }
   function drawList() {
-    ul.replaceChildren(); const term = q.value.trim().toLowerCase(); const rows = threads.filter(t => !term || t.title.toLowerCase().includes(term));
-    if (!rows.length) { ul.append(E('li', L.empty, 'mkc-empty')); return; }
+    ul.replaceChildren(); const term = q.value.trim().toLowerCase(); const rows = threads.filter(t => (!term || t.title.toLowerCase().includes(term)) && (filter === 'all' || (filter === 'unread' ? t.unread > 0 : t.kind === 'group')));
+    if (!rows.length) { ul.append(E('li', filter === 'unread' ? W.noUnread : L.empty, 'mkc-empty')); return; }
     for (const t of rows) {
-      const li = E('li'); const b = E('button', undefined, 'mkc-trow'); b.type = 'button'; b.append(avatar(t.title, t.avatar_url));
+      const li = E('li'); const b = E('button', undefined, 'mkc-trow' + (current?.id === t.id ? ' is-active' : '') + (t.unread ? ' has-unread' : '')); b.type = 'button'; b.append(avatar(t.title, t.avatar_url));
       const mid = E('span', undefined, 'mkc-tmid'); const top = E('span', undefined, 'mkc-ttop'); top.append(E('strong', t.title), E('small', t.last ? listTime(t.last.at, lang) : '', t.unread ? 'is-new' : ''));
       const bot = E('span', undefined, 'mkc-tbot'); const prev = E('span', undefined, 'mkc-prev'); if (t.last?.mine) prev.append(icon('checks', 'mkc-i mkc-tick')); if (t.last?.audio) { prev.append(icon('mic', 'mkc-i mkc-mini')); prev.append(document.createTextNode(L.voice)); } else prev.append(document.createTextNode(t.last?.body || t.subtitle || ''));
       bot.append(prev); if (t.unread) bot.append(E('b', t.unread > 99 ? '99+' : t.unread, 'mkc-badge'));
@@ -78,12 +92,15 @@ export function openMessenger({ api, lang = 'en', threadId = null, onChange = ()
   }
   // conversation
   async function openThread(t) {
-    current = t; o.classList.add('is-conv'); convView.replaceChildren();
-    const bar = E('header', undefined, 'mkc-bar mkc-cbar'); const bk = ibtn('back', L.chats); bk.onclick = () => { stopPoll(); o.classList.remove('is-conv'); current = null; loadThreads(); onChange(); };
+    current = t; o.classList.add('is-conv'); convView.replaceChildren(); drawList();
+    const bar = E('header', undefined, 'mkc-bar mkc-cbar'); const bk = ibtn('back', L.chats); bk.onclick = () => { stopPoll(); o.classList.remove('is-conv'); current = null; convView.replaceChildren(intro()); loadThreads(); onChange(); };
     const who = E('div', undefined, 'mkc-who'); who.append(avatar(t.title, t.avatar_url)); const nm = E('div'); nm.append(E('strong', t.title), E('small', t.subtitle || L.online)); who.append(nm); bar.append(bk, who);
     const scroller = E('div', undefined, 'mkc-wall'); scroller.setAttribute('aria-live', 'polite'); const list = E('div', undefined, 'mkc-msgs'); scroller.append(list);
     const comp = composer(t, async () => { await refresh(true); });
-    convView.append(bar, scroller, comp);
+    const downB = E('button', undefined, 'mkc-down'); downB.type = 'button'; downB.setAttribute('aria-label', W.down); downB.title = W.down; downB.append(icon('down')); downB.hidden = true; downB.onclick = () => scroller.scrollTo({top: scroller.scrollHeight, behavior: 'smooth'});
+    scroller.addEventListener('scroll', () => { downB.hidden = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 160; }, {passive: true});
+    const wallWrap = E('div', undefined, 'mkc-wallwrap'); wallWrap.append(scroller, downB);
+    convView.append(bar, wallWrap, comp);
     let sig = '';
     async function refresh(force) {
       try { const rows = (await api('/api/chat/threads/' + t.id + '/messages')).data; const s = rows.length + ':' + (rows.at(-1)?.id || '') + ':' + rows.filter(r => r.read).length; if (!force && s === sig) return; sig = s; const atEnd = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight < 80; drawMsgs(list, rows); if (atEnd || force) requestAnimationFrame(() => { scroller.scrollTop = scroller.scrollHeight; }); if (rows.some(r => !r.mine)) api('/api/chat/threads/' + t.id + '/read', { method: 'POST', body: '{}' }).then(onChange).catch(() => { }); }
@@ -100,7 +117,8 @@ export function openMessenger({ api, lang = 'en', threadId = null, onChange = ()
       if (m.system) { list.append(E('p', m.body, 'mkc-sys')); prevMine = null; continue; }
       const b = E('div', undefined, 'mkc-msg ' + (m.mine ? 'out' : 'in') + (prevMine === m.mine ? ' cont' : '')); prevMine = m.mine;
       if (!m.mine && current?.kind === 'group') b.append(E('span', m.sender, 'mkc-sender'));
-      if (m.audio) b.append(voicePlayer(m.audio)); else b.append(E('p', m.body));
+      if (!b.classList.contains('cont')) b.classList.add('tail');
+      if (m.audio) b.append(voicePlayer(m.audio)); else b.append(linkify(m.body));
       const meta = E('span', undefined, 'mkc-meta'); meta.append(document.createTextNode(clock(m.at, lang))); if (m.mine) meta.append(icon(m.read ? 'checks' : 'check', 'mkc-i mkc-tick' + (m.read ? ' is-read' : ''))); b.append(meta); list.append(b);
     }
   }
@@ -115,13 +133,17 @@ export function openMessenger({ api, lang = 'en', threadId = null, onChange = ()
     return w;
   }
   function composer(t, after) {
-    const f = E('form', undefined, 'mkc-comp'); const pill = E('div', undefined, 'mkc-pill'); const ta = E('textarea'); ta.rows = 1; ta.maxLength = 2000; ta.placeholder = L.write; ta.setAttribute('aria-label', L.write); pill.append(ta);
+    const f = E('form', undefined, 'mkc-comp'); const pill = E('div', undefined, 'mkc-pill'); const ta = E('textarea'); ta.rows = 1; ta.maxLength = 2000; ta.placeholder = L.write; ta.setAttribute('aria-label', L.write);
+    const emo = ibtn('smile', W.emoji, 'mkc-ib mkc-emo'); const pick = E('div', undefined, 'mkc-emoji'); pick.hidden = true; pick.setAttribute('role', 'listbox'); pick.setAttribute('aria-label', W.emoji);
+    for (const ch of EMOJI) { const eb = E('button', ch); eb.type = 'button'; eb.onclick = () => { const a = ta.selectionStart ?? ta.value.length, z = ta.selectionEnd ?? a; ta.value = ta.value.slice(0, a) + ch + ta.value.slice(z); ta.selectionStart = ta.selectionEnd = a + ch.length; ta.dispatchEvent(new Event('input')); ta.focus({preventScroll: true}); }; pick.append(eb); }
+    emo.onclick = () => { pick.hidden = !pick.hidden; emo.classList.toggle('is-on', !pick.hidden); };
+    pill.append(emo, ta);
     const act = E('button', undefined, 'mkc-act'); act.type = 'button'; const setMode = () => { const txt = ta.value.trim().length > 0; act.replaceChildren(icon(txt ? 'send' : 'mic')); act.setAttribute('aria-label', txt ? L.send : L.record); act.title = txt ? L.send : L.record; act.dataset.mode = txt ? 'send' : 'mic'; }; setMode();
     ta.oninput = () => { ta.style.height = 'auto'; ta.style.height = Math.min(120, ta.scrollHeight) + 'px'; setMode(); };
     ta.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey && !matchMedia('(pointer: coarse)').matches) { e.preventDefault(); sendText(); } };
     const rec = E('div', undefined, 'mkc-rec'); rec.hidden = true; const recDot = E('i', undefined, 'mkc-recdot'); const recT = E('span', '0:00'); const recCancel = E('button', L.cancel, 'mkc-reccancel'); recCancel.type = 'button'; rec.append(recDot, recT, E('small', L.recording), recCancel);
-    f.append(rec, pill, act);
-    async function sendText() { const body = ta.value.trim(); if (!body) return; act.disabled = true; try { await api('/api/chat/threads/' + t.id + '/messages', { method: 'POST', body: JSON.stringify({ body }) }); ta.value = ''; ta.style.height = 'auto'; setMode(); await after(); } catch (e) { toast(e.message); } finally { act.disabled = false; ta.focus({ preventScroll: true }); } }
+    f.append(pick, rec, pill, act);
+    async function sendText() { const body = ta.value.trim(); if (!body) return; act.disabled = true; try { await api('/api/chat/threads/' + t.id + '/messages', { method: 'POST', body: JSON.stringify({ body }) }); ta.value = ''; ta.style.height = 'auto'; pick.hidden = true; emo.classList.remove('is-on'); setMode(); await after(); } catch (e) { toast(e.message); } finally { act.disabled = false; ta.focus({ preventScroll: true }); } }
     f.onsubmit = e => { e.preventDefault(); sendText(); };
     // voice notes: tap to start, tap again to send (works on desktop + mobile); cancel discards.
     let mr = null, chunks = [], started = 0, tick = null, cancelled = false, stream = null;

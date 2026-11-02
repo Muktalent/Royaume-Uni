@@ -1,6 +1,7 @@
 // MUK Talent – optional AI assistant endpoint (v6).
 // Disabled unless ASSISTANT_API_KEY (or OPENAI_API_KEY) is set. Nothing is stored.
 import { rateLimit, ipKeyGenerator } from "express-rate-limit";
+import express from "express";
 
 const LANGS = new Set(["fr", "en", "es", "ar"]);
 const LANG_NAME = { fr: "French", en: "English", es: "Spanish", ar: "Arabic" };
@@ -69,7 +70,7 @@ export function mountAssistant(app, { fetchImpl = globalThis.fetch } = {}) {
 
   app.get("/api/assistant/status", (req, res) => {
     res.set("Cache-Control", "no-store");
-    res.json({ enabled: !!key() });
+    res.json({ enabled: !!key(), voice: !!key() && process.env.ASSISTANT_VOICE !== "off" });
   });
 
   app.post("/api/assistant", validOrigin, limited, async (req, res) => {
@@ -93,6 +94,66 @@ export function mountAssistant(app, { fetchImpl = globalThis.fetch } = {}) {
       res.json({ reply });
     } catch (e) {
       console.error(JSON.stringify({ event: "assistant_upstream", message: String(e && e.message).slice(0, 120) }));
+      res.status(503).json({ error: "Service temporairement indisponible." });
+    }
+  });
+
+  // v17 · Voz para móviles: transcripción (audio → texto) y síntesis (texto → mp3). Nada se guarda.
+  const voiceLimited = rateLimit({
+    windowMs: 10 * 60 * 1000, limit: 60, standardHeaders: "draft-7", legacyHeaders: false,
+    keyGenerator: clientIp, validate: { xForwardedForHeader: false },
+    message: { error: "Trop de demandes. Réessayez dans quelques minutes." },
+  });
+  const audioBase = () => (process.env.ASSISTANT_AUDIO_URL || "https://api.openai.com/v1").replace(/\/$/, "");
+  const voiceOn = () => !!key() && process.env.ASSISTANT_VOICE !== "off";
+  const EXT = { "audio/webm": "webm", "video/webm": "webm", "audio/mp4": "mp4", "video/mp4": "mp4", "audio/x-m4a": "m4a", "audio/m4a": "m4a", "audio/aac": "m4a", "audio/ogg": "ogg", "audio/wav": "wav", "audio/x-wav": "wav", "audio/mpeg": "mp3" };
+  const rawAudio = express.raw({ type: ["audio/*", "video/webm", "video/mp4", "application/octet-stream"], limit: "4mb" });
+
+  app.post("/api/assistant/transcribe", validOrigin, voiceLimited, rawAudio, async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    if (!voiceOn()) return res.status(503).json({ error: "Service temporairement indisponible." });
+    const buf = req.body;
+    if (!Buffer.isBuffer(buf) || buf.length < 600) return res.status(400).json({ error: "Audio vide." });
+    const mime = String(req.get("content-type") || "audio/webm").split(";")[0].trim().toLowerCase();
+    const ext = EXT[mime] || "webm";
+    const l = LANGS.has(String(req.query.lang)) ? String(req.query.lang) : "";
+    try {
+      const fd = new FormData();
+      fd.append("file", new Blob([buf], { type: mime }), "speech." + ext);
+      fd.append("model", process.env.ASSISTANT_STT_MODEL || "gpt-4o-mini-transcribe");
+      if (l) fd.append("language", l);
+      fd.append("response_format", "json");
+      const r = await fetchImpl(audioBase() + "/audio/transcriptions", { method: "POST", headers: { authorization: `Bearer ${key()}` }, body: fd, signal: AbortSignal.timeout(25000) });
+      if (!r.ok) throw new Error(`upstream ${r.status}`);
+      const j = await r.json();
+      res.json({ text: String(j?.text || "").replace(/\s+/g, " ").trim().slice(0, 600) });
+    } catch (e) {
+      console.error(JSON.stringify({ event: "assistant_stt", message: String(e && e.message).slice(0, 120) }));
+      res.status(503).json({ error: "Service temporairement indisponible." });
+    }
+  });
+
+  const VOICES = { fr: "nova", en: "nova", es: "nova", ar: "nova" };
+  app.post("/api/assistant/speech", validOrigin, voiceLimited, async (req, res) => {
+    res.set("Cache-Control", "no-store");
+    if (!voiceOn()) return res.status(503).json({ error: "Service temporairement indisponible." });
+    const body = req.body && typeof req.body === "object" ? req.body : {};
+    const text = typeof body.text === "string" ? body.text.replace(/https?:\/\/\S+/g, "").replace(/\s+/g, " ").trim().slice(0, 1500) : "";
+    if (!text) return res.status(400).json({ error: "Texte vide." });
+    const l = LANGS.has(body.lang) ? body.lang : "fr";
+    try {
+      const r = await fetchImpl(audioBase() + "/audio/speech", {
+        method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${key()}` },
+        body: JSON.stringify({ model: process.env.ASSISTANT_TTS_MODEL || "gpt-4o-mini-tts", voice: process.env.ASSISTANT_TTS_VOICE || VOICES[l], input: text, response_format: "mp3" }),
+        signal: AbortSignal.timeout(25000),
+      });
+      if (!r.ok) throw new Error(`upstream ${r.status}`);
+      const audio = Buffer.from(await r.arrayBuffer());
+      res.set("Content-Type", "audio/mpeg");
+      res.set("Content-Length", String(audio.length));
+      res.send(audio);
+    } catch (e) {
+      console.error(JSON.stringify({ event: "assistant_tts", message: String(e && e.message).slice(0, 120) }));
       res.status(503).json({ error: "Service temporairement indisponible." });
     }
   });

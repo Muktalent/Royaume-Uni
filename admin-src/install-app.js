@@ -19,13 +19,13 @@ const TX = {
 const E = (t, v, c) => { const n = document.createElement(t); if (v !== undefined) n.textContent = String(v); if (c) n.className = c; return n; };
 function css() {
   if (document.getElementById('mukInstallCss')) return; const s = E('style'); s.id = 'mukInstallCss';
-  s.textContent = `.mki{position:fixed;z-index:9500;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));display:grid;gap:12px;padding:16px;border-radius:22px;background:#0d2224;color:#f7f1e3;border:1px solid rgba(201,164,92,.4);box-shadow:0 24px 60px -20px rgba(4,16,17,.7);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;transform:translateY(130%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+  s.textContent = `.mki{position:fixed;z-index:9500;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));display:grid;gap:12px;padding:16px;border-radius:22px;background:#15383D;color:#f7f1e3;border:1px solid rgba(193,164,116,.4);box-shadow:0 24px 60px -20px rgba(10,28,31,.6);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;transform:translateY(130%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
 .mki.in{transform:none}.mki-top{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center}.mki img{width:52px;height:52px;border-radius:14px;display:block}
 .mki strong{display:block;font-size:15.5px}.mki p{margin:2px 0 0;color:#a9bfb8;font-size:13px}.mki-x{width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#c9d8d2;font-size:20px;line-height:1;cursor:pointer}
 .mki-row{display:flex;gap:10px}.mki-row button{flex:1;min-height:46px;border-radius:14px;border:1px solid rgba(233,240,236,.18);background:transparent;color:#f7f1e3;font:inherit;font-weight:650;cursor:pointer}
-.mki-row .mki-go{background:#c9a45c;border-color:#c9a45c;color:#0d2224}.mki ol{margin:0;padding:0;list-style:none;display:grid;gap:8px}.mki li{display:flex;gap:10px;align-items:center;color:#e9f0ec}
-.mki li b{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(201,164,92,.18);color:#e2c07a;font-size:12px}.mki li svg{width:18px;height:18px;fill:none;stroke:#e2c07a;stroke-width:2;vertical-align:-3px}
-.mki button:focus-visible{outline:2px solid #c9a45c;outline-offset:2px}@media(min-width:700px){.mki{left:auto;right:20px;width:380px}}@media(prefers-reduced-motion:reduce){.mki{transition:none}}`;
+.mki-row .mki-go{background:#C1A474;border-color:#C1A474;color:#15383D}.mki ol{margin:0;padding:0;list-style:none;display:grid;gap:8px}.mki li{display:flex;gap:10px;align-items:center;color:#e9f0ec}
+.mki li b{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(193,164,116,.18);color:#D8C29A;font-size:12px}.mki li svg{width:18px;height:18px;fill:none;stroke:#D8C29A;stroke-width:2;vertical-align:-3px}
+.mki button:focus-visible{outline:2px solid #C1A474;outline-offset:2px}@media(min-width:700px){.mki{left:auto;right:20px;width:380px}}@media(prefers-reduced-motion:reduce){.mki{transition:none}}`;
   document.head.append(s);
 }
 export function offerInstall({ lang = 'en' } = {}) {

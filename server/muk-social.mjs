@@ -354,6 +354,51 @@ export function mountMukSocial(app, { db = service } = {}) {
     ok(await client.from("mk_post_reads").upsert(ids.map(post_id => ({ post_id, user_id: me.id })), { onConflict: "post_id,user_id", ignoreDuplicates: true }));
     res.json({ ok: true });
   }));
+  // v17 · "Since your last visit": recent changes relevant to the caller's role. Each source is optional
+  // (a missing table or column never breaks the dashboard) and only metadata is returned, never document contents.
+  app.get("/api/updates", limiter(600), route(async (req, res, me) => {
+    const { client } = me; const items = [];
+    const raw = new Date(String(req.query.since || "")), floor = Date.now() - 30 * 864e5;
+    const since = new Date(Number.isNaN(raw.getTime()) ? Date.now() - 7 * 864e5 : Math.max(raw.getTime(), floor)).toISOString();
+    const safe = async fn => { try { await fn(); } catch { /* optional source */ } };
+    const rows = r => (r && !r.error && Array.isArray(r.data)) ? r.data : [];
+    const name = c => [c?.first_name, c?.last_name].filter(Boolean).join(" ") || c?.reference || "";
+    if (me.kind === "student") {
+      await safe(async () => { for (const s of rows(await client.from("gp_stages").select("stage_key,status,updated_at").eq("student_id", me.id).gt("updated_at", since).limit(20))) items.push({ type: "stage", key: s.stage_key, status: s.status, at: s.updated_at }); });
+      await safe(async () => { for (const d of rows(await client.from("gp_documents").select("label,status,reviewed_at").eq("student_id", me.id).gt("reviewed_at", since).limit(20))) items.push({ type: "document", label: d.label, status: d.status, at: d.reviewed_at }); });
+      await safe(async () => { for (const t of rows(await client.from("gp_tasks").select("title,created_at,created_by").eq("student_id", me.id).gt("created_at", since).limit(20))) if (t.created_by !== me.id) items.push({ type: "task", title: t.title, at: t.created_at }); });
+      await safe(async () => { for (const e of rows(await client.from("gp_events").select("title,starts_on,created_at").eq("student_id", me.id).gt("created_at", since).limit(10))) items.push({ type: "event", title: e.title, date: e.starts_on, at: e.created_at }); });
+      await safe(async () => { const m = rows(await client.from("gp_messages").select("created_at").eq("student_id", me.id).neq("sender_role", "student").gt("created_at", since).order("created_at", { ascending: false }).limit(50)); if (m.length) items.push({ type: "message", count: m.length, at: m[0].created_at }); });
+    } else {
+      let cands = client.from("crm_candidates").select("id,reference,first_name,last_name,created_at").is("archived_at", null).gt("created_at", since).order("created_at", { ascending: false }).limit(12);
+      if (!me.admin) cands = cands.eq("assigned_to", me.id);
+      await safe(async () => { for (const c of rows(await cands)) items.push({ type: "candidate", name: name(c), ref: c.reference, at: c.created_at }); });
+      await safe(async () => {
+        const st = rows(await client.from("mt_case_pipeline").select("candidate_id,stage,updated_at").gt("updated_at", since).order("updated_at", { ascending: false }).limit(40));
+        if (!st.length) return;
+        let q = client.from("crm_candidates").select("id,reference,first_name,last_name,assigned_to").in("id", st.map(x => x.candidate_id));
+        if (!me.admin) q = q.eq("assigned_to", me.id);
+        const map = new Map(rows(await q).map(c => [c.id, c]));
+        for (const x of st) { const c = map.get(x.candidate_id); if (c) items.push({ type: "stage", name: name(c), ref: c.reference, stage: x.stage, at: x.updated_at }); }
+      });
+      if (me.admin) await safe(async () => { for (const e of rows(await client.from("crm_enquiries").select("full_name,created_at").gt("created_at", since).order("created_at", { ascending: false }).limit(10))) items.push({ type: "enquiry", name: e.full_name, at: e.created_at }); });
+      await safe(async () => {
+        let q = client.from("mt_staff_documents").select("owner_id,direction,title,status,created_at,signed_at").neq("status", "uploading").or(`created_at.gt.${since},signed_at.gt.${since}`).order("created_at", { ascending: false }).limit(20);
+        if (!me.admin) q = q.eq("owner_id", me.id).eq("direction", "to_employee");
+        const docs = rows(await q); const names = new Map();
+        if (me.admin && docs.length) for (const s of rows(await client.from("crm_staff").select("user_id,full_name").in("user_id", [...new Set(docs.map(d => d.owner_id))]))) names.set(s.user_id, s.full_name);
+        for (const d of docs) { if (me.admin && d.direction === "to_employee" && !(d.signed_at && d.signed_at > since)) continue; items.push({ type: "hrdoc", title: d.title, status: d.status, name: names.get(d.owner_id) || "", at: d.signed_at && d.signed_at > since ? d.signed_at : d.created_at }); }
+      });
+      if (!me.admin) await safe(async () => {
+        const mine = rows(await client.from("gp_students").select("user_id,full_name").eq("counsellor_id", me.id).limit(400)); if (!mine.length) return;
+        const nm = new Map(mine.map(s => [s.user_id, s.full_name]));
+        for (const d of rows(await client.from("gp_documents").select("student_id,label,status,uploaded_at").in("student_id", [...nm.keys()]).gt("uploaded_at", since).order("uploaded_at", { ascending: false }).limit(20))) items.push({ type: "document", name: nm.get(d.student_id), label: d.label, status: d.status, at: d.uploaded_at });
+      });
+    }
+    items.sort((a, b) => String(b.at).localeCompare(String(a.at)));
+    res.set("Cache-Control", "no-store");
+    res.json({ data: { since, items: items.slice(0, 30) } });
+  }));
   app.get("/api/notifications/summary", limiter(900), route(async (req, res, me) => {
     const { client } = me; let chat = 0;
     const gpCount = me.kind === "student"
