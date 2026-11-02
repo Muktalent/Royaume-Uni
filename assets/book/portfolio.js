@@ -1,4 +1,4 @@
-import { $, $$, el, t, lang, items, safeUrl, isEmail, tagsOf, paragraphs, fmtDate, year, pad, icon, brandFor, ext, viewer, toolbar, certStatus, statusLabel } from './common.js';
+import { $, $$, el, t, lang, items, safeUrl, isEmail, tagsOf, paragraphs, fmtDate, year, pad, icon, brandFor, ext, viewer, toolbar, certStatus, statusLabel, isPlanned } from './common.js';
 
 const book = $('#book');
 const D = { profile: null, projects: [], certs: [], exp: [], edu: [], links: [], error: false };
@@ -73,12 +73,12 @@ function renderCover() {
   if (p?.cover_url) { const im = el('img', { src: p.cover_url, alt: '', decoding: 'async' }); im.addEventListener('error', () => { im.remove(); art.classList.remove('has-photo'); }); art.append(im); }
   const stories = [];
   if (D.projects[0]) stories.push([t('h1'), D.projects[0].title]);
-  const c = [...D.certs].sort(byDate)[0]; if (c) stories.push([t('h2'), c.title]);
+  const c = [...D.certs].filter(x => !isPlanned(x)).sort(byDate)[0]; if (c) stories.push([t('h2'), c.title]);
   if (p?.category) stories.push([t('h3'), p.category]);
   if (!stories.length) stories.push([t('h1'), t('soon')]);
   $('#coverStories').replaceChildren(...stories.slice(0, 3).map(([k, v]) => el('div', { class: 'story' }, el('span', { class: 'story-k', text: k }), el('span', { class: 'story-v', text: v }))));
   $('#openLabel').textContent = t('open'); $('#openBook').setAttribute('aria-label', `${t('open')} — ${t('cv')}`);
-  const latest = [...D.projects.map(x => ({ x, k: 'p' })), ...D.certs.map(x => ({ x, k: 'c' }))].sort((a, b) => byDate(a.x, b.x))[0];
+  const latest = [...D.projects.map(x => ({ x, k: 'p' })), ...D.certs.filter(x => !isPlanned(x)).map(x => ({ x, k: 'c' }))].sort((a, b) => byDate(a.x, b.x))[0];
   $('#coverLatest').hidden = !latest;
   if (latest) {
     $('#latestLabel').textContent = t('latest'); $('#latestAll').textContent = t('allPosts');
@@ -116,9 +116,9 @@ function renderCv() {
   const skills = tagsOf(p?.tags);
   if (skills.length) out.push(sub(t('skills')), el('ul', { class: 'skills' }, skills.map(s => el('li', { text: s }))));
   if (D.certs.length) {
-    const top = [...D.certs].sort(byDate).slice(0, 4);
+    const top = [...D.certs.filter(c => !isPlanned(c)).sort(byDate), ...D.certs.filter(isPlanned).sort((a, b) => byDate(b, a))].slice(0, 4);
     out.push(sub(t('learning')), el('ul', { class: 'mini-certs' }, top.map(c => el('li', {},
-      el('a', { href: '/certificates/#' + encodeURIComponent(c.slug) }, icon('award', 20), el('span', {}, el('strong', { text: c.title }), el('small', { text: [c.issuer, year(c.issued_on)].filter(Boolean).join(' · ') })))))),
+      el('a', { href: '/certificates/#' + encodeURIComponent(c.slug) }, icon('award', 20), el('span', {}, el('strong', { text: c.title }), el('small', { text: [c.issuer, isPlanned(c) ? `${t('target')} ${year(c.issued_on)}` : year(c.issued_on)].filter(Boolean).join(' · ') })))))),
       el('p', { class: 'more' }, el('a', { href: '/certificates/', class: 'link-arrow' }, t('allCerts'), icon('arrow', 15))));
   }
   box.replaceChildren(...out);

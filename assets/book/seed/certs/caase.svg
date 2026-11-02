@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1414 1000" width="1414" height="1000">
+<defs><linearGradient id="p" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffdf8"/><stop offset="1" stop-color="#f3ede0"/></linearGradient>
+<pattern id="g" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M0 11h22M11 0v22" stroke="#152e36" stroke-opacity=".035"/></pattern></defs>
+<rect width="1414" height="1000" fill="url(#p)"/><rect width="1414" height="1000" fill="url(#g)"/>
+<rect x="34" y="34" width="1346" height="932" fill="none" stroke="#c9a45c" stroke-width="3"/>
+<rect x="50" y="50" width="1314" height="900" fill="none" stroke="#c9a45c" stroke-opacity=".5" stroke-width="1.2"/>
+<rect x="50" y="50" width="1314" height="14" fill="#6c3fc5"/>
+<text x="707" y="168" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="26" letter-spacing="9" font-weight="700" fill="#6c3fc5">PDSO</text>
+<text x="707" y="222" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="22" letter-spacing="6" fill="#6b7c80">PRACTICAL DEVSECOPS</text>
+<text x="707" y="330" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="30" fill="#8a6d3b">Certification roadmap</text>
+<line x1="557" y1="362" x2="857" y2="362" stroke="#c9a45c" stroke-width="2"/>
+<text x="707" y="436" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="54" fill="#152e36">Certified Agentic AI Security</text><text x="707" y="504" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="54" fill="#152e36">Expert (CAASE)</text>
+<text x="707" y="612" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="22" letter-spacing="5" fill="#6b7c80">RAG &amp; AGENTIC SECURITY</text>
+<g transform="translate(707 790)"><circle r="74" fill="#6c3fc5" fill-opacity=".12"/><circle r="58" fill="none" stroke="#6c3fc5" stroke-width="3" stroke-dasharray="8 7"/>
+<text y="10" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#6c3fc5">PDSO</text></g>
+<text x="707" y="912" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="20" letter-spacing="5" font-weight="700" fill="#2b5b6e">TARGET · JUNE 2027</text>
+</svg>

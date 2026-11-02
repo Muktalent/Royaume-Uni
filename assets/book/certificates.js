@@ -1,4 +1,4 @@
-import { $, $$, el, t, items, safeUrl, tagsOf, paragraphs, fmtDate, year, pad, icon, ext, viewer, toolbar, certStatus, statusLabel } from './common.js';
+import { $, $$, el, t, items, safeUrl, tagsOf, paragraphs, fmtDate, year, pad, icon, ext, viewer, toolbar, certStatus, statusLabel, isPlanned } from './common.js';
 
 const D = { certs: [], profile: null, error: false, loading: true };
 let filter = '', open = null;
@@ -13,8 +13,8 @@ const pill = c => { const s = certStatus(c); return el('span', { class: 'status-
 function show(c) {
   if (open) open.close();
   const n = D.certs.indexOf(c) + 1;
-  const rows = [[t('issuer'), c.issuer], [t('issued'), fmtDate(c.issued_on, true)], [t('expires'), c.expires_on ? fmtDate(c.expires_on, true) : t('noExpiry')], [t('credId'), c.subtitle], [t('category'), c.category]].filter(r => r[1]);
-  const links = [ext(c.verification_url, [t('verifyIssuer'), icon('check', 15)], 'pill small'), ext(c.document_url, [t('pdf'), icon('doc', 15)], 'pill small ghost')].filter(Boolean);
+  const rows = [[t('issuer'), c.issuer], [isPlanned(c) ? t('target') : t('issued'), fmtDate(c.issued_on, true)], [t('expires'), isPlanned(c) ? '' : c.expires_on ? fmtDate(c.expires_on, true) : t('noExpiry')], [t('credId'), c.subtitle], [t('category'), c.category]].filter(r => r[1]);
+  const links = [ext(c.verification_url, [t('verifyIssuer'), icon('check', 15)], 'pill small'), ext(c.document_url, [t('pdf'), icon('doc', 15)], 'pill small ghost'), safeUrl(c.website_url) && c.website_url !== c.verification_url ? ext(c.website_url, [t('official'), icon('ext', 15)], 'pill small ghost') : null].filter(Boolean);
   open = viewer({
     label: c.title, images: [c.cover_url, ...(c.gallery_urls || [])].filter(Boolean),
     info: [el('p', { class: 'kicker', text: `${t('certs')} · ${pad(n)}` }), el('h2', { text: c.title }), pill(c),
@@ -33,9 +33,9 @@ function render() {
   const out = [el('h1', { class: 'section-title' }, el('span', { text: t('certTitle') })), el('p', { class: 'intro center', text: t('certIntro') })];
   const list = D.certs;
   if (list.length) {
-    const issuers = new Set(list.map(c => c.issuer).filter(Boolean)).size, ver = list.filter(c => safeUrl(c.verification_url)).length;
-    const latest = list.map(c => year(c.issued_on)).filter(Boolean).sort().pop() || '—';
-    out.push(el('div', { class: 'stats' }, [[pad(list.length), t('credentials')], [pad(issuers), t('issuers')], [pad(ver), t('verifiable')], [latest, t('latest')]].map(([b, s]) => el('div', {}, el('b', { text: b }), el('span', { text: s })))));
+    const issuers = new Set(list.map(c => c.issuer).filter(Boolean)).size, done = list.filter(c => !isPlanned(c)).length, wip = list.length - done;
+    const latest = list.filter(c => !isPlanned(c)).map(c => year(c.issued_on)).filter(Boolean).sort().pop() || '—';
+    out.push(el('div', { class: 'stats' }, [[pad(done), t('earned')], [pad(wip), t('inProgress')], [pad(issuers), t('issuers')], [latest, t('latest')]].map(([b, s]) => el('div', {}, el('b', { text: b }), el('span', { text: s })))));
     const cats = [...new Set(list.map(c => c.category).filter(Boolean))];
     if (filter && !cats.includes(filter)) filter = '';
     if (cats.length > 1) out.push(el('div', { class: 'tabs', role: 'group', 'aria-label': t('category') },
@@ -50,7 +50,7 @@ function render() {
         ext(c.verification_url, [t('verify'), icon('check', 13)]), ext(c.document_url, [t('pdf'), icon('doc', 13)])].filter(Boolean);
       return el('article', { class: 'cert' }, frame,
         el('p', { class: 'k' }, el('span', { text: [pad(n), c.category].filter(Boolean).join(' · ') }), pill(c)),
-        el('h3', { text: c.title }), el('p', { class: 'by', text: [c.issuer, fmtDate(c.issued_on)].filter(Boolean).join(' · ') }), el('div', { class: 'acts' }, acts));
+        el('h3', { text: c.title }), el('p', { class: 'by', text: [c.issuer, isPlanned(c) ? `${t('target')} ${fmtDate(c.issued_on)}` : fmtDate(c.issued_on)].filter(Boolean).join(' · ') }), el('div', { class: 'acts' }, acts));
     })));
     if (list.length >= 4) {
       out.push(el('h2', { class: 'subtitle' }, el('span', { text: t('index') })), el('div', { class: 'ledger-wrap' }, el('table', { class: 'ledger' },

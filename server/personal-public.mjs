@@ -7,8 +7,9 @@ export function mountPersonal(app){
   if(!['project','certificate','profile','experience','education','link'].includes(kind))return res.status(400).json({error:'Invalid content type.'});
   const {data,error}=await db.from('mt_personal_items').select(fields).eq('kind',kind).eq('published',true).order('sort_order').order('created_at',{ascending:false}).limit(200);
   if(error){console.error({requestId:req.requestId,code:error.code});return res.status(503).json({error:'Personal content is not available yet.'});}
-  const paths=[...new Set(data.flatMap(i=>[i.cover_path,i.document_path,...i.gallery_paths.split('\n')]).map(p=>p.trim()).filter(Boolean))];
-  const links={};
+  const pub=p=>/^\/assets\/book\/seed\/[a-z0-9/_-]+\.(webp|jpg|png|svg)$/i.test(p);
+  const paths=[...new Set(data.flatMap(i=>[i.cover_path,i.document_path,...i.gallery_paths.split('\n')]).map(p=>p.trim()).filter(p=>p&&!pub(p)))];
+  const links={};for(const p of data.flatMap(i=>[i.cover_path,i.document_path,...i.gallery_paths.split('\n')]).map(p=>p.trim()))if(pub(p))links[p]=p;
   if(paths.length){const r=await db.storage.from('mt-personal').createSignedUrls(paths,600);if(!r.error)for(const x of r.data||[])if(x.signedUrl)links[x.path]=x.signedUrl;}
   res.set('X-Robots-Tag','noindex, nofollow');
   res.json({data:data.map(i=>({...i,cover_url:links[i.cover_path]||'',document_url:links[i.document_path]||'',gallery_urls:i.gallery_paths.split('\n').map(p=>links[p.trim()]).filter(Boolean)}))});

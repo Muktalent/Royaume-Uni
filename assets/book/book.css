@@ -239,6 +239,8 @@ dialog.viewer::backdrop{background:rgba(40,25,35,.6);backdrop-filter:blur(3px)}
 .status-pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
 .status-pill.ok{background:#dcefe0;color:#2f7a45}
 .status-pill.soon{background:#fbe8cc;color:#9a5a12}
+.status-pill.planned{background:#e3ecf0;color:#2b5b6e}
+.status-pill.planned::before{background:transparent;border:1.5px solid currentColor;width:5px;height:5px}
 .status-pill.expired{background:#f6d8d5;color:#a3352b}
 
 /* Mobile / tablet: real pages, one at a time */

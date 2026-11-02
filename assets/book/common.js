@@ -32,7 +32,7 @@ const STR = {
     role: 'Role', date: 'Date', category: 'Category', prev: 'Previous image', next: 'Next image', closeD: 'Close',
     certTitle: 'CERTIFICATES', certIntro: 'Training, certifications and evidence of learning — each with a link to verify it with the issuer.',
     credentials: 'credentials', issuers: 'issuers', verifiable: 'verifiable', details: 'DETAILS', verify: 'VERIFY', pdf: 'PDF',
-    active: 'Active', renew: 'Renew soon', expired: 'Expired', noExpiry: 'No expiry', issued: 'Issued', expires: 'Expires', issuer: 'Issuer',
+    official: 'Official page', planned: 'In progress', target: 'Target', earned: 'earned', inProgress: 'in progress', roadmap: 'Roadmap', active: 'Active', renew: 'Renew soon', expired: 'Expired', noExpiry: 'No expiry', issued: 'Issued', expires: 'Expires', issuer: 'Issuer',
     credId: 'Credential ID', verifyIssuer: 'Verify with issuer', index: 'Index of all credentials', noCerts: 'Certificates will appear here soon.',
     backBook: 'Back to portfolio', theme: 'Change theme', lang: 'Español', error: 'Content is not available right now. Please try again later.',
     projects: n => `${n} PROJECT${n === 1 ? '' : 'S'}`, certCount: n => `${n} CERTIFICATE${n === 1 ? '' : 'S'}`,
@@ -51,7 +51,7 @@ const STR = {
     role: 'Rol', date: 'Fecha', category: 'Categoría', prev: 'Imagen anterior', next: 'Imagen siguiente', closeD: 'Cerrar',
     certTitle: 'CERTIFICADOS', certIntro: 'Formación, certificaciones y evidencias de aprendizaje, cada una con su enlace de verificación del emisor.',
     credentials: 'credenciales', issuers: 'emisores', verifiable: 'verificables', details: 'DETALLES', verify: 'VERIFICAR', pdf: 'PDF',
-    active: 'Vigente', renew: 'Renovar pronto', expired: 'Caducado', noExpiry: 'Sin caducidad', issued: 'Expedido', expires: 'Caduca', issuer: 'Emisor',
+    official: 'Página oficial', planned: 'En curso', target: 'Objetivo', earned: 'obtenidas', inProgress: 'en curso', roadmap: 'Hoja de ruta', active: 'Vigente', renew: 'Renovar pronto', expired: 'Caducado', noExpiry: 'Sin caducidad', issued: 'Expedido', expires: 'Caduca', issuer: 'Emisor',
     credId: 'ID de credencial', verifyIssuer: 'Verificar con el emisor', index: 'Índice de credenciales', noCerts: 'Pronto aparecerán aquí los certificados.',
     backBook: 'Volver al portafolio', theme: 'Cambiar tema', lang: 'English', error: 'El contenido no está disponible ahora. Inténtalo más tarde.',
     projects: n => `${n} PROYECTO${n === 1 ? '' : 'S'}`, certCount: n => `${n} CERTIFICADO${n === 1 ? '' : 'S'}`,
@@ -111,12 +111,14 @@ export function fmtDate(d, long = false) {
 }
 export const year = d => (d ? String(d).slice(0, 4) : '');
 export const pad = n => String(n).padStart(2, '0');
+export const isPlanned = c => !!c.issued_on && new Date(c.issued_on + 'T00:00:00Z') > Date.now();
 export function certStatus(c) {
+  if (isPlanned(c)) return 'planned';
   if (!c.expires_on) return 'none';
   const days = (new Date(c.expires_on + 'T23:59:59Z') - Date.now()) / 864e5;
   return days < 0 ? 'expired' : days <= 90 ? 'soon' : 'ok';
 }
-export const statusLabel = s => ({ ok: t('active'), soon: t('renew'), expired: t('expired'), none: t('noExpiry') })[s];
+export const statusLabel = s => ({ ok: t('active'), soon: t('renew'), expired: t('expired'), none: t('noExpiry'), planned: t('planned') })[s];
 
 /* ---------- Icons ---------- */
 const P = {
