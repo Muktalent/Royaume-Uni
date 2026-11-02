@@ -34,7 +34,7 @@
  <section id="panel" hidden>
   <div class="a-head">
    <div><span class="mono">Contenido</span><h1>Tu libro: portfolio y certificados</h1><p class="a-muted">Los borradores son privados. Marca “Publicado” para mostrar una entrada en las páginas públicas.</p></div>
-   <div class="a-actions"><button id="newItem" class="btn btn-solid" type="button">Nueva entrada</button><button id="logout" class="btn" type="button">Cerrar sesión</button></div>
+   <div class="a-actions"><button id="newItem" class="btn btn-solid" type="button">+ Nueva entrada</button><button id="cvBtn" class="btn" type="button">Subir CV (PDF)</button><button id="logout" class="btn" type="button">Cerrar sesión</button></div>
   </div>
   <div class="a-guide">
    <div><b>profile · Perfil y portada</b><p>Una sola entrada. Título = nombre (portada) · Resumen = titular · Categoría = “ahora mismo” (p. ej. Open to remote pentesting roles) · Emisor = ciudad · Descripción = bio · Competencias = skills · Web = LinkedIn · Repositorio = GitHub · Verificación = enlace para reservar llamada · Portada = tu foto · Documento = CV en PDF.</p></div>
@@ -44,19 +44,22 @@
    <div><b>certificate · Certificados</b><p>Título · Emisor · Expedición y caducidad (opcional; avisa “Renew soon” 90 días antes) · Resumen = ID de credencial · Categoría (pestañas) · Verificación = URL oficial · Portada = imagen · Documento = PDF.</p></div>
    <div><b>link · Redes y email</b><p>Una entrada por red: Título = nombre (GitHub, TryHackMe…) · Web = URL https (el icono se pone solo). Para el email: Título = Email · Resumen = tu dirección; activa la carta de contacto.</p></div>
   </div>
+  <div class="a-filter"><div id="kinds" class="a-kinds" role="toolbar" aria-label="Filtrar por tipo"></div><input id="search" type="search" placeholder="Buscar por título o identificador" aria-label="Buscar"></div>
   <div id="records" class="a-records"></div>
+  <div id="shade" class="a-shade" hidden></div>
 
-  <form id="editor" class="a-card a-editor" hidden>
-   <div class="a-head"><h2 id="editTitle">Entrada</h2></div>
+  <form id="editor" class="a-card a-editor" role="dialog" aria-modal="true" aria-labelledby="editTitle" hidden>
+   <div class="a-head a-ehead"><h2 id="editTitle">Entrada</h2><button id="xClose" class="a-x" type="button" aria-label="Cerrar">×</button></div>
    <div id="fields" class="a-fields"></div>
-   <fieldset class="a-upload"><legend class="mono">Subir archivo (guarda primero)</legend>
+   <fieldset class="a-upload"><legend class="mono">Subir archivo · se guarda automáticamente</legend>
     <select id="uploadTarget" aria-label="Destino"><option value="cover_path">Portada / foto / imagen del certificado</option><option value="gallery_paths">Añadir a la galería</option><option value="document_path">Documento (PDF)</option></select>
     <input id="uploadFile" type="file" accept="image/jpeg,image/png,image/webp,application/pdf" aria-label="Archivo">
     <button id="upload" class="btn" type="button">Subir</button>
    </fieldset>
-   <div class="a-actions a-sticky"><button class="btn btn-solid" type="submit">Guardar</button><button id="cancel" class="btn" type="button">Cerrar</button><button id="delete" class="btn a-danger" type="button">Eliminar</button></div>
+   <div class="a-actions a-sticky"><p id="editStatus" class="a-estatus" role="status" aria-live="polite"></p><button class="btn btn-solid" type="submit">Guardar</button><button id="cancel" class="btn" type="button">Cerrar</button><button id="delete" class="btn a-danger" type="button">Eliminar</button></div>
   </form>
  </section>
 </main>
+<div id="toast" class="a-toast" role="status" aria-live="polite"></div>
 </body>
 </html>

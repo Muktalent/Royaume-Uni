@@ -7912,9 +7912,9 @@ var RealtimeChannel = class _RealtimeChannel {
     const newPostgresBindings = [];
     for (let i = 0; i < bindingsLen; i++) {
       const clientPostgresBinding = clientPostgresBindings[i];
-      const { filter: { event, schema, table, filter } } = clientPostgresBinding;
+      const { filter: { event, schema, table, filter: filter2 } } = clientPostgresBinding;
       const serverPostgresFilter = postgres_changes && postgres_changes[i];
-      if (serverPostgresFilter && serverPostgresFilter.event === event && _RealtimeChannel.isFilterValueEqual(serverPostgresFilter.schema, schema) && _RealtimeChannel.isFilterValueEqual(serverPostgresFilter.table, table) && _RealtimeChannel.isFilterValueEqual(serverPostgresFilter.filter, filter)) {
+      if (serverPostgresFilter && serverPostgresFilter.event === event && _RealtimeChannel.isFilterValueEqual(serverPostgresFilter.schema, schema) && _RealtimeChannel.isFilterValueEqual(serverPostgresFilter.table, table) && _RealtimeChannel.isFilterValueEqual(serverPostgresFilter.filter, filter2)) {
         newPostgresBindings.push(Object.assign(Object.assign({}, clientPostgresBinding), { id: serverPostgresFilter.id }));
       } else {
         this.unsubscribe();
@@ -8122,14 +8122,14 @@ var RealtimeChannel = class _RealtimeChannel {
    *   .subscribe()
    * ```
    */
-  on(type, filter, callback) {
+  on(type, filter2, callback) {
     const stateCheck = this.channelAdapter.isJoined() || this.channelAdapter.isJoining();
     const typeCheck = type === REALTIME_LISTEN_TYPES.PRESENCE || type === REALTIME_LISTEN_TYPES.POSTGRES_CHANGES;
     if (stateCheck && typeCheck) {
       this.socket.log("channel", `cannot add \`${type}\` callbacks for ${this.topic} after \`subscribe()\`.`);
       throw new Error(`cannot add \`${type}\` callbacks for ${this.topic} after \`subscribe()\`.`);
     }
-    return this._on(type, filter, callback);
+    return this._on(type, filter2, callback);
   }
   /**
    * Sends a broadcast message explicitly via REST API.
@@ -8316,12 +8316,12 @@ var RealtimeChannel = class _RealtimeChannel {
     return response;
   }
   /** @internal */
-  _on(type, filter, callback) {
+  _on(type, filter2, callback) {
     const typeLower = type.toLocaleLowerCase();
     const ref = this.channelAdapter.on(type, callback);
     const binding = {
       type: typeLower,
-      filter,
+      filter: filter2,
       callback,
       ref
     };
@@ -20568,9 +20568,22 @@ var dirty = false;
 var busy = false;
 var specs = [["kind", "Tipo", "select", ["profile", "experience", "education", "project", "certificate", "link"]], ["slug", "Identificador URL", "text"], ["title", "T\xEDtulo / nombre profesional", "text"], ["subtitle", "Resumen", "textarea"], ["category", "Categor\xEDa", "text"], ["body", "Descripci\xF3n / caso pr\xE1ctico (texto plano)", "textarea"], ["tags", "Competencias separadas por comas", "text"], ["issuer", "Emisor / empresa / instituci\xF3n / ciudad", "text"], ["issued_on", "Fecha de expedici\xF3n o de inicio", "date"], ["expires_on", "Fecha de caducidad o de fin (vac\xEDo = actualidad)", "date"], ["website_url", "Web (HTTPS)", "url"], ["repository_url", "Repositorio (HTTPS)", "url"], ["verification_url", "Verificaci\xF3n / caso pr\xE1ctico / contacto (HTTPS)", "url"], ["cover_path", "Ruta de portada", "text"], ["document_path", "Ruta del documento", "text"], ["gallery_paths", "Rutas de galer\xEDa, una por l\xEDnea", "textarea"], ["sort_order", "Orden", "number"], ["published", "Publicado", "checkbox"]];
 var limits = { slug: 160, title: 200, subtitle: 500, category: 80, body: 16e3, tags: 600, issuer: 200, cover_path: 300, document_path: 300, gallery_paths: 4e3, website_url: 2e3, repository_url: 2e3, verification_url: 2e3 };
+var toastTimer;
 function message(s, error = false) {
-  $("status").textContent = s;
-  $("status").classList.toggle("error", error);
+  for (const id of ["status", "editStatus"]) {
+    const el = $(id);
+    if (el) {
+      el.textContent = s;
+      el.classList.toggle("error", error);
+    }
+  }
+  const t = $("toast");
+  if (t && s) {
+    t.textContent = s;
+    t.className = "a-toast show" + (error ? " error" : "");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.className = "a-toast", error ? 9e3 : 4e3);
+  }
 }
 function setBusy(v) {
   busy = v;
@@ -20581,18 +20594,58 @@ function mayLeave() {
 }
 function closeEditor() {
   $("editor").hidden = true;
+  $("shade").hidden = true;
+  document.body.classList.remove("a-lock");
   current = null;
   dirty = false;
+}
+var rows = [];
+var filter = "all";
+var kindLabel = { all: "Todo", profile: "Perfil", experience: "Experiencia", education: "Educaci\xF3n", project: "Proyectos", certificate: "Certificados", link: "Enlaces" };
+function friendly(e) {
+  const m = e.message || String(e);
+  if (e.code === "23505") return "Ya existe una entrada con ese Identificador URL. Cambia el identificador.";
+  if (e.code === "23514") return "Alg\xFAn campo no cumple el formato (enlaces https://, fechas o tipo). " + m;
+  if (e.code === "42501" || /row-level security/i.test(m)) return "Permiso denegado: inicia sesi\xF3n con la cuenta propietaria.";
+  if (/JWT|expired/i.test(m)) return "Sesi\xF3n caducada. Vuelve a iniciar sesi\xF3n.";
+  return m;
 }
 async function list() {
   const { data, error } = await client.from("mt_personal_items").select("*").order("sort_order").order("created_at", { ascending: false }).limit(500);
   if (error) throw error;
+  rows = data;
+  render();
+}
+function render() {
+  const tabs = $("kinds");
+  tabs.replaceChildren();
+  for (const k of Object.keys(kindLabel)) {
+    const n = k === "all" ? rows.length : rows.filter((r) => r.kind === k).length;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "a-chip" + (filter === k ? " on" : "");
+    b.textContent = `${kindLabel[k]} \xB7 ${n}`;
+    b.onclick = () => {
+      filter = k;
+      render();
+    };
+    tabs.append(b);
+  }
+  const q = ($("search").value || "").toLowerCase();
   $("records").replaceChildren();
-  for (const r of data) {
+  const shown = rows.filter((r) => (filter === "all" || r.kind === filter) && (!q || `${r.title} ${r.slug} ${r.issuer}`.toLowerCase().includes(q)));
+  for (const r of shown) {
     const row = document.createElement("div");
     row.className = "record";
     const span = document.createElement("span");
-    span.textContent = `${r.published ? "Publicado" : "Borrador"} \xB7 ${r.kind} \xB7 ${r.title}`;
+    const st = document.createElement("em");
+    st.className = r.published ? "pub" : "draft";
+    st.textContent = r.published ? "Publicado" : "Borrador";
+    const k = document.createElement("small");
+    k.textContent = kindLabel[r.kind] || r.kind;
+    const t = document.createElement("b");
+    t.textContent = r.title;
+    span.append(st, k, t);
     const b = document.createElement("button");
     b.type = "button";
     b.textContent = "Editar";
@@ -20601,6 +20654,12 @@ async function list() {
     };
     row.append(span, b);
     $("records").append(row);
+  }
+  if (!shown.length) {
+    const p = document.createElement("p");
+    p.className = "a-muted";
+    p.textContent = "No hay entradas con este filtro.";
+    $("records").append(p);
   }
 }
 function edit(r = null) {
@@ -20618,7 +20677,8 @@ function edit(r = null) {
     if (opts) for (const o of opts) f.append(new Option(o, o));
     if (type === "checkbox") f.checked = r?.[key] || false;
     else f.value = r?.[key] ?? (key === "sort_order" ? 0 : key === "kind" ? "project" : "");
-    if (["slug", "title"].includes(key)) f.required = true;
+    if (key === "title") f.required = true;
+    if (key === "slug" && !r) f.placeholder = "se genera desde el t\xEDtulo";
     if (limits[key]) f.maxLength = limits[key];
     if (type === "number") {
       f.min = 0;
@@ -20630,8 +20690,14 @@ function edit(r = null) {
     $("fields").append(wrap);
   }
   $("editor").hidden = false;
-  $("editTitle").textContent = r ? "Editar contenido" : "Nuevo contenido";
+  $("shade").hidden = false;
+  document.body.classList.add("a-lock");
+  $("editTitle").textContent = r ? "Editar: " + r.title : "Nueva entrada";
+  $("editStatus").textContent = r ? "" : "Rellena al menos Tipo, Identificador y T\xEDtulo y pulsa Guardar.";
+  $("editStatus").classList.remove("error");
   $("delete").hidden = !r;
+  $("editor").scrollTop = 0;
+  setTimeout(() => $("editor").elements.namedItem(r ? "title" : "kind").focus(), 30);
 }
 function values() {
   const v = {};
@@ -20647,14 +20713,26 @@ function values() {
   if (v.expires_on && v.issued_on && v.expires_on < v.issued_on) throw Error("La caducidad no puede preceder a la expedici\xF3n.");
   return v;
 }
-async function save() {
+function autoSlug() {
+  const f = $("editor").elements;
+  if (!current && !f.namedItem("slug").value.trim()) f.namedItem("slug").value = f.namedItem("title").value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
+}
+async function save(retry = true) {
+  autoSlug();
   const v = values();
   let q;
   if (current) q = client.from("mt_personal_items").update(v).eq("id", current.id).eq("updated_at", current.updated_at);
   else q = client.from("mt_personal_items").insert(v);
   const { data, error } = await q.select().maybeSingle();
-  if (error) throw error;
-  if (!data) throw Error("El contenido ha cambiado en otra sesi\xF3n. Cierra y vuelve a abrir el registro.");
+  if (error) throw new Error(friendly(error));
+  if (!data && current && retry) {
+    const r = await client.from("mt_personal_items").select("updated_at").eq("id", current.id).maybeSingle();
+    if (r.data) {
+      current = { ...current, updated_at: r.data.updated_at };
+      return save(false);
+    }
+  }
+  if (!data) throw Error("No se pudo guardar: el registro ya no existe o tu sesi\xF3n no es la propietaria. Recarga la p\xE1gina.");
   current = data;
   dirty = false;
   await list();
@@ -20665,10 +20743,12 @@ $("editor").onsubmit = async (e) => {
   if (busy) return;
   setBusy(true);
   try {
-    await save();
-    message("Guardado. Los cambios publicados ya est\xE1n disponibles.");
+    const d = await save();
+    $("editTitle").textContent = "Editar: " + d.title;
+    $("delete").hidden = false;
+    message(d.published ? "Guardado y publicado." : "Guardado como borrador (marca Publicado para mostrarlo).");
   } catch (e2) {
-    message(e2.message, true);
+    message(friendly(e2), true);
   } finally {
     setBusy(false);
   }
@@ -20676,7 +20756,33 @@ $("editor").onsubmit = async (e) => {
 $("newItem").onclick = () => {
   if (mayLeave()) edit();
 };
-$("cancel").onclick = () => {
+$("search").oninput = render;
+$("shade").onclick = () => {
+  if (mayLeave()) closeEditor();
+};
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !$("editor").hidden && mayLeave()) closeEditor();
+});
+$("cvBtn").onclick = () => {
+  const p = rows.find((r) => r.kind === "profile");
+  if (!p) {
+    message("Crea primero la entrada de tipo profile.", true);
+    return;
+  }
+  if (!mayLeave()) return;
+  edit(p);
+  $("uploadTarget").value = "document_path";
+  $("uploadFile").accept = "application/pdf";
+  $("editStatus").textContent = "Elige tu CV en PDF y pulsa Subir.";
+  $("uploadFile").click();
+};
+$("uploadTarget").onchange = () => {
+  $("uploadFile").accept = $("uploadTarget").value === "document_path" ? "application/pdf" : "image/jpeg,image/png,image/webp";
+};
+$("editor").addEventListener("invalid", (e) => {
+  message("Revisa el campo: " + (e.target.closest("label")?.firstChild?.textContent || e.target.name), true);
+}, true);
+$("cancel").onclick = $("xClose").onclick = () => {
   if (mayLeave()) closeEditor();
 };
 $("delete").onclick = async () => {
@@ -20684,7 +20790,7 @@ $("delete").onclick = async () => {
   setBusy(true);
   try {
     const { data, error } = await client.from("mt_personal_items").delete().eq("id", current.id).eq("updated_at", current.updated_at).select("id");
-    if (error) throw error;
+    if (error) throw new Error(friendly(error));
     if (!data.length) throw Error("Conflicto de edici\xF3n. Vuelve a abrir el registro.");
     closeEditor();
     await list();
@@ -20700,7 +20806,7 @@ $("upload").onclick = async () => {
   setBusy(true);
   let uploadedPath = null;
   try {
-    if (!current) throw Error("Guarda primero el registro.");
+    if (!current || dirty) await save();
     const file = $("uploadFile").files[0], target = $("uploadTarget").value;
     if (!file) throw Error("Selecciona un archivo.");
     if (file.size > 10485760) throw Error("M\xE1ximo 10 MB.");
@@ -20709,15 +20815,15 @@ $("upload").onclick = async () => {
     if (target === "document_path" && ext !== "pdf" || target !== "document_path" && ext === "pdf") throw Error("El tipo no corresponde al destino seleccionado.");
     const { data: { user }, error: ue } = await client.auth.getUser();
     if (ue || !user) throw Error("Sesi\xF3n caducada.");
-    uploadedPath = `${user.id}/${current.id}/${crypto.randomUUID()}.${ext}`;
+    uploadedPath = `${user.id}/${current.id}/${crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2)}.${ext}`;
     const { error } = await client.storage.from("mt-personal").upload(uploadedPath, file, { contentType: file.type, upsert: false });
-    if (error) throw error;
+    if (error) throw new Error(friendly(error));
     const f = $("editor").elements.namedItem(target);
     f.value = target === "gallery_paths" ? [f.value.trim(), uploadedPath].filter(Boolean).join("\n") : uploadedPath;
     dirty = true;
     await save();
     $("uploadFile").value = "";
-    message("Archivo subido y asociado.");
+    message(target === "document_path" && current.kind === "profile" ? "CV subido. Aparecer\xE1 como bot\xF3n de descarga en el portfolio si la entrada est\xE1 Publicada." : "Archivo subido y asociado.");
   } catch (e) {
     message(`${e.message}${uploadedPath ? " Si el archivo lleg\xF3 a subirse, puede quedar sin asociar; revisa Storage antes de borrarlo." : ""}`, true);
   } finally {
