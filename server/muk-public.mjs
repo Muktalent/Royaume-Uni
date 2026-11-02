@@ -92,8 +92,11 @@ export function mountMukPublic(app, { db = service } = {}) {
     const staff = ok(await client.from("crm_staff").select("user_id,role,active").eq("active", true).limit(300));
     const active = new Set(staff.map(s => s.user_id));
     const cards = ok(await client.from("mt_public_cards").select("*").eq("published", true).limit(200)).filter(c => active.has(c.owner_id));
+    // team-v16 · "Visible en web" (mt_employee_directory.web_visible). If the column is not there yet, nobody is hidden.
+    const vis = cards.length ? await client.from("mt_employee_directory").select("user_id,web_visible").in("user_id", cards.map(c => c.owner_id)) : { data: [] };
+    const hidden = new Set(vis.error ? [] : (vis.data || []).filter(d => d.web_visible === false).map(d => d.user_id));
     const out = [];
-    for (const c of cards) {
+    for (const c of cards.filter(c => !hidden.has(c.owner_id))) {
       const region = REGIONS.includes(c.region) ? c.region : regionOf(c.assigned_city) || "maghreb";
       const link = await cardLinkFor(client, c.owner_id, c.slug).catch(() => null);
       out.push({ slug: c.slug, name: c.display_name, title: c.job_title || "Student Recruitment Counsellor", city: c.assigned_city || null, languages: Array.isArray(c.languages) ? c.languages.slice(0, 4) : [], region, photo: `/api/counsellor/${c.slug}/photo`, url: link?.url || `/book/?c=${c.slug}` });

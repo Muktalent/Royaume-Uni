@@ -1,8 +1,6 @@
 import { mountAdminExperience, renderAdminPipeline } from "./admin-experience.js";
-import { mountProfessionalAdmin } from "./professional-workspace.js";
 import { requirePasswordChange } from "./employee-security.js";
-import { mountStaffAccounts } from "./staff-accounts.js";
-import { mountEmployee, mountWorkspaceAdmin } from "./employee.js";
+import { mountEmployee } from "./employee.js";
 import { initGateway, showLoginMessage, startMatrix, stopMatrix, showReset, t, gateLang } from "./gateway.js";
 import { mountStudentPortal } from "./student-portal.js";
 import { openMessenger, heartButton, watchNotifications, setDot, linkChatCss, icon as mkIcon } from "./muk-chat.js";
@@ -12,10 +10,11 @@ import { mountExportButtons } from "./exports.js";
 import { createClient } from "@supabase/supabase-js";
 import { AUTH_OPTIONS, watchDayEnd, stopWatch, setRememberDevice } from "./session-store.js";
 import { mountAdminSoft } from "./admin-soft.js";
+import { renderTeamAdmin, mountTeamBadge } from "./team-admin.js";
 import { offerInstall } from "./install-app.js";
 const $ = id => document.getElementById(id);
 const state = {client:null,session:null,staff:null,config:null,section:"overview",page:1,total:0,epoch:0,listRequest:0,detailRequest:0,relatedRequest:0,busy:false,loading:false,detail:null,dirty:false,related:"notes",relatedPage:1,staffOptions:[]};
-const titles={overview:"Resumen",passport:"Global Passport",candidates:"Leads y casos",enquiries:"Consultas",appointments:"Citas",staff:"Equipo",documents:"Documentos",intelligence:"Pipeline e informes"};
+const titles={overview:"Resumen",passport:"Global Passport",candidates:"Leads y casos",enquiries:"Consultas",appointments:"Citas",staff:"Equipo",documents:"Documentos",intelligence:"Pipeline e informes","team-create":"Crear colaborador","team-people":"Equipo","team-list":"Empleados","team-docs":"Documentos"};
 const statusText={new:"Nuevo",contacted:"Contactado",assessment_in_progress:"Evaluación en curso",documents_pending:"Documentos pendientes",ready_for_review:"Listo para revisión",on_hold:"En espera",closed:"Cerrado",in_progress:"En curso",awaiting_reply:"Esperando respuesta",resolved:"Resuelto",archived:"Archivado",confirmed:"Confirmada",completed:"Completada",cancelled:"Cancelada",no_show:"No se presentó",pending:"Pendiente",accepted:"Aceptado",rejected:"Rechazado",clean:"Limpio",infected:"Infectado",failed:"Fallido",open:"Abierta",revoked:"Revocada",admin:"Administrador",collaborator:"Colaborador",fr:"Francés",en:"Inglés"};
 const descriptions={overview:"Una vista global de la actividad y los próximos pasos.",candidates:"Leads y expedientes. Acepta como caso los leads que MUK Talent vaya a gestionar.",enquiries:"Revisa las consultas recibidas y organiza su seguimiento.",appointments:"Consulta las citas existentes y registra su resultado. Horas mostradas en Africa/Casablanca.",blocks:"Gestiona indisponibilidades de los asesores. No cancela citas existentes.",staff:"Cuentas, identidad profesional, territorios y acceso de los miembros del equipo.",settings:"Horario de apertura. Duración fija: 30 minutos y margen de 10 minutos.",documents:"Inventario de documentos existentes. No incluye descarga, subida ni análisis antivirus.","document-requests":"Consulta de solicitudes existentes. No genera enlaces privados."};
 function el(tag,text,cls){const n=document.createElement(tag);if(text!==undefined)n.textContent=String(text);if(cls)n.className=cls;return n;}
@@ -53,7 +52,7 @@ async function api(url,options={}){
  return result;
 }
 function resource(){return state.config.resources[state.section];}
-const GROUPS=[["home","Inicio","home",["overview"]],["students","Estudiantes","users",["candidates","enquiries","passport"]],["agenda","Agenda","calendar",["appointments"]],["team","Equipo","card",["staff","documents"]],["reports","Informes","chart",["intelligence"]]];
+const GROUPS=[["home","Inicio","home",["overview"]],["students","Estudiantes","users",["candidates","enquiries","passport"]],["agenda","Agenda","calendar",["appointments"]],["team","Equipo","card",["team-people","team-create","team-list","team-docs"]],["reports","Informes","chart",["intelligence"]]];
 const groupOf=name=>GROUPS.find(g=>g[3].includes(name))||GROUPS[0];
 function navIcon(name){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("aria-hidden","true");s.setAttribute("class","nav-icon");s.setAttribute("fill","none");s.setAttribute("stroke","currentColor");s.setAttribute("stroke-width","1.7");s.setAttribute("stroke-linecap","round");s.setAttribute("stroke-linejoin","round");for(const d of UI_PATHS[name]||[]){const p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d",d);s.append(p);}return s;}
 let adminWatch=null;
@@ -80,7 +79,17 @@ function markNav(name){
 }
 async function navigate(name,overdue=false){
  if(!state.session||!state.config)return;
- document.getElementById("adminPipelineView")?.remove();document.getElementById("adminPassportView")?.remove();
+ document.getElementById("adminPipelineView")?.remove();document.getElementById("adminPassportView")?.remove();document.getElementById("adminTeamView")?.remove();
+ if(name==="staff"||name==="documents")name="team-list";
+ if(String(name).startsWith("team-")){
+  state.section=name;state.page=1;state.listRequest++;state.loading=false;
+  $("overview").hidden=true;$("listView").hidden=true;$("createRecord").hidden=true;
+  const teamText={"team-people":"Todo el equipo de un vistazo. Toca una foto para ver su pantalla en modo lectura.","team-create":"Alta de un nuevo colaborador en un único formulario: datos, foto, salario y estado.","team-list":"Abre un empleado para editar sus datos, su visibilidad en la web o eliminar su perfil.","team-docs":"Contratos para firmar, nóminas y documentos recibidos del equipo."};
+  $("pageTitle").textContent=titles[name];$("pageDescription").textContent=teamText[name]||"";message("globalMessage");
+  markNav(name);
+  const host=document.createElement("section");host.id="adminTeamView";$("globalMessage").after(host);
+  return renderTeamAdmin({host,api,tab:name,navigate,notice:(t,err)=>message("globalMessage",t,Boolean(err))});
+ }
  if(name==="passport"){
   state.section=name;state.page=1;state.listRequest++;state.loading=false;
   $("overview").hidden=true;$("listView").hidden=true;$("createRecord").hidden=true;
@@ -357,16 +366,6 @@ async function initialise(){
   else{const {data}=await state.client.auth.getSession();if(data.session){showLoginMessage(t("restoring"));try{await enter(data.session);}catch(e){resetLogin(e.message);await state.client.auth.signOut({scope:"local"}).catch(()=>{});}}}
  }catch(e){showLoginMessage(`Unable to connect. ${e.message}`,"error");}
 }
-mountStaffAccounts({
-  api,
-  onCreated: async () => {
-    if (state.staff?.role !== "admin") return;
-    await loadStaffOptions();
-    if (state.section === "staff") await loadList();
-  }
-});
-mountWorkspaceAdmin({ api, getStaff: () => state.staff });
-mountProfessionalAdmin({ api, getStaff: () => state.staff });
 initialise();
 
 mountExportButtons(async()=>{
@@ -376,5 +375,6 @@ mountExportButtons(async()=>{
 
 mountAdminExperience({api,getState:()=>state,openRecord});
 mountAdminSoft({api,getState:()=>state,navigate});
+mountTeamBadge({api,getState:()=>state});
 
 

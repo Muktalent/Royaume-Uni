@@ -12,22 +12,27 @@ export function shiftMonth(month,delta){const [y,m]=month.split('-').map(Number)
 function days(month){const [y,m]=month.split('-').map(Number),n=new Date(Date.UTC(y,m,0)).getUTCDate(),out=[];for(let d=1;d<=n;d++){const date=new Date(Date.UTC(y,m-1,d));out.push({date:date.toISOString().slice(0,10),weekday:(date.getUTCDay()+6)%7});}return out;}
 
 // Pure calculation, unit-tested. verifiedDates are Morocco calendar dates (YYYY-MM-DD).
-export function computePayroll({month,today,verifiedDates=[],base=PAYROLL.base_monthly,perLead=PAYROLL.per_verified_lead}){
+export function computePayroll({month,today,verifiedDates=[],base=PAYROLL.base_monthly,perLead=PAYROLL.per_verified_lead,currency=PAYROLL.currency}){
  const list=days(month),work=list.filter(d=>d.weekday<5),working_days=work.length;
  const elapsed_days=today<list[0].date?0:today>list[list.length-1].date?working_days:work.filter(d=>d.date<=today).length;
  const daily=working_days?base/working_days:0,inMonth=verifiedDates.filter(d=>d.startsWith(month)).sort();
  const commission=inMonth.length*perLead,base_accrued=Math.round(daily*elapsed_days*100)/100;
  const byDay={};for(const d of inMonth)byDay[d]=(byDay[d]||0)+1;
- return {month,currency:PAYROLL.currency,base_monthly:base,per_verified_lead:perLead,daily_rate:Math.round(daily*100)/100,working_days,elapsed_days,remaining_days:working_days-elapsed_days,
+ return {month,currency,base_monthly:base,per_verified_lead:perLead,daily_rate:Math.round(daily*100)/100,working_days,elapsed_days,remaining_days:working_days-elapsed_days,
   verified_count:inMonth.length,commission,base_accrued,earned_to_date:Math.round((base_accrued+commission)*100)/100,projected_total:base+commission,
   days:list.map(d=>({date:d.date,workday:d.weekday<5,verified:byDay[d.date]||0}))};
 }
-export function history({month,today,verifiedDates,base,perLead,months=9}){const out=[];for(let i=months-1;i>=0;i--){const m=shiftMonth(month,-i),p=computePayroll({month:m,today,verifiedDates,base,perLead});out.push({month:m,verified_count:p.verified_count,commission:p.commission,total:m<today.slice(0,7)?p.projected_total:p.earned_to_date});}return out;}
+export function history({month,today,verifiedDates,base,perLead,currency,months=9}){const out=[];for(let i=months-1;i>=0;i--){const m=shiftMonth(month,-i),p=computePayroll({month:m,today,verifiedDates,base,perLead,currency});out.push({month:m,verified_count:p.verified_count,commission:p.commission,total:m<today.slice(0,7)?p.projected_total:p.earned_to_date});}return out;}
 
 function privileged(){if(!process.env.SUPABASE_SERVICE_ROLE_KEY)throw Error('Payroll unavailable');return createClient(process.env.SUPABASE_URL,process.env.SUPABASE_SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});}
 function check(r){if(r.error)throw Error('Database operation failed');return r.data;}
 function bounds(month,months){const from=shiftMonth(month,-(months-1)),[fy,fm]=from.split('-').map(Number),[ty,tm]=month.split('-').map(Number);return {from:new Date(Date.UTC(fy,fm-1,1)-86400000).toISOString(),to:new Date(Date.UTC(ty,tm,1)+86400000).toISOString()};}
-async function rate(client,id){const d=await client.from('mt_employee_directory').select('commission_rate,commission_currency').eq('user_id',id).maybeSingle();const r=d.data;return !d.error&&r&&r.commission_rate!=null&&r.commission_currency==='MAD'?Number(r.commission_rate):PAYROLL.per_verified_lead;}
+// Per-employee pay terms (team-v16). Without a saved salary the historic default (3,000 MAD + 2,000 MAD per lead) applies.
+export function payTerms(d){const currency=d&&/^[A-Z]{3}$/.test(d.salary_currency||'')?d.salary_currency:PAYROLL.currency,isDefault=currency===PAYROLL.currency;
+ const base=d&&d.base_salary!=null&&Number.isFinite(Number(d.base_salary))?Number(d.base_salary):isDefault?PAYROLL.base_monthly:0;
+ const perLead=d&&d.commission_rate!=null&&(d.commission_currency||PAYROLL.currency)===currency?Number(d.commission_rate):isDefault?PAYROLL.per_verified_lead:0;
+ return {base,perLead,currency};}
+async function terms(client,id){let d=await client.from('mt_employee_directory').select('commission_rate,commission_currency,base_salary,salary_currency').eq('user_id',id).maybeSingle();if(d.error)d=await client.from('mt_employee_directory').select('commission_rate,commission_currency').eq('user_id',id).maybeSingle();return payTerms(d.error?null:d.data);}
 
 export function mountPayroll(app,{requireStaff,requireAdmin}){
  const wrap=fn=>async(req,res)=>{try{await fn(req,res);}catch(e){const forbidden=e.message==='Forbidden';res.status(e instanceof z.ZodError?400:forbidden?403:503).json({error:e instanceof z.ZodError?'Invalid month.':forbidden?'Not allowed.':'Payroll is temporarily unavailable.',requestId:req.requestId});}};
@@ -36,18 +41,21 @@ export function mountPayroll(app,{requireStaff,requireAdmin}){
  app.get('/api/workspace/payroll',requireStaff,wrap(async(req,res)=>{
   const id=owner(req),month=monthText.parse(req.query.month||currentMonth()),today=dayKey(new Date()),client=privileged(),{from,to}=bounds(month,9);
   const rows=check(await client.from('crm_candidates').select('id,reference,case_accepted_at').eq('assigned_to',id).not('case_accepted_at','is',null).gte('case_accepted_at',from).lt('case_accepted_at',to).is('archived_at',null).or(`created_by.eq.${id},source.eq.public_counsellor_card`).order('case_accepted_at',{ascending:true}).limit(1000));
-  const verifiedDates=rows.map(r=>dayKey(r.case_accepted_at)),perLead=await rate(client,id),summary=computePayroll({month,today,verifiedDates,perLead});
+  const verifiedDates=rows.map(r=>dayKey(r.case_accepted_at)),t=await terms(client,id),perLead=t.perLead,summary=computePayroll({month,today,verifiedDates,...t});
   const leads=rows.filter(r=>dayKey(r.case_accepted_at).startsWith(month)).map(r=>({reference:r.reference,verified_on:dayKey(r.case_accepted_at),amount:perLead}));
-  res.json({data:{...summary,today,zone:PAYROLL.zone,workdays:PAYROLL.workdays,leads,history:history({month,today,verifiedDates,perLead}),notice:'Estimate for information. Final pay is confirmed by MUK Talent administration.'}});
+  res.json({data:{...summary,today,zone:PAYROLL.zone,workdays:PAYROLL.workdays,leads,history:history({month,today,verifiedDates,...t}),notice:'Estimate for information. Final pay is confirmed by MUK Talent administration.'}});
  }));
  // Team overview for administrators (one query for everyone, no personal data beyond name and totals).
  app.get('/api/admin/payroll',requireStaff,requireAdmin,wrap(async(req,res)=>{
   const month=monthText.parse(req.query.month||currentMonth()),today=dayKey(new Date()),client=privileged(),{from,to}=bounds(month,1);
   const team=check(await client.from('crm_staff').select('user_id,full_name,role,active').eq('active',true).eq('role','collaborator').order('full_name').limit(200));
   const ids=team.map(t=>t.user_id),rows=ids.length?check(await client.from('crm_candidates').select('assigned_to,created_by,source,case_accepted_at').in('assigned_to',ids).not('case_accepted_at','is',null).gte('case_accepted_at',from).lt('case_accepted_at',to).is('archived_at',null).limit(5000)):[];
-  const dirs=ids.length?check(await client.from('mt_employee_directory').select('user_id,commission_rate,commission_currency').in('user_id',ids)):[];
-  const data=team.map(t=>{const d=dirs.find(x=>x.user_id===t.user_id),perLead=d&&d.commission_rate!=null&&d.commission_currency==='MAD'?Number(d.commission_rate):PAYROLL.per_verified_lead;const dates=rows.filter(r=>r.assigned_to===t.user_id&&(r.created_by===t.user_id||r.source==='public_counsellor_card')).map(r=>dayKey(r.case_accepted_at));const p=computePayroll({month,today,verifiedDates:dates,perLead});return {user_id:t.user_id,full_name:t.full_name,verified_count:p.verified_count,commission:p.commission,base_accrued:p.base_accrued,earned_to_date:p.earned_to_date,projected_total:p.projected_total};});
-  const totals=data.reduce((a,r)=>({verified_count:a.verified_count+r.verified_count,commission:a.commission+r.commission,projected_total:a.projected_total+r.projected_total}),{verified_count:0,commission:0,projected_total:0});
-  res.json({data,totals,month,currency:PAYROLL.currency,base_monthly:PAYROLL.base_monthly,per_verified_lead:PAYROLL.per_verified_lead});
+  let dq=ids.length?await client.from('mt_employee_directory').select('user_id,commission_rate,commission_currency,base_salary,salary_currency,removed_at').in('user_id',ids):{data:[]};if(dq.error)dq=await client.from('mt_employee_directory').select('user_id,commission_rate,commission_currency').in('user_id',ids);const dirs=check(dq);
+  const data=team.filter(t=>!dirs.find(x=>x.user_id===t.user_id)?.removed_at).map(t=>{const d=dirs.find(x=>x.user_id===t.user_id),pt=payTerms(d);const dates=rows.filter(r=>r.assigned_to===t.user_id&&(r.created_by===t.user_id||r.source==='public_counsellor_card')).map(r=>dayKey(r.case_accepted_at));const p=computePayroll({month,today,verifiedDates:dates,...pt});return {user_id:t.user_id,full_name:t.full_name,currency:pt.currency,base_monthly:pt.base,per_verified_lead:pt.perLead,verified_count:p.verified_count,commission:p.commission,base_accrued:p.base_accrued,earned_to_date:p.earned_to_date,projected_total:p.projected_total};});
+  // Totals are only summed per currency; amounts in different currencies are never added together.
+  const by={};for(const r of data){const a=by[r.currency]||(by[r.currency]={currency:r.currency,verified_count:0,commission:0,projected_total:0,people:0});a.verified_count+=r.verified_count;a.commission+=r.commission;a.projected_total+=r.projected_total;a.people++;}
+  const totals_by_currency=Object.values(by).sort((a,b)=>b.people-a.people),main=totals_by_currency[0]||{currency:PAYROLL.currency,verified_count:0,commission:0,projected_total:0};
+  const totals={verified_count:data.reduce((a,r)=>a+r.verified_count,0),commission:main.commission,projected_total:main.projected_total};
+  res.json({data,totals,totals_by_currency,month,currency:main.currency,base_monthly:PAYROLL.base_monthly,per_verified_lead:PAYROLL.per_verified_lead});
  }));
 }

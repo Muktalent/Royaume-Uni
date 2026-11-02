@@ -5,16 +5,16 @@ const $=id=>document.getElementById(id);
 const E=(t,v,c)=>{const n=document.createElement(t);if(v!=null)n.textContent=String(v);if(c)n.className=c;return n;};
 const fmt=(v,key)=>{if(v==null||v==='')return '—';if(/_at$|last_updated/.test(key)){const d=new Date(v);return isNaN(d)?String(v):d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}return String(v);};
 const order=c=>[...c.filter(x=>x[0]==='reference'),...c.filter(x=>x[0]==='stage'),['__status','Status'],...c.filter(x=>x[0]!=='reference'&&x[0]!=='stage')];
-let report=null,filter='',q='';
+let report=null,filter='',q='',shareToken='';
 async function start(){
- const token=location.hash.slice(1);history.replaceState(null,'',location.pathname);
+ const token=location.hash.slice(1);history.replaceState(null,'',location.pathname);shareToken=token;
  if(!/^[A-Za-z0-9_-]{40,100}$/.test(token)){fail('This link is incomplete. Ask MUK Talent for a new report link.');return;}
  try{const r=await fetch('/api/pipeline-share',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token}),cache:'no-store',credentials:'omit'});const j=await r.json().catch(()=>({}));if(!r.ok)throw Error(j.error||'This report is unavailable.');report=j;}catch(e){fail(e.message);return;}
  $('title').textContent=report.title||'Accepted case pipeline';
- $('meta').textContent=report.count+' accepted cases · as of '+new Date(report.as_of).toLocaleString('en-GB')+' · link expires '+new Date(report.expires_at).toLocaleString('en-GB');
+ $('meta').textContent=(report.recipient?'Prepared for '+report.recipient+' · ':'')+report.count+' accepted cases · as of '+new Date(report.as_of).toLocaleString('en-GB')+' · link expires '+new Date(report.expires_at).toLocaleString('en-GB');
  for(const s of new Set(Object.values(META).map(m=>m[0])))$('filter').append(new Option(s,s));
  $('filter').onchange=()=>{filter=$('filter').value;paint();};$('q').oninput=()=>{q=$('q').value.trim().toLowerCase();paint();};
- $('print').hidden=$('csv').hidden=$('tools').hidden=false;$('print').onclick=()=>print();$('csv').onclick=csv;
+ $('print').hidden=$('csv').hidden=$('xlsx').hidden=$('tools').hidden=false;$('xlsx').onclick=xlsx;$('print').onclick=()=>print();$('csv').onclick=csv;
  paint();
 }
 function fail(text){$('title').textContent='Report unavailable';$('meta').textContent=text;$('meta').classList.add('ps-error');}
@@ -29,3 +29,11 @@ function paint(){
 }
 function csv(){const cols=order(report.columns||[]);const esc=v=>{let s=String(v??'');if(/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';};const lines=[cols.map(c=>esc(c[1])).join(',')];for(const r of rows())lines.push(cols.map(([k])=>esc(k==='__status'?(META[r.stage]||['—'])[0]:r[k])).join(','));const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),a=E('a');a.href=URL.createObjectURL(blob);a.download='muk-talent-pipeline.csv';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);}
 start();
+
+async function xlsx(){const b=$('xlsx');b.disabled=true;const label=b.textContent;b.textContent='Preparing…';
+ try{const r=await fetch('/api/pipeline-share/xlsx',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:shareToken}),cache:'no-store',credentials:'omit'});
+  if(!r.ok){const j=await r.json().catch(()=>({}));throw Error(j.error||'Download unavailable.');}
+  const blob=await r.blob(),cd=r.headers.get('Content-Disposition')||'',name=/filename="([^"]+)"/.exec(cd)?.[1]||'MUK-Talent-pipeline.xlsx',a=document.createElement('a'),url=URL.createObjectURL(blob);
+  a.href=url;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);}
+ catch(e){$('meta').textContent=e.message;$('meta').classList.add('ps-error');}
+ finally{b.disabled=false;b.textContent=label;}}

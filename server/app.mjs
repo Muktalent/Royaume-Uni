@@ -23,6 +23,7 @@ import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { mountTeamHr } from "./team-hr.mjs";
 import { InputError, validId, validateValues, validateRelations } from "./validation.mjs";
 
 const config = JSON.parse(readFileSync(new URL("./crm-config.json", import.meta.url), "utf8"));
@@ -41,7 +42,7 @@ if (!origin.startsWith("https://")) throw new Error("SUPABASE_URL debe usar HTTP
 const root = fileURLToPath(new URL("../", import.meta.url));
 const app = express();
 app.disable("x-powered-by");
-app.use(helmet({contentSecurityPolicy:{directives:{connectSrc:["'self'",origin,"https://api.cloudinary.com"],imgSrc:["'self'","data:","blob:",origin,"https://res.cloudinary.com","https://i.vimeocdn.com","https://i.ytimg.com"],frameSrc:["https://player.vimeo.com","https://www.youtube-nocookie.com"],mediaSrc:["'self'","blob:",origin,"https://res.cloudinary.com"]}}}));
+app.use(helmet({contentSecurityPolicy:{directives:{connectSrc:["'self'",origin,"https://api.cloudinary.com"],imgSrc:["'self'","data:","blob:",origin,"https://res.cloudinary.com","https://i.vimeocdn.com","https://i.ytimg.com"],frameSrc:["blob:","https://player.vimeo.com","https://www.youtube-nocookie.com"],mediaSrc:["'self'","blob:",origin,"https://res.cloudinary.com"]}}}));
 app.use((req,res,next)=>{req.requestId=randomUUID();res.set("X-Request-Id",req.requestId);res.set("Cache-Control","no-store");res.set("Permissions-Policy","camera=(), microphone=(), geolocation=(), payment=()");next();});
 app.use("/api",rateLimit({keyGenerator:(req)=>ipKeyGenerator((process.env.VERCEL?String(req.headers["x-vercel-forwarded-for"]||req.headers["x-forwarded-for"]||"").split(",")[0].trim():req.ip)||"127.0.0.1"),validate:{xForwardedForHeader:false},windowMs:60000,limit:240,standardHeaders:"draft-7",legacyHeaders:false,message:{error:"Demasiadas peticiones. Espera un minuto."}}));
 app.use(express.json({limit:"64kb",strict:true}));
@@ -80,6 +81,7 @@ app.get("/api/me",requireStaff,(req,res)=>res.json({staff:req.staff}));
 mountCardLinks(app, { requireStaff });
 mountProfessionalWorkspace(app, { requireStaff, requireAdmin });
 mountPayroll(app, { requireStaff, requireAdmin });
+mountTeamHr(app, { requireStaff, requireAdmin });
 mountAdminPipeline(app, { requireStaff, requireAdmin });
 mountEvaluation(app);
 mountAssistant(app);
