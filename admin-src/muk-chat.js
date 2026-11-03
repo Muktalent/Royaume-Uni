@@ -41,9 +41,24 @@ const listTime = (iso, lang) => { const d = new Date(iso); return d.toDateString
 const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
 const initials = n => String(n || 'M').split(/\s+/).filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase();
 function avatar(name, url, cls = 'mkc-av') { const a = E('span', undefined, cls); a.dataset.tone = String([...String(name || '')].reduce((x, c) => x + c.charCodeAt(0), 0) % 5); if (url) { const i = E('img'); i.src = url; i.alt = ''; i.referrerPolicy = 'no-referrer'; i.onerror = () => { i.remove(); a.textContent = initials(name); }; a.append(i); } else a.textContent = initials(name); return a; }
-export function linkChatCss() { if (document.getElementById('mukChatCss')) return; const l = E('link'); l.id = 'mukChatCss'; l.rel = 'stylesheet'; l.href = '/admin/muk-chat.css?v=17.0.0'; document.head.append(l); }
+export function linkChatCss() { if (document.getElementById('mukChatCss')) return; const l = E('link'); l.id = 'mukChatCss'; l.rel = 'stylesheet'; l.href = '/admin/muk-chat.css?v=18.0.0'; document.head.append(l); }
 function toast(text) { const t = E('div', text, 'mkc-toast'); t.setAttribute('role', 'status'); document.body.append(t); setTimeout(() => t.remove(), 2600); }
-function overlay(cls, label) { linkChatCss(); const o = E('div', undefined, 'mkc-layer ' + cls); o.setAttribute('role', 'dialog'); o.setAttribute('aria-modal', 'true'); o.setAttribute('aria-label', label); document.body.append(o); document.documentElement.classList.add('mkc-lock'); const prev = document.activeElement; const close = () => { o.remove(); if (!document.querySelector('.mkc-layer')) document.documentElement.classList.remove('mkc-lock'); prev?.focus?.(); }; o.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } }); return { o, close }; }
+// v18 · On phones the keyboard shrinks the visible area. Keep the chat exactly on the visible part (no page showing underneath)
+// and freeze the page behind it, so the composer stays glued to the keyboard like WhatsApp.
+let pinCount = 0, pinY = 0;
+export function pinToViewport(el) {
+  const vv = window.visualViewport; const html = document.documentElement, body = document.body;
+  if (pinCount++ === 0) { pinY = scrollY; body.style.position = 'fixed'; body.style.top = -pinY + 'px'; body.style.left = '0'; body.style.right = '0'; body.style.width = '100%'; }
+  const fit = () => { if (!vv) return; el.style.setProperty('top', vv.offsetTop + 'px', 'important'); el.style.setProperty('height', vv.height + 'px', 'important'); el.style.setProperty('bottom', 'auto', 'important'); html.style.setProperty('--mkc-kb', Math.max(0, innerHeight - vv.height) + 'px'); };
+  fit(); vv?.addEventListener('resize', fit); vv?.addEventListener('scroll', fit);
+  return () => {
+    vv?.removeEventListener('resize', fit); vv?.removeEventListener('scroll', fit);
+    ['top', 'height', 'bottom'].forEach(k => el.style.removeProperty(k));
+    if (--pinCount === 0) { body.style.position = body.style.top = body.style.left = body.style.right = body.style.width = ''; html.style.removeProperty('--mkc-kb'); scrollTo(0, pinY); }
+  };
+}
+
+function overlay(cls, label) { linkChatCss(); const o = E('div', undefined, 'mkc-layer ' + cls); o.setAttribute('role', 'dialog'); o.setAttribute('aria-modal', 'true'); o.setAttribute('aria-label', label); document.body.append(o); document.documentElement.classList.add('mkc-lock'); const unpin = matchMedia('(max-width: 899px), (pointer: coarse)').matches ? pinToViewport(o) : () => { }; const prev = document.activeElement; const close = () => { unpin(); o.remove(); if (!document.querySelector('.mkc-layer')) document.documentElement.classList.remove('mkc-lock'); prev?.focus?.(); }; o.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); close(); } }); return { o, close }; }
 
 // ---------------- Instagram-style hide on scroll ----------------
 export function hideOnScroll(el, { offset = 64 } = {}) {

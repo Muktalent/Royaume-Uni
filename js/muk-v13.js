@@ -38,6 +38,34 @@
     team().then(list => { track.replaceChildren(...list.map(card), ...(list.length < 2 ? [soon()] : [])); track.scrollLeft = 0; requestAnimationFrame(updateNav); });
   }
 
+  /* ---------------- v18 · Our counsellors gallery (About): one photo in colour, the rest in black and white ---------------- */
+  function mountGallery(box) {
+    const gal = $("[data-v18-gallery]", box); if (!gal) return;
+    const nameEl = $("[data-v18-name]", box), roleEl = $("[data-v18-role]", box), metaEl = $("[data-v18-meta]", box), idBox = $(".v18-member-id", box);
+    const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let shots = [], list = [], current = -1;
+    const show = (i, focus) => {
+      if (i === current || !list[i]) return; current = i; const m = list[i];
+      shots.forEach((b, k) => { const on = k === i; b.classList.toggle("is-active", on); b.setAttribute("aria-pressed", String(on)); });
+      const paint = () => { nameEl.textContent = m.name; roleEl.textContent = m.title || "Student counsellor"; metaEl.textContent = [m.city, (m.languages || []).join(" · ")].filter(Boolean).join(" · "); idBox.classList.remove("is-out"); };
+      if (reduce || !nameEl.textContent) paint(); else { idBox.classList.add("is-out"); setTimeout(paint, 180); }
+      if (focus) shots[i].focus({ preventScroll: true });
+      const b = shots[i]; if (gal.scrollWidth > gal.clientWidth) gal.scrollTo({ left: Math.max(0, b.offsetLeft - 8), behavior: reduce ? "auto" : "smooth" });
+    };
+    team().then(data => {
+      list = data;
+      if (!list.length) { box.classList.add("is-empty"); nameEl.textContent = "L’équipe s’agrandit"; nameEl.removeAttribute("data-no-i18n"); roleEl.textContent = ""; gal.hidden = true; return; }
+      shots = list.map((m, i) => {
+        const b = el("button", "v18-shot"); b.type = "button"; b.setAttribute("aria-label", `${m.name} · ${m.title || ""}`); b.setAttribute("aria-pressed", "false"); b.setAttribute("data-no-i18n", "");
+        b.append(photo(m, "v18-shot-photo"));
+        b.addEventListener("click", () => show(i));
+        b.addEventListener("keydown", e => { const rtl = d.documentElement.dir === "rtl"; const k = e.key === "ArrowRight" ? (rtl ? -1 : 1) : e.key === "ArrowLeft" ? (rtl ? 1 : -1) : 0; if (k) { e.preventDefault(); show((i + k + list.length) % list.length, true); } });
+        return b;
+      });
+      gal.replaceChildren(...shots); gal.style.setProperty("--n", String(list.length)); current = -1; show(0);
+    });
+  }
+
   /* ---------------- New content (home): floating banner + full-screen latest videos ---------------- */
   function mountLatest() {
     if (!/^\/(index\.html)?$/.test(location.pathname)) return;
@@ -197,7 +225,8 @@
   window.MUKTalk = Object.freeze({ open, close });
 
   function init() {
-    $$("#notre-equipe").forEach(mountTeam);
+    $$("#notre-equipe:not(.v18-team)").forEach(mountTeam);
+    $$("[data-v18-team]").forEach(mountGallery);
     $$("[data-v13-faces]").forEach(mountFaces);
     mountLatest();
     d.addEventListener("click", e => { const b = e.target.closest("[data-v13-talk]"); if (!b) return; e.preventDefault(); open({ source: location.pathname.startsWith("/parents") ? "parents" : "home", priority: b.dataset.priority }); });

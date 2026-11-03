@@ -43,7 +43,7 @@ function loadPack(l){
  packPromises[l]=new Promise(res=>{
   const done=()=>res(pack(l));
   if(existing){if(pack(l))return done();existing.addEventListener("load",done,{once:true});existing.addEventListener("error",()=>res(null),{once:true});setTimeout(done,4000);return;}
-  const s=document.createElement("script");s.src=`/i18n/${l}.js?v=14.0.0`;s.onload=done;s.onerror=()=>res(null);document.head.append(s);
+  const s=document.createElement("script");s.src=`/i18n/${l}.js?v=18.0.0`;s.onload=done;s.onerror=()=>res(null);document.head.append(s);
  });
  return packPromises[l];
 }

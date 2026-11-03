@@ -21982,7 +21982,7 @@ function linkChatCss() {
   const l = E4("link");
   l.id = "mukChatCss";
   l.rel = "stylesheet";
-  l.href = "/admin/muk-chat.css?v=17.0.0";
+  l.href = "/admin/muk-chat.css?v=18.0.0";
   document.head.append(l);
 }
 function toast(text) {
@@ -21990,6 +21990,40 @@ function toast(text) {
   t2.setAttribute("role", "status");
   document.body.append(t2);
   setTimeout(() => t2.remove(), 2600);
+}
+var pinCount = 0;
+var pinY = 0;
+function pinToViewport(el2) {
+  const vv = window.visualViewport;
+  const html = document.documentElement, body = document.body;
+  if (pinCount++ === 0) {
+    pinY = scrollY;
+    body.style.position = "fixed";
+    body.style.top = -pinY + "px";
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
+  }
+  const fit = () => {
+    if (!vv) return;
+    el2.style.setProperty("top", vv.offsetTop + "px", "important");
+    el2.style.setProperty("height", vv.height + "px", "important");
+    el2.style.setProperty("bottom", "auto", "important");
+    html.style.setProperty("--mkc-kb", Math.max(0, innerHeight - vv.height) + "px");
+  };
+  fit();
+  vv?.addEventListener("resize", fit);
+  vv?.addEventListener("scroll", fit);
+  return () => {
+    vv?.removeEventListener("resize", fit);
+    vv?.removeEventListener("scroll", fit);
+    ["top", "height", "bottom"].forEach((k) => el2.style.removeProperty(k));
+    if (--pinCount === 0) {
+      body.style.position = body.style.top = body.style.left = body.style.right = body.style.width = "";
+      html.style.removeProperty("--mkc-kb");
+      scrollTo(0, pinY);
+    }
+  };
 }
 function overlay(cls, label2) {
   linkChatCss();
@@ -21999,8 +22033,11 @@ function overlay(cls, label2) {
   o.setAttribute("aria-label", label2);
   document.body.append(o);
   document.documentElement.classList.add("mkc-lock");
+  const unpin = matchMedia("(max-width: 899px), (pointer: coarse)").matches ? pinToViewport(o) : () => {
+  };
   const prev = document.activeElement;
   const close = () => {
+    unpin();
     o.remove();
     if (!document.querySelector(".mkc-layer")) document.documentElement.classList.remove("mkc-lock");
     prev?.focus?.();
@@ -24739,11 +24776,29 @@ function applyV17({ role: role2 = "admin", lang: lang2 = "es" } = {}) {
   const html = document.documentElement;
   html.classList.add("v17");
   html.dataset.v17Role = role2;
+  if (!html.dataset.v17Kb && window.visualViewport) {
+    html.dataset.v17Kb = "1";
+    const vv = window.visualViewport;
+    let base = vv.height, bw = innerWidth;
+    const kb = () => {
+      if (innerWidth !== bw) {
+        bw = innerWidth;
+        base = vv.height;
+      }
+      base = Math.max(base, vv.height);
+      const t2 = document.activeElement;
+      const typing = t2 && (t2.tagName === "INPUT" || t2.tagName === "TEXTAREA" || t2.isContentEditable);
+      html.classList.toggle("v17-kb", !!typing && vv.height < base * 0.8);
+    };
+    vv.addEventListener("resize", kb);
+    addEventListener("focusin", () => setTimeout(kb, 300));
+    addEventListener("focusout", () => setTimeout(kb, 120));
+  }
   if (!document.getElementById("mukV17Css")) {
     const l = E9("link");
     l.id = "mukV17Css";
     l.rel = "stylesheet";
-    l.href = "/admin/muk-v17.css?v=17.0.0";
+    l.href = "/admin/muk-v17.css?v=18.0.0";
     document.head.append(l);
   } else document.head.append(document.getElementById("mukV17Css"));
   let m = document.querySelector("meta[name=theme-color]");

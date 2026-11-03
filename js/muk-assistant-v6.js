@@ -419,13 +419,19 @@ async function open(){
  if(!opened){opened=true;labels();if(KB)renderAll();}
  panel.hidden=false;requestAnimationFrame(()=>panel.classList.add("is-open"));
  launch.setAttribute("aria-expanded","true");root.classList.add("is-open");
- if(matchMedia("(max-width:640px)").matches)d.classList.add("v6a-lock");
+ if(matchMedia("(max-width:640px)").matches){d.classList.add("v6a-lock");pinPanel();}
  setTimeout(()=>{if(!matchMedia("(pointer:coarse)").matches)input.focus();},120);
  aiStatus();
 }
+/* v18 · Phones: keep the panel on the visible area when the keyboard opens and freeze the page behind it. */
+let unpinPanel=()=>{};
+function pinPanel(){unpinPanel();const vv=window.visualViewport,b=document.body,y=scrollY;b.style.position="fixed";b.style.top=-y+"px";b.style.left="0";b.style.right="0";b.style.width="100%";
+ const fit=()=>{if(!vv)return;panel.style.setProperty("top",vv.offsetTop+"px","important");panel.style.setProperty("height",vv.height+"px","important");panel.style.setProperty("bottom","auto","important");};
+ fit();vv&&vv.addEventListener("resize",fit);vv&&vv.addEventListener("scroll",fit);
+ unpinPanel=()=>{vv&&vv.removeEventListener("resize",fit);vv&&vv.removeEventListener("scroll",fit);["top","height","bottom"].forEach(k=>panel.style.removeProperty(k));b.style.position=b.style.top=b.style.left=b.style.right=b.style.width="";scrollTo(0,y);unpinPanel=()=>{};};}
 function close(){
  if(inCall)endCall();if(listening&&srvRec){srvRec.abort();srvRec=null;listening=false;micState(false);}if(listening&&rec)rec.abort();stopSpeak();
- panel.classList.remove("is-open");root.classList.remove("is-open");launch.setAttribute("aria-expanded","false");d.classList.remove("v6a-lock");
+ panel.classList.remove("is-open");root.classList.remove("is-open");launch.setAttribute("aria-expanded","false");d.classList.remove("v6a-lock");unpinPanel();
  setTimeout(()=>{if(!panel.classList.contains("is-open"))panel.hidden=true;},260);
  launch.focus();
 }

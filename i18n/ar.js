@@ -5,3 +5,4 @@
 
 /* MUK_I18N_V14 */
 (function(p){if(!p)return;Object.assign(p.t,{"De nouveaux counsellors nous rejoignent bientôt. Écrivez-nous en attendant : nous vous répondons depuis le Royaume-Uni.": "ينضم إلينا قريبًا مستشارون جدد. في الأثناء، راسلونا: نجيبكم من المملكة المتحدة.", "Nouveau contenu": "محتوى جديد", "Nos dernières vidéos": "أحدث مقاطع الفيديو", "Dernières vidéos": "أحدث الفيديوهات", "Masquer": "إخفاء", "Nouveau": "جديد", "Vidéo": "فيديو", "Ouvrir la vidéo ↗": "فتح الفيديو ↗", "Fermer": "إغلاق", "Rencontrer l’équipe": "تعرّفوا على الفريق"});})(window.MUK_I18N_PACKS.ar);
+(function(p){if(!p)return;Object.assign(p.t,{"Gratuit": "مجاناً", "Premier accompagnement": "إرشاد أولي", "Étapes vers le Royaume-Uni": "خطوات نحو مشروعك في المملكة المتحدة", "Rentrée universitaire": "الدخول الجامعي"});})((window.MUK_I18N_PACKS||{}).ar);

@@ -52,7 +52,9 @@ function ago(at, lang) {
 let applied = false;
 export function applyV17({role = 'admin', lang = 'es'} = {}) {
   const html = document.documentElement; html.classList.add('v17'); html.dataset.v17Role = role;
-  if (!document.getElementById('mukV17Css')) { const l = E('link'); l.id = 'mukV17Css'; l.rel = 'stylesheet'; l.href = '/admin/muk-v17.css?v=17.0.0'; document.head.append(l); }
+  // v18 · Teclado abierto en el móvil: la barra inferior se oculta para no subir encima del teclado.
+  if (!html.dataset.v17Kb && window.visualViewport) { html.dataset.v17Kb = '1'; const vv = window.visualViewport; let base = vv.height, bw = innerWidth; const kb = () => { if (innerWidth !== bw) { bw = innerWidth; base = vv.height; } base = Math.max(base, vv.height); const t = document.activeElement; const typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable); html.classList.toggle('v17-kb', !!typing && vv.height < base * 0.8); }; vv.addEventListener('resize', kb); addEventListener('focusin', () => setTimeout(kb, 300)); addEventListener('focusout', () => setTimeout(kb, 120)); }
+  if (!document.getElementById('mukV17Css')) { const l = E('link'); l.id = 'mukV17Css'; l.rel = 'stylesheet'; l.href = '/admin/muk-v17.css?v=18.0.0'; document.head.append(l); }
   else document.head.append(document.getElementById('mukV17Css')); // siempre la última hoja
   let m = document.querySelector('meta[name=theme-color]'); if (!m) { m = E('meta'); m.name = 'theme-color'; document.head.append(m); } m.content = '#15383D';
   let mf = document.querySelector('link[rel=manifest]'); if (!mf) { mf = E('link'); mf.rel = 'manifest'; document.head.append(mf); } mf.href = '/admin/team.webmanifest?v=17';
