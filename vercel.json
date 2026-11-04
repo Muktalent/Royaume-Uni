@@ -1,450 +1,502 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": null,
-  "buildCommand": "npm run build:admin && npm run build:personal && node tools/build-site.mjs",
-  "outputDirectory": "web-dist",
-  "functions": {
-    "api/index.mjs": {
-      "includeFiles": "server/**",
-      "maxDuration": 30
-    }
+ "$schema": "https://openapi.vercel.sh/vercel.json",
+ "framework": null,
+ "buildCommand": "npm run build:admin && npm run build:personal && npm run build:healthcare && node tools/build-site.mjs",
+ "outputDirectory": "web-dist",
+ "functions": {
+  "api/index.mjs": {
+   "includeFiles": "server/**",
+   "maxDuration": 30
+  }
+ },
+ "rewrites": [
+  {
+   "source": "/api/:path*",
+   "destination": "/api/index?__crm_route=:path*"
   },
-  "rewrites": [
+  {
+   "source": "/admin",
+   "destination": "/admin/index.html"
+  },
+  {
+   "source": "/admin/",
+   "destination": "/admin/index.html"
+  },
+  {
+   "source": "/portal",
+   "destination": "/admin/index.html"
+  },
+  {
+   "source": "/portal/",
+   "destination": "/admin/index.html"
+  },
+  {
+   "source": "/login",
+   "destination": "/admin/index.html"
+  },
+  {
+   "source": "/login/",
+   "destination": "/admin/index.html"
+  },
+  {
+   "source": "/:handle((?!(?:admin|api|portal|login|healthcare|book|services|privacy|terms|portfolio|certificates|personal-admin|pipeline-share|assets|fonts|images|img|css|js)(?![a-zA-Z0-9-]))[a-zA-Z0-9][a-zA-Z0-9-]{1,28}[a-zA-Z0-9])",
+   "destination": "/book/index.html"
+  },
+  {
+   "source": "/:handle((?!(?:admin|api|portal|login|healthcare|book|services|privacy|terms|portfolio|certificates|personal-admin|pipeline-share|assets|fonts|images|img|css|js)(?![a-zA-Z0-9-]))[a-zA-Z0-9][a-zA-Z0-9-]{1,28}[a-zA-Z0-9])/",
+   "destination": "/book/index.html"
+  }
+ ],
+ "headers": [
+  {
+   "source": "/(.*)",
+   "headers": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/index?__crm_route=:path*"
+     "key": "X-Content-Type-Options",
+     "value": "nosniff"
     },
     {
-      "source": "/admin",
-      "destination": "/admin/index.html"
+     "key": "Referrer-Policy",
+     "value": "strict-origin-when-cross-origin"
     },
     {
-      "source": "/admin/",
-      "destination": "/admin/index.html"
+     "key": "Permissions-Policy",
+     "value": "camera=(), microphone=(self), geolocation=(), payment=(), usb=(), interest-cohort=()"
     },
     {
-      "source": "/portal",
-      "destination": "/admin/index.html"
-    },
-    {
-      "source": "/portal/",
-      "destination": "/admin/index.html"
-    },
-    {
-      "source": "/login",
-      "destination": "/admin/index.html"
-    },
-    {
-      "source": "/login/",
-      "destination": "/admin/index.html"
-    },
-    {
-      "source": "/:handle((?!(?:admin|api|portal|login|book|services|privacy|terms|portfolio|certificates|personal-admin|pipeline-share|assets|fonts|images|img|css|js)(?![a-zA-Z0-9-]))[a-zA-Z0-9][a-zA-Z0-9-]{1,28}[a-zA-Z0-9])",
-      "destination": "/book/index.html"
-    },
-    {
-      "source": "/:handle((?!(?:admin|api|portal|login|book|services|privacy|terms|portfolio|certificates|personal-admin|pipeline-share|assets|fonts|images|img|css|js)(?![a-zA-Z0-9-]))[a-zA-Z0-9][a-zA-Z0-9-]{1,28}[a-zA-Z0-9])/",
-      "destination": "/book/index.html"
+     "key": "X-Frame-Options",
+     "value": "SAMEORIGIN"
     }
-  ],
-  "headers": [
+   ]
+  },
+  {
+   "source": "/sw.js",
+   "headers": [
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(self), geolocation=(), payment=(), usb=(), interest-cohort=()"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "SAMEORIGIN"
-        }
-      ]
+     "key": "Cache-Control",
+     "value": "no-cache, max-age=0, must-revalidate"
     },
     {
-      "source": "/sw.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, max-age=0, must-revalidate"
-        },
-        {
-          "key": "Service-Worker-Allowed",
-          "value": "/"
-        },
-        {
-          "key": "Content-Type",
-          "value": "application/javascript; charset=utf-8"
-        }
-      ]
+     "key": "Service-Worker-Allowed",
+     "value": "/"
     },
     {
-      "source": "/offline.html",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex"
-        }
-      ]
-    },
-    {
-      "source": "/book",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-cache"
-        }
-      ]
-    },
-    {
-      "source": "/book/:path*",
-      "headers": [
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-cache"
-        }
-      ]
-    },
-    {
-      "source": "/book/fonts/:path*",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/admin/:path*",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        },
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co blob: https://res.cloudinary.com https://i.vimeocdn.com https://i.ytimg.com; frame-src blob: https://player.vimeo.com https://www.youtube-nocookie.com; media-src 'self' blob: https://*.supabase.co https://res.cloudinary.com; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co https://api.cloudinary.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
-        }
-      ]
-    },
-    {
-      "source": "/portal",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        },
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co blob: https://res.cloudinary.com https://i.vimeocdn.com https://i.ytimg.com; frame-src blob: https://player.vimeo.com https://www.youtube-nocookie.com; media-src 'self' blob: https://*.supabase.co https://res.cloudinary.com; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co https://api.cloudinary.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
-        }
-      ]
-    },
-    {
-      "source": "/portal/",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        },
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co blob: https://res.cloudinary.com https://i.vimeocdn.com https://i.ytimg.com; frame-src blob: https://player.vimeo.com https://www.youtube-nocookie.com; media-src 'self' blob: https://*.supabase.co https://res.cloudinary.com; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co https://api.cloudinary.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
-        }
-      ]
-    },
-    {
-      "source": "/login",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        },
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co blob: https://res.cloudinary.com https://i.vimeocdn.com https://i.ytimg.com; frame-src blob: https://player.vimeo.com https://www.youtube-nocookie.com; media-src 'self' blob: https://*.supabase.co https://res.cloudinary.com; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co https://api.cloudinary.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
-        }
-      ]
-    },
-    {
-      "source": "/login/",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        },
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co blob: https://res.cloudinary.com https://i.vimeocdn.com https://i.ytimg.com; frame-src blob: https://player.vimeo.com https://www.youtube-nocookie.com; media-src 'self' blob: https://*.supabase.co https://res.cloudinary.com; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co https://api.cloudinary.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
-        }
-      ]
-    },
-    {
-      "source": "/portfolio",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "no-referrer"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        }
-      ]
-    },
-    {
-      "source": "/portfolio/:path*",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "no-referrer"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        }
-      ]
-    },
-    {
-      "source": "/certificates",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "no-referrer"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        }
-      ]
-    },
-    {
-      "source": "/certificates/:path*",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "no-referrer"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        }
-      ]
-    },
-    {
-      "source": "/personal-admin",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "no-referrer"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        }
-      ]
-    },
-    {
-      "source": "/personal-admin/:path*",
-      "headers": [
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "no-referrer"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        }
-      ]
-    },
-    {
-      "source": "/pipeline-share",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        },
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "no-referrer"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
-        }
-      ]
-    },
-    {
-      "source": "/pipeline-share/:path*",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store"
-        },
-        {
-          "key": "X-Robots-Tag",
-          "value": "noindex, nofollow"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "no-referrer"
-        },
-        {
-          "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
-        }
-      ]
+     "key": "Content-Type",
+     "value": "application/javascript; charset=utf-8"
     }
-  ],
-  "redirects": [
+   ]
+  },
+  {
+   "source": "/offline.html",
+   "headers": [
     {
-      "source": "/:path*",
-      "has": [
-        {
-          "type": "host",
-          "value": "muktalent.com"
-        }
-      ],
-      "destination": "https://www.muktalent.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/services/ielts-guidance/:path*",
-      "destination": "/services/#anglais",
-      "permanent": true
-    },
-    {
-      "source": "/services/scholarships/:path*",
-      "destination": "/services/university-applications/#financement",
-      "permanent": true
+     "key": "X-Robots-Tag",
+     "value": "noindex"
     }
-  ]
+   ]
+  },
+  {
+   "source": "/book",
+   "headers": [
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
+    },
+    {
+     "key": "X-Content-Type-Options",
+     "value": "nosniff"
+    },
+    {
+     "key": "Referrer-Policy",
+     "value": "strict-origin-when-cross-origin"
+    },
+    {
+     "key": "Cache-Control",
+     "value": "no-cache"
+    }
+   ]
+  },
+  {
+   "source": "/book/:path*",
+   "headers": [
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
+    },
+    {
+     "key": "X-Content-Type-Options",
+     "value": "nosniff"
+    },
+    {
+     "key": "Referrer-Policy",
+     "value": "strict-origin-when-cross-origin"
+    },
+    {
+     "key": "Cache-Control",
+     "value": "no-cache"
+    }
+   ]
+  },
+  {
+   "source": "/book/fonts/:path*",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "public, max-age=31536000, immutable"
+    }
+   ]
+  },
+  {
+   "source": "/admin/:path*",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    },
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co blob: https://res.cloudinary.com https://i.vimeocdn.com https://i.ytimg.com; frame-src blob: https://player.vimeo.com https://www.youtube-nocookie.com; media-src 'self' blob: https://*.supabase.co https://res.cloudinary.com; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co https://api.cloudinary.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+    }
+   ]
+  },
+  {
+   "source": "/portal",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    },
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co blob: https://res.cloudinary.com https://i.vimeocdn.com https://i.ytimg.com; frame-src blob: https://player.vimeo.com https://www.youtube-nocookie.com; media-src 'self' blob: https://*.supabase.co https://res.cloudinary.com; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co https://api.cloudinary.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+    }
+   ]
+  },
+  {
+   "source": "/portal/",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    },
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co blob: https://res.cloudinary.com https://i.vimeocdn.com https://i.ytimg.com; frame-src blob: https://player.vimeo.com https://www.youtube-nocookie.com; media-src 'self' blob: https://*.supabase.co https://res.cloudinary.com; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co https://api.cloudinary.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+    }
+   ]
+  },
+  {
+   "source": "/login",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    },
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co blob: https://res.cloudinary.com https://i.vimeocdn.com https://i.ytimg.com; frame-src blob: https://player.vimeo.com https://www.youtube-nocookie.com; media-src 'self' blob: https://*.supabase.co https://res.cloudinary.com; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co https://api.cloudinary.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+    }
+   ]
+  },
+  {
+   "source": "/login/",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    },
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://*.supabase.co blob: https://res.cloudinary.com https://i.vimeocdn.com https://i.ytimg.com; frame-src blob: https://player.vimeo.com https://www.youtube-nocookie.com; media-src 'self' blob: https://*.supabase.co https://res.cloudinary.com; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co https://api.cloudinary.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+    }
+   ]
+  },
+  {
+   "source": "/portfolio",
+   "headers": [
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Referrer-Policy",
+     "value": "no-referrer"
+    },
+    {
+     "key": "X-Content-Type-Options",
+     "value": "nosniff"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+    },
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    }
+   ]
+  },
+  {
+   "source": "/portfolio/:path*",
+   "headers": [
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Referrer-Policy",
+     "value": "no-referrer"
+    },
+    {
+     "key": "X-Content-Type-Options",
+     "value": "nosniff"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+    },
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    }
+   ]
+  },
+  {
+   "source": "/certificates",
+   "headers": [
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Referrer-Policy",
+     "value": "no-referrer"
+    },
+    {
+     "key": "X-Content-Type-Options",
+     "value": "nosniff"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+    },
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    }
+   ]
+  },
+  {
+   "source": "/certificates/:path*",
+   "headers": [
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Referrer-Policy",
+     "value": "no-referrer"
+    },
+    {
+     "key": "X-Content-Type-Options",
+     "value": "nosniff"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+    },
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    }
+   ]
+  },
+  {
+   "source": "/personal-admin",
+   "headers": [
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Referrer-Policy",
+     "value": "no-referrer"
+    },
+    {
+     "key": "X-Content-Type-Options",
+     "value": "nosniff"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+    },
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    }
+   ]
+  },
+  {
+   "source": "/personal-admin/:path*",
+   "headers": [
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Referrer-Policy",
+     "value": "no-referrer"
+    },
+    {
+     "key": "X-Content-Type-Options",
+     "value": "nosniff"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+    },
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    }
+   ]
+  },
+  {
+   "source": "/pipeline-share",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    },
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Referrer-Policy",
+     "value": "no-referrer"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    }
+   ]
+  },
+  {
+   "source": "/pipeline-share/:path*",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    },
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Referrer-Policy",
+     "value": "no-referrer"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+    }
+   ]
+  },
+  {
+   "source": "/healthcare/((?!portal).*)",
+   "headers": [
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com; font-src 'self'; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+    }
+   ]
+  },
+  {
+   "source": "/healthcare/assets/fonts/:path*",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "public, max-age=31536000, immutable"
+    }
+   ]
+  },
+  {
+   "source": "/healthcare/portal",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    },
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+    }
+   ]
+  },
+  {
+   "source": "/healthcare/portal/:path*",
+   "headers": [
+    {
+     "key": "Cache-Control",
+     "value": "no-store"
+    },
+    {
+     "key": "X-Robots-Tag",
+     "value": "noindex, nofollow"
+    },
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https://qximjrweeagjufsrewpy.supabase.co; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+    }
+   ]
+  }
+ ],
+ "redirects": [
+  {
+   "source": "/:path*",
+   "has": [
+    {
+     "type": "host",
+     "value": "muktalent.com"
+    }
+   ],
+   "destination": "https://www.muktalent.com/:path*",
+   "permanent": true
+  },
+  {
+   "source": "/services/ielts-guidance/:path*",
+   "destination": "/services/#anglais",
+   "permanent": true
+  },
+  {
+   "source": "/services/scholarships/:path*",
+   "destination": "/services/university-applications/#financement",
+   "permanent": true
+  }
+ ]
 }

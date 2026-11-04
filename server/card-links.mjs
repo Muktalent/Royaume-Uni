@@ -10,7 +10,7 @@ const MAX_HANDLES_PER_PERSON = 5;
 
 // Top-level paths that belong to the website or could be used for impersonation.
 export const RESERVED_HANDLES = new Set([
-  "admin","administrator","api","app","apps","assets","static","public","book","booking","bookings","card","cards",
+  "admin","administrator","healthcare","health-care","api","app","apps","assets","static","public","book","booking","bookings","card","cards",
   "privacy","terms","legal","cookies","cookie","gdpr","services","service","portfolio","certificates","certificate",
   "personal-admin","pipeline-share","about","about-us","contact","contact-us","blog","news","press","careers","jobs",
   "login","logout","signin","sign-in","signup","sign-up","register","account","accounts","dashboard","team","teams",

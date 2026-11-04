@@ -20,7 +20,8 @@
     "check:api": "node --check server/index.mjs",
     "build:admin": "esbuild admin-src/app.js --bundle --format=esm --platform=browser --outfile=admin/app.js",
     "check:admin": "node --check admin-src/app.js",
-    "build:personal": "esbuild admin-src/personal.js --bundle --format=esm --platform=browser --outfile=personal-admin/app.js"
+    "build:personal": "esbuild admin-src/personal.js --bundle --format=esm --platform=browser --outfile=personal-admin/app.js",
+    "build:healthcare": "node tools/healthcare/build.mjs && esbuild admin-src/healthcare/portal.js --bundle --minify --format=esm --platform=browser --outfile=healthcare/portal/app.js"
   },
   "devDependencies": {
     "esbuild": "^0.28.2"

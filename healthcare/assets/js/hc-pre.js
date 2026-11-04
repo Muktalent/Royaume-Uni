@@ -1,0 +1,1 @@
+(function(){var d=document.documentElement;d.classList.remove("no-js");try{var l=new URLSearchParams(location.search).get("lang")||localStorage.getItem("hc_lang");if(l&&/^(es|fr|ar)$/.test(l)){d.lang=l;if(l==="ar")d.dir="rtl";d.classList.add("hc-i18n-wait");setTimeout(function(){d.classList.remove("hc-i18n-wait")},2500)}}catch(e){}})();

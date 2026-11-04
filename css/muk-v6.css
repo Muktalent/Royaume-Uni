@@ -454,3 +454,13 @@ html .muk-nav-dialog .v6-nav-wa{background:#152e36;color:#fff}
 html[data-theme="dark"] .muk-nav-dialog .v6-nav-wa{background:#e2c07a;color:#0d2224}
 html[data-theme="dark"] .muk-nav-dialog .v6-nav-wa .v6-wa{fill:#0d2224}
 .muk-nav-dialog .muk-nav-foot{display:none}
+
+/* v19 · Our Divisions (discreet corporate row above the legal footer line) */
+.v6-divisions{max-width:1240px;margin:0 auto 22px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;padding:14px 0 0;font-size:13px}
+.v6-divisions-label{color:var(--f-muted);font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-inline-end:6px}
+.v6-divisions a{display:inline-flex;align-items:center;gap:6px;color:var(--f-text);font-weight:600;letter-spacing:.02em;transition:color .25s ease}
+.v6-divisions a.is-current{color:#e2c07a}
+.v6-divisions a:hover{color:#fff}
+.v6-divisions a svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;opacity:.7}
+[dir="rtl"] .v6-divisions a svg{transform:scaleX(-1)}
+.v6-divisions-sep{width:1px;height:14px;background:var(--f-line)}

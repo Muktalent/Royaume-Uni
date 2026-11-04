@@ -14,6 +14,7 @@ import { mountPayroll } from "./payroll.mjs";
 import { mountGlobalPassport } from "./global-passport.mjs";
 import { mountMukSocial } from "./muk-social.mjs";
 import { mountMukPublic } from "./muk-public.mjs";
+import { mountHealthcare } from "./healthcare.mjs";
 import "dotenv/config";
 import express from "express";
 import helmet from "helmet";
@@ -128,6 +129,8 @@ mountBusinessWallet(app);
 mountGlobalPassport(app, { requireStaff });
 mountMukSocial(app);
 mountMukPublic(app);
+// v19 · MUKTalent Healthcare division (own hc_* tables, own auth checks, MFA for team access).
+mountHealthcare(app);
 app.use("/api",requireStaff,requireAdmin);
 mountExports(app);
 app.get("/api/admin-config",(req,res)=>res.json(config));

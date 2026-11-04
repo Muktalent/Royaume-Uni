@@ -587,3 +587,4 @@ html:has(#studentPortal){overscroll-behavior-y:none}
 #employeeWorkspace.lux.soft .lx-pm-del{color:#b4483c}
 #employeeWorkspace.lux.soft .lx-pm-del:hover{background:#fbeeec;color:#9b3a30}
 #employeeWorkspace.lux.soft .lx-pm-msg{margin:6px 8px 2px;font-size:12px;color:#2a7563}
+a.nav-button,a.dock-button{text-decoration:none}#appShell #navigation a.nav-hc{margin-top:6px;border-top:1px solid rgba(185,155,104,.25);border-radius:0 0 12px 12px}

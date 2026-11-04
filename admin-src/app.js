@@ -57,6 +57,8 @@ const GROUPS=[["home","Inicio","home",["overview"]],["students","Estudiantes","u
 const groupOf=name=>GROUPS.find(g=>g[3].includes(name))||GROUPS[0];
 function navIcon(name){const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("aria-hidden","true");s.setAttribute("class","nav-icon");s.setAttribute("fill","none");s.setAttribute("stroke","currentColor");s.setAttribute("stroke-width","1.7");s.setAttribute("stroke-linecap","round");s.setAttribute("stroke-linejoin","round");for(const d of UI_PATHS[name]||[]){const p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d",d);s.append(p);}return s;}
 let adminWatch=null,adminUpdates=null,adminMsgNotify=null;
+// v19 · Entry to the separate MUKTalent Healthcare management area (own design, own data).
+function hcLink(cls,tag){const a=document.createElement("a");a.className=cls;a.href="/healthcare/portal/";a.title="MUKTalent Healthcare";const s=document.createElementNS("http://www.w3.org/2000/svg","svg");s.setAttribute("viewBox","0 0 24 24");s.setAttribute("aria-hidden","true");s.setAttribute("class","nav-icon");s.setAttribute("fill","none");s.setAttribute("stroke","currentColor");s.setAttribute("stroke-width","1.7");s.setAttribute("stroke-linecap","round");s.setAttribute("stroke-linejoin","round");for(const d of ["M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10Z","M12 9.5v5M9.5 12h5"]){const p=document.createElementNS("http://www.w3.org/2000/svg","path");p.setAttribute("d",d);s.append(p);}a.append(s,el(tag,"Healthcare"));return a;}
 function nav(){
  const nav=$("navigation");nav.replaceChildren();
  let dock=document.getElementById("adminDock");if(!dock){dock=el("nav",undefined,"admin-dock");dock.id="adminDock";dock.setAttribute("aria-label","Secciones");$("appShell").append(dock);}dock.replaceChildren();
@@ -64,6 +66,7 @@ function nav(){
   const b=el("button",undefined,"nav-button");b.type="button";b.dataset.group=id;b.append(navIcon(ic),el("span",label));b.addEventListener("click",()=>navigate(sections[0]));nav.append(b);
   const d=el("button",undefined,"dock-button");d.type="button";d.dataset.group=id;d.append(navIcon(ic),el("small",label));d.addEventListener("click",()=>navigate(sections[0]));dock.append(d);
  }
+ nav.append(hcLink("nav-button nav-hc","span"));dock.append(hcLink("dock-button dock-hc","small"));
  {linkChatCss();const open=()=>openMessenger({api,lang:"es",onChange:()=>adminWatch?.refresh()});const c=el("button",undefined,"nav-button nav-chat");c.id="adminChatNav";c.type="button";c.append(mkIcon("chat","nav-icon"),el("span","Mensajes"),el("i",undefined,"nav-chat-badge"));c.addEventListener("click",open);nav.append(c);
   if(!document.getElementById("adminChatTop")){const h=heartButton("es",open);h.id="adminChatTop";h.classList.add("admin-heart");h.setAttribute("aria-label","Mensajes");h.title="Mensajes";document.querySelector("#appShell .page-header").append(h);}
   if(!adminMsgNotify)adminMsgNotify=messageNotifier({lang:"es",onOpen:open});if(!adminWatch)adminWatch=watchNotifications(api,x=>{adminMsgNotify(x);const h=document.getElementById("adminChatTop");if(h)setDot(h,{chat_unread:x.chat_unread});const b=document.querySelector("#adminChatNav .nav-chat-badge");if(b){b.textContent=x.chat_unread?String(x.chat_unread>99?"99+":x.chat_unread):"";b.hidden=!x.chat_unread;}});else adminWatch.refresh();}
@@ -295,6 +298,8 @@ async function enter(session){
   state.epoch++;
   const who = await api("/api/whoami");
   if (who.kind === "inactive") throw new Error("Esta cuenta del equipo no está activa.");
+  // v19 · Healthcare candidates have their own private portal.
+  if (who.kind === "healthcare") { location.replace("/healthcare/portal/"); return; }
   if (who.kind === "student" || who.kind === "new") {
     $("loginView").hidden = true; $("appShell").hidden = true; stopMatrix();
     await mountStudentPortal({ api, client: state.client, who, onLogout: async () => {
@@ -328,6 +333,7 @@ async function enter(session){
       }
     });
     offerInstall({ lang: "en" });
+    api("/api/hc/me").then(hc=>{if(hc?.role!=="consultant"||document.getElementById("hcConsultantLink"))return;const a=document.createElement("a");a.id="hcConsultantLink";a.href="/healthcare/portal/";a.textContent="MUKTalent Healthcare →";a.setAttribute("style","position:fixed;right:18px;bottom:18px;z-index:60;background:#174C4B;color:#F6F5EF;padding:11px 18px;border-radius:999px;font:600 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 10px 30px rgba(23,76,75,.35)");document.body.append(a);}).catch(()=>{});
     return;
   }
   state.config = await api("/api/admin-config");

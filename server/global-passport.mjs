@@ -205,6 +205,11 @@ export function mountGlobalPassport(app, { requireStaff, db = service }) {
     const staff = ok(await client.from("crm_staff").select("role,active").eq("user_id", u.id).maybeSingle());
     if (staff) return res.json({ kind: staff.active ? "staff" : "inactive", email: u.email });
     const student = ok(await client.from("gp_students").select("reference,full_name").eq("user_id", u.id).maybeSingle());
+    // v19 · Healthcare candidates have their own portal; never offer them the student Global Passport.
+    if (!student) {
+      const hc = await client.from("hc_candidates").select("id").eq("user_id", u.id).is("erased_at", null).maybeSingle();
+      if (hc.data || u.user_metadata?.division === "healthcare") return res.json({ kind: "healthcare", email: u.email, redirect: "/healthcare/portal/" });
+    }
     res.json({ kind: student ? "student" : "new", email: u.email, confirmed: Boolean(u.email_confirmed_at || u.confirmed_at), name: student?.full_name || u.user_metadata?.full_name || null, destinations: DESTINATIONS, levels: STUDY_LEVELS });
   }));
 

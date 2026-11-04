@@ -29672,6 +29672,28 @@ function navIcon(name) {
 var adminWatch = null;
 var adminUpdates = null;
 var adminMsgNotify = null;
+function hcLink(cls, tag) {
+  const a = document.createElement("a");
+  a.className = cls;
+  a.href = "/healthcare/portal/";
+  a.title = "MUKTalent Healthcare";
+  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  s.setAttribute("viewBox", "0 0 24 24");
+  s.setAttribute("aria-hidden", "true");
+  s.setAttribute("class", "nav-icon");
+  s.setAttribute("fill", "none");
+  s.setAttribute("stroke", "currentColor");
+  s.setAttribute("stroke-width", "1.7");
+  s.setAttribute("stroke-linecap", "round");
+  s.setAttribute("stroke-linejoin", "round");
+  for (const d of ["M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.6-7 10-7 10Z", "M12 9.5v5M9.5 12h5"]) {
+    const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    p.setAttribute("d", d);
+    s.append(p);
+  }
+  a.append(s, el(tag, "Healthcare"));
+  return a;
+}
 function nav() {
   const nav2 = $2("navigation");
   nav2.replaceChildren();
@@ -29697,6 +29719,8 @@ function nav() {
     d.addEventListener("click", () => navigate(sections[0]));
     dock.append(d);
   }
+  nav2.append(hcLink("nav-button nav-hc", "span"));
+  dock.append(hcLink("dock-button dock-hc", "small"));
   {
     linkChatCss();
     const open = () => openMessenger({ api, lang: "es", onChange: () => adminWatch?.refresh() });
@@ -30242,6 +30266,10 @@ async function enter(session) {
   state.epoch++;
   const who = await api("/api/whoami");
   if (who.kind === "inactive") throw new Error("Esta cuenta del equipo no est\xE1 activa.");
+  if (who.kind === "healthcare") {
+    location.replace("/healthcare/portal/");
+    return;
+  }
   if (who.kind === "student" || who.kind === "new") {
     $2("loginView").hidden = true;
     $2("appShell").hidden = true;
@@ -30279,6 +30307,16 @@ async function enter(session) {
       }
     });
     offerInstall({ lang: "en" });
+    api("/api/hc/me").then((hc) => {
+      if (hc?.role !== "consultant" || document.getElementById("hcConsultantLink")) return;
+      const a = document.createElement("a");
+      a.id = "hcConsultantLink";
+      a.href = "/healthcare/portal/";
+      a.textContent = "MUKTalent Healthcare \u2192";
+      a.setAttribute("style", "position:fixed;right:18px;bottom:18px;z-index:60;background:#174C4B;color:#F6F5EF;padding:11px 18px;border-radius:999px;font:600 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 10px 30px rgba(23,76,75,.35)");
+      document.body.append(a);
+    }).catch(() => {
+    });
     return;
   }
   state.config = await api("/api/admin-config");
