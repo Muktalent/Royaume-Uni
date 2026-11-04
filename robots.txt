@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://www.muktalent.com/sitemap.xml
+Sitemap: https://www.muktalent.com/healthcare/sitemap.xml
