@@ -1,5 +1,5 @@
 @charset "UTF-8";
-/* MUK Talent · v22 · Site: privacy banner, footer (+ header v22 at the end)
+/* MUKTalent · v22 · Site: privacy banner, footer (+ header v22 at the end)
    Built by joining, in the SAME order as before, the files listed below (the cascade is unchanged).
    Edit this file directly from now on; the old separate files were removed.
    public-privacy-v5.css
@@ -10,7 +10,7 @@
 .muk-legal{background:#f6f4ef;color:#163b37;padding:45px 22px 65px}.muk-legal-wrap{max-width:850px;margin:auto}.muk-legal h1{font:400 clamp(32px,5vw,52px)/1.12 Georgia,serif;margin:15px 0}.muk-legal h2{font-size:21px;margin:30px 0 12px}.muk-legal p,.muk-legal li{font-size:15px;line-height:1.75;margin-bottom:12px}.muk-legal ul,.muk-legal ol{padding-left:22px}.muk-legal a{color:inherit;text-underline-offset:4px}.muk-legal-eyebrow,.muk-legal-updated{font-size:11px!important;letter-spacing:.7px}.muk-legal table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13px}.muk-legal th,.muk-legal td{border:1px solid #cdd8cf;text-align:left;vertical-align:top;padding:12px;overflow-wrap:anywhere}.muk-legal button,.muk-privacy-panel button,.muk-cookie-info button{font:600 12px/1.4 system-ui,sans-serif;min-height:44px;padding:10px 14px;border:1px solid #aebeb5;border-radius:8px;background:#fff;color:#163b37;cursor:pointer}.muk-legal-footer-links{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding-top:12px;font-size:11px}.muk-legal-footer-links a,.muk-legal-footer-links button{color:inherit;font:inherit;background:none;border:0;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:30px;display:inline-flex;align-items:center}.muk-cookie-info{position:fixed;left:16px;right:16px;bottom:max(12px,env(safe-area-inset-bottom));z-index:9000;max-width:660px;margin:auto;background:#fff;color:#163b37;border:1px solid #d4ded6;border-radius:12px;box-shadow:0 10px 50px #10251f30;padding:16px 18px;font:13px/1.6 system-ui,sans-serif}.muk-cookie-info p{margin:0 0 12px}.muk-cookie-actions{display:flex;gap:8px;flex-wrap:wrap}.muk-cookie-info button:first-child{background:#163b37;color:white}.muk-cookie-info a{color:inherit}.muk-cookie-info[hidden]{display:none}.muk-privacy-panel{max-width:min(540px,calc(100vw - 32px));max-height:85dvh;margin:auto;padding:26px;border:1px solid #b9c9be;border-radius:14px;color:#163b37;background:white;font:14px/1.65 system-ui,sans-serif}.muk-privacy-panel::backdrop{background:#071a18a6}.muk-privacy-panel h2{font-size:24px;margin:0 0 16px}.muk-privacy-panel p{margin:12px 0}.muk-privacy-panel .muk-cookie-actions{margin-top:20px}.muk-privacy-panel :focus-visible,.muk-cookie-info :focus-visible{outline:2px solid #9e753d;outline-offset:3px}body.menu-open .muk-cookie-info{visibility:hidden;pointer-events:none}@media(max-width:600px){.muk-legal th,.muk-legal td{padding:8px;font-size:11px}.muk-legal-footer-links{gap:6px 14px}.muk-legal h2{font-size:20px}}
 
 /* ==================== footer-v21.css ==================== */
-/* MUK Talent · v21 · Footer, cleaner and more professional (all Education pages).
+/* MUKTalent · v21 · Footer, cleaner and more professional (all Education pages).
    Keeps the website colours (dark teal, ivory text, gold detail) defined in muk-v6.css (--f-*).
    The "Rentrée 2027" call-to-action panel has been removed; the AQF statement is now a compact,
    expandable line; divisions, legal links and social icons sit in a single bottom bar. */
@@ -70,7 +70,7 @@ html[dir=rtl] .v21-aqf p{padding:0 30px 18px 0}
 }
 
 /* ==================== header-v22 ====================
-   MUK Talent · v22 · Header: cleaner, consistent and more professional.
+   MUKTalent · v22 · Header: cleaner, consistent and more professional.
    · One height (84 px desktop, 68 px mobile), content aligned with the page (max 1240 px)
    · Translucent over the hero, solid with a hairline once you scroll
    · Navigation in sentence case, same size and colour for every item; the current page is marked
@@ -165,3 +165,41 @@ html[dir=rtl] .v21-aqf p{padding:0 30px 18px 0}
   html[data-theme="dark"] body>header.header .mobile-menu-toggle{border-color:rgba(255,255,255,.14)!important;background:rgba(255,255,255,.04)!important}
   html body.menu-open>header.header{background:transparent!important;border-color:transparent!important;-webkit-backdrop-filter:none;backdrop-filter:none}
 }
+
+/* ===== v23 · Movimiento sutil (todo se desactiva con «reducir movimiento») ===== */
+@media (prefers-reduced-motion: no-preference) {
+  /* Transición suave entre páginas (Chrome, Edge y Safari recientes; el resto navega igual que antes) */
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root) { animation: v23-page-out .22s cubic-bezier(.4,0,1,1) both; }
+  ::view-transition-new(root) { animation: v23-page-in .38s cubic-bezier(.2,.7,.2,1) both; }
+  body > header { view-transition-name: muk-header; }
+  ::view-transition-group(muk-header) { animation-duration: 0s; }
+
+  /* Barra fina de progreso de lectura (navegadores con animaciones ligadas al scroll) */
+  @supports (animation-timeline: scroll()) {
+    html.v6-motion::after {
+      content: ""; position: fixed; inset: 0 0 auto 0; height: 2px; z-index: 2147483000; pointer-events: none;
+      background: linear-gradient(90deg, var(--v6-gold, #b48a43), #d9c49a);
+      transform-origin: 0 50%; transform: scaleX(0);
+      animation: v23-progress linear both; animation-timeline: scroll(root block);
+    }
+    html[dir="rtl"].v6-motion::after { transform-origin: 100% 50%; }
+  }
+
+  /* Foto principal: entrada suave al cargar (no interfiere con el zoom al pasar el ratón) */
+  .v6-motion .mt-hero-photo { animation: v23-photo-in 1.1s cubic-bezier(.2,.7,.2,1) .15s backwards; }
+
+  /* Preguntas frecuentes: se abren y cierran con suavidad (navegadores compatibles) */
+  .v6-motion details { interpolate-size: allow-keywords; }
+  .v6-motion details::details-content { block-size: 0; overflow: clip; opacity: 0; transition: block-size .35s cubic-bezier(.2,.7,.2,1), opacity .3s ease, content-visibility .35s allow-discrete; }
+  .v6-motion details[open]::details-content { block-size: auto; opacity: 1; }
+
+  /* Flechas de los botones: pequeño empuje al pasar el ratón */
+  .mt-button span, .v6-btn span, .v6-cta span { display: inline-block; transition: transform .25s cubic-bezier(.2,.7,.2,1); }
+  .mt-button:hover span, .v6-btn:hover span, .v6-cta:hover span { transform: translate(3px, -1px); }
+  html[dir="rtl"] .mt-button:hover span, html[dir="rtl"] .v6-btn:hover span, html[dir="rtl"] .v6-cta:hover span { transform: translate(-3px, -1px); }
+}
+@keyframes v23-page-out { to { opacity: 0; transform: translateY(-6px); } }
+@keyframes v23-page-in { from { opacity: 0; transform: translateY(10px); } }
+@keyframes v23-progress { to { transform: scaleX(1); } }
+@keyframes v23-photo-in { from { opacity: 0; clip-path: inset(10% 0 0 0); transform: scale(1.03); } to { opacity: 1; clip-path: inset(0 0 0 0); transform: none; } }

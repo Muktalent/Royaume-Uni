@@ -1,4 +1,4 @@
-// mk-badge-v4 · MUK Talent ID-badge business card, actions menu, social links.
+// mk-badge-v4 · MUKTalent ID-badge business card, actions menu, social links.
 // Every node is created with textContent / setAttribute on fixed attribute names. No innerHTML, no inline styles (CSP safe).
 import {BRAND_PATHS,UI_PATHS} from './card-icons.js';
 const SVG='http://www.w3.org/2000/svg';
@@ -11,15 +11,15 @@ const sameOrigin=value=>{try{const u=new URL(value,location.origin);return u.pro
 
 // The card face. `link` = {display} short link text shown on the badge.
 export function createBusinessCard({data={},photoUrl,link,showPhone=false}={}){
- const name=data.display_name||data.full_name||'MUK Talent',title=(data.job_title||'Team member').toUpperCase();
- const scene=E('div',undefined,'biz-scene mk-scene'),badge=E('article',undefined,'mk-badge');badge.setAttribute('aria-label',name+', '+(data.job_title||'MUK Talent')+' · MUK Talent business card');
+ const name=data.display_name||data.full_name||'MUKTalent',title=(data.job_title||'Team member').toUpperCase();
+ const scene=E('div',undefined,'biz-scene mk-scene'),badge=E('article',undefined,'mk-badge');badge.setAttribute('aria-label',name+', '+(data.job_title||'MUKTalent')+' · MUKTalent business card');
  const band=E('div',undefined,'mk-band'),bandText=E('span',title,'mk-band-title');bandText.setAttribute('aria-hidden','true');band.append(bandText);
  badge.style.setProperty('--title-len',String(Math.max(8,title.length)));badge.style.setProperty('--name-len',String(Math.max(10,name.length)));
- const panel=E('div',undefined,'mk-panel'),logo=E('img',undefined,'mk-logo');logo.src='/book/muk-badge-logo.png';logo.alt='MUK Talent';logo.width=500;logo.height=291;logo.decoding='async';
+ const panel=E('div',undefined,'mk-panel'),logo=E('img',undefined,'mk-logo');logo.src='/book/muk-badge-logo.png';logo.alt='MUKTalent';logo.width=500;logo.height=291;logo.decoding='async';
  const photo=E('div',undefined,'mk-photo');photo.append(E('span',initials(name),'mk-initials'));
  if(photoUrl){const img=E('img');img.alt='Photo of '+name;img.decoding='async';img.referrerPolicy='no-referrer';img.onload=()=>photo.classList.add('mk-has-photo');img.onerror=()=>img.remove();img.src=photoUrl;photo.append(img);}
  const id=E('div',undefined,'mk-id'),heading=E('h2',name,'mk-name');if(name.length>24)heading.classList.add('mk-name-long');id.append(heading);
- const lines=E('ul',undefined,'mk-lines');lines.append(E('li',data.employee_code?'ID '+data.employee_code:'MUK Talent team'));if(data.assigned_city)lines.append(E('li',data.assigned_city));if(showPhone&&data.contact_phone){const li=E('li',undefined,'mk-phone-line'),a=E('a',data.contact_phone);a.href='tel:'+String(data.contact_phone).replace(/[^+\d]/g,'');a.setAttribute('aria-label','Call '+name+' '+data.contact_phone);li.append(a);lines.append(li);}const shown=link?.display||data.short_display;if(shown)lines.append(E('li',shown,'mk-link-line'));else lines.append(E('li','muktalent.com'));id.append(lines);
+ const lines=E('ul',undefined,'mk-lines');lines.append(E('li',data.employee_code?'ID '+data.employee_code:'MUKTalent team'));if(data.assigned_city)lines.append(E('li',data.assigned_city));if(showPhone&&data.contact_phone){const li=E('li',undefined,'mk-phone-line'),a=E('a',data.contact_phone);a.href='tel:'+String(data.contact_phone).replace(/[^+\d]/g,'');a.setAttribute('aria-label','Call '+name+' '+data.contact_phone);li.append(a);lines.append(li);}const shown=link?.display||data.short_display;if(shown)lines.append(E('li',shown,'mk-link-line'));else lines.append(E('li','muktalent.com'));id.append(lines);
  const sheen=E('span',undefined,'mk-sheen');sheen.setAttribute('aria-hidden','true');
  panel.append(logo,photo,id);badge.append(band,panel,sheen);scene.append(badge);
  // Subtle 3D tilt on precise pointers only.
@@ -51,7 +51,7 @@ export function createContactChips(data={},socials=[]){
 function vcard({name,data,url,socials}){
  const safe=v=>String(v||'').replace(/\\/g,'\\\\').replace(/[\r\n]+/g,'\\n').replace(/;/g,'\\;').replace(/,/g,'\\,');
  const parts=String(name||'').trim().split(/\s+/),last=parts.length>1?parts.pop():'',first=parts.join(' ');
- const lines=['BEGIN:VCARD','VERSION:3.0','N:'+safe(last)+';'+safe(first)+';;;','FN:'+safe(name),'ORG:MUK Talent','TITLE:'+safe(data.job_title),'URL;TYPE=WORK:'+url];
+ const lines=['BEGIN:VCARD','VERSION:3.0','N:'+safe(last)+';'+safe(first)+';;;','FN:'+safe(name),'ORG:MUKTalent','TITLE:'+safe(data.job_title),'URL;TYPE=WORK:'+url];
  if(data.contact_phone)lines.push('TEL;TYPE=WORK,VOICE:'+safe(data.contact_phone));if(data.contact_email)lines.push('EMAIL;TYPE=WORK:'+safe(data.contact_email));if(data.assigned_city)lines.push('ADR;TYPE=WORK:;;;'+safe(data.assigned_city)+';;;');
  for(const s of socials||[])lines.push('X-SOCIALPROFILE;TYPE='+safe(s.platform)+':'+s.url,'URL;TYPE='+safe(s.label)+':'+s.url);
  lines.push('END:VCARD');return lines.join('\r\n');
@@ -84,7 +84,7 @@ export function createCardMenu({url,display,qrImage,name,data={},slug,socials=[]
  const item=(ic,label,hint,onSelect,cls='')=>{const b=E('button',undefined,'mk-item '+cls);b.type='button';const t=E('span',undefined,'mk-item-text');t.append(E('strong',label));if(hint)t.append(E('small',hint));const i=E('span',undefined,'mk-item-icon');i.append(typeof ic==='string'?icon(ic):ic);b.append(i,t);b.onclick=async()=>{await onSelect(b);};menu.append(b);return b;};
  const group=label=>menu.append(E('p',label,'mk-menu-label'));
  group('Share');
- item('share','Share card','Send by WhatsApp, email or any app',async()=>{try{if(navigator.share){await navigator.share({title:name+' · MUK Talent',text:name+' · '+(data.job_title||'MUK Talent'),url:safeUrl});close();}else{await copyNow();close();}}catch(e){if(e.name!=='AbortError')say(shown);}});
+ item('share','Share card','Send by WhatsApp, email or any app',async()=>{try{if(navigator.share){await navigator.share({title:name+' · MUKTalent',text:name+' · '+(data.job_title||'MUKTalent'),url:safeUrl});close();}else{await copyNow();close();}}catch(e){if(e.name!=='AbortError')say(shown);}});
  item('link','Copy short link',shown,async()=>{await copyNow();close();});
  if(qrImage)item('qr','QR code','Show full screen or download',()=>{close();qrDialog({qrImage,display:shown,name});});
  group('Save');
@@ -120,7 +120,7 @@ export function createCardMenu({url,display,qrImage,name,data={},slug,socials=[]
  function open(){menu.hidden=false;toggle.setAttribute('aria-expanded','true');box.classList.add('mk-open');document.addEventListener('pointerdown',onDoc);document.addEventListener('keydown',onKey);menu.querySelector('button')?.focus({preventScroll:true});}
  function close(){if(menu.hidden)return;menu.hidden=true;walletBox.hidden=true;toggle.setAttribute('aria-expanded','false');box.classList.remove('mk-open');document.removeEventListener('pointerdown',onDoc);document.removeEventListener('keydown',onKey);}
  toggle.onclick=()=>menu.hidden?open():close();
- box.share=async()=>{try{if(navigator.share){await navigator.share({title:name+' · MUK Talent',text:name+' · '+(data.job_title||'MUK Talent'),url:safeUrl});}else await copyNow();}catch(e){if(e.name!=='AbortError')say(shown);}};
+ box.share=async()=>{try{if(navigator.share){await navigator.share({title:name+' · MUKTalent',text:name+' · '+(data.job_title||'MUKTalent'),url:safeUrl});}else await copyNow();}catch(e){if(e.name!=='AbortError')say(shown);}};
  box.showQr=qrImage?()=>qrDialog({qrImage,display:shown,name}):null;
  box.saveContact=()=>{const blob=new Blob([vcard({name,data,url:safeUrl,socials})],{type:'text/vcard;charset=utf-8'}),href=URL.createObjectURL(blob);download(href,fileName(name)+'.vcf');setTimeout(()=>URL.revokeObjectURL(href),1500);};
  box.openWallet=async()=>{if(menu.hidden)open();if(walletBox.hidden)await walletFlow();wallet.scrollIntoView({block:'nearest',behavior:'smooth'});};
@@ -133,9 +133,9 @@ export function createShareTools(options){return createCardMenu(options);}
 const okPhone=v=>{const p=String(v||'').replace(/[^\d+]/g,'');return /^\+?\d{6,16}$/.test(p)?p:null;};
 const okMail=v=>{const m=String(v||'').trim();return /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/.test(m)?m:null;};
 export function createProfileCard({data={},photoUrl,link,socials=[],onSaveContact}={}){
- const name=data.display_name||data.full_name||'MUK Talent',title=data.job_title||'Team member';
- const card=E('article',undefined,'pc-card');card.setAttribute('aria-label',name+', '+title+' · MUK Talent digital business card');
- const top=E('div',undefined,'pc-top'),logo=E('img',undefined,'pc-logo');logo.src='/book/muk-badge-logo.png';logo.alt='MUK Talent';logo.width=500;logo.height=291;logo.decoding='async';
+ const name=data.display_name||data.full_name||'MUKTalent',title=data.job_title||'Team member';
+ const card=E('article',undefined,'pc-card');card.setAttribute('aria-label',name+', '+title+' · MUKTalent digital business card');
+ const top=E('div',undefined,'pc-top'),logo=E('img',undefined,'pc-logo');logo.src='/book/muk-badge-logo.png';logo.alt='MUKTalent';logo.width=500;logo.height=291;logo.decoding='async';
  const stripes=E('div',undefined,'pc-stripes');stripes.setAttribute('aria-hidden','true');for(let i=0;i<4;i++)stripes.append(E('i'));
  top.append(logo,stripes);if(data.employee_code)top.append(E('span','ID '+data.employee_code,'pc-code'));
  const photo=E('div',undefined,'pc-photo');photo.append(E('span',initials(name),'pc-initials'));
@@ -167,11 +167,11 @@ export function createActionTiles(menu,{onEdit}={}){
 }
 // Preview of how the pass looks once saved to Google / Apple Wallet.
 export function createWalletPreview({data={},photoUrl,qrImage,display}={}){
- const name=data.display_name||data.full_name||'MUK Talent',pass=E('figure',undefined,'pc-pass');pass.setAttribute('aria-label','Wallet pass preview');
- const head=E('div',undefined,'pc-pass-head'),av=E('span',undefined,'pc-pass-avatar');if(photoUrl){const i=E('img');i.alt='';i.src=photoUrl;i.referrerPolicy='no-referrer';i.onerror=()=>i.remove();av.append(i);}else av.append(E('b',initials(name)));head.append(av,E('span',name.split(/\s+/)[0]+' · MUK Talent'));
- const body=E('div',undefined,'pc-pass-body');body.append(E('small',(data.job_title||'MUK Talent')),E('strong',name));
+ const name=data.display_name||data.full_name||'MUKTalent',pass=E('figure',undefined,'pc-pass');pass.setAttribute('aria-label','Wallet pass preview');
+ const head=E('div',undefined,'pc-pass-head'),av=E('span',undefined,'pc-pass-avatar');if(photoUrl){const i=E('img');i.alt='';i.src=photoUrl;i.referrerPolicy='no-referrer';i.onerror=()=>i.remove();av.append(i);}else av.append(E('b',initials(name)));head.append(av,E('span',name.split(/\s+/)[0]+' · MUKTalent'));
+ const body=E('div',undefined,'pc-pass-body');body.append(E('small',(data.job_title||'MUKTalent')),E('strong',name));
  const qr=E('div',undefined,'pc-pass-qr');if(qrImage){const q=E('img');q.src=qrImage;q.alt='QR code';q.width=q.height=150;qr.append(q);}else qr.append(E('span','QR','pc-pass-qr-empty'));
  const row=E('div',undefined,'pc-pass-row');for(const [k,v]of [['Territory',data.assigned_city||'United Kingdom'],['Staff ID',data.employee_code||'—']]){const c=E('div');c.append(E('small',k),E('b',v));row.append(c);}
- const foot=E('div',undefined,'pc-pass-foot'),logo=E('img');logo.src='/book/muk-badge-logo.png';logo.alt='MUK Talent';logo.width=120;logo.height=70;foot.append(logo,E('span','Your digital business card'));
+ const foot=E('div',undefined,'pc-pass-foot'),logo=E('img');logo.src='/book/muk-badge-logo.png';logo.alt='MUKTalent';logo.width=120;logo.height=70;foot.append(logo,E('span','Your digital business card'));
  pass.append(head,body,row,qr,E('p',display||'muktalent.com','pc-pass-link'),foot);return pass;
 }

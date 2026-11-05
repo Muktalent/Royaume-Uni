@@ -318,35 +318,54 @@ async function docsTab({host, api, notice}) {
   const list = sectionCard('Documentos del equipo');
   host.append(counters, send, list);
   const team = (await loadTeam(api)).filter(p => p.account_active);
-  // Formulario de envío
-  const form = E('form', undefined, 'th-grid'), owner = E('select'), kind = E('select'), title = input('text', '', {required: true, maxLength: 200, placeholder: 'Ej. Contrato de colaboración 2027'}), note = E('textarea'), file = input('file');
-  owner.required = true; owner.append(new Option('Elige un empleado…', '')); for (const p of team) owner.append(new Option(p.full_name, p.user_id));
+  // Formulario de envío (v23: varios destinatarios, solo lectura, confirmación de lectura y caducidad)
+  const form = E('form', undefined, 'th-grid'), scope = E('select'), owner = E('select'), kind = E('select'), title = input('text', '', {required: true, maxLength: 200, placeholder: 'Ej. Contrato de colaboración 2027'}), note = E('textarea'), file = input('file');
+  for (const [v, l] of [['one', 'Un empleado'], ['some', 'Varios empleados'], ['all', `Todo el equipo (${team.length})`]]) scope.append(new Option(l, v));
+  owner.append(new Option('Elige un empleado…', '')); for (const p of team) owner.append(new Option(p.full_name, p.user_id));
+  const picks = E('div', undefined, 'th-recipient-list'), boxes = [];
+  for (const p of team) { const l = E('label'), c = input('checkbox'); c.value = p.user_id; boxes.push(c); l.append(c, E('span', p.full_name)); picks.append(l); }
   const preset = sessionStorage.getItem('th-doc-owner'); if (preset) { owner.value = preset; sessionStorage.removeItem('th-doc-owner'); }
   for (const [v, l] of DOC_KINDS) kind.append(new Option(l, v));
   note.maxLength = 2000; note.rows = 2; note.placeholder = 'Mensaje opcional para el empleado';
   file.accept = 'application/pdf,image/jpeg,image/png'; file.required = true;
   const sign = toggle('Requiere firma', 'El empleado podrá leerlo y firmarlo aquí mismo (dibujando su firma o escribiendo su nombre). Solo PDF.', true);
-  const syncKind = () => { if (kind.value === 'contract') { sign.box.checked = true; sign.box.disabled = true; } else sign.box.disabled = false; if (!title.value || title.dataset.auto) { title.value = kind.value === 'contract' ? 'Contrato' : ''; title.dataset.auto = '1'; } };
+  const ro = toggle('Solo lectura (no descargable)', 'Se lee dentro de la plataforma, sin botones de descargar, imprimir ni abrir en otra pestaña.', false);
+  const ack = toggle('Pedir confirmación de lectura', 'El empleado debe pulsar «He leído y entiendo» al terminar. Verás la fecha y hora.', false);
+  const exp = input('date', '', {min: new Date(Date.now() + 864e5).toISOString().slice(0, 10)});
+  const warn = E('p', 'Recomendación: deja los contratos y las nóminas descargables, para que el empleado pueda conservar una copia de lo que firma y cobra.', 'th-warn'); warn.hidden = true;
+  const ownerField = field('Empleado', owner, {required: true}), picksField = E('div', undefined, 'th-field th-wide'); picksField.append(E('label', 'Destinatarios'), picks);
+  const syncScope = () => { ownerField.hidden = scope.value !== 'one'; owner.required = scope.value === 'one'; picksField.hidden = scope.value !== 'some'; };
+  const syncWarn = () => { warn.hidden = !(ro.box.checked && ['contract', 'payslip'].includes(kind.value)); };
+  const syncKind = () => { if (kind.value === 'contract') { sign.box.checked = true; sign.box.disabled = true; } else sign.box.disabled = false; if (!title.value || title.dataset.auto) { title.value = kind.value === 'contract' ? 'Contrato' : ''; title.dataset.auto = '1'; } syncWarn(); };
   title.oninput = () => { delete title.dataset.auto; };
-  kind.onchange = syncKind; syncKind();
+  kind.onchange = syncKind; scope.onchange = syncScope; ro.box.onchange = syncWarn;
   const msg = E('p', '', 'th-msg'), go = E('button', 'Enviar documento', 'th-btn th-primary'); go.type = 'submit';
   const bar = E('div', undefined, 'th-form-bar th-wide'); bar.append(msg, go);
-  form.append(field('Empleado', owner, {required: true}), field('Tipo', kind), field('Título', title, {required: true}), field('Archivo', file, {required: true, hint: 'PDF, JPG o PNG · máx. 10 MB'}), field('Mensaje', note, {wide: true}));
-  const signWrap = E('div', undefined, 'th-wide'); signWrap.append(sign.el); form.append(signWrap, bar);
-  send.append(form);
+  form.append(field('Enviar a', scope), ownerField, picksField, field('Tipo', kind), field('Título', title, {required: true}), field('Archivo', file, {required: true, hint: 'PDF, JPG o PNG · máx. 10 MB'}), field('Visible hasta (opcional)', exp, {hint: 'Después de esta fecha el empleado deja de verlo. Los firmados no caducan.'}), field('Mensaje', note, {wide: true}));
+  const opts = E('div', undefined, 'th-wide th-options'); opts.append(sign.el, ro.el, ack.el);
+  const warnWrap = E('div', undefined, 'th-wide'); warnWrap.append(warn);
+  form.append(opts, warnWrap, bar);
+  send.append(form); syncScope(); syncKind();
+  const recipients = () => scope.value === 'all' ? team.map(p => p.user_id) : scope.value === 'some' ? boxes.filter(b => b.checked).map(b => b.value) : (owner.value ? [owner.value] : []);
   form.onsubmit = async e => {
     e.preventDefault(); if (!form.reportValidity()) return;
     const f = file.files?.[0]; if (!f) return;
+    const to = recipients();
+    if (!to.length) { msg.className = 'th-msg th-error'; msg.textContent = 'Elige al menos un empleado.'; return; }
     if (!['application/pdf', 'image/jpeg', 'image/png'].includes(f.type)) { msg.className = 'th-msg th-error'; msg.textContent = 'Usa PDF, JPG o PNG.'; return; }
     if (f.size > 10 * 1024 * 1024) { msg.className = 'th-msg th-error'; msg.textContent = 'El archivo supera 10 MB.'; return; }
     if (sign.box.checked && f.type !== 'application/pdf') { msg.className = 'th-msg th-error'; msg.textContent = 'Para pedir firma, el archivo debe ser PDF.'; return; }
+    if (to.length > 1 && !confirm(`¿Enviar «${title.value.trim()}» a ${to.length} empleados?`)) return;
     go.disabled = true; msg.className = 'th-msg'; msg.textContent = 'Subiendo…';
+    const expires_at = exp.value ? new Date(exp.value + 'T23:59:59').toISOString() : null;
     try {
-      const started = await api('/api/admin/hr-docs/start', {method: 'POST', body: JSON.stringify({owner_id: owner.value, kind: kind.value, title: title.value.trim(), note: note.value.trim(), name: f.name.slice(0, 200), mime: f.type, bytes: f.size, requires_signature: sign.box.checked})});
+      const started = await api('/api/admin/hr-docs/start', {method: 'POST', body: JSON.stringify({owner_id: to[0], kind: kind.value, title: title.value.trim(), note: note.value.trim(), name: f.name.slice(0, 200), mime: f.type, bytes: f.size, requires_signature: sign.box.checked, view_only: ro.box.checked, requires_ack: ack.box.checked, expires_at})});
       await putFile(started, f);
       await api('/api/admin/hr-docs/finish', {method: 'POST', body: JSON.stringify({id: started.id})});
-      msg.className = 'th-msg th-ok'; msg.textContent = 'Enviado a ' + owner.selectedOptions[0].textContent + '.';
-      form.reset(); syncKind(); refreshDocBadge(api); await paintList();
+      let total = 1;
+      if (to.length > 1) { msg.textContent = `Enviando a ${to.length} empleados…`; const r = await api('/api/admin/hr-docs/' + started.id + '/share', {method: 'POST', body: JSON.stringify({owner_ids: to.slice(1)})}); total += r.sent; }
+      msg.className = 'th-msg th-ok'; msg.textContent = to.length === 1 ? 'Enviado a ' + (team.find(p => p.user_id === to[0])?.full_name || 'el empleado') + '.' : `Enviado a ${total} de ${to.length} empleados.`;
+      form.reset(); for (const b of boxes) b.checked = false; syncScope(); syncKind(); refreshDocBadge(api); await paintList();
     } catch (err) { msg.className = 'th-msg th-error'; msg.textContent = err.message; }
     finally { go.disabled = false; }
   };
@@ -355,7 +374,7 @@ async function docsTab({host, api, notice}) {
   who.append(new Option('Todo el equipo', '')); for (const p of team) who.append(new Option(p.full_name, p.user_id));
   if (preset) who.value = preset;
   let mode = 'attention', docs = [];
-  const modes = [['attention', 'Requieren mi atención'], ['pending', 'Pendientes de firma'], ['received', 'Recibidos'], ['sent', 'Enviados'], ['all', 'Todo']];
+  const modes = [['attention', 'Requieren mi atención'], ['pending', 'Pendientes de firma'], ['unconfirmed', 'Sin confirmar lectura'], ['received', 'Recibidos'], ['sent', 'Enviados'], ['all', 'Todo']];
   for (const [id, l] of modes) { const b = button(l, () => { mode = id; paintRows(); }, 'th-seg-btn'); b.dataset.mode = id; filt.append(b); }
   who.onchange = () => paintRows();
   tools.append(filt, who);
@@ -368,7 +387,7 @@ async function docsTab({host, api, notice}) {
   }
   function paintRows() {
     for (const b of filt.children) b.setAttribute('aria-pressed', String(b.dataset.mode === mode));
-    const rows = docs.filter(d => (!who.value || d.owner_id === who.value) && (mode === 'all' || (mode === 'attention' && d.needs_admin) || (mode === 'pending' && d.requires_signature && ['sent', 'viewed'].includes(d.status)) || (mode === 'received' && d.direction === 'from_employee') || (mode === 'sent' && d.direction === 'to_employee')));
+    const rows = docs.filter(d => (!who.value || d.owner_id === who.value) && (mode === 'all' || (mode === 'attention' && d.needs_admin) || (mode === 'pending' && d.requires_signature && ['sent', 'viewed'].includes(d.status)) || (mode === 'unconfirmed' && d.requires_ack && !d.acknowledged_at && !d.expired) || (mode === 'received' && d.direction === 'from_employee') || (mode === 'sent' && d.direction === 'to_employee')));
     rowsBox.replaceChildren();
     if (!rows.length) rowsBox.append(E('p', mode === 'attention' ? 'Nada pendiente. Los documentos nuevos y firmados aparecerán aquí.' : 'No hay documentos con este filtro.', 'th-muted th-pad'));
     for (const d of rows) {
@@ -381,13 +400,55 @@ async function docsTab({host, api, notice}) {
       if (d.review_note) main.append(E('small', 'Nota: ' + d.review_note, 'th-muted'));
       const [label, tone] = STATUS_ES[d.status] || [d.status, 'grey'];
       const st = E('div', undefined, 'th-doc-state'); st.append(chip(label, tone)); if (d.requires_signature && d.status !== 'signed') st.append(chip('Requiere firma', 'ink'));
+      if (d.direction === 'to_employee') {
+        if (d.view_only) st.append(chip('Solo lectura', 'ink'));
+        if (d.requires_ack) st.append(d.acknowledged_at ? chip('Lectura confirmada', 'green') : chip('Sin confirmar', 'amber'));
+        if (d.expired) st.append(chip('Caducado', 'grey')); else if (d.expires_at) st.append(chip('Hasta ' + new Date(d.expires_at).toLocaleDateString('es-ES', {day: 'numeric', month: 'short'}), 'grey'));
+        const seen = d.view_count ? `Abierto ${d.view_count} ${d.view_count === 1 ? 'vez' : 'veces'} · último ${fmtWhen(d.last_viewed_at)}` : (d.status === 'sent' ? 'Aún no lo ha abierto' : '');
+        if (d.acknowledged_at) main.append(E('small', 'Confirmó la lectura · ' + fmtWhen(d.acknowledged_at), 'th-ok'));
+        if (seen) main.append(E('small', seen, 'th-muted'));
+      }
       const acts = E('div', undefined, 'th-doc-actions');
       const view = variant => openViewer({title: d.title, subtitle: d.owner_name + ' · ' + (DOC_KIND_ES[d.kind] || ''), load: () => api('/api/admin/hr-docs/' + d.id + '/file' + (variant ? '?variant=' + variant : '')), actions: d.direction === 'from_employee' && d.status === 'submitted' ? [dlg => reviewBar(dlg, d)] : []}).then(dlg => dlg.addEventListener('close', () => { if (d.status === 'signed' && d.needs_admin) { d.needs_admin = false; paintCounters(); paintRows(); refreshDocBadge(api); } }));
       if (d.status === 'signed') acts.append(button('Ver firmado', () => view('signed'), 'th-btn th-primary'), button('Original', () => view()));
       else acts.append(button('Ver', () => view(), d.needs_admin ? 'th-btn th-primary' : 'th-btn'));
+      if (d.direction === 'to_employee') acts.append(button('Opciones', () => docOptions(d), 'th-btn th-ghost'), button('Accesos', () => docViews(d), 'th-btn th-ghost'));
       if (d.direction === 'to_employee' && d.status !== 'signed') acts.append(button('Retirar', async () => { if (!confirm('¿Retirar este documento? El empleado dejará de verlo.')) return; try { await api('/api/admin/hr-docs/' + d.id, {method: 'DELETE'}); await paintList(); } catch (e) { notice(e.message, true); } }, 'th-btn th-ghost'));
       row.append(icon, main, st, acts); rowsBox.append(row);
     }
+  }
+  // v23 · Cambiar solo lectura / confirmación / caducidad después de enviar.
+  function docOptions(d) {
+    const dialog = E('dialog', undefined, 'th-confirm'), f = E('form', undefined, 'th-form');
+    const r1 = toggle('Solo lectura (no descargable)', 'Sin descargar, imprimir ni abrir en otra pestaña.', d.view_only);
+    const r2 = toggle('Pedir confirmación de lectura', d.acknowledged_at ? 'Ya confirmada el ' + fmtWhen(d.acknowledged_at) + '.' : 'El empleado debe pulsar «He leído y entiendo».', d.requires_ack);
+    const ex = input('date', d.expires_at ? d.expires_at.slice(0, 10) : '', {min: new Date(Date.now() + 864e5).toISOString().slice(0, 10)});
+    const batch = d.batch_id ? toggle('Aplicar a todas las copias', 'Este documento se envió a varios empleados. Cambia la opción para todos a la vez.', true) : null;
+    const w = E('p', 'Recomendación: deja los contratos y las nóminas descargables, para que el empleado conserve una copia.', 'th-warn'); const sw = () => { w.hidden = !(r1.box.checked && ['contract', 'payslip'].includes(d.kind)); }; r1.box.onchange = sw; sw();
+    const m = E('p', '', 'th-msg'), row = E('div', undefined, 'th-inline th-end'), ok = E('button', 'Guardar', 'th-btn th-primary'); ok.type = 'submit';
+    row.append(button('Cancelar', () => dialog.close()), ok);
+    f.append(E('h2', 'Opciones · ' + d.title), E('p', d.owner_name, 'th-muted'), r1.el, w, r2.el, field('Visible hasta (vacío = sin caducidad)', ex), ...(batch ? [batch.el] : []), m, row);
+    dialog.append(f); document.body.append(dialog); dialog.onclose = () => dialog.remove(); dialog.showModal();
+    f.onsubmit = async e => {
+      e.preventDefault(); ok.disabled = true;
+      try { await api('/api/admin/hr-docs/' + d.id, {method: 'PATCH', body: JSON.stringify({view_only: r1.box.checked, requires_ack: r2.box.checked, expires_at: ex.value ? new Date(ex.value + 'T23:59:59').toISOString() : null, whole_batch: !!batch?.box.checked})}); dialog.close(); notice('Opciones guardadas.'); await paintList(); }
+      catch (err) { m.className = 'th-msg th-error'; m.textContent = err.message; ok.disabled = false; }
+    };
+  }
+  // v23 · Registro de accesos del empleado.
+  async function docViews(d) {
+    const dialog = E('dialog', undefined, 'th-confirm'), box = E('div');
+    const head = E('div', undefined, 'th-form'); head.append(E('h2', 'Accesos · ' + d.title), E('p', d.owner_name + (d.view_count ? ` · ${d.view_count} ${d.view_count === 1 ? 'apertura' : 'aperturas'}` : ''), 'th-muted'));
+    const list = E('ul', undefined, 'th-views'), foot = E('div', undefined, 'th-inline th-end th-pad'); foot.append(button('Cerrar', () => dialog.close()));
+    box.append(head, list, foot); dialog.append(box); document.body.append(dialog); dialog.onclose = () => dialog.remove(); dialog.showModal();
+    list.append(E('li', 'Cargando…'));
+    try {
+      const r = await api('/api/admin/hr-docs/' + d.id + '/views');
+      list.replaceChildren();
+      if (!r.data.length) list.append(E('li', r.available === false ? 'El registro de accesos se activa al aplicar la migración v23.' : 'El empleado aún no lo ha abierto.'));
+      const device = ua => /iPhone|iPad/.test(ua) ? 'iPhone / iPad' : /Android/.test(ua) ? 'Android' : /Mac OS/.test(ua) ? 'Mac' : /Windows/.test(ua) ? 'Windows' : ua ? 'Otro dispositivo' : '';
+      for (const v of r.data) { const li = E('li'); li.append(E('span', fmtWhen(v.viewed_at)), E('small', device(v.device))); list.append(li); }
+    } catch (e) { list.replaceChildren(E('li', e.message)); }
   }
   function reviewBar(dlg, d) {
     const bar = E('div', undefined, 'th-inline th-end'), noteIn = input('text', '', {maxLength: 1000, placeholder: 'Nota para el empleado (opcional)'});

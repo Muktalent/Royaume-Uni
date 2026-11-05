@@ -1,5 +1,5 @@
 @charset "UTF-8";
-/* MUK Talent · v22 · Core: tokens, dark mode, header, footer base
+/* MUKTalent · v22 · Core: tokens, dark mode, header, footer base
    Built by joining, in the SAME order as before, the files listed below (the cascade is unchanged).
    Edit this file directly from now on; the old separate files were removed.
    muk-dark-v6.css
@@ -7,7 +7,7 @@
    muk-v13.css */
 
 /* ==================== muk-dark-v6.css ==================== */
-/* MUK Talent – dark theme generated from the public stylesheets (tools/gen-dark-theme). Do not edit by hand; tweak css/muk-v6.css instead. */
+/* MUKTalent – dark theme generated from the public stylesheets (tools/gen-dark-theme). Do not edit by hand; tweak css/muk-v6.css instead. */
 /* from style.css */
 html[data-theme="dark"] body {
 background: #131a19;
@@ -49,7 +49,7 @@ to right,
 #101615dc,
 #101615bc
 ),
-url('/assets/hero.jpg')
+url('/assets/hero.webp')
 }
 html[data-theme="dark"] .cta {
 background: #0f0f0f;
@@ -112,7 +112,7 @@ background: linear-gradient(
 #101615dc,
 #101615ca
 ),
-url('/assets/hero.jpg')
+url('/assets/hero.webp')
 }
 html[data-theme="dark"] .info-card {
 background: #101615bc;
@@ -253,7 +253,7 @@ background: #0b141a
 }
 html[data-theme="dark"] .signature-hero-bg {
 background: linear-gradient(to right, #0a0f15b8, #0a0f1542),
-url('/assets/hero.jpg')
+url('/assets/hero.webp')
 }
 html[data-theme="dark"] .signature-hero-overlay {
 background: #0e1b2294
@@ -797,7 +797,7 @@ color: #ffffff
 }
 
 /* ==================== muk-v6.css ==================== */
-/* MUK Talent public site v6 — motion, theme, language, media, footer, assistant */
+/* MUKTalent public site v6 — motion, theme, language, media, footer, assistant */
 :root{
   --v6-ink:#152e36;--v6-text:#2c3f42;--v6-muted:#5f6f6c;--v6-paper:#f6f4ef;--v6-surface:#ffffff;--v6-surface-2:#eef1ec;
   --v6-line:#dbe1da;--v6-accent:#2a7563;--v6-accent-strong:#1f5f51;--v6-gold:#b48a43;
@@ -1265,7 +1265,7 @@ html[data-theme="dark"] .muk-nav-dialog .v6-nav-wa .v6-wa{fill:#0d2224}
 .v6-divisions-sep{width:1px;height:14px;background:var(--f-line)}
 
 /* ==================== muk-v13.css ==================== */
-/* MUK Talent v13 · trust sections, For Parents, Our Team carousel, Speak to Our Team, responsive hardening. */
+/* MUKTalent v13 · trust sections, For Parents, Our Team carousel, Speak to Our Team, responsive hardening. */
 :root{--v13-ink:#152e36;--v13-teal:#16393a;--v13-green:#2a7563;--v13-gold:#c9a45c;--v13-gold-d:#b48a43;--v13-paper:#f6f4ef;--v13-card:#fff;--v13-line:#dce2dc;--v13-muted:#5d6e6b;--v13-soft:#edf0e8}
 html[data-theme="dark"]{--v13-ink:#e7efea;--v13-paper:#0b1413;--v13-card:#12201f;--v13-line:#25403b;--v13-muted:#a3b6b0;--v13-soft:#0f1c1b}
 

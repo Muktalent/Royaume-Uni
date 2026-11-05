@@ -1,4 +1,4 @@
-// muk-social-v1 · MUK Talent chat (WhatsApp style), notification feed, Cloudinary video library
+// muk-social-v1 · MUKTalent chat (WhatsApp style), notification feed, Cloudinary video library
 // and Global Passport photo. Service-role only: every route verifies the Supabase session and the
 // caller's relationship to the thread before touching data (tables have RLS with no policies).
 import { createClient } from "@supabase/supabase-js";
@@ -139,7 +139,7 @@ export function mountMukSocial(app, { db = service } = {}) {
       client.from("crm_staff").select("user_id,full_name,role").in("user_id", list),
       client.from("gp_students").select("user_id,full_name,reference").in("user_id", list)
     ]);
-    for (const r of ok(s)) out.set(r.user_id, { user_id: r.user_id, name: r.full_name, kind: "staff", role: r.role === "admin" ? "MUK Talent" : "Counsellor" });
+    for (const r of ok(s)) out.set(r.user_id, { user_id: r.user_id, name: r.full_name, kind: "staff", role: r.role === "admin" ? "MUKTalent" : "Counsellor" });
     for (const r of ok(g)) out.set(r.user_id, { user_id: r.user_id, name: me.kind === "staff" || r.user_id === me.id ? r.full_name : shortName(r.full_name), kind: "student", role: me.kind === "staff" ? r.reference : "Student" });
     return out;
   }
@@ -176,9 +176,9 @@ export function mountMukSocial(app, { db = service } = {}) {
       const names = await people(client, students.flatMap(s => [s.user_id, s.counsellor_id]), me);
       for (const s of students) {
         if (me.kind === "staff" && !last.has(s.user_id)) continue; // staff: only active conversations; new ones via contacts
-        const peer = me.kind === "student" ? (names.get(s.counsellor_id) || { name: "MUK Talent", kind: "staff", role: "Counsellor" }) : (names.get(s.user_id) || { name: "Student", kind: "student" });
+        const peer = me.kind === "student" ? (names.get(s.counsellor_id) || { name: "MUKTalent", kind: "staff", role: "Counsellor" }) : (names.get(s.user_id) || { name: "Student", kind: "student" });
         const l = last.get(s.user_id);
-        threads.push({ id: `gp_${s.user_id}`, kind: "counsellor", title: peer.name, subtitle: me.kind === "student" ? "Counsellor · MUK Talent" : peer.role, peer_id: me.kind === "student" ? s.counsellor_id : s.user_id, pinned: me.kind === "student", last: l ? { body: l.audio_path ? null : l.body, audio: Boolean(l.audio_path), mine: me.kind === "student" ? l.sender_role === "student" : l.sender_role === "counsellor", at: l.created_at } : null, unread: unread.get(s.user_id) || 0 });
+        threads.push({ id: `gp_${s.user_id}`, kind: "counsellor", title: peer.name, subtitle: me.kind === "student" ? "Counsellor · MUKTalent" : peer.role, peer_id: me.kind === "student" ? s.counsellor_id : s.user_id, pinned: me.kind === "student", last: l ? { body: l.audio_path ? null : l.body, audio: Boolean(l.audio_path), mine: me.kind === "student" ? l.sender_role === "student" : l.sender_role === "counsellor", at: l.created_at } : null, unread: unread.get(s.user_id) || 0 });
       }
     }
     // Direct / group conversations
@@ -200,7 +200,7 @@ export function mountMukSocial(app, { db = service } = {}) {
       for (const c of ok(convs)) {
         const others = mem.filter(m => m.conversation_id === c.id && m.user_id !== me.id).map(m => names.get(m.user_id)).filter(Boolean);
         const peer = others[0]; const l = last.get(c.id);
-        threads.push({ id: `mk_${c.id}`, kind: c.kind, title: c.title || peer?.name || "MUK Talent", subtitle: peer ? (peer.kind === "staff" ? peer.role : "Student") : "", peer_id: peer?.user_id || null, last: l ? { body: l.audio_path ? null : l.body, audio: Boolean(l.audio_path), mine: l.sender_id === me.id, at: l.created_at } : null, unread: unread.get(c.id) || 0, created_at: c.created_at });
+        threads.push({ id: `mk_${c.id}`, kind: c.kind, title: c.title || peer?.name || "MUKTalent", subtitle: peer ? (peer.kind === "staff" ? peer.role : "Student") : "", peer_id: peer?.user_id || null, last: l ? { body: l.audio_path ? null : l.body, audio: Boolean(l.audio_path), mine: l.sender_id === me.id, at: l.created_at } : null, unread: unread.get(c.id) || 0, created_at: c.created_at });
       }
     }
     threads.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || String(b.last?.at || b.created_at || "").localeCompare(String(a.last?.at || a.created_at || "")));
@@ -213,7 +213,7 @@ export function mountMukSocial(app, { db = service } = {}) {
       const a = await gpAccess(client, me, t.id);
       const msgs = ok(await client.from("gp_messages").select("id,sender_role,sender_id,kind,body,audio_path,audio_ms,read_at,created_at").eq("student_id", a.student_id).order("created_at", { ascending: false }).limit(200)).reverse();
       const names = await people(client, msgs.map(m => m.sender_id).concat([a.counsellor_id, a.student_id]), me);
-      rows = await Promise.all(msgs.map(async m => ({ id: m.id, mine: me.kind === "student" ? m.sender_role === "student" : (m.sender_role === "counsellor" && (m.sender_id === me.id || !m.sender_id)), system: m.sender_role === "system" || m.kind === "system", sender: m.sender_role === "system" ? "MUK Talent" : (names.get(m.sender_id)?.name || (m.sender_role === "student" ? names.get(a.student_id)?.name : names.get(a.counsellor_id)?.name) || "MUK Talent"), body: m.body, audio: m.audio_path ? { url: await audioUrl(client, m.audio_path), ms: m.audio_ms || 0 } : null, read: Boolean(m.read_at), at: m.created_at })));
+      rows = await Promise.all(msgs.map(async m => ({ id: m.id, mine: me.kind === "student" ? m.sender_role === "student" : (m.sender_role === "counsellor" && (m.sender_id === me.id || !m.sender_id)), system: m.sender_role === "system" || m.kind === "system", sender: m.sender_role === "system" ? "MUKTalent" : (names.get(m.sender_id)?.name || (m.sender_role === "student" ? names.get(a.student_id)?.name : names.get(a.counsellor_id)?.name) || "MUKTalent"), body: m.body, audio: m.audio_path ? { url: await audioUrl(client, m.audio_path), ms: m.audio_ms || 0 } : null, read: Boolean(m.read_at), at: m.created_at })));
     } else {
       await mkAccess(client, me, t.id);
       const [msgs, members] = await Promise.all([
@@ -222,7 +222,7 @@ export function mountMukSocial(app, { db = service } = {}) {
       ]);
       const list = ok(msgs).reverse(), mem = ok(members); const names = await people(client, mem.map(m => m.user_id), me);
       const othersRead = mem.filter(m => m.user_id !== me.id).map(m => m.last_read_at).filter(Boolean).sort()[0] || null;
-      rows = await Promise.all(list.map(async m => ({ id: m.id, mine: m.sender_id === me.id, system: false, sender: names.get(m.sender_id)?.name || "MUK Talent", body: m.body, audio: m.audio_path ? { url: await audioUrl(client, m.audio_path), ms: m.audio_ms || 0 } : null, read: Boolean(othersRead && othersRead >= m.created_at), at: m.created_at })));
+      rows = await Promise.all(list.map(async m => ({ id: m.id, mine: m.sender_id === me.id, system: false, sender: names.get(m.sender_id)?.name || "MUKTalent", body: m.body, audio: m.audio_path ? { url: await audioUrl(client, m.audio_path), ms: m.audio_ms || 0 } : null, read: Boolean(othersRead && othersRead >= m.created_at), at: m.created_at })));
     }
     res.json({ data: rows });
   }));
@@ -268,7 +268,7 @@ export function mountMukSocial(app, { db = service } = {}) {
       if (me.counsellor_id) { const c = staff.find(s => s.user_id === me.counsellor_id); if (c) out.push({ user_id: c.user_id, name: c.full_name, kind: "staff", role: "Counsellor", thread_id: `gp_${me.id}` }); }
       for (const s of st) out.push({ user_id: s.user_id, name: shortName(s.full_name), kind: "student", role: s.country_residence || "Student" });
     } else {
-      for (const s of staff) if (s.user_id !== me.id) out.push({ user_id: s.user_id, name: s.full_name, kind: "staff", role: s.role === "admin" ? "Admin · MUK Talent" : "Counsellor" });
+      for (const s of staff) if (s.user_id !== me.id) out.push({ user_id: s.user_id, name: s.full_name, kind: "staff", role: s.role === "admin" ? "Admin · MUKTalent" : "Counsellor" });
       let q = client.from("gp_students").select("user_id,full_name,reference").order("updated_at", { ascending: false }).limit(400); if (!me.admin) q = q.eq("counsellor_id", me.id);
       for (const s of ok(await q)) out.push({ user_id: s.user_id, name: s.full_name, kind: "student", role: s.reference, thread_id: `gp_${s.user_id}` });
     }
@@ -326,7 +326,7 @@ export function mountMukSocial(app, { db = service } = {}) {
       const em = url && !fileVideo ? embedInfo(url) : null;
       if (!poster && url) poster = cloudinaryPoster(url) || em?.poster || null;
       const a = authors.get(p.author_id);
-      return { id: p.id, kind: p.kind, title: p.title, body: p.body, url, poster, embed: em?.src || null, play: url ? (fileVideo ? "video" : videoKind(url)) : null, live_at: p.live_at, audience: p.audience, author: a?.name || "MUK Talent", author_id: p.author_id, at: p.created_at, read: read.has(p.id), mine: p.author_id === me.id };
+      return { id: p.id, kind: p.kind, title: p.title, body: p.body, url, poster, embed: em?.src || null, play: url ? (fileVideo ? "video" : videoKind(url)) : null, live_at: p.live_at, audience: p.audience, author: a?.name || "MUKTalent", author_id: p.author_id, at: p.created_at, read: read.has(p.id), mine: p.author_id === me.id };
     }));
   }
   app.get("/api/feed", limiter(600), route(async (req, res, me) => {
@@ -335,7 +335,7 @@ export function mountMukSocial(app, { db = service } = {}) {
     res.json({ data: await decorate(client, posts, me) });
   }));
   app.post("/api/feed", limiter(60, 60), route(async (req, res, me) => {
-    const { client } = me; if (me.kind !== "staff") throw new SocialError("Only the MUK Talent team can publish.", 403);
+    const { client } = me; if (me.kind !== "staff") throw new SocialError("Only the MUKTalent team can publish.", 403);
     const v = postSchema.parse(req.body);
     if (v.media_url && embedInfo(v.media_url)) { const e = embedInfo(v.media_url); v.media_url = e.url; if (!v.poster_url) { const meta = await vimeoMeta(e.url).catch(() => null); if (meta?.poster && /^https:\/\//.test(meta.poster)) v.poster_url = meta.poster; } }
     if (v.media_id) { const m = ok(await client.from("mk_media").select("*").eq("id", v.media_id).maybeSingle()); if (!m || (!me.admin && m.owner_id !== me.id)) throw new SocialError("Video not found in your library.", 404); if (m.asset_id) v.asset_id = m.asset_id; }

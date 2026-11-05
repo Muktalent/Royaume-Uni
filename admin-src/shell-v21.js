@@ -49,7 +49,7 @@ function enhanceEmployee() {
   const side = root.querySelector('.lx-sidebar');
   if (side && !side.querySelector('.u-brand')) side.prepend(brand('Team workspace'));
   const name = root.querySelector('.lx-sidebar-footer strong')?.textContent.trim();
-  const role = root.querySelector('.lx-sidebar-footer small')?.textContent.trim() || 'MUK Talent team';
+  const role = root.querySelector('.lx-sidebar-footer small')?.textContent.trim() || 'MUKTalent team';
   const header = root.querySelector('.lx-header');
   setChip(header, name, role);
 }

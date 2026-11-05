@@ -1,4 +1,4 @@
-/* muk-chat-v1 · MUK Talent Messenger, notification centre and video viewer. Palette: ink #2B2A28, teal #2B2A28, accent #2B2A28, gold #B49B6C, paper #f6f4ef. */
+/* muk-chat-v1 · MUKTalent Messenger, notification centre and video viewer. Palette: ink #2B2A28, teal #2B2A28, accent #2B2A28, gold #B49B6C, paper #f6f4ef. */
 html.mkc-lock,html.mkc-lock body{overflow:hidden!important;overscroll-behavior:none}
 .mkc-layer{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;background:#f6f4ef;color:#2B2A28;font:15px/1.4 "Inter","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;animation:mkc-in .22s cubic-bezier(.2,.8,.2,1)}
 @keyframes mkc-in{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}

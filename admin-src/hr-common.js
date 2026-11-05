@@ -3,7 +3,7 @@
 import {createClient} from '@supabase/supabase-js';
 import {E, linkCss} from './gp-ui.js';
 
-export const CSS_VERSION = '21.0.0';
+export const CSS_VERSION = '23.0.0';
 export function linkHrCss() { linkCss('teamHrCss', '/admin/team-hr.css?v=' + CSS_VERSION); }
 
 export const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
@@ -82,34 +82,111 @@ export function combo({input, options, onPick, max = 8, label = 'Sugerencias'}) 
   return {wrap, close, refresh: filter};
 }
 
-// Visor de documentos: descarga el archivo con la URL firmada y lo muestra en un blob (CSP: frame-src blob:).
+// Visor de documentos v23: PDF dibujado página a página con pdf.js (todas las páginas también en iPhone),
+// imágenes en lienzo y modo «solo lectura» sin descargar, imprimir ni abrir en otra pestaña.
+const PDFJS = '/assets/vendor/pdfjs/';
+let pdfjsLib = null;
+async function loadPdfJs() {
+  if (pdfjsLib) return pdfjsLib;
+  const url = PDFJS + 'pdf.min.js';
+  const lib = await import(url);
+  lib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js';
+  return (pdfjsLib = lib);
+}
+const isPdf = (blob, r) => blob.type === 'application/pdf' || r?.mime === 'application/pdf';
+
+async function renderPdf(stage, blob, {onEnd, labels}) {
+  const lib = await loadPdfJs();
+  const doc = await lib.getDocument({data: new Uint8Array(await blob.arrayBuffer()), isEvalSupported: false, enableScripting: false, standardFontDataUrl: PDFJS + 'standard_fonts/', wasmUrl: PDFJS + 'wasm/'}).promise;
+  const pages = E('div', undefined, 'th-pages'); stage.replaceChildren(pages);
+  let zoom = 1, ended = false;
+  const slots = [];
+  for (let n = 1; n <= doc.numPages; n++) { const slot = E('div', undefined, 'th-page'); slot.dataset.page = n; slot.setAttribute('aria-label', labels.page + ' ' + n); pages.append(slot); slots.push(slot); }
+  const draw = async slot => {
+    const n = +slot.dataset.page, page = await doc.getPage(n);
+    const width = Math.max(240, pages.clientWidth - 32) * zoom, base = page.getViewport({scale: 1});
+    const scale = width / base.width, ratio = Math.min(window.devicePixelRatio || 1, 2), vp = page.getViewport({scale: scale * ratio});
+    const canvas = E('canvas'); canvas.width = Math.floor(vp.width); canvas.height = Math.floor(vp.height);
+    canvas.style.width = Math.floor(vp.width / ratio) + 'px'; canvas.style.height = Math.floor(vp.height / ratio) + 'px';
+    await page.render({canvas, viewport: vp}).promise;
+    slot.replaceChildren(canvas); slot.dataset.done = '1'; slot.style.minHeight = '';
+  };
+  const sizeSlots = async () => { const first = await doc.getPage(1), base = first.getViewport({scale: 1}); const h = (Math.max(240, pages.clientWidth - 32) * zoom) * base.height / base.width; for (const s of slots) if (!s.dataset.done) s.style.minHeight = Math.round(h) + 'px'; };
+  await sizeSlots();
+  const io = new IntersectionObserver(entries => {
+    for (const e of entries) if (e.isIntersecting) {
+      const slot = e.target; if (!slot.dataset.busy) { slot.dataset.busy = '1'; draw(slot).catch(() => slot.replaceChildren(E('p', labels.fail, 'th-error th-center'))); }
+    }
+  }, {root: pages, rootMargin: '600px 0px'});
+  for (const s of slots) io.observe(s);
+  // «Fin del documento» solo cuando la última página se ve de verdad en pantalla (no por precarga).
+  const endIo = new IntersectionObserver(entries => { if (!ended && entries.some(e => e.isIntersecting)) { ended = true; endIo.disconnect(); onEnd?.(); } }, {root: pages, threshold: .35});
+  endIo.observe(slots[slots.length - 1]);
+  const redraw = async () => { for (const s of slots) { delete s.dataset.done; delete s.dataset.busy; s.replaceChildren(); io.unobserve(s); } await sizeSlots(); for (const s of slots) io.observe(s); };
+  return {pages: doc.numPages, zoom: async d => { zoom = Math.min(3, Math.max(.5, +(zoom + d).toFixed(2))); await redraw(); return zoom; }, destroy: () => { io.disconnect(); endIo.disconnect(); doc.destroy(); }};
+}
+
+async function renderImage(stage, blob, {viewOnly, title, onEnd, src}) {
+  if (!viewOnly) { const img = E('img'); img.alt = title; img.src = src; stage.replaceChildren(img); onEnd?.(); return {pages: 1}; }
+  const bmp = await createImageBitmap(blob), canvas = E('canvas'); canvas.width = bmp.width; canvas.height = bmp.height;
+  canvas.getContext('2d').drawImage(bmp, 0, 0); canvas.className = 'th-img-canvas'; canvas.setAttribute('aria-label', title);
+  stage.replaceChildren(canvas); onEnd?.(); return {pages: 1};
+}
+
 export async function openViewer({title, subtitle = '', load, actions = [], lang = 'es'}) {
   linkHrCss();
-  const t = lang === 'es' ? {loading: 'Cargando documento…', close: 'Cerrar', open: 'Abrir en otra pestaña', download: 'Descargar', fail: 'No se pudo abrir el documento.'} : {loading: 'Loading document…', close: 'Close', open: 'Open in a new tab', download: 'Download', fail: 'The document could not be opened.'};
+  const t = lang === 'es'
+    ? {loading: 'Cargando documento…', close: 'Cerrar', open: 'Abrir en otra pestaña', download: 'Descargar', fail: 'No se pudo abrir el documento.', page: 'Página', pages: n => n === 1 ? '1 página' : n + ' páginas', ro: 'Solo lectura', roHint: 'Este documento se puede leer aquí, pero no descargar ni imprimir.', zin: 'Ampliar', zout: 'Reducir'}
+    : {loading: 'Loading document…', close: 'Close', open: 'Open in a new tab', download: 'Download', fail: 'The document could not be opened.', page: 'Page', pages: n => n === 1 ? '1 page' : n + ' pages', ro: 'Read-only', roHint: 'You can read this document here, but it cannot be downloaded or printed.', zin: 'Zoom in', zout: 'Zoom out'};
   const dialog = E('dialog', undefined, 'th-viewer'); dialog.lang = lang;
   const head = E('header', undefined, 'th-viewer-head'), titles = E('div');
-  titles.append(E('h2', title), subtitle ? E('p', subtitle, 'th-muted') : '');
+  const sub = E('p', subtitle, 'th-muted');
+  titles.append(E('h2', title), sub);
   const tools = E('div', undefined, 'th-viewer-tools'), close = E('button', t.close, 'th-btn'); close.type = 'button';
   tools.append(close); head.append(titles, tools);
   const stage = E('div', undefined, 'th-viewer-stage'); stage.append(E('p', t.loading, 'th-muted th-center'));
   const foot = E('footer', undefined, 'th-viewer-foot');
   dialog.append(head, stage, foot); document.body.append(dialog);
-  let blobUrl = null;
-  const done = () => { if (blobUrl) URL.revokeObjectURL(blobUrl); dialog.remove(); };
+  let blobUrl = null, view = null, viewOnly = false;
+  const block = e => { if (viewOnly) e.preventDefault(); };
+  const keys = e => { if (viewOnly && (e.ctrlKey || e.metaKey) && /^[spc]$/i.test(e.key)) e.preventDefault(); };
+  const done = () => { if (blobUrl) URL.revokeObjectURL(blobUrl); view?.destroy?.(); document.removeEventListener('keydown', keys, true); document.body.classList.remove('th-noprint'); dialog.remove(); };
   close.onclick = () => dialog.close(); dialog.onclose = done;
   dialog.showModal();
   try {
     const r = await load();
     if (!r?.url) throw Error(t.fail);
+    viewOnly = !!r.view_only;
+    if (viewOnly) {
+      dialog.classList.add('is-viewonly'); document.body.classList.add('th-noprint');
+      dialog.addEventListener('contextmenu', block); dialog.addEventListener('dragstart', block); document.addEventListener('keydown', keys, true);
+      const ro = E('span', t.ro, 'th-chip'); ro.dataset.tone = 'ink'; ro.title = t.roHint; titles.append(ro);
+    }
     const res = await fetch(r.url, {cache: 'no-store'});
     if (!res.ok) throw Error(t.fail);
-    const blob = await res.blob(); blobUrl = URL.createObjectURL(blob);
-    stage.replaceChildren();
-    if (blob.type.startsWith('image/')) { const img = E('img'); img.alt = title; img.src = blobUrl; stage.append(img); }
-    else { const frame = E('iframe'); frame.title = title; frame.src = blobUrl; stage.append(frame); }
-    const open = E('a', t.open, 'th-btn'); open.href = blobUrl; open.target = '_blank'; open.rel = 'noopener';
-    tools.prepend(open);
-    if (r.download_url) { const dl = E('a', t.download, 'th-btn'); dl.href = r.download_url; dl.rel = 'noopener'; tools.prepend(dl); }
+    const blob = await res.blob();
+    const onEnd = () => { dialog.dataset.ended = '1'; dialog.dispatchEvent(new CustomEvent('th-viewer-end')); };
+    if (isPdf(blob, r)) {
+      try { view = await renderPdf(stage, blob, {onEnd, labels: t}); }
+      catch (err) {
+        if (viewOnly) throw err;
+        blobUrl = URL.createObjectURL(blob); const frame = E('iframe'); frame.title = title; frame.src = blobUrl; stage.replaceChildren(frame); onEnd();
+      }
+    } else { if (!viewOnly) blobUrl = URL.createObjectURL(blob); view = await renderImage(stage, blob, {viewOnly, title, onEnd, src: blobUrl}); }
+    if (view?.pages) sub.textContent = [subtitle, t.pages(view.pages)].filter(Boolean).join(' · ');
+    if (view?.zoom) {
+      const z = E('div', undefined, 'th-zoom'), out = E('button', '−', 'th-btn th-ghost'), lab = E('span', '100%'), inn = E('button', '+', 'th-btn th-ghost');
+      out.type = inn.type = 'button'; out.setAttribute('aria-label', t.zout); inn.setAttribute('aria-label', t.zin);
+      const go = async d => { const v = await view.zoom(d); lab.textContent = Math.round(v * 100) + '%'; };
+      out.onclick = () => go(-.25); inn.onclick = () => go(.25);
+      z.append(out, lab, inn); tools.prepend(z);
+    }
+    if (!viewOnly) {
+      if (!blobUrl) blobUrl = URL.createObjectURL(blob);
+      const open = E('a', t.open, 'th-btn'); open.href = blobUrl; open.target = '_blank'; open.rel = 'noopener';
+      tools.prepend(open);
+      if (r.download_url) { const dl = E('a', t.download, 'th-btn'); dl.href = r.download_url; dl.rel = 'noopener'; tools.prepend(dl); }
+    }
   } catch (e) { stage.replaceChildren(E('p', e.message || t.fail, 'th-error th-center')); }
   for (const a of actions) if (a) foot.append(a(dialog));
   foot.hidden = !foot.children.length;

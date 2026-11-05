@@ -37,7 +37,7 @@ export function handleProblem(handle) {
   if (handle.length > 30) return "Use 30 characters or fewer.";
   if (!HANDLE_RE.test(handle)) return "Use lowercase letters, numbers and single hyphens only (no spaces or accents).";
   if (UUID_RE.test(handle)) return "Choose a name, not an identifier.";
-  if (RESERVED_HANDLES.has(handle)) return "This name is reserved by MUK Talent.";
+  if (RESERVED_HANDLES.has(handle)) return "This name is reserved by MUKTalent.";
   return null;
 }
 export function slugifyName(text) {

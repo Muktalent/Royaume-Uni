@@ -1,5 +1,5 @@
 @charset "UTF-8";
-/* MUK Talent · v22 · Pages: content sections and menus
+/* MUKTalent · v22 · Pages: content sections and menus
    Built by joining, in the SAME order as before, the files listed below (the cascade is unchanged).
    Edit this file directly from now on; the old separate files were removed.
    style.css
@@ -284,7 +284,7 @@ body {
       rgba(255,255,255,0.96),
       rgba(255,255,255,0.82)
     ),
-    url('/assets/hero.jpg');
+    url('/assets/hero.webp');
 
   background-size: cover;
   background-position: center;
@@ -868,7 +868,7 @@ body {
       rgba(255,255,255,0.96),
       rgba(255,255,255,0.88)
     ),
-    url('/assets/hero.jpg');
+    url('/assets/hero.webp');
   background-size: cover;
   background-position: center;
 }
@@ -1699,7 +1699,7 @@ body {
   inset: 0;
   background:
     linear-gradient(to right, rgba(10,16,22,0.72), rgba(10,16,22,0.26)),
-    url('/assets/hero.jpg');
+    url('/assets/hero.webp');
   background-size: cover;
   background-position: center;
   transform: scale(1.03);

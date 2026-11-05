@@ -2,7 +2,7 @@
 // Several modules add their own stylesheet when they open (team, chat, workspace…).
 // This keeps /assets/brand/muk-unified.css as the LAST stylesheet so the shared look always wins,
 // without touching any feature code.
-export const UNIFIED_CSS = '/assets/brand/muk-unified.css?v=22.0.0';
+export const UNIFIED_CSS = '/assets/brand/muk-unified.css?v=23.0.0';
 
 export function mountUnifiedTheme(doc = document) {
   const head = doc.head;

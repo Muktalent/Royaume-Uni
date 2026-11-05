@@ -50,7 +50,7 @@ export function mountPayroll(app,{requireStaff,requireAdmin}){
   const rows=check(await client.from('crm_candidates').select('id,reference,case_accepted_at').eq('assigned_to',id).not('case_accepted_at','is',null).gte('case_accepted_at',from).lt('case_accepted_at',to).is('archived_at',null).or(`created_by.eq.${id},source.eq.public_counsellor_card`).order('case_accepted_at',{ascending:true}).limit(1000));
   const verifiedDates=rows.map(r=>dayKey(r.case_accepted_at)),t=await terms(client,id),perLead=t.perLead,summary=computePayroll({month,today,verifiedDates,...t});
   const leads=rows.filter(r=>dayKey(r.case_accepted_at).startsWith(month)).map(r=>({reference:r.reference,verified_on:dayKey(r.case_accepted_at),amount:perLead}));
-  res.json({data:{...summary,today,zone:PAYROLL.zone,workdays:PAYROLL.workdays,leads,history:history({month,today,verifiedDates,...t}),notice:'Estimate for information. Final pay is confirmed by MUK Talent administration.'}});
+  res.json({data:{...summary,today,zone:PAYROLL.zone,workdays:PAYROLL.workdays,leads,history:history({month,today,verifiedDates,...t}),notice:'Estimate for information. Final pay is confirmed by MUKTalent administration.'}});
  }));
  // Team overview for administrators (one query for everyone, no personal data beyond name and totals).
  app.get('/api/admin/payroll',requireStaff,requireAdmin,wrap(async(req,res)=>{

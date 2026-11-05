@@ -1,4 +1,4 @@
-// MUK Talent v13 · public team carousel + family / assistant enquiries routed to the team messenger.
+// MUKTalent v13 · public team carousel + family / assistant enquiries routed to the team messenger.
 import { createClient } from "@supabase/supabase-js";
 import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import { randomBytes } from "node:crypto";
@@ -128,7 +128,7 @@ export function mountMukPublic(app, { db = service } = {}) {
       if (a && /^video\//.test(a.mime || "")) { url = (await client.storage.from("mt-employee-private").createSignedUrl(a.object_path, 6 * 3600)).data?.signedUrl || null; play = "video"; }
       else if (url) { const e = embedInfo(url); embed = e?.src || null; play = videoKind(url); poster = poster || cloudinaryPoster(url) || e?.poster || null; }
       if (!url) continue;
-      out.push({ id: p.id, title: p.title, body: p.body || null, url, embed, play, poster: poster || null, author: sm.get(p.author_id) || "MUK Talent", at: p.created_at });
+      out.push({ id: p.id, title: p.title, body: p.body || null, url, embed, play, poster: poster || null, author: sm.get(p.author_id) || "MUKTalent", at: p.created_at });
     }
     vcache = { at: Date.now(), data: out };
     res.set("Cache-Control", "public, max-age=60");

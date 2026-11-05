@@ -1,4 +1,4 @@
-/* MUK Talent v6 – runs in <head> before first paint: theme, language, motion. No data leaves the browser. */
+/* MUKTalent v6 – runs in <head> before first paint: theme, language, motion. No data leaves the browser. */
 (function(){
  "use strict";
  var d=document.documentElement,LANGS=["fr","en","es","ar"];
@@ -21,7 +21,7 @@
  d.setAttribute("data-lang",l);
  if(l!=="fr"){
   d.lang=l;d.dir=l==="ar"?"rtl":"ltr";d.className+=" v6-i18n-pending";
-  var s=document.createElement("script");s.src="/i18n/"+l+".js?v=6.0.0";s.async=false;document.head.appendChild(s);
+  var s=document.createElement("script");s.src="/i18n/"+l+".js?v=23.0.0";s.async=false;document.head.appendChild(s);
  }
  var reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
  if(!reduce)d.className+=" v6-motion";

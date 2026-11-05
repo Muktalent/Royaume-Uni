@@ -1,4 +1,4 @@
-// MUK Talent · service worker v17. Instalación como app (PWA) para los paneles.
+// MUKTalent · service worker v17. Instalación como app (PWA) para los paneles.
 // Sólo gestiona navegaciones a /login, /admin y /portal: red primero y, sin conexión, una página offline.
 // Nunca guarda respuestas de /api ni datos personales.
 const VERSION = 'muk-v17-1';

@@ -1,4 +1,4 @@
-/* MUK Talent v13–v14 · Our Team gallery (About), new-content videos (home), counsellor faces, "Speak to Our Team" form (parents + assistant hand-off). */
+/* MUKTalent v13–v14 · Our Team gallery (About), new-content videos (home), counsellor faces, "Speak to Our Team" form (parents + assistant hand-off). */
 (() => {
   "use strict";
   const d = document, $ = (s, r = d) => r.querySelector(s), $$ = (s, r = d) => [...r.querySelectorAll(s)];
@@ -113,7 +113,7 @@
           b.append(thumb(v, "v14-lv-thumb"));
           const t = el("span", "v14-lv-meta"); const tt = el("strong", "", v.title); tt.setAttribute("data-no-i18n", "");
           const m = el("span", "v14-lv-sub"); m.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>'; const dt = el("span", "", fmt(v.at)); dt.setAttribute("data-no-i18n", ""); m.append(dt);
-          const au = el("span", "v14-lv-sub"); au.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>'; const an = el("span", "", v.author || "MUK Talent"); an.setAttribute("data-no-i18n", ""); au.append(an);
+          const au = el("span", "v14-lv-sub"); au.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>'; const an = el("span", "", v.author || "MUKTalent"); an.setAttribute("data-no-i18n", ""); au.append(an);
           const row = el("span", "v14-lv-row"); row.append(m, au); t.append(el("small", "", i === 0 ? "Nouveau" : "Vidéo"), tt, row); b.append(t);
           b.onclick = () => show(i); li.append(b); side.append(li);
         });
@@ -167,7 +167,7 @@
     const msg = el("textarea"); msg.name = "message"; msg.maxLength = 1500; msg.placeholder = "Votre question ou ce qui compte le plus pour vous (facultatif)";
     const hp = el("input", "v13-hp"); hp.name = "website"; hp.tabIndex = -1; hp.autocomplete = "off"; hp.setAttribute("aria-hidden", "true");
     const consent = el("label", "v13-consent"); const cc = el("input"); cc.type = "checkbox"; cc.name = "consent"; cc.required = true;
-    const ct = el("span"); ct.append(d.createTextNode("J’accepte que MUK Talent utilise ces informations pour me recontacter, conformément à la "), Object.assign(el("a", "", "politique de confidentialité"), { href: "/privacy/", target: "_blank" }), d.createTextNode("."));
+    const ct = el("span"); ct.append(d.createTextNode("J’accepte que MUKTalent utilise ces informations pour me recontacter, conformément à la "), Object.assign(el("a", "", "politique de confidentialité"), { href: "/privacy/", target: "_blank" }), d.createTextNode("."));
     consent.append(cc, ct);
     const err = el("p", "v13-err"); err.hidden = true; err.setAttribute("role", "alert");
     const submit = el("button", "v13-submit", "Envoyer à l’équipe"); submit.type = "submit";

@@ -6,14 +6,14 @@ profile=dict(kind='profile',slug='profile',title='Your Name',
  subtitle='Cybersecurity engineer focused on LLM and AI application security, AI red teaming and explainable risk assessment',
  category='Open to MSc and AI security roles · 2027',issuer='London, United Kingdom',
  website_url='https://www.linkedin.com/in/your-profile',repository_url='https://github.com/your-username',verification_url='',
- body="""I am a final-year BSc (Hons) Cybersecurity and Networks student at the University of East London and the founder of MUK Talent. My work sits where security engineering meets machine learning: I break LLM applications to learn how to defend them, I design guardrails for RAG and agentic systems, and I build risk models that explain their decisions in plain language.
+ body="""I am a final-year BSc (Hons) Cybersecurity and Networks student at the University of East London and the founder of MUKTalent. My work sits where security engineering meets machine learning: I break LLM applications to learn how to defend them, I design guardrails for RAG and agentic systems, and I build risk models that explain their decisions in plain language.
 
 My final-year project, AegisGate, is an AI-driven network detection and response platform that learns normal network behaviour, correlates evidence across events and turns anomalies into explainable, actionable alerts. Alongside it I maintain a set of open-source labs for prompt-injection testing, retrieval poisoning and agent tool-call control, mapped to the OWASP Top 10 for LLM Applications and MITRE ATLAS.
 
 I am preparing for a master's degree in cybersecurity and artificial intelligence and for a career in AI security engineering and adversarial testing.""",
  tags='LLM security, Prompt injection, AI red teaming, RAG security, Agentic AI, MITRE ATLAS, OWASP LLM Top 10, Threat modelling, Python, PyTorch, scikit-learn, SHAP, Network security, Wireshark, Nmap, Burp Suite, Kali Linux, Docker, Supabase, Node.js, SQL',sort_order=0)
 exp=[
- dict(slug='exp-muk-talent',title='Founder & Director',issuer='MUK Talent (Maghreb UK Talent Ltd)',category='London · Company no. 16987132',issued_on='2025-11-01',
+ dict(slug='exp-muk-talent',title='Founder & Director',issuer='MUKTalent (MUKTalent Ltd)',category='London · Company no. 16987132',issued_on='2025-11-01',
   body='Founded a UK student-recruitment and talent company and built its full digital platform myself: public website, student portal, team workspace, media studio and digital business cards. Designed the authentication, row-level security policies and audit trail on Supabase, and run the security reviews before every release.',
   tags='Leadership, Secure architecture, Supabase RLS, Node.js, Vercel',sort_order=1),
  dict(slug='exp-cisco-ethical-hacker',title='Ethical Hacker · Work-Based Learning placement',issuer='Cisco Networking Academy · Skills for All',category='Remote · 4 weeks',issued_on='2026-02-08',expires_on='2026-03-08',
@@ -64,8 +64,8 @@ The dashboard writes the explanation in plain language and ranks remediation ste
 
 Delivered as a professional report with an executive summary, CVSS-rated findings, evidence and prioritised remediation.""",
   tags='Nmap, Burp Suite, Metasploit, Hydra, CVSS, Reporting',sort_order=6),
- dict(slug='muk-talent-platform',title='MUK Talent Platform',subtitle='Secure student-recruitment platform built end to end',category='Secure Web',issuer='Founder · Full-stack developer',issued_on='2026-10-01',cover='muktalent',
-  body="""Designed and built the complete MUK Talent platform: multilingual public website, student portal, team workspace with media studio and chat, and digital business cards with Apple and Google Wallet passes.
+ dict(slug='muk-talent-platform',title='MUKTalent Platform',subtitle='Secure student-recruitment platform built end to end',category='Secure Web',issuer='Founder · Full-stack developer',issued_on='2026-10-01',cover='muktalent',
+  body="""Designed and built the complete MUKTalent platform: multilingual public website, student portal, team workspace with media studio and chat, and digital business cards with Apple and Google Wallet passes.
 
 Security by design: Supabase row-level security on every table, signed storage URLs, strict content-security policy, rate limiting and an automated test suite run before each deployment.""",
   tags='Node.js, Supabase, PostgreSQL RLS, Vercel, CSP, i18n',website_url='https://www.muktalent.com',sort_order=7),
@@ -132,7 +132,7 @@ links=[dict(kind='link',slug='link-email',title='Email',subtitle='agents@muktale
  dict(kind='link',slug='link-linkedin',title='LinkedIn',website_url='https://www.linkedin.com/in/your-profile',sort_order=2),
  dict(kind='link',slug='link-github',title='GitHub',website_url='https://github.com/your-username',sort_order=3),
  dict(kind='link',slug='link-htb',title='Hack The Box',website_url='https://app.hackthebox.com/profile/your-id',sort_order=4),
- dict(kind='link',slug='link-muktalent',title='MUK Talent',website_url='https://www.muktalent.com',sort_order=5)]
+ dict(kind='link',slug='link-muktalent',title='MUKTalent',website_url='https://www.muktalent.com',sort_order=5)]
 rows=[profile]+[dict(kind='experience',**x) for x in exp]+[dict(kind='education',**x) for x in edu]
 for p in proj:
     p=dict(p);c=p.pop('cover');p['cover_path']=f'{SEED}/projects/{c}.webp';rows.append(dict(kind='project',**p))
@@ -142,7 +142,7 @@ def q(v):
     if v is None: return 'null'
     if isinstance(v,int): return str(v)
     return "'"+str(v).replace("'","''")+"'"
-out=['-- MUK Talent · contenido inicial del portfolio y certificados (datos de ejemplo, editables en /personal-admin/).',
+out=['-- MUKTalent · contenido inicial del portfolio y certificados (datos de ejemplo, editables en /personal-admin/).',
  '-- Ejecutar UNA vez en Supabase > SQL Editor. No sobrescribe nada: si un identificador (slug) ya existe, lo deja como está.',
  '-- Requiere haber ejecutado antes supabase/personal.sql y supabase/personal-book.sql.','begin;']
 for r in rows:

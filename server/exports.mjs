@@ -36,7 +36,7 @@ export function mountExports(app){
    const candidates=await all(req.db,'crm_candidates','id,reference,first_name,last_name,email,phone_e164,whatsapp_phone_e164,preferred_language,residence_country_code,residence_city,status,assigned_to,target_study_level,subject_interest,intended_intake,budget_amount,budget_currency,funding_plan,next_action,next_action_at,created_at,updated_at,archived_at,evaluation_payload');
    const partnerCandidates=candidates.filter(c=>c.status!=='closed');
    const stats=overview(mode==='partners'?partnerCandidates:candidates),wb=new ExcelJS.Workbook();
-   wb.creator='Maghreb UK Talent';wb.created=new Date();wb.modified=new Date();
+   wb.creator='MUKTalent';wb.created=new Date();wb.modified=new Date();
    const generated=new Date().toISOString();
    if(mode==='internal'){
     const [education,enquiries,staff]=await Promise.all([
@@ -62,7 +62,7 @@ export function mountExports(app){
    }else{
     const profiles=partnerRows(partnerCandidates);
     sheet(wb,'Read first',['Topic','Information'],[
-     ['Report','MAGHREB UK TALENT — prospective student pipeline'],['Generated UTC',generated],
+     ['Report','MUKTALENT — prospective student pipeline'],['Generated UTC',generated],
      ['Purpose','Draft for partnership discussions. Review the lawful basis, notice and recipient before external disclosure. No automatic sharing.'],
      ['Privacy','MINIMISED / PSEUDONYMISED, NOT ANONYMOUS. Do not attempt re-identification.'],
      ['Scope','Non-archived candidate records, excluding closed projects. General enquiries are excluded to avoid double counting.'],

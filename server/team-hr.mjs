@@ -6,6 +6,8 @@ import {createHash, randomUUID} from 'node:crypto';
 import {rateLimit} from 'express-rate-limit';
 import {z} from 'zod';
 import {validSignature} from './workspace-extras.mjs';
+import {V23_FIELDS, V23_DEFAULTS, isExpired, fileAccess} from './hr-docs-rules.mjs';
+export {V23_FIELDS, V23_DEFAULTS, isExpired, fileAccess, keepCopyKinds} from './hr-docs-rules.mjs';
 
 const bucket = 'mt-employee-private';
 const MB = 1024 * 1024;
@@ -138,7 +140,7 @@ async function teamRows(client, {includeRemoved = false} = {}) {
   }).filter(r => includeRemoved || !r.removed_at);
 }
 
-export const needsAdmin = d => (d.direction === 'from_employee' && d.status === 'submitted') || (d.status === 'signed' && !d.admin_seen_at);
+export const needsAdmin = d =>(d.direction === 'from_employee' && d.status === 'submitted') || (d.status === 'signed' && !d.admin_seen_at);
 
 // ---------- Firma de PDF ----------
 export function cleanStrokes(input) {
@@ -174,7 +176,7 @@ export async function stampSignature(originalBytes, info) {
   const page = pdf.addPage([595.28, 841.89]);
   const ink = rgb(0.05, 0.13, 0.14), gold = rgb(0.72, 0.56, 0.24), grey = rgb(0.4, 0.43, 0.45);
   page.drawRectangle({x: 0, y: 781, width: 595.28, height: 61, color: ink});
-  page.drawText('MUK TALENT', {x: 48, y: 812, size: 16, font: bold, color: gold});
+  page.drawText('MUKTALENT', {x: 48, y: 812, size: 16, font: bold, color: gold});
   page.drawText('Electronic signature certificate', {x: 48, y: 794, size: 11, font, color: rgb(1, 1, 1)});
   let y = 740;
   const row = (label, value) => {
@@ -212,12 +214,12 @@ export async function stampSignature(originalBytes, info) {
   y = box.y - 30;
   const statement = [
     `${info.signerName} confirmed that they read this document in full and agreed to sign it electronically.`,
-    'The signature, time, account and IP address above were recorded by the MUK Talent workspace at the moment of signing.',
+    'The signature, time, account and IP address above were recorded by the MUKTalent workspace at the moment of signing.',
     'The SHA-256 fingerprint identifies the exact original file that was signed. Any later change to the file produces a different fingerprint.'
   ];
   for (const s of statement) { page.drawText(safe(s), {x: 48, y, size: 9, font, color: grey, maxWidth: 500, lineHeight: 12}); y -= 30; }
   pdf.setTitle(safe(info.title + ' (signed)'));
-  pdf.setProducer('MUK Talent workspace');
+  pdf.setProducer('MUKTalent workspace');
   return Buffer.from(await pdf.save());
 }
 
@@ -350,11 +352,17 @@ export function mountTeamHr(app, {requireStaff, requireAdmin}) {
   }));
 
   // ===== Documentos =====
-  const docFields = 'id,owner_id,direction,kind,title,note,original_name,mime,bytes,requires_signature,status,viewed_at,signed_at,signer_name,signature_method,reviewed_at,review_note,admin_seen_at,created_at,created_by,signed_path';
-  const shape = (d, names = new Map()) => ({...d, signed_path: undefined, has_signed: !!d.signed_path, kind_label: KIND_LABEL[d.kind] || 'Document', owner_name: names.get(d.owner_id) || '', needs_admin: needsAdmin(d)});
+  const baseFields = 'id,owner_id,direction,kind,title,note,original_name,mime,bytes,requires_signature,status,viewed_at,signed_at,signer_name,signature_method,reviewed_at,review_note,admin_seen_at,created_at,created_by,signed_path';
+  const docFields = baseFields + ',' + V23_FIELDS;
+  // v23: si la migración 20261105200000 aún no está aplicada, se sigue funcionando como antes.
+  const withV23 = async build => { const r = await build(docFields); if (r.error?.code === '42703') return check(await build(baseFields)).map(d => ({...V23_DEFAULTS, ...d})); return check(r); };
+  const shape = (d, names = new Map()) => ({...V23_DEFAULTS, ...d, signed_path: undefined, has_signed: !!d.signed_path, kind_label: KIND_LABEL[d.kind] || 'Document', owner_name: names.get(d.owner_id) || '', needs_admin: needsAdmin(d), expired: isExpired(d)});
+  const v23Patch = v => (v.view_only || v.requires_ack || v.expires_at || v.batch_id) ? {view_only: !!v.view_only, requires_ack: !!v.requires_ack, expires_at: v.expires_at || null, batch_id: v.batch_id || null} : {};
   async function startUpload(client, {owner, by, direction, v}) {
     const id = randomUUID(), ext = {'application/pdf': 'pdf', 'image/jpeg': 'jpg', 'image/png': 'png'}[v.mime], path = `${owner}/hr/${id}.${ext}`;
-    check(await client.from('mt_staff_documents').insert({id, owner_id: owner, direction, kind: v.kind, title: v.title, note: v.note || '', original_name: v.name, mime: v.mime, bytes: v.bytes, object_path: path, requires_signature: !!v.requires_signature, status: 'uploading', created_by: by}));
+    const r = await client.from('mt_staff_documents').insert({id, owner_id: owner, direction, kind: v.kind, title: v.title, note: v.note || '', original_name: v.name, mime: v.mime, bytes: v.bytes, object_path: path, requires_signature: !!v.requires_signature, status: 'uploading', created_by: by, ...v23Patch(v)});
+    if (r.error?.code === '42703' || r.error?.code === 'PGRST204') throw new Http(503, 'Para usar «solo lectura», confirmación de lectura o caducidad, aplica antes la migración 20261105200000_hr_docs_view_only.sql en Supabase.');
+    check(r);
     const signed = await client.storage.from(bucket).createSignedUploadUrl(path);
     if (signed.error) throw Error('Upload could not be started');
     return {id, path, token: signed.data.token};
@@ -374,7 +382,8 @@ export function mountTeamHr(app, {requireStaff, requireAdmin}) {
     }
     check(await client.from('mt_staff_documents').update({status: nextStatus, sha256: createHash('sha256').update(bytes).digest('hex'), updated_at: new Date().toISOString()}).eq('id', row.id));
   }
-  const uploadSchema = z.object({title: z.string().trim().min(1).max(200), note: z.string().trim().max(2000).default(''), kind: z.enum(DOC_KINDS).default('other'), name: z.string().min(1).max(200), mime: z.enum(DOC_MIMES), bytes: z.number().int().min(1).max(10 * MB), requires_signature: z.boolean().default(false)}).strict();
+  const uploadSchema = z.object({title: z.string().trim().min(1).max(200), note: z.string().trim().max(2000).default(''), kind: z.enum(DOC_KINDS).default('other'), name: z.string().min(1).max(200), mime: z.enum(DOC_MIMES), bytes: z.number().int().min(1).max(10 * MB), requires_signature: z.boolean().default(false), view_only: z.boolean().default(false), requires_ack: z.boolean().default(false), expires_at: z.string().datetime({offset: true}).nullable().default(null)}).strict();
+  const futureOrNull = iso => { if (iso && Date.parse(iso) <= Date.now()) throw new Http(400, 'La fecha de caducidad debe ser futura.'); return iso; };
 
   // --- administración ---
   app.get('/api/admin/hr-docs/summary', requireStaff, requireAdmin, wrap(async (req, res) => {
@@ -385,15 +394,15 @@ export function mountTeamHr(app, {requireStaff, requireAdmin}) {
   }));
   app.get('/api/admin/hr-docs', requireStaff, requireAdmin, wrap(async (req, res) => {
     const client = db();
-    let q = client.from('mt_staff_documents').select(docFields).neq('status', 'uploading').order('created_at', {ascending: false}).limit(500);
-    if (req.query.owner) q = q.eq('owner_id', uuid.parse(req.query.owner));
-    const rows = check(await q), ids = [...new Set(rows.map(r => r.owner_id))];
+    const owner = req.query.owner ? uuid.parse(req.query.owner) : null;
+    const rows = await withV23(f => { let q = client.from('mt_staff_documents').select(f).neq('status', 'uploading').order('created_at', {ascending: false}).limit(500); if (owner) q = q.eq('owner_id', owner); return q; }), ids = [...new Set(rows.map(r => r.owner_id))];
     const names = new Map(ids.length ? check(await client.from('crm_staff').select('user_id,full_name').in('user_id', ids)).map(s => [s.user_id, s.full_name]) : []);
     res.json({data: rows.map(r => shape(r, names))});
   }));
   app.post('/api/admin/hr-docs/start', requireStaff, requireAdmin, writeLimit, wrap(async (req, res) => {
     const {owner_id, ...rest} = req.body || {}, owner = uuid.parse(owner_id), v = uploadSchema.parse(rest), client = db();
     if (v.requires_signature && v.mime !== 'application/pdf') throw new Http(400, 'Solo los PDF se pueden enviar para firmar.');
+    futureOrNull(v.expires_at);
     const person = check(await client.from('crm_staff').select('user_id,active').eq('user_id', owner).maybeSingle());
     if (!person?.active) throw new Http(400, 'El empleado no está activo.');
     res.json(await startUpload(client, {owner, by: req.staff.user_id, direction: 'to_employee', v}));
@@ -404,6 +413,45 @@ export function mountTeamHr(app, {requireStaff, requireAdmin}) {
     if (!row) throw new Http(400, 'La subida no está pendiente.');
     await finishUpload(client, row, 'sent');
     res.json({ok: true});
+  }));
+  // v23 · Enviar el mismo documento a más empleados (copia en Storage, sin volver a subirlo).
+  app.post('/api/admin/hr-docs/:id/share', requireStaff, requireAdmin, writeLimit, wrap(async (req, res) => {
+    const id = uuid.parse(req.params.id), v = z.object({owner_ids: z.array(uuid).min(1).max(200)}).strict().parse(req.body), client = db();
+    const row = check(await client.from('mt_staff_documents').select('*').eq('id', id).eq('direction', 'to_employee').maybeSingle());
+    if (!row || row.status === 'uploading') throw new Http(404, 'Documento no encontrado.');
+    const people = check(await client.from('crm_staff').select('user_id,active').in('user_id', v.owner_ids)).filter(p => p.active && p.user_id !== row.owner_id);
+    const batch = row.batch_id || randomUUID();
+    if (!row.batch_id) check(await client.from('mt_staff_documents').update({batch_id: batch}).eq('id', id));
+    let sent = 0;
+    for (const p of people) {
+      const nid = randomUUID(), path = `${p.user_id}/hr/${nid}.${row.object_path.split('.').pop()}`;
+      const cp = await client.storage.from(bucket).copy(row.object_path, path);
+      if (cp.error) continue;
+      const ins = await client.from('mt_staff_documents').insert({id: nid, owner_id: p.user_id, direction: 'to_employee', kind: row.kind, title: row.title, note: row.note, original_name: row.original_name, mime: row.mime, bytes: row.bytes, object_path: path, requires_signature: row.requires_signature, status: 'sent', created_by: req.staff.user_id, sha256: row.sha256, view_only: row.view_only, requires_ack: row.requires_ack, expires_at: row.expires_at, batch_id: batch});
+      if (ins.error) { await client.storage.from(bucket).remove([path]); continue; }
+      sent++;
+    }
+    res.json({ok: true, sent, skipped: v.owner_ids.length - sent});
+  }));
+  // v23 · Cambiar «solo lectura», confirmación o caducidad sin volver a subir el archivo.
+  app.patch('/api/admin/hr-docs/:id', requireStaff, requireAdmin, writeLimit, wrap(async (req, res) => {
+    const id = uuid.parse(req.params.id), client = db();
+    const v = z.object({view_only: z.boolean().optional(), requires_ack: z.boolean().optional(), expires_at: z.string().datetime({offset: true}).nullable().optional(), whole_batch: z.boolean().default(false)}).strict().parse(req.body || {});
+    if (v.expires_at) futureOrNull(v.expires_at);
+    const row = check(await client.from('mt_staff_documents').select('id,direction,batch_id').eq('id', id).maybeSingle());
+    if (!row || row.direction !== 'to_employee') throw new Http(404, 'Documento no encontrado.');
+    const {whole_batch, ...patch} = v;
+    if (!Object.keys(patch).length) return res.json({ok: true, updated: 0});
+    let q = client.from('mt_staff_documents').update({...patch, updated_at: new Date().toISOString()});
+    q = whole_batch && row.batch_id ? q.eq('batch_id', row.batch_id) : q.eq('id', id);
+    const done = check(await q.select('id'));
+    res.json({ok: true, updated: done.length});
+  }));
+  // v23 · Registro de accesos del empleado a un documento.
+  app.get('/api/admin/hr-docs/:id/views', requireStaff, requireAdmin, wrap(async (req, res) => {
+    const id = uuid.parse(req.params.id);
+    const r = await db().from('mt_staff_document_views').select('viewed_at,device').eq('document_id', id).order('viewed_at', {ascending: false}).limit(200);
+    res.json({data: r.error ? [] : r.data, available: !r.error});
   }));
   app.get('/api/admin/hr-docs/:id/file', requireStaff, requireAdmin, wrap(async (req, res) => {
     const id = uuid.parse(req.params.id), variant = req.query.variant === 'signed' ? 'signed' : 'original', client = db();
@@ -440,16 +488,20 @@ export function mountTeamHr(app, {requireStaff, requireAdmin}) {
   // --- empleado (también lo usa el admin en modo vista con ?owner=) ---
   const ownerScope = req => { if (!req.query.owner) return req.staff.user_id; if (req.staff.role !== 'admin') throw new Http(403, 'Not allowed.'); return uuid.parse(req.query.owner); };
   app.get('/api/workspace/hr-docs/summary', requireStaff, wrap(async (req, res) => {
-    const r = await db().from('mt_staff_documents').select('status,requires_signature,direction').eq('owner_id', ownerScope(req)).eq('direction', 'to_employee').in('status', ['sent', 'viewed']).limit(500);
-    if (r.error) return res.json({data: {to_sign: 0, unread: 0}});
-    res.json({data: {to_sign: r.data.filter(d => d.requires_signature).length, unread: r.data.filter(d => d.status === 'sent').length}});
+    const owner = ownerScope(req), client = db();
+    let r = await client.from('mt_staff_documents').select('status,requires_signature,direction,requires_ack,acknowledged_at,expires_at').eq('owner_id', owner).eq('direction', 'to_employee').in('status', ['sent', 'viewed']).limit(500);
+    if (r.error?.code === '42703') r = await client.from('mt_staff_documents').select('status,requires_signature,direction').eq('owner_id', owner).eq('direction', 'to_employee').in('status', ['sent', 'viewed']).limit(500);
+    if (r.error) return res.json({data: {to_sign: 0, unread: 0, to_confirm: 0}});
+    const live = r.data.filter(d => !isExpired(d));
+    res.json({data: {to_sign: live.filter(d => d.requires_signature).length, unread: live.filter(d => d.status === 'sent').length, to_confirm: live.filter(d => d.requires_ack && !d.acknowledged_at && !d.requires_signature).length}});
   }));
   app.get('/api/workspace/hr-docs', requireStaff, wrap(async (req, res) => {
-    const rows = check(await db().from('mt_staff_documents').select(docFields).eq('owner_id', ownerScope(req)).neq('status', 'uploading').order('created_at', {ascending: false}).limit(300));
-    res.json({data: rows.map(r => { const s = shape(r); delete s.admin_seen_at; delete s.needs_admin; return s; })});
+    const owner = ownerScope(req), client = db();
+    const rows = await withV23(f => client.from('mt_staff_documents').select(f).eq('owner_id', owner).neq('status', 'uploading').order('created_at', {ascending: false}).limit(300));
+    res.json({data: rows.filter(r => !isExpired(r)).map(r => { const s = shape(r); delete s.admin_seen_at; delete s.needs_admin; delete s.batch_id; return s; })});
   }));
   app.post('/api/workspace/hr-docs/start', requireStaff, writeLimit, wrap(async (req, res) => {
-    const v = uploadSchema.parse({...(req.body || {}), requires_signature: false});
+    const v = {...uploadSchema.parse({...(req.body || {}), requires_signature: false}), view_only: false, requires_ack: false, expires_at: null};
     res.json(await startUpload(db(), {owner: req.staff.user_id, by: req.staff.user_id, direction: 'from_employee', v}));
   }));
   app.post('/api/workspace/hr-docs/finish', requireStaff, writeLimit, wrap(async (req, res) => {
@@ -461,13 +513,30 @@ export function mountTeamHr(app, {requireStaff, requireAdmin}) {
   }));
   app.get('/api/workspace/hr-docs/:id/file', requireStaff, wrap(async (req, res) => {
     const id = uuid.parse(req.params.id), owner = ownerScope(req), client = db(), variant = req.query.variant === 'signed' ? 'signed' : 'original';
-    const row = check(await client.from('mt_staff_documents').select('id,owner_id,object_path,signed_path,original_name,title,status,direction').eq('id', id).eq('owner_id', owner).maybeSingle());
-    if (!row || row.status === 'uploading') throw new Http(404, 'Document not found.');
-    const path = variant === 'signed' && row.signed_path ? row.signed_path : row.object_path;
-    const view = await client.storage.from(bucket).createSignedUrl(path, 300), download = await client.storage.from(bucket).createSignedUrl(path, 300, {download: variant === 'signed' && row.signed_path ? `${row.title}_signed.pdf` : row.original_name});
-    // Solo el propio empleado marca como leído (no el admin en modo vista).
-    if (!req.query.owner && row.direction === 'to_employee' && row.status === 'sent') await client.from('mt_staff_documents').update({status: 'viewed', viewed_at: new Date().toISOString(), updated_at: new Date().toISOString()}).eq('id', id).eq('status', 'sent');
-    res.json({url: view.data?.signedUrl || null, download_url: download.data?.signedUrl || null});
+    const fileBase = 'id,owner_id,object_path,signed_path,original_name,title,status,direction,mime';
+    const [row] = await withV23(f => client.from('mt_staff_documents').select(f === docFields ? fileBase + ',view_only,expires_at,view_count' : fileBase).eq('id', id).eq('owner_id', owner).limit(1));
+    if (!row || row.status === 'uploading' || isExpired(row)) throw new Http(404, 'This document is no longer available.');
+    const path = variant === 'signed' && row.signed_path ? row.signed_path : row.object_path, access = fileAccess(row);
+    const view = await client.storage.from(bucket).createSignedUrl(path, access.url_seconds);
+    const download = access.downloadable ? await client.storage.from(bucket).createSignedUrl(path, 300, {download: variant === 'signed' && row.signed_path ? `${row.title}_signed.pdf` : row.original_name}) : null;
+    // Solo el propio empleado marca como leído y queda registrado (no el admin en modo vista).
+    if (!req.query.owner && row.direction === 'to_employee') {
+      const at = new Date().toISOString();
+      if (row.status === 'sent') await client.from('mt_staff_documents').update({status: 'viewed', viewed_at: at, updated_at: at}).eq('id', id).eq('status', 'sent');
+      await client.from('mt_staff_document_views').insert({document_id: id, viewer_id: req.staff.user_id, device: String(req.get('user-agent') || '').slice(0, 300)});
+      await client.from('mt_staff_documents').update({view_count: (row.view_count || 0) + 1, last_viewed_at: at}).eq('id', id);
+    }
+    res.json({url: view.data?.signedUrl || null, download_url: download?.data?.signedUrl || null, view_only: !access.downloadable, mime: row.mime});
+  }));
+  // v23 · «He leído y entiendo este documento».
+  app.post('/api/workspace/hr-docs/:id/ack', requireStaff, writeLimit, wrap(async (req, res) => {
+    const id = uuid.parse(req.params.id), client = db();
+    const row = check(await client.from('mt_staff_documents').select('id,direction,requires_ack,acknowledged_at,status,expires_at').eq('id', id).eq('owner_id', req.staff.user_id).maybeSingle());
+    if (!row || row.direction !== 'to_employee' || !row.requires_ack || isExpired(row)) throw new Http(404, 'Document not found.');
+    if (row.acknowledged_at) return res.json({ok: true, acknowledged_at: row.acknowledged_at});
+    const at = new Date().toISOString();
+    check(await client.from('mt_staff_documents').update({acknowledged_at: at, status: row.status === 'sent' ? 'viewed' : row.status, updated_at: at}).eq('id', id).is('acknowledged_at', null));
+    res.json({ok: true, acknowledged_at: at});
   }));
   app.post('/api/workspace/hr-docs/:id/sign', requireStaff, signLimit, wrap(async (req, res) => {
     const id = uuid.parse(req.params.id), client = db();

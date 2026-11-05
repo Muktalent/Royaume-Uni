@@ -69,12 +69,12 @@ const telHref=value=>'tel:'+String(value).replace(/[^\d+]/g,'');
 async function googleSave(card){
  const config=googleConfig();if(!config)throw Error('Google Wallet is not configured');
  const d=await passDetails(card),origin=d.origin,id=config.issuer+'.muktalent_'+card.slug.replaceAll('-',''),localized=value=>({defaultValue:{language:'en',value}}),image=(uri,label)=>({sourceUri:{uri},contentDescription:localized(label)}),asset=name=>origin+'/api/business-card/'+card.slug+'/wallet/'+name;
- const text=[{id:'role',header:'Position',body:card.job_title||'MUK Talent'},{id:'territory',header:'Territory',body:card.assigned_city||'United Kingdom'}];
+ const text=[{id:'role',header:'Position',body:card.job_title||'MUKTalent'},{id:'territory',header:'Territory',body:card.assigned_city||'United Kingdom'}];
  if(d.code)text.push({id:'staff_id',header:'Staff ID',body:d.code});
  text.push({id:'link',header:'Business card',body:d.display});
  if(card.contact_phone)text.push({id:'phone',header:'Direct line',body:card.contact_phone});
  if(card.contact_email)text.push({id:'email',header:'Email',body:card.contact_email});
- text.push({id:'about',header:'MUK Talent',body:'Maghreb UK Talent connects students and partners with UK universities. Scan the code or tap “Book an appointment” to arrange a 30-minute consultation.'});
+ text.push({id:'about',header:'MUKTalent',body:'MUKTalent connects students and partners with UK universities. Scan the code or tap “Book an appointment” to arrange a 30-minute consultation.'});
  const uris=[{id:'book',uri:d.book,description:'Book an appointment with '+card.display_name}];
  if(card.contact_phone)uris.push({id:'call',uri:telHref(card.contact_phone),description:'Call '+card.display_name});
  const wa=d.socials.find(x=>x.platform==='whatsapp');if(wa)uris.push({id:'whatsapp',uri:wa.url,description:'WhatsApp'});
@@ -82,16 +82,16 @@ async function googleSave(card){
  uris.push({id:'card',uri:d.url,description:'Open business card · Share · Add to Wallet'});
  for(const x of d.socials)if(x.platform!=='whatsapp'&&uris.length<9)uris.push({id:'social_'+x.platform,uri:x.url,description:x.label});
  uris.push({id:'site',uri:'https://muktalent.com',description:'muktalent.com'});
- // v8 · ClickCard layout: avatar + "Name · MUK Talent" header row, title label, big name, QR, black brand hero with gold stripe.
- const first=String(card.display_name||'MUK Talent').trim().split(/\s+/)[0];
+ // v8 · ClickCard layout: avatar + "Name · MUKTalent" header row, title label, big name, QR, black brand hero with gold stripe.
+ const first=String(card.display_name||'MUKTalent').trim().split(/\s+/)[0];
  const body={id,classId:config.classId,genericType:'GENERIC_OTHER',state:'ACTIVE',hexBackgroundColor:'#111111',
-  cardTitle:localized(first+' · MUK Talent'),header:localized(card.display_name),subheader:localized(card.job_title||'MUK Talent'),
+  cardTitle:localized(first+' · MUKTalent'),header:localized(card.display_name),subheader:localized(card.job_title||'MUKTalent'),
   logo:image(d.photo?asset('avatar.png?v='+d.photo.id+'&style=soft-v8'):asset('logo.png?style=gold-v7'),card.display_name),
   barcode:{type:'QR_CODE',value:d.url,alternateText:d.display},
-  heroImage:image(asset('brand.png?style=soft-v8'),'MUK Talent · Your digital business card'),
+  heroImage:image(asset('brand.png?style=soft-v8'),'MUKTalent · Your digital business card'),
   textModulesData:text,linksModuleData:{uris}};
  // An actual public deployment is required; do not replace images with expiring URLs or localhost.
- try{await walletPublicImage(body.logo.sourceUri.uri,d.photo?'public_photo':'public_logo');}catch(error){if(!d.photo)throw error;body.logo=image(asset('logo.png?style=gold-v7'),'MUK Talent');await walletPublicImage(body.logo.sourceUri.uri,'public_logo');}
+ try{await walletPublicImage(body.logo.sourceUri.uri,d.photo?'public_photo':'public_logo');}catch(error){if(!d.photo)throw error;body.logo=image(asset('logo.png?style=gold-v7'),'MUKTalent');await walletPublicImage(body.logo.sourceUri.uri,'public_logo');}
  // Decorative images are optional: if Google could not fetch them, issue the pass without them instead of failing.
  for(const key of ['heroImage']){try{await walletPublicImage(body[key].sourceUri.uri,key==='heroImage'?'public_photo':'public_logo');}catch(error){delete body[key];console.warn(JSON.stringify({event:'wallet_optional_image_skipped',image:key,reason:walletSafeReason(error.message)}));}}
  const token=await oauth(config),headers={Authorization:'Bearer '+token,'Content-Type':'application/json'},selector=id=>({firstValue:{fields:[{fieldPath:"object.textModulesData['"+id+"']"}]}});
@@ -128,10 +128,10 @@ async function applePass(card){
  for(const suffix of ['','@2x','@3x']){const k=suffix?Number(suffix[1]):1;buffers['icon'+suffix+'.png']=await walletImage('apple-icon'+suffix+'.png',[29*k,29*k]);buffers['logo'+suffix+'.png']=await walletImage('apple-logo'+suffix+'.png',[50*k,50*k]);}
  // Only the employee's deliberately public profile-photo category is eligible.
  try{const bytes=await avatarBytes(card);if(bytes){const sharp=(await import('sharp')).default;for(const [suffix,k]of [['',1],['@2x',2],['@3x',3]]){const w=90*k,h=90*k,r=12*k;const mask=Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect width="${w}" height="${h}" rx="${r}" fill="#fff"/></svg>`),ring=Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}"><rect x="${k*.75}" y="${k*.75}" width="${w-k*1.5}" height="${h-k*1.5}" rx="${r}" fill="none" stroke="#c9b48a" stroke-width="${k*1.5}"/></svg>`);buffers['thumbnail'+suffix+'.png']=await sharp(bytes,{limitInputPixels:16000000}).rotate().resize(w,h,{fit:'cover',position:'attention'}).ensureAlpha().composite([{input:mask,blend:'dest-in'},{input:ring}]).png().toBuffer();}}}catch{}
- const pass=new PKPass(buffers,{wwdr:cfg.wwdr,signerCert:cfg.signerCert,signerKey:cfg.signerKey,...(cfg.signerKeyPassphrase?{signerKeyPassphrase:cfg.signerKeyPassphrase}:{})},{passTypeIdentifier:cfg.passType,teamIdentifier:cfg.team,serialNumber:card.slug,organizationName:'MUK Talent',description:'Business card · '+card.display_name+' · MUK Talent',foregroundColor:'rgb(240,232,214)',backgroundColor:'rgb(22,22,22)',labelColor:'rgb(201,180,138)',sharingProhibited:false});
+ const pass=new PKPass(buffers,{wwdr:cfg.wwdr,signerCert:cfg.signerCert,signerKey:cfg.signerKey,...(cfg.signerKeyPassphrase?{signerKeyPassphrase:cfg.signerKeyPassphrase}:{})},{passTypeIdentifier:cfg.passType,teamIdentifier:cfg.team,serialNumber:card.slug,organizationName:'MUKTalent',description:'Business card · '+card.display_name+' · MUKTalent',foregroundColor:'rgb(240,232,214)',backgroundColor:'rgb(22,22,22)',labelColor:'rgb(201,180,138)',sharingProhibited:false});
  pass.type='generic';
  pass.headerFields.push({key:'territory',label:'TERRITORY',value:card.assigned_city||'UK'});
- pass.primaryFields.push({key:'name',label:(card.job_title||'MUK Talent').toUpperCase(),value:card.display_name});
+ pass.primaryFields.push({key:'name',label:(card.job_title||'MUKTalent').toUpperCase(),value:card.display_name});
  if(card.contact_phone)pass.secondaryFields.push({key:'phone',label:'DIRECT LINE',value:card.contact_phone});
  if(card.contact_email)pass.secondaryFields.push({key:'email',label:'EMAIL',value:card.contact_email});
  if(d.code)pass.auxiliaryFields.push({key:'staff_id',label:'STAFF ID',value:d.code});
@@ -144,7 +144,7 @@ async function applePass(card){
  link('card','BUSINESS CARD · SHARE · WALLET',d.url,d.display);
  for(const x of d.socials)if(x.platform!=='whatsapp')link('social_'+x.platform,x.label.toUpperCase(),x.url,x.value||x.label);
  link('site','WEBSITE','https://muktalent.com','muktalent.com');
- pass.backFields.push({key:'about',label:'MUK TALENT',value:'Maghreb UK Talent connects students and partners with UK universities. Share this card from Wallet, or scan the code to open it, book an appointment and add it to your own Wallet.'});
+ pass.backFields.push({key:'about',label:'MUKTALENT',value:'MUKTalent connects students and partners with UK universities. Share this card from Wallet, or scan the code to open it, book an appointment and add it to your own Wallet.'});
  pass.backFields.push({key:'notice',label:'ABOUT THIS CARD',value:'Professional contact card. It is not an identity or access credential.'});
  pass.setBarcodes({format:'PKBarcodeFormatQR',message:d.url,messageEncoding:'iso-8859-1',altText:d.display});
  return pass.getAsBuffer();

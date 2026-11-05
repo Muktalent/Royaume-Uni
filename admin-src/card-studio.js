@@ -18,7 +18,7 @@ export async function renderCardStudio({host,api,owner,readOnly,directory,openTa
  if(!host.isConnected)return;
  const data=cardData(d);if(qr?.handle)data.short_display=qr.display;
  const socials=Array.isArray(d.socials)?d.socials:[];
- const head=E('div',undefined,'cs-head'),ht=E('div');ht.append(E('p','BUSINESS CARD','lx-overline'),E('h2','Your MUK Talent card'));
+ const head=E('div',undefined,'cs-head'),ht=E('div');ht.append(E('p','BUSINESS CARD','lx-overline'),E('h2','Your MUKTalent card'));
  const live=E('span',d.card?.published?'Published':'Preview','cs-state'+(d.card?.published?' is-live':''));head.append(ht,live);main.append(head);
  const card=visitCard({d,data,qr});main.append(card);
  const flip=btn('Show back',()=>{const back=card.classList.toggle('is-back');flip.textContent=back?'Show front':'Show back';},'cs-flip');flip.prepend(icon('refresh','lx-btn-icon'));main.append(flip);
@@ -29,7 +29,7 @@ export async function renderCardStudio({host,api,owner,readOnly,directory,openTa
   act('wallet','Add to Wallet',()=>menu.openWallet(),true);act('share','Share',()=>menu.share());if(menu.showQr)act('qr','QR code',()=>menu.showQr());act('contact','Save contact',()=>menu.saveContact());act('open','Open card',()=>window.open(qr.url,'_blank','noopener,noreferrer'));
   main.append(acts,menu);menu.classList.add('cs-menu');}
  else main.append(E('p','Preview only. Your administrator publishes the card once your professional details are ready. You can already choose your domain.','cs-note'));
- main.append(E('p','Name, position, territory and ID are managed by MUK Talent. Your photo and work contact are in Profile.','cs-note'));
+ main.append(E('p','Name, position, territory and ID are managed by MUKTalent. Your photo and work contact are in Profile.','cs-note'));
  editor=await shortLinkPanel({host:side,api,owner,readOnly,onChanged});
  side.append(socialSummary({socials,readOnly,openTab}));
 }
@@ -37,9 +37,9 @@ export async function renderCardStudio({host,api,owner,readOnly,directory,openTa
 // Clean 85 × 55 business card · front: identity and contacts · back: QR and domain.
 function visitCard({d,data,qr}){
  const scene=E('div',undefined,'cs-visit'),inner=E('div',undefined,'cs-visit-in');scene.append(inner);
- const front=E('article',undefined,'cs-face cs-front');front.setAttribute('aria-label',(d.full_name||'MUK Talent')+' business card');
- const logo=E('img',undefined,'cs-logo');logo.src='/assets/brand/logo-ivory.svg';logo.alt='MUK Talent';logo.width=374;logo.height=72;
- const id=E('div',undefined,'cs-who');id.append(E('strong',d.full_name||'MUK Talent','cs-name'),E('span',d.job_title||'Team member','cs-role'));
+ const front=E('article',undefined,'cs-face cs-front');front.setAttribute('aria-label',(d.full_name||'MUKTalent')+' business card');
+ const logo=E('img',undefined,'cs-logo');logo.src='/assets/brand/logo-ivory.svg';logo.alt='MUKTalent';logo.width=374;logo.height=72;
+ const id=E('div',undefined,'cs-who');id.append(E('strong',d.full_name||'MUKTalent','cs-name'),E('span',d.job_title||'Team member','cs-role'));
  const list=E('ul',undefined,'cs-lines');
  const line=(ic,text)=>{if(!text)return;const li=E('li');li.append(icon(ic),E('span',text));list.append(li);};
  line('phone',data.contact_phone);line('mail',data.contact_email);line('link',data.short_display||'muktalent.com');if(data.assigned_city)line('pin',data.assigned_city);
@@ -100,6 +100,6 @@ export async function renderSocialEditor({host,api,owner,readOnly,onSaved}){
  else form.append(E('p','Read-only preview.','lx-muted'));
  function paint(links){preview.replaceChildren(E('p','PREVIEW','lx-overline'),createSocialLinks(Object.entries(links||{}).map(([platform,v])=>({platform,label:platform,value:v.value,url:v.url}))));}
  paint(info.links);panel.append(form,preview);
- const note=E('details',undefined,'cs-details');note.append(E('summary','Why links and not a login with each network?'),E('p','Signing in with Instagram, TikTok or LinkedIn would give MUK Talent access to your private account data and requires approval from each platform. Linking your public profile gives clients the same one-tap access without sharing your passwords or permissions.','lx-muted'));panel.append(note);
+ const note=E('details',undefined,'cs-details');note.append(E('summary','Why links and not a login with each network?'),E('p','Signing in with Instagram, TikTok or LinkedIn would give MUKTalent access to your private account data and requires approval from each platform. Linking your public profile gives clients the same one-tap access without sharing your passwords or permissions.','lx-muted'));panel.append(note);
 }
 

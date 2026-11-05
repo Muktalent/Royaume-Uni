@@ -58,7 +58,7 @@ export function applyV17({role = 'admin', lang = 'es'} = {}) {
   else document.head.append(document.getElementById('mukV17Css')); // siempre la última hoja
   let m = document.querySelector('meta[name=theme-color]'); if (!m) { m = E('meta'); m.name = 'theme-color'; document.head.append(m); } m.content = '#2B2A28';
   let mf = document.querySelector('link[rel=manifest]'); if (!mf) { mf = E('link'); mf.rel = 'manifest'; document.head.append(mf); } mf.href = '/admin/team.webmanifest?v=17';
-  for (const [n, c] of [['apple-mobile-web-app-capable', 'yes'], ['mobile-web-app-capable', 'yes'], ['apple-mobile-web-app-status-bar-style', 'black-translucent'], ['apple-mobile-web-app-title', 'MUK Talent']]) { let x = document.querySelector(`meta[name="${n}"]`); if (!x) { x = E('meta'); x.name = n; document.head.append(x); } x.content = c; }
+  for (const [n, c] of [['apple-mobile-web-app-capable', 'yes'], ['mobile-web-app-capable', 'yes'], ['apple-mobile-web-app-status-bar-style', 'black-translucent'], ['apple-mobile-web-app-title', 'MUKTalent']]) { let x = document.querySelector(`meta[name="${n}"]`); if (!x) { x = E('meta'); x.name = n; document.head.append(x); } x.content = c; }
   if (!document.querySelector('link[rel=apple-touch-icon]')) { const a = E('link'); a.rel = 'apple-touch-icon'; a.href = '/icon-192.png'; document.head.append(a); }
   if (applied) return; applied = true;
   if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('/sw.js', {scope: '/'}).catch(() => { });

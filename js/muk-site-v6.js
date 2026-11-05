@@ -1,13 +1,13 @@
-/* MUK Talent v6 – theme, FR/EN/ES/AR, motion, hero video. Plain JS, no third-party code, CSP friendly. */
+/* MUKTalent v6 – theme, FR/EN/ES/AR, motion, hero video. Plain JS, no third-party code, CSP friendly. */
 (()=>{
 "use strict";
 const d=document.documentElement,LANGS=["fr","en","es","ar"],NAMES={fr:"Français",en:"English",es:"Español",ar:"العربية"};
 const reduce=matchMedia("(prefers-reduced-motion: reduce)");
 const UI={
- fr:{dark:"Activer le mode sombre",light:"Activer le mode clair",lang:"Langue",play:"Lire la vidéo",pause:"Mettre la vidéo en pause",soundOn:"Activer le son",soundOff:"Couper le son",video:"Vidéo de présentation Maghreb UK Talent"},
- en:{dark:"Switch to dark mode",light:"Switch to light mode",lang:"Language",play:"Play video",pause:"Pause video",soundOn:"Turn sound on",soundOff:"Mute",video:"Maghreb UK Talent introduction video"},
- es:{dark:"Activar modo oscuro",light:"Activar modo claro",lang:"Idioma",play:"Reproducir vídeo",pause:"Pausar vídeo",soundOn:"Activar sonido",soundOff:"Silenciar",video:"Vídeo de presentación de Maghreb UK Talent"},
- ar:{dark:"تفعيل الوضع الداكن",light:"تفعيل الوضع الفاتح",lang:"اللغة",play:"تشغيل الفيديو",pause:"إيقاف الفيديو مؤقتًا",soundOn:"تشغيل الصوت",soundOff:"كتم الصوت",video:"فيديو تعريفي بـ Maghreb UK Talent"}
+ fr:{dark:"Activer le mode sombre",light:"Activer le mode clair",lang:"Langue",play:"Lire la vidéo",pause:"Mettre la vidéo en pause",soundOn:"Activer le son",soundOff:"Couper le son",video:"Vidéo de présentation MUKTalent"},
+ en:{dark:"Switch to dark mode",light:"Switch to light mode",lang:"Language",play:"Play video",pause:"Pause video",soundOn:"Turn sound on",soundOff:"Mute",video:"MUKTalent introduction video"},
+ es:{dark:"Activar modo oscuro",light:"Activar modo claro",lang:"Idioma",play:"Reproducir vídeo",pause:"Pausar vídeo",soundOn:"Activar sonido",soundOff:"Silenciar",video:"Vídeo de presentación de MUKTalent"},
+ ar:{dark:"تفعيل الوضع الداكن",light:"تفعيل الوضع الفاتح",lang:"اللغة",play:"تشغيل الفيديو",pause:"إيقاف الفيديو مؤقتًا",soundOn:"تشغيل الصوت",soundOff:"كتم الصوت",video:"فيديو تعريفي بـ MUKTalent"}
 };
 const store={get(k){try{return localStorage.getItem(k);}catch{return null;}},set(k,v){try{localStorage.setItem(k,v);}catch{}}};
 let lang=LANGS.includes(d.dataset.lang)?d.dataset.lang:"fr";
@@ -43,7 +43,7 @@ function loadPack(l){
  packPromises[l]=new Promise(res=>{
   const done=()=>res(pack(l));
   if(existing){if(pack(l))return done();existing.addEventListener("load",done,{once:true});existing.addEventListener("error",()=>res(null),{once:true});setTimeout(done,4000);return;}
-  const s=document.createElement("script");s.src=`/i18n/${l}.js?v=18.0.0`;s.onload=done;s.onerror=()=>res(null);document.head.append(s);
+  const s=document.createElement("script");s.src=`/i18n/${l}.js?v=23.0.0`;s.onload=done;s.onerror=()=>res(null);document.head.append(s);
  });
  return packPromises[l];
 }

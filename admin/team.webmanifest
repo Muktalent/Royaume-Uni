@@ -1,7 +1,7 @@
 {
-  "name": "MUK Talent",
-  "short_name": "MUK Talent",
-  "description": "MUK Talent team workspace and Global Passport student portal.",
+  "name": "MUKTalent",
+  "short_name": "MUKTalent",
+  "description": "MUKTalent team workspace and Global Passport student portal.",
   "id": "/login/",
   "start_url": "/login/?source=pwa",
   "scope": "/",

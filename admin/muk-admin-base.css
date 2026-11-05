@@ -1,5 +1,5 @@
 @charset "UTF-8";
-/* MUK Talent · v22 · Dashboard base styles
+/* MUKTalent · v22 · Dashboard base styles
    Joined in the SAME order as before (cascade unchanged): style.css, admin-premium.css, muk-soft-admin.css, gateway.css.
    muk-brand.css stays separate because the app keeps it after the module styles. */
 
@@ -179,7 +179,7 @@ body:has(#loginView:not([hidden])) .login-card .primary{background:#161514;color
 }
 
 /* ==================== gateway.css ==================== */
-/* gateway v11 · MUK Talent login (students + team). Ivory veil over the brand poster, solid white card. */
+/* gateway v11 · MUKTalent login (students + team). Ivory veil over the brand poster, solid white card. */
 #loginView.gp-gate{--g-ink:#2B2A28;--g-text:#3A3834;--g-muted:#6C6962;--g-line:#E5DDCE;--g-gold:#A28655;--g-gold-d:#796440;--g-green:#2B2A28;--g-paper:#f6f4ef;
  position:relative;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;overflow:hidden;background:var(--g-paper);color:var(--g-text);font:400 15px/1.5 "Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;isolation:isolate}
 #loginView[hidden]{display:none!important}

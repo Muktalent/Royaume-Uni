@@ -1,4 +1,4 @@
-// MUK Talent · v21 · Dashboard palette ("negros y blancos seda").
+// MUKTalent · v21 · Dashboard palette ("negros y blancos seda").
 // Applies ONLY to the private dashboards (admin, team workspace, Global Passport, counsellor centre,
 // Healthcare portal, personal admin). The public website keeps its own design and colours.
 //   Negro seda #161514 (navigation, main elements) · Grafito #2B2A28 (text, secondary)

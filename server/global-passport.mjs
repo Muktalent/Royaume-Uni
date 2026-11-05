@@ -1,4 +1,4 @@
-// global-passport-v1 · MUK Talent GLOBAL PASSPORT
+// global-passport-v1 · MUKTalent GLOBAL PASSPORT
 // Student portal (My Global Journey) + Counsellor Control Centre.
 // All data lives in private gp_* tables; only this server (service role) touches them,
 // after verifying the Supabase session and the caller's relationship to the file.

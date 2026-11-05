@@ -66,6 +66,19 @@
     {
      "key": "X-Frame-Options",
      "value": "SAMEORIGIN"
+    },
+    {
+     "key": "Strict-Transport-Security",
+     "value": "max-age=63072000"
+    }
+   ]
+  },
+  {
+   "source": "/((?!admin|portal|login|book|portfolio|certificates|personal-admin|pipeline-share|healthcare|api|offline).*)",
+   "headers": [
+    {
+     "key": "Content-Security-Policy",
+     "value": "default-src 'self'; script-src 'self' https://*.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://www.google.com https://connect.facebook.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; media-src 'self' blob: data:; connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://www.google.com https://www.googleadservices.com https://pagead2.googlesyndication.com https://*.facebook.com https://connect.facebook.net; frame-src https://td.doubleclick.net https://www.googletagmanager.com https://www.facebook.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests"
     }
    ]
   },

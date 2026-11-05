@@ -1,6 +1,6 @@
 // v22 · "Mensajes" section in every Education dashboard (replaces the heart button).
 // Paints the unread count on every element marked with data-msg-badge (sidebar item, mobile dock item…)
-// and in the browser tab title, e.g. "(2) MUK Talent". The toast / system notification for new messages
+// and in the browser tab title, e.g. "(2) MUKTalent". The toast / system notification for new messages
 // is still sent by messageNotifier (muk-v17.js).
 let baseTitle = null;
 

@@ -54,7 +54,7 @@ export function mountEvaluation(app){
     const sent=await fetch('https://api.resend.com/emails',{method:'POST',signal:AbortSignal.timeout(7000),
      headers:{Authorization:`Bearer ${process.env.RESEND_API_KEY}`,'Content-Type':'application/json','Idempotency-Key':`evaluation-booking-${data.id}`},
      body:JSON.stringify({from:process.env.BOOKING_FROM_EMAIL,to:[data.email],reply_to:'agents@muktalent.com',
-      subject:'Votre entretien avec Maghreb UK Talent',text:`Bonjour ${data.full_name},\n\nVotre entretien de 30 minutes est réservé.\nMaroc : ${fmt('Africa/Casablanca')}\nRoyaume-Uni : ${fmt('Europe/London')}\nRéférence : ${data.reference}\n\nPour modifier ou annuler, écrivez à agents@muktalent.com.\nMaghreb UK Talent`})});
+      subject:'Votre entretien avec MUKTalent',text:`Bonjour ${data.full_name},\n\nVotre entretien de 30 minutes est réservé.\nMaroc : ${fmt('Africa/Casablanca')}\nRoyaume-Uni : ${fmt('Europe/London')}\nRéférence : ${data.reference}\n\nPour modifier ou annuler, écrivez à agents@muktalent.com.\nMUKTalent`})});
     email_confirmation=sent.ok?'sent':'failed';
    }catch{email_confirmation='failed';}
   }

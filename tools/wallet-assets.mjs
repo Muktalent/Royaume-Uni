@@ -15,7 +15,7 @@ async function save(name,img){await img.png({compressionLevel:9}).toFile(fileURL
 // Google circular logo: gold mark on the card colour.
 {const m=await fit(mark,{width:360});const {height}=await meta(m);
  await save('google-logo.png',sharp({create:{width:660,height:660,channels:4,background:BG}}).composite([{input:m,left:150,top:Math.round((660-height)/2)}]));}
-// Google wide logo (1280x400): mark + MUK TALENT + tagline.
+// Google wide logo (1280x400): mark + MUKTALENT + tagline.
 {const m=await fit(mark,{height:210}),w=await fit(word,{height:88}),t=await fit(tag,{height:34});const mw=(await meta(m)).width,ww=(await meta(w)).width,tw=(await meta(t)).width;const x=Math.round((1280-(mw+44+ww))/2);
  await save('google-wide-logo.png',sharp({create:{width:1280,height:400,channels:4,background:BG}}).composite([{input:m,left:x,top:95},{input:w,left:x+mw+44,top:128},{input:t,left:x+mw+44+Math.round((ww-tw)/2),top:236}]));}
 // Apple logo (max 160x50 pt): mark + wordmark.

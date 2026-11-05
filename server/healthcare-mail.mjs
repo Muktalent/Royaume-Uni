@@ -22,7 +22,7 @@ const T = {
     docBody: l => [`Your consultant has requested: <b>${l}</b>.`, "Please upload it securely through your candidate portal. Do not send identity documents by email."],
     msgSubject: "New message from your MUKTalent Healthcare consultant",
     msgBody: ["You have a new message in your candidate portal."],
-    sign: "MUKTalent Healthcare · Maghreb UK Talent Ltd · London, United Kingdom",
+    sign: "MUKTalent Healthcare · MUKTalent Ltd · London, United Kingdom",
     footer: "You are receiving this email because you contacted MUKTalent Healthcare. Privacy notice:"
   },
   es: {
@@ -44,7 +44,7 @@ const T = {
     docBody: l => [`Tu consultor ha solicitado: <b>${l}</b>.`, "Súbelo de forma segura a través de tu portal. No envíes documentos de identidad por correo electrónico."],
     msgSubject: "Nuevo mensaje de tu consultor de MUKTalent Healthcare",
     msgBody: ["Tienes un mensaje nuevo en tu portal del candidato."],
-    sign: "MUKTalent Healthcare · Maghreb UK Talent Ltd · Londres, Reino Unido",
+    sign: "MUKTalent Healthcare · MUKTalent Ltd · Londres, Reino Unido",
     footer: "Recibes este correo porque contactaste con MUKTalent Healthcare. Aviso de privacidad:"
   },
   fr: {
@@ -66,7 +66,7 @@ const T = {
     docBody: l => [`Votre consultant vous demande : <b>${l}</b>.`, "Déposez-le de manière sécurisée via votre portail. N’envoyez pas de pièces d’identité par e-mail."],
     msgSubject: "Nouveau message de votre consultant MUKTalent Healthcare",
     msgBody: ["Vous avez un nouveau message dans votre portail candidat."],
-    sign: "MUKTalent Healthcare · Maghreb UK Talent Ltd · Londres, Royaume-Uni",
+    sign: "MUKTalent Healthcare · MUKTalent Ltd · Londres, Royaume-Uni",
     footer: "Vous recevez cet e-mail car vous avez contacté MUKTalent Healthcare. Politique de confidentialité :"
   },
   ar: {
@@ -88,7 +88,7 @@ const T = {
     docBody: l => [`طلب مستشارك: <b>${l}</b>.`, "يرجى رفعه بأمان عبر بوابة المرشح. لا ترسل وثائق الهوية عبر البريد الإلكتروني."],
     msgSubject: "رسالة جديدة من مستشارك في MUKTalent Healthcare",
     msgBody: ["لديك رسالة جديدة في بوابة المرشح."],
-    sign: "MUKTalent Healthcare · Maghreb UK Talent Ltd · لندن، المملكة المتحدة",
+    sign: "MUKTalent Healthcare · MUKTalent Ltd · لندن، المملكة المتحدة",
     footer: "تتلقى هذه الرسالة لأنك تواصلت مع MUKTalent Healthcare. إشعار الخصوصية:"
   }
 };

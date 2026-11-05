@@ -9,7 +9,7 @@ export function mountAdminSoft({api,getState,navigate}){
  function hero(){let h=document.getElementById('adminSoftHero');if(h)return h;h=E('section',undefined,'as-hero');h.id='adminSoftHero';h.setAttribute('aria-label','Resumen del día');overview.prepend(h);return h;}
  async function paint(){const s=getState();if(!s.staff||s.staff.role!=='admin'||busy)return;const id=++stamp;busy=true;const h=hero();
   const first=String(s.staff.full_name||'').split(/\s+/)[0]||'equipo';
-  const greet=E('article',undefined,'as-greet');greet.append(E('p','MUK TALENT · ADMINISTRACIÓN','as-overline'),E('h2','Hola, '+first),E('p',new Intl.DateTimeFormat('es-ES',{timeZone:'Africa/Casablanca',weekday:'long',day:'numeric',month:'long'}).format(new Date())+' · Africa/Casablanca','as-muted'));
+  const greet=E('article',undefined,'as-greet');greet.append(E('p','MUKTALENT · ADMINISTRACIÓN','as-overline'),E('h2','Hola, '+first),E('p',new Intl.DateTimeFormat('es-ES',{timeZone:'Africa/Casablanca',weekday:'long',day:'numeric',month:'long'}).format(new Date())+' · Africa/Casablanca','as-muted'));
   const quick=E('div',undefined,'as-quick');for(const [label,section]of [['Leads y casos','candidates'],['Pipeline e informes','intelligence'],['Equipo','team-people'],['Citas','appointments']]){const b=E('button',label,'as-quick-btn');b.type='button';b.onclick=()=>navigate(section);quick.append(b);}greet.append(quick);
   const pay=E('article',undefined,'as-pay');pay.append(E('p','NÓMINA DEL EQUIPO · '+new Intl.DateTimeFormat('es-ES',{month:'long',year:'numeric'}).format(new Date()).toUpperCase(),'as-overline'));
   h.replaceChildren(greet,pay);

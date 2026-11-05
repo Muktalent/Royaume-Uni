@@ -58,6 +58,6 @@ test("v14 /api/public/videos returns the 3 latest website videos with player dat
     const j = await (await fetch(`http://127.0.0.1:${port}/api/public/videos`)).json();
     assert.equal(j.data.length, 2);
     assert.equal(j.data[0].play, "vimeo"); assert.match(j.data[0].embed, /player\.vimeo\.com\/video\/1241983353/); assert.equal(j.data[0].author, "Laura");
-    assert.equal(j.data[1].play, "video"); assert.equal(j.data[1].url, "https://x.supabase.co/signed.mp4"); assert.equal(j.data[1].author, "MUK Talent");
+    assert.equal(j.data[1].play, "video"); assert.equal(j.data[1].url, "https://x.supabase.co/signed.mp4"); assert.equal(j.data[1].author, "MUKTalent");
   } finally { srv.close(); }
 });

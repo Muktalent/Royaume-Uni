@@ -86,7 +86,7 @@ const font = (o = {}) => ({name: 'Calibri', size: 10.5, color: {argb: C.text}, .
 function band(ws, lastCol, title, subtitle, mode) {
   ws.mergeCells(1, 1, 1, lastCol); ws.mergeCells(2, 1, 2, lastCol);
   const t = ws.getCell(1, 1), s = ws.getCell(2, 1);
-  t.value = {richText: [{text: 'MUK TALENT   ', font: font({bold: true, size: 15, color: {argb: C.gold}})}, {text: title, font: font({bold: true, size: 15, color: {argb: C.white}})}]};
+  t.value = {richText: [{text: 'MUKTALENT   ', font: font({bold: true, size: 15, color: {argb: C.gold}})}, {text: title, font: font({bold: true, size: 15, color: {argb: C.white}})}]};
   s.value = subtitle;
   s.font = font({size: 10, color: {argb: mode === 'partners' ? 'FFE7DFC9' : 'FFFFD7D2'}});
   for (const r of [1, 2]) for (let c = 1; c <= lastCol; c++) ws.getCell(r, c).fill = solid(C.ink);
@@ -125,13 +125,13 @@ function smallTable(ws, top, left, title, entries, total, {limit = 8, color = C.
 }
 
 export async function buildPipelineWorkbook(rawRows, {mode = 'partners', title = 'Student recruitment pipeline', recipient = '', asOf = new Date().toISOString(), sample = false} = {}) {
-  const preparedBy = 'MUK Talent';
+  const preparedBy = 'MUKTalent';
   const partners = mode === 'partners';
   // Sólo datos de estudiantes: se descartan campos del personal (responsable, creador, etc.).
   const rows = sortRows(rawRows.map(r => { const {owner_name, owner_id, assigned_to, created_by, ...rest} = englishRow(r); return {...rest, ...partnerRow(r)}; }));
   const total = rows.length, when = fmtDate(new Date(asOf));
   const wb = new ExcelJS.Workbook();
-  wb.creator = preparedBy; wb.company = 'MUK Talent'; wb.created = new Date(asOf); wb.modified = new Date(asOf);
+  wb.creator = preparedBy; wb.company = 'MUKTalent'; wb.created = new Date(asOf); wb.modified = new Date(asOf);
   wb.title = title; wb.subject = partners ? 'Partner pipeline report' : 'Internal pipeline report';
   const subtitle = `${recipient ? 'Prepared for ' + recipient + '   ·   ' : ''}Snapshot ${when}   ·   ${total} accepted case${total === 1 ? '' : 's'}   ·   ${partners ? 'Pseudonymised: no names or contact details' : 'CONFIDENTIAL · internal use only'}`;
   wb.calcProperties.fullCalcOnLoad = true;
@@ -141,7 +141,7 @@ export async function buildPipelineWorkbook(rawRows, {mode = 'partners', title =
   sum.columns = [{width: 2}, ...Array.from({length: 12}, () => ({width: 12.5})), {width: 2}];
   band(sum, 14, title, subtitle, mode);
   sum.mergeCells('B5:M5');
-  sum.getCell('B5').value = partners ? 'Executive summary of the applicants MUK Talent is currently progressing. Each row in "Case pipeline" is one accepted student case.' : 'Internal view of every accepted case, including contact details and internal follow-up. Do not share outside MUK Talent.';
+  sum.getCell('B5').value = partners ? 'Executive summary of the applicants MUKTalent is currently progressing. Each row in "Case pipeline" is one accepted student case.' : 'Internal view of every accepted case, including contact details and internal follow-up. Do not share outside MUKTalent.';
   sum.getCell('B5').font = font({italic: true, color: {argb: C.muted}}); sum.getRow(5).height = 20;
   // KPI tiles
   const kpis = [
@@ -204,7 +204,7 @@ export async function buildPipelineWorkbook(rawRows, {mode = 'partners', title =
     'How to read this report',
     '• Stages follow the order of the admissions journey (1 → 7). "On hold" and "Closed" cases are shown separately.',
     '• Readiness columns are declared by the student or counsellor and are not document verification.',
-    partners ? '• No names, emails or phone numbers are included. Downloaded copies cannot be withdrawn, so share them only with authorised staff.' : '• This version contains personal data. Keep it inside MUK Talent and delete local copies when no longer needed.',
+    partners ? '• No names, emails or phone numbers are included. Downloaded copies cannot be withdrawn, so share them only with authorised staff.' : '• This version contains personal data. Keep it inside MUKTalent and delete local copies when no longer needed.',
     '• Pipeline stages are a progress indicator, not a guarantee of admission or enrolment.'
   ];
   notes.forEach((t, i) => { sum.mergeCells(r, 2, r, 13); const c = sum.getCell(r, 2); c.value = t; c.font = i ? font({size: 9.5, color: {argb: C.muted}}) : font({bold: true, size: 10.5, color: {argb: C.ink}}); c.alignment = {wrapText: true, vertical: 'top'}; sum.getRow(r).height = i ? 16 : 20; r++; });
@@ -302,15 +302,15 @@ export async function buildPipelineWorkbook(rawRows, {mode = 'partners', title =
   for (const [tone, label, meaning] of [['good', 'Green', 'Available / confirmed / completed, or IELTS 6.5 and above.'], ['mid', 'Amber', 'In progress or partial, or IELTS 5.5 – 6.0.'], ['bad', 'Red', 'Not available / not defined, or IELTS below 5.5.'], ['none', 'Grey', 'Not yet assessed or unknown.']]) line(label, '', meaning, rr => { rr.getCell(1).fill = solid(TRAFFIC[tone].fill); rr.getCell(1).font = font({bold: true, color: {argb: TRAFFIC[tone].font}}); });
   gr++;
   section('Columns');
-  const defs = {reference: 'MUK Talent case reference. Quote it when asking about a student.', stage: 'Current step in the admissions journey.', status: 'Short status derived from the stage (same colour code).', country: 'Country where the student currently lives.', target_study_level: 'Level of study the student is applying for.', subject_interest: 'Subject or field the student wants to study.', intended_intake: 'Intake the student is aiming for.', target_university: 'Institution recorded as the current target.', target_course: 'Course recorded as the current target.', external_next_step: 'Next admissions step, written for partners.', english_test: 'English test declared by the student.', english_score: 'Declared IELTS overall band (or equivalent).', passport: 'Passport availability (declared).', school_status: 'Status of secondary studies (declared).', funding: 'Funding readiness (declared).', case_accepted_at: 'Date MUK Talent opened the case.', last_updated: 'Date of the latest change to the case.', first_name: 'Internal only.', last_name: 'Internal only.', email: 'Internal only.', whatsapp_phone_e164: 'Internal only.', residence_city: 'Internal only.', owner_name: 'MUK Talent employee responsible for the case.', next_action: 'Internal follow-up task.', next_action_at: 'Internal follow-up date.', budget_amount: 'Declared budget.', budget_currency: 'Budget currency.'};
+  const defs = {reference: 'MUKTalent case reference. Quote it when asking about a student.', stage: 'Current step in the admissions journey.', status: 'Short status derived from the stage (same colour code).', country: 'Country where the student currently lives.', target_study_level: 'Level of study the student is applying for.', subject_interest: 'Subject or field the student wants to study.', intended_intake: 'Intake the student is aiming for.', target_university: 'Institution recorded as the current target.', target_course: 'Course recorded as the current target.', external_next_step: 'Next admissions step, written for partners.', english_test: 'English test declared by the student.', english_score: 'Declared IELTS overall band (or equivalent).', passport: 'Passport availability (declared).', school_status: 'Status of secondary studies (declared).', funding: 'Funding readiness (declared).', case_accepted_at: 'Date MUKTalent opened the case.', last_updated: 'Date of the latest change to the case.', first_name: 'Internal only.', last_name: 'Internal only.', email: 'Internal only.', whatsapp_phone_e164: 'Internal only.', residence_city: 'Internal only.', owner_name: 'MUKTalent employee responsible for the case.', next_action: 'Internal follow-up task.', next_action_at: 'Internal follow-up date.', budget_amount: 'Declared budget.', budget_currency: 'Budget currency.'};
   for (const [key, header, , group] of cols) line(header, group, defs[key] || '');
   gr++;
   section('About this report');
-  for (const t of [`Prepared by ${preparedBy} on ${when}${recipient ? ' for ' + recipient : ''}.`, sample ? 'Illustrative portfolio prepared for partnership presentations.' : 'Only cases accepted by MUK Talent and not archived are included.', 'Stages and readiness are a progress indicator, not a guarantee of admission or enrolment.', partners ? 'Direct identifiers are excluded. The report is pseudonymised, not guaranteed anonymous.' : 'Contains personal data: confidential, internal use only.', 'Questions: agents@muktalent.com · muktalent.com']) { g.mergeCells(gr, 1, gr, 3); g.getCell(gr, 1).value = t; g.getCell(gr, 1).font = font({color: {argb: C.muted}}); g.getCell(gr, 1).alignment = {wrapText: true}; gr++; }
+  for (const t of [`Prepared by ${preparedBy} on ${when}${recipient ? ' for ' + recipient : ''}.`, sample ? 'Illustrative portfolio prepared for partnership presentations.' : 'Only cases accepted by MUKTalent and not archived are included.', 'Stages and readiness are a progress indicator, not a guarantee of admission or enrolment.', partners ? 'Direct identifiers are excluded. The report is pseudonymised, not guaranteed anonymous.' : 'Contains personal data: confidential, internal use only.', 'Questions: agents@muktalent.com · muktalent.com']) { g.mergeCells(gr, 1, gr, 3); g.getCell(gr, 1).value = t; g.getCell(gr, 1).font = font({color: {argb: C.muted}}); g.getCell(gr, 1).alignment = {wrapText: true}; gr++; }
   g.pageSetup = {paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0};
 
   for (const sheet of wb.worksheets) {
-    sheet.headerFooter.oddFooter = `&L&8MUK Talent · ${partners ? 'Partner report' : 'CONFIDENTIAL – internal'}&C&8${when}&R&8Page &P of &N`;
+    sheet.headerFooter.oddFooter = `&L&8MUKTalent · ${partners ? 'Partner report' : 'CONFIDENTIAL – internal'}&C&8${when}&R&8Page &P of &N`;
   }
   return wb.xlsx.writeBuffer();
 }

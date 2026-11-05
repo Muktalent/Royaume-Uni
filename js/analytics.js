@@ -1,4 +1,4 @@
-/* MUK Talent · Google Analytics 4 + Google Ads (Consent Mode v2, basic mode).
+/* MUKTalent · Google Analytics 4 + Google Ads (Consent Mode v2, basic mode).
    Nothing is sent to Google until the visitor accepts in the cookie banner.
    1) Paste your GA4 Measurement ID below (G-...).
    2) Optional: paste your Google Ads tag ID (AW-...) to measure campaign conversions. */

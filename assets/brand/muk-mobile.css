@@ -1,4 +1,4 @@
-/* MUK Talent · v20 · Mobile stability for every public page (Education, Healthcare, cards, portfolio).
+/* MUKTalent · v20 · Mobile stability for every public page (Education, Healthcare, cards, portfolio).
    Loaded LAST on each page. It only prevents sideways movement and accidental zoom;
    it does not change the layout or the design of any section. */
 html,body{max-width:100%;overflow-x:hidden}
