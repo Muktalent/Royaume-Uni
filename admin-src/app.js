@@ -1,12 +1,13 @@
 import "./unified-theme.js";
 import "./shell-v21.js";
 import { startPresence, stopPresence } from "./presence.js";
+import { badgeEl, paintUnread, resetUnreadTitle } from "./messages-badge.js";
 import { mountAdminExperience, renderAdminPipeline } from "./admin-experience.js";
 import { requirePasswordChange } from "./employee-security.js";
 import { mountEmployee } from "./employee.js";
 import { initGateway, showLoginMessage, startMatrix, stopMatrix, showReset, t, gateLang } from "./gateway.js";
 import { mountStudentPortal } from "./student-portal.js";
-import { openMessenger, heartButton, watchNotifications, setDot, linkChatCss, icon as mkIcon } from "./muk-chat.js";
+import { openMessenger, watchNotifications, linkChatCss, icon as mkIcon } from "./muk-chat.js";
 import { renderControlCentre } from "./counsellor.js";
 import { UI_PATHS } from "../book/card-icons.js";
 import { mountExportButtons } from "./exports.js";
@@ -35,7 +36,7 @@ function valueText(key,value){
  return statusText[value]||String(value).replaceAll("_"," ");
 }
 function resetLogin(text=""){
- stopWatch();stopPresence();
+ stopWatch();stopPresence();resetUnreadTitle();
  document.getElementById("employeeWorkspace")?.remove();document.getElementById("studentPortal")?.remove();document.getElementById("gpControlOverlay")?.remove();
  state.epoch++;state.session=null;state.staff=null;state.config=null;state.staffOptions=[];state.detail=null;state.dirty=false;state.busy=false;state.loading=false;
  if($("recordDialog").open)$("recordDialog").close();
@@ -69,10 +70,12 @@ function nav(){
   const b=el("button",undefined,"nav-button");b.type="button";b.dataset.group=id;b.append(navIcon(ic),el("span",label));b.addEventListener("click",()=>navigate(sections[0]));nav.append(b);
   const d=el("button",undefined,"dock-button");d.type="button";d.dataset.group=id;d.append(navIcon(ic),el("small",label));d.addEventListener("click",()=>navigate(sections[0]));dock.append(d);
  }
+ // v22 · "Mensajes" is a section of the menu (sidebar + mobile dock) with an unread counter; the heart button is gone.
+ {linkChatCss();const open=()=>openMessenger({api,lang:"es",onChange:()=>adminWatch?.refresh()});const c=el("button",undefined,"nav-button nav-chat");c.id="adminChatNav";c.type="button";c.dataset.group="messages";c.append(mkIcon("chat","nav-icon"),el("span","Mensajes"),badgeEl("nav-chat-badge"));c.addEventListener("click",open);nav.append(c);
+  const dm=el("button",undefined,"dock-button dock-chat");dm.type="button";dm.dataset.group="messages";dm.append(mkIcon("chat","nav-icon"),el("small","Mensajes"),badgeEl("dock-chat-badge"));dm.addEventListener("click",open);dock.append(dm);
+  document.getElementById("adminChatTop")?.remove();
+  if(!adminMsgNotify)adminMsgNotify=messageNotifier({lang:"es",onOpen:open});if(!adminWatch)adminWatch=watchNotifications(api,x=>{adminMsgNotify(x);paintUnread(x.chat_unread);});else adminWatch.refresh();}
  nav.append(hcLink("nav-button nav-hc","span"));dock.append(hcLink("dock-button dock-hc","small"));
- {linkChatCss();const open=()=>openMessenger({api,lang:"es",onChange:()=>adminWatch?.refresh()});const c=el("button",undefined,"nav-button nav-chat");c.id="adminChatNav";c.type="button";c.append(mkIcon("chat","nav-icon"),el("span","Mensajes"),el("i",undefined,"nav-chat-badge"));c.addEventListener("click",open);nav.append(c);
-  if(!document.getElementById("adminChatTop")){const h=heartButton("es",open);h.id="adminChatTop";h.classList.add("admin-heart");h.setAttribute("aria-label","Mensajes");h.title="Mensajes";document.querySelector("#appShell .page-header").append(h);}
-  if(!adminMsgNotify)adminMsgNotify=messageNotifier({lang:"es",onOpen:open});if(!adminWatch)adminWatch=watchNotifications(api,x=>{adminMsgNotify(x);const h=document.getElementById("adminChatTop");if(h)setDot(h,{chat_unread:x.chat_unread});const b=document.querySelector("#adminChatNav .nav-chat-badge");if(b){b.textContent=x.chat_unread?String(x.chat_unread>99?"99+":x.chat_unread):"";b.hidden=!x.chat_unread;}});else adminWatch.refresh();}
  if(!document.getElementById("mobileLogout")){const o=el("button",undefined,"mobile-logout");o.id="mobileLogout";o.type="button";o.setAttribute("aria-label","Cerrar sesión");o.append(navIcon("logout"));o.addEventListener("click",()=>$("logout").click());document.querySelector("#appShell .page-header").append(o);}
  if(!document.getElementById("mobileWeb")){const w=el("a",undefined,"mobile-web");w.id="mobileWeb";w.href="/";w.setAttribute("aria-label","Volver a la web");w.textContent="\u2190";document.querySelector("#appShell .page-header").append(w);}
  if(!document.getElementById("adminTabs")){const t=el("div",undefined,"admin-tabs");t.id="adminTabs";t.setAttribute("role","tablist");$("globalMessage").before(t);}

@@ -2,7 +2,8 @@
 import {E,gi,btn,ring,avatar,countrySelect,countryName,iso,fmtDate,ago,daysUntil,linkCss,idleLogout,reducedMotion} from './gp-ui.js';
 import {gateLang} from './gateway.js';
 import {applyV17,mountUpdates,messageNotifier} from './muk-v17.js';
-import {openMessenger,openNotifications,heartButton,watchNotifications,setDot,hideOnScroll,linkChatCss} from './muk-chat.js';
+import {openMessenger,openNotifications,watchNotifications,hideOnScroll,linkChatCss} from './muk-chat.js';
+import {paintUnread} from './messages-badge.js';
 
 const TX={
  en:{photoAdd:'Add photo',photoChange:'Change photo',photoBusy:'Uploading…',photoHint:'JPG, PNG or WebP · max 5 MB',ppType:'Type',ppCode:'Code',ppNo:'Passport No.',surname:'Surname',given:'Given names',ppNat:'Nationality',ppDob:'Date of birth',ppDest:'Destination',ppIssue:'Date of issue',ppAuth:'Authority',ppSign:'Holder’s signature',ppFile:'File',language:'Language',notifications:'Notifications',brand:'GLOBAL PASSPORT',journeyTitle:'My Global Journey',pages:{journey:'Journey',documents:'Documents',plan:'Plan',messages:'Messages',profile:'Profile'},
@@ -43,7 +44,8 @@ export async function mountStudentPortal({api,client,who,onLogout}){
  const logout=async()=>{watcher?.stop();root.remove();await onLogout();};
  idleLogout(root,logout);linkChatCss();
  let summary=null,watcher=null,dockEl=null;
- const paintDots=()=>{root.querySelectorAll('.mkc-heart').forEach(b=>setDot(b,summary));const n=summary?.chat_unread||0;root.querySelectorAll('[data-gp-msg]').forEach(b=>{b.querySelector('.gp-badge')?.remove();if(n)b.append(E('i',n>9?'9+':n,'gp-badge'));});};
+ // v22 · No heart: the Messages section (sidebar + dock) carries the unread count; new messages still notify.
+ const paintDots=()=>{const n=summary?.chat_unread||0;root.querySelectorAll('[data-gp-msg]').forEach(b=>{b.querySelector('.gp-badge')?.remove();if(n)b.append(E('i',n>9?'9+':n,'gp-badge'));});paintUnread(n,root);};
  const openChat=()=>openMessenger({api,lang,onChange:()=>watcher?.refresh()});
  const openNotif=()=>openNotifications({api,lang,summary,onOpenChat:openChat,onChange:()=>watcher?.refresh()});
  let data=null,page='journey',openStage=null;const pages=()=>['journey','documents','plan','messages','profile'].map(id=>[id,L('pages.'+id)]);
@@ -104,7 +106,7 @@ export async function mountStudentPortal({api,client,who,onLogout}){
  function render(dir){
   const s=data.student;root.replaceChildren();root.lang=lang;
   const top=E('header',undefined,'gp-top gp-top-ig');const brand=E('a',undefined,'gp-top-brand');brand.href='/';brand.setAttribute('aria-label',L('website'));const wm=E('img',undefined,'gp-logo');wm.src='/assets/brand/logo-ivory.svg';wm.alt='MUK Talent';wm.width=374;wm.height=72;brand.append(wm);
-  const right=E('div',undefined,'gp-top-right');const heart=heartButton(lang,openNotif);heart.classList.add('gp-heart');right.append(langMenu(()=>render()),heart);top.append(brand,right);hideOnScroll(top);
+  const right=E('div',undefined,'gp-top-right');right.append(langMenu(()=>render()));top.append(brand,right);hideOnScroll(top);
   const side=E('nav',undefined,'gp-side');side.setAttribute('aria-label','Global Passport');for(const [id,label]of pages()){const b=btn(label,()=>go(id),'gp-side-btn',{journey:'globe',documents:'doc',plan:'calendar',messages:'chat',profile:'user'}[id]);if(id===page)b.setAttribute('aria-current','page');if(id==='messages')b.dataset.gpMsg='1';side.append(b);}
   const webSide=E('a','\u2190 '+L('website'),'gp-side-btn gp-side-web');webSide.href='/';side.append(webSide);const out=btn(L('signOut'),logout,'gp-side-btn gp-side-out','logout');side.append(out);
   mainEl=E('main',undefined,'gp-main');mainEl.dataset.page=page;if(dir&&!reducedMotion())mainEl.classList.add('enter-'+dir);

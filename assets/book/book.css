@@ -344,3 +344,8 @@ dialog.viewer::backdrop{background:rgba(40,25,35,.6);backdrop-filter:blur(3px)}
   .stats div:nth-child(n+3){border-top:1px dashed #c9bdb5}
   .ledger .hide-s{display:none}
 }
+/* v22 · Download CV: large pill under the introduction, like a book "bookmark" button */
+.launch-cv{margin:30px 0 34px}
+.pill.pill-cv{min-height:clamp(58px,6vw,72px);min-width:min(100%,300px);padding:0 clamp(40px,6vw,72px);font-size:clamp(16px,1.6vw,19px);letter-spacing:.1em;box-shadow:0 10px 24px -16px rgba(0,0,0,.45)}
+.pill.pill-cv:hover{transform:translateY(-2px);box-shadow:0 16px 30px -18px rgba(0,0,0,.5)}
+.pill.pill-cv:active{transform:translateY(0)}

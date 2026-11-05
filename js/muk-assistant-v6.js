@@ -6,10 +6,10 @@ const d=document.documentElement,V="6.0.0",KEY="muk-assistant-v6",TEASE="muk-ass
 const LANGS=["fr","en","es","ar"],VOICE={fr:"fr-FR",en:"en-GB",es:"es-ES",ar:"ar-SA"},REC={fr:"fr-FR",en:"en-GB",es:"es-ES",ar:"ar-MA"};
 const lang=()=>{const l=(window.MUKSite&&window.MUKSite.lang)||(d.lang||"fr").slice(0,2);return LANGS.includes(l)?l:"fr";};
 const UI={
- fr:{title:"Assistant MUK Talent",sub:"Écrire ou parler",open:"Ouvrir l’assistant",close:"Fermer l’assistant",reset:"Nouvelle conversation",call:"Appel vocal",ph:"Posez votre question…",send:"Envoyer",mic:"Dicter votre question",micStop:"Arrêter la dictée",listen:"Écouter la réponse",stop:"Arrêter la lecture",typing:"L’assistant écrit…",teaser:"Une question sur vos études au Royaume-Uni ?",teaserClose:"Masquer",disc:"Assistant automatique : il peut se tromper. Ne partagez pas de données sensibles.",privacy:"Confidentialité",micDenied:"Le micro n’est pas autorisé. Vous pouvez écrire votre question.",callTitle:"Appel avec l’assistant",callHello:"Je vous écoute. Posez votre question.",callListening:"Je vous écoute…",callThinking:"Je réfléchis…",callSpeaking:"Je réponds…",callPaused:"Micro en pause",callTap:"Touchez le cercle pour parler",noHear:"Je n’ai rien entendu. Réessayez en parlant près du micro.",callUnsupported:"La voix n’est pas disponible dans ce navigateur. Essayez Chrome, Edge ou Safari, ou réservez un échange avec un conseiller.",callEnd:"Raccrocher",callMute:"Couper le micro",callUnmute:"Réactiver le micro",book:"Réserver une visio avec un conseiller",phone:"Appeler un conseiller",suggest:"Suggestions",you:"Vous",bot:"Assistant",live:"IA"},
- en:{title:"MUK Talent assistant",sub:"Type or talk",open:"Open the assistant",close:"Close the assistant",reset:"New conversation",call:"Voice call",ph:"Ask your question…",send:"Send",mic:"Dictate your question",micStop:"Stop dictation",listen:"Listen to the answer",stop:"Stop reading",typing:"The assistant is typing…",teaser:"A question about studying in the UK?",teaserClose:"Hide",disc:"Automated assistant: it may make mistakes. Do not share sensitive data.",privacy:"Privacy",micDenied:"Microphone access is blocked. You can type your question.",callTitle:"Call with the assistant",callHello:"I’m listening. Ask your question.",callListening:"Listening…",callThinking:"Thinking…",callSpeaking:"Answering…",callPaused:"Microphone paused",callTap:"Tap the circle to speak",noHear:"I didn’t hear anything. Try again, speaking close to the microphone.",callUnsupported:"Voice is not available in this browser. Try Chrome, Edge or Safari, or book a call with an adviser.",callEnd:"Hang up",callMute:"Mute microphone",callUnmute:"Unmute microphone",book:"Book a video call with an adviser",phone:"Call an adviser",suggest:"Suggestions",you:"You",bot:"Assistant",live:"AI"},
- es:{title:"Asistente MUK Talent",sub:"Escribe o habla",open:"Abrir el asistente",close:"Cerrar el asistente",reset:"Nueva conversación",call:"Llamada de voz",ph:"Escribe tu pregunta…",send:"Enviar",mic:"Dictar tu pregunta",micStop:"Detener el dictado",listen:"Escuchar la respuesta",stop:"Detener la lectura",typing:"El asistente está escribiendo…",teaser:"¿Una pregunta sobre estudiar en el Reino Unido?",teaserClose:"Ocultar",disc:"Asistente automático: puede equivocarse. No compartas datos sensibles.",privacy:"Privacidad",micDenied:"El micrófono no está autorizado. Puedes escribir tu pregunta.",callTitle:"Llamada con el asistente",callHello:"Te escucho. Haz tu pregunta.",callListening:"Te escucho…",callThinking:"Pensando…",callSpeaking:"Respondiendo…",callPaused:"Micrófono en pausa",callTap:"Toca el círculo para hablar",noHear:"No he oído nada. Inténtalo de nuevo hablando cerca del micrófono.",callUnsupported:"La voz no está disponible en este navegador. Prueba Chrome, Edge o Safari, o reserva una cita con un asesor.",callEnd:"Colgar",callMute:"Silenciar micrófono",callUnmute:"Activar micrófono",book:"Reservar una videollamada con un asesor",phone:"Llamar a un asesor",suggest:"Sugerencias",you:"Tú",bot:"Asistente",live:"IA"},
- ar:{title:"مساعد MUK Talent",sub:"اكتب أو تحدث",open:"فتح المساعد",close:"إغلاق المساعد",reset:"محادثة جديدة",call:"مكالمة صوتية",ph:"اكتب سؤالك…",send:"إرسال",mic:"إملاء سؤالك",micStop:"إيقاف الإملاء",listen:"الاستماع إلى الإجابة",stop:"إيقاف القراءة",typing:"المساعد يكتب…",teaser:"هل لديك سؤال عن الدراسة في المملكة المتحدة؟",teaserClose:"إخفاء",disc:"مساعد آلي: قد يخطئ. لا تشارك بيانات حساسة.",privacy:"الخصوصية",micDenied:"الميكروفون غير مسموح. يمكنك كتابة سؤالك.",callTitle:"مكالمة مع المساعد",callHello:"أنا أستمع إليك. اطرح سؤالك.",callListening:"أستمع إليك…",callThinking:"أفكر…",callSpeaking:"أجيب…",callPaused:"الميكروفون متوقف",callTap:"المس الدائرة للتحدث",noHear:"لم أسمع شيئًا. حاول مرة أخرى بالقرب من الميكروفون.",callUnsupported:"الصوت غير متاح في هذا المتصفح. جرّب Chrome أو Edge أو Safari، أو احجز موعدًا مع مستشار.",callEnd:"إنهاء المكالمة",callMute:"كتم الميكروفون",callUnmute:"تشغيل الميكروفون",book:"حجز مكالمة فيديو مع مستشار",phone:"الاتصال بمستشار",suggest:"اقتراحات",you:"أنت",bot:"المساعد",live:"ذكاء اصطناعي"}
+ fr:{title:"Assistant MUK Talent",sub:"Écrire ou parler",open:"Ouvrir l’assistant",close:"Fermer l’assistant",reset:"Nouvelle conversation",call:"Appel vocal",ph:"Posez votre question…",send:"Envoyer",mic:"Dicter votre question",micStop:"Arrêter la dictée",listen:"Écouter la réponse",stop:"Arrêter la lecture",typing:"L’assistant écrit…",teaser:"Une question sur vos études au Royaume-Uni ?",teaserClose:"Masquer",disc:"Assistant automatique : il peut se tromper. Ne partagez pas de données sensibles.",privacy:"Confidentialité",micDenied:"Le micro n’est pas autorisé. Vous pouvez écrire votre question.",callTitle:"Appel avec l’assistant",callHello:"Je vous écoute. Posez votre question.",callListening:"Je vous écoute…",callThinking:"Je réfléchis…",callSpeaking:"Je réponds…",callPaused:"Micro en pause",callTap:"Touchez le cercle pour parler",callTapDone:"Parlez, puis touchez le cercle pour envoyer",noHear:"Je n’ai rien entendu. Réessayez en parlant près du micro.",callUnsupported:"La voix n’est pas disponible dans ce navigateur. Essayez Chrome, Edge ou Safari, ou réservez un échange avec un conseiller.",callEnd:"Raccrocher",callMute:"Couper le micro",callUnmute:"Réactiver le micro",book:"Réserver une visio avec un conseiller",phone:"Appeler un conseiller",suggest:"Suggestions",you:"Vous",bot:"Assistant",live:"IA"},
+ en:{title:"MUK Talent assistant",sub:"Type or talk",open:"Open the assistant",close:"Close the assistant",reset:"New conversation",call:"Voice call",ph:"Ask your question…",send:"Send",mic:"Dictate your question",micStop:"Stop dictation",listen:"Listen to the answer",stop:"Stop reading",typing:"The assistant is typing…",teaser:"A question about studying in the UK?",teaserClose:"Hide",disc:"Automated assistant: it may make mistakes. Do not share sensitive data.",privacy:"Privacy",micDenied:"Microphone access is blocked. You can type your question.",callTitle:"Call with the assistant",callHello:"I’m listening. Ask your question.",callListening:"Listening…",callThinking:"Thinking…",callSpeaking:"Answering…",callPaused:"Microphone paused",callTap:"Tap the circle to speak",callTapDone:"Speak, then tap the circle to send",noHear:"I didn’t hear anything. Try again, speaking close to the microphone.",callUnsupported:"Voice is not available in this browser. Try Chrome, Edge or Safari, or book a call with an adviser.",callEnd:"Hang up",callMute:"Mute microphone",callUnmute:"Unmute microphone",book:"Book a video call with an adviser",phone:"Call an adviser",suggest:"Suggestions",you:"You",bot:"Assistant",live:"AI"},
+ es:{title:"Asistente MUK Talent",sub:"Escribe o habla",open:"Abrir el asistente",close:"Cerrar el asistente",reset:"Nueva conversación",call:"Llamada de voz",ph:"Escribe tu pregunta…",send:"Enviar",mic:"Dictar tu pregunta",micStop:"Detener el dictado",listen:"Escuchar la respuesta",stop:"Detener la lectura",typing:"El asistente está escribiendo…",teaser:"¿Una pregunta sobre estudiar en el Reino Unido?",teaserClose:"Ocultar",disc:"Asistente automático: puede equivocarse. No compartas datos sensibles.",privacy:"Privacidad",micDenied:"El micrófono no está autorizado. Puedes escribir tu pregunta.",callTitle:"Llamada con el asistente",callHello:"Te escucho. Haz tu pregunta.",callListening:"Te escucho…",callThinking:"Pensando…",callSpeaking:"Respondiendo…",callPaused:"Micrófono en pausa",callTap:"Toca el círculo para hablar",callTapDone:"Habla y toca el círculo para enviar",noHear:"No he oído nada. Inténtalo de nuevo hablando cerca del micrófono.",callUnsupported:"La voz no está disponible en este navegador. Prueba Chrome, Edge o Safari, o reserva una cita con un asesor.",callEnd:"Colgar",callMute:"Silenciar micrófono",callUnmute:"Activar micrófono",book:"Reservar una videollamada con un asesor",phone:"Llamar a un asesor",suggest:"Sugerencias",you:"Tú",bot:"Asistente",live:"IA"},
+ ar:{title:"مساعد MUK Talent",sub:"اكتب أو تحدث",open:"فتح المساعد",close:"إغلاق المساعد",reset:"محادثة جديدة",call:"مكالمة صوتية",ph:"اكتب سؤالك…",send:"إرسال",mic:"إملاء سؤالك",micStop:"إيقاف الإملاء",listen:"الاستماع إلى الإجابة",stop:"إيقاف القراءة",typing:"المساعد يكتب…",teaser:"هل لديك سؤال عن الدراسة في المملكة المتحدة؟",teaserClose:"إخفاء",disc:"مساعد آلي: قد يخطئ. لا تشارك بيانات حساسة.",privacy:"الخصوصية",micDenied:"الميكروفون غير مسموح. يمكنك كتابة سؤالك.",callTitle:"مكالمة مع المساعد",callHello:"أنا أستمع إليك. اطرح سؤالك.",callListening:"أستمع إليك…",callThinking:"أفكر…",callSpeaking:"أجيب…",callPaused:"الميكروفون متوقف",callTap:"المس الدائرة للتحدث",callTapDone:"تحدث ثم المس الدائرة للإرسال",noHear:"لم أسمع شيئًا. حاول مرة أخرى بالقرب من الميكروفون.",callUnsupported:"الصوت غير متاح في هذا المتصفح. جرّب Chrome أو Edge أو Safari، أو احجز موعدًا مع مستشار.",callEnd:"إنهاء المكالمة",callMute:"كتم الميكروفون",callUnmute:"تشغيل الميكروفون",book:"حجز مكالمة فيديو مع مستشار",phone:"الاتصال بمستشار",suggest:"اقتراحات",you:"أنت",bot:"المساعد",live:"ذكاء اصطناعي"}
 };
 const ui=k=>(UI[lang()]||UI.fr)[k]||UI.fr[k];
 const SVG={
@@ -285,25 +285,45 @@ function stopSpeak(){speakSeq++;if(TTS){try{speechSynthesis.cancel();}catch{}}if
 /* ---------- server recording (mobile) ---------- */
 const CAN_REC_TYPES=["audio/webm;codecs=opus","audio/webm","audio/mp4","audio/ogg;codecs=opus","audio/aac"];
 let srvRec=null;
-// Records one utterance. Ends on silence after speech, on stop(), or at maxMs. Resolves {blob,heard} or null if aborted.
-function recordOnce({maxMs=15000,silenceMs=1300,quietMs=8000,onLevel}={}){
+// Records one utterance. Ends on silence after speech, on stop(), or at maxMs. Resolves {blob,heard,vad} or null if aborted.
+// v22 · iPhone: a call keeps ONE microphone stream open (reopening it every turn made iOS switch the audio route and
+// return silent or very quiet audio). The silence detector resumes the AudioContext first and adapts to the room noise;
+// if iOS still blocks it, the user ends the turn by tapping the circle instead of waiting for the time limit.
+let callStream=null,callSource=null;
+function micConstraints(){return {audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true,channelCount:1}};}
+function setAudioSession(type){try{if(navigator.audioSession)navigator.audioSession.type=type;}catch{}}
+async function getCallStream(){
+ const live=callStream&&callStream.getAudioTracks().some(t=>t.readyState==="live");
+ if(live)return callStream;
+ releaseCallStream();
+ setAudioSession("play-and-record");
+ callStream=await navigator.mediaDevices.getUserMedia(micConstraints());
+ for(const t of callStream.getAudioTracks())t.addEventListener("ended",()=>{if(callStream&&!callStream.getAudioTracks().some(x=>x.readyState==="live")){callStream=null;callSource=null;}});
+ return callStream;
+}
+function releaseCallStream(){try{callSource&&callSource.disconnect();}catch{}callSource=null;if(callStream){callStream.getTracks().forEach(t=>t.stop());callStream=null;}setAudioSession("auto");}
+function recordOnce({maxMs=15000,silenceMs=1300,quietMs=8000,onLevel,stream:shared=null}={}){
  let stopFn=()=>{},abortFn=()=>{};
  const pr=(async()=>{
-  const stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true}});
+  const stream=shared||await navigator.mediaDevices.getUserMedia(micConstraints());
+  if(player&&!player.paused){try{player.pause();}catch{}}
+  if(audioCtx&&audioCtx.state!=="running"){try{await audioCtx.resume();}catch{}}
   const type=CAN_REC_TYPES.find(t=>MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||"";
   const mr=new MediaRecorder(stream,type?{mimeType:type}:undefined),chunks=[];
-  let heard=false,aborted=false,timer=0,raf=0,src=null,an=null,t0=Date.now(),loud=0;
+  let heard=false,aborted=false,timer=0,raf=0,src=null,an=null,t0=Date.now(),loud=0,floor=0,samples=0;
   const vad=!!(audioCtx&&audioCtx.state==="running");
-  if(vad){try{src=audioCtx.createMediaStreamSource(stream);an=audioCtx.createAnalyser();an.fftSize=1024;src.connect(an);}catch{an=null;}}
+  if(vad){try{src=shared?(callSource||(callSource=audioCtx.createMediaStreamSource(stream))):audioCtx.createMediaStreamSource(stream);an=audioCtx.createAnalyser();an.fftSize=1024;src.connect(an);}catch{an=null;}}
   if(!an)heard=true;
   const buf=an?new Uint8Array(an.fftSize):null;
   const tick=()=>{if(!an)return;an.getByteTimeDomainData(buf);let sum=0;for(let i=0;i<buf.length;i++){const x=(buf[i]-128)/128;sum+=x*x;}const rms=Math.sqrt(sum/buf.length);onLevel&&onLevel(rms);const now=Date.now();
-   if(rms>0.035){heard=true;loud=now;}
+   if(now-t0<450){floor=(floor*samples+rms)/(++samples);return;}   // learn the room noise for the first ~0.4 s
+   const threshold=Math.max(0.012,Math.min(0.05,floor*2.6+0.006));
+   if(rms>threshold){heard=true;loud=now;}
    if(heard&&loud&&now-loud>silenceMs)finish();else if(!heard&&now-t0>quietMs)finish();};
   const finish=()=>{clearInterval(raf);clearTimeout(timer);if(mr.state!=="inactive")mr.stop();};
   stopFn=finish;abortFn=()=>{aborted=true;finish();};
-  const out=new Promise(res=>{mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};mr.onstop=()=>{stream.getTracks().forEach(t=>t.stop());try{src&&src.disconnect();}catch{}res(aborted?null:{blob:new Blob(chunks,{type:mr.mimeType||type||"audio/webm"}),heard});};});
-  mr.start(250);timer=setTimeout(finish,maxMs);raf=setInterval(tick,90);
+  const out=new Promise(res=>{mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data);};mr.onstop=()=>{if(!shared)stream.getTracks().forEach(t=>t.stop());try{an&&src&&src.disconnect(an);if(!shared&&src)src.disconnect();}catch{}res(aborted?null:{blob:new Blob(chunks,{type:mr.mimeType||type||"audio/webm"}),heard,vad:!!an});};});
+  mr.start(250);timer=setTimeout(finish,an?maxMs:Math.min(maxMs,12000));raf=setInterval(tick,90);
   return out;
  })();
  return {promise:pr,stop:()=>stopFn(),abort:()=>abortFn()};
@@ -356,6 +376,7 @@ async function startCall(){
  if(voiceSrv===null)await aiStatus();if(!inCall)return;
  const srv=useSrvListen();
  if(!srv&&(!SR||!TTS)&&!(useSrvSpeak()&&SR)){setCall("idle",ui("callUnsupported"));return;}
+ if(srv){try{await getCallStream();}catch(e){setCall("idle",micErr(e)?ui("micDenied"):ui("callTap"));callMuted=true;callBox.classList.add("v6a-tap");return;}if(!inCall){releaseCallStream();return;}}
  setCall("speaking",ui("callSpeaking"));
  speak(ui("callHello"),lang(),null,()=>{if(inCall)callListen();});
  setTimeout(()=>panel.querySelector('[data-a="hang"]').focus(),60);
@@ -363,9 +384,15 @@ async function startCall(){
 let callMisses=0;
 async function callListenServer(){
  if(!inCall||callMuted||srvRec)return;
- setCall("listening",ui("callListening"));callText.textContent="";
- const h=recordOnce({maxMs:20000,silenceMs:1200,quietMs:7000,onLevel:v=>{orb.style.setProperty("--lvl",Math.min(1,v*9).toFixed(2));}});srvRec=h;let res=null;
- try{res=await h.promise;}catch(e){srvRec=null;setCall("idle",micErr(e)?ui("micDenied"):ui("callTap"));callMuted=true;callBox.classList.add("v6a-tap");return;}
+ callText.textContent="";
+ let stream=null;
+ try{stream=await getCallStream();}catch(e){setCall("idle",micErr(e)?ui("micDenied"):ui("callTap"));callMuted=true;callBox.classList.add("v6a-tap");return;}
+ if(!inCall||callMuted)return;
+ if(audioCtx&&audioCtx.state!=="running"){try{await audioCtx.resume();}catch{}}
+ const manual=!(audioCtx&&audioCtx.state==="running");
+ setCall("listening",manual?ui("callTapDone"):ui("callListening"));
+ const h=recordOnce({stream,maxMs:20000,silenceMs:1200,quietMs:7000,onLevel:v=>{orb.style.setProperty("--lvl",Math.min(1,v*9).toFixed(2));}});srvRec=h;let res=null;
+ try{res=await h.promise;}catch(e){srvRec=null;releaseCallStream();setCall("idle",micErr(e)?ui("micDenied"):ui("callTap"));callMuted=true;callBox.classList.add("v6a-tap");return;}
  srvRec=null;orb.style.removeProperty("--lvl");
  if(!res||!inCall||callMuted)return;
  if(!res.heard||res.blob.size<1200){callMisses++;if(callMisses>=3){callMuted=true;callBox.classList.add("v6a-tap");setCall("idle",ui("callTap"));return;}setTimeout(callListenServer,250);return;}
@@ -403,13 +430,13 @@ function callListen(){
  try{r.start();}catch{callRec=null;setTimeout(callListen,500);}
 }
 // Tap the orb to talk again (needed on iPhone after a pause).
-orb.addEventListener("click",()=>{if(!inCall)return;unlockTTS();callBox.classList.remove("v6a-tap");callMisses=0;if(callMuted){callMuted=false;const b=panel.querySelector('[data-a="mute"]');b.classList.remove("is-off");b.innerHTML=icon("mic");b.setAttribute("aria-label",ui("callMute"));}stopSpeak();srvRec&&srvRec.abort();srvRec=null;callRec&&callRec.abort();callRec=null;callListen();});
+orb.addEventListener("click",()=>{if(!inCall)return;unlockTTS();if(srvRec&&!callMuted&&callBox.dataset.state==="listening"){srvRec.stop();return;}callBox.classList.remove("v6a-tap");callMisses=0;if(callMuted){callMuted=false;const b=panel.querySelector('[data-a="mute"]');b.classList.remove("is-off");b.innerHTML=icon("mic");b.setAttribute("aria-label",ui("callMute"));}stopSpeak();srvRec&&srvRec.abort();srvRec=null;callRec&&callRec.abort();callRec=null;callListen();});
 function toggleMute(){
  callMuted=!callMuted;const b=panel.querySelector('[data-a="mute"]');b.classList.toggle("is-off",callMuted);b.innerHTML=icon(callMuted?"micOff":"mic");
  b.setAttribute("aria-label",callMuted?ui("callUnmute"):ui("callMute"));
- if(callMuted){srvRec&&srvRec.abort();srvRec=null;callRec&&callRec.abort();stopSpeak();setCall("idle",ui("callPaused"));}else{callBox.classList.remove("v6a-tap");callMisses=0;callListen();}
+ if(callMuted){srvRec&&srvRec.abort();srvRec=null;callRec&&callRec.abort();stopSpeak();releaseCallStream();setCall("idle",ui("callPaused"));}else{callBox.classList.remove("v6a-tap");callMisses=0;callListen();}
 }
-function endCall(){inCall=false;callBox.classList.remove("v6a-tap");srvRec&&srvRec.abort();srvRec=null;callRec&&callRec.abort();callRec=null;stopSpeak();callBox.hidden=true;panel.classList.remove("v6a-in-call");panel.querySelector('[data-a="call"]').focus();}
+function endCall(){inCall=false;callBox.classList.remove("v6a-tap");srvRec&&srvRec.abort();srvRec=null;releaseCallStream();callRec&&callRec.abort();callRec=null;stopSpeak();callBox.hidden=true;panel.classList.remove("v6a-in-call");panel.querySelector('[data-a="call"]').focus();}
 
 /* ---------- open / close ---------- */
 let opened=false;

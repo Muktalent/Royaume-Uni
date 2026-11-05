@@ -107,8 +107,8 @@ function renderCv() {
     out.push(el('p', { class: 'about' }, `${t('iam')} `, el('mark', { text: firstName(p.title) || p.title }), p.subtitle ? `. ${p.subtitle.replace(/^\s*[—-]\s*/, '')}` : '.'));
     const meta = [p.issuer && el('span', {}, icon('pin', 15), p.issuer), p.category && el('span', { class: 'now' }, el('i'), p.category)].filter(Boolean);
     if (meta.length) out.push(el('p', { class: 'meta' }, meta));
-    const cv = safeUrl(p.document_url);
-    if (cv) out.push(el('p', { class: 'launch' }, el('a', { class: 'pill', href: cv, target: '_blank', rel: 'noopener noreferrer' }, t('downloadCv'))));
+    // v22 · Big "Download CV" button (fresh link from /api/personal/cv, so it never expires on an open page).
+    if (safeUrl(p.document_url)) out.push(el('p', { class: 'launch launch-cv' }, el('a', { class: 'pill pill-cv', href: '/api/personal/cv', download: '', rel: 'nofollow' }, t('downloadCv'))));
     const body = paragraphs(p.body); if (body.length) out.push(el('div', { class: 'prose' }, body));
   }
   if (D.exp.length) out.push(sub(t('worked')), timeline(D.exp));

@@ -238,3 +238,23 @@ body{overscroll-behavior-x:none;-webkit-text-size-adjust:100%;text-size-adjust:1
 @media (max-width:700px){ .u-user{display:none!important} #appShell .u-brand,#employeeWorkspace .u-brand{display:none} }
 @media (max-width:820px){ #studentPortal .u-brand,#studentPortal .u-side-label,#studentPortal .u-user{display:none} }
 #employeeWorkspace#employeeWorkspace .u-brand b,#appShell#appShell .u-brand b,#studentPortal#studentPortal .u-brand b{color:var(--u-ivory)!important}
+
+/* =====================================================================
+   v22 · "Mensajes" section (replaces the heart) — same look as the
+   Healthcare nav items, with a champagne count pill (.pt-count)
+   ===================================================================== */
+.mkc-heart,.admin-heart,.lx-heart,.lx-hero-heart,.gp-heart{display:none!important}
+#appShell#appShell #navigation .nav-chat{margin-top:0!important;border:0!important}
+#appShell#appShell #navigation .nav-chat .nav-icon{color:inherit!important;stroke:currentColor}
+:is(#appShell,#employeeWorkspace) :is(.nav-chat-badge,.dock-chat-badge,.lx-nav-msg .th-nav-badge,.lx-dock-msg .th-nav-badge){min-width:22px;height:22px;margin-inline-start:auto;padding:0 7px;border-radius:999px;background:var(--u-champ)!important;color:var(--u-black)!important;font:700 11.5px/22px var(--u-sans);font-style:normal;text-align:center}
+:is(#appShell,#employeeWorkspace) [data-msg-badge][hidden]{display:none!important}
+#employeeWorkspace .lx-nav-msg,#employeeWorkspace .lx-dock-msg{position:relative}
+#appShell .dock-chat,#employeeWorkspace .lx-dock-msg{position:relative}
+#appShell .dock-chat .dock-chat-badge,#employeeWorkspace .lx-dock-msg .th-nav-badge{position:absolute;top:2px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;font-size:10.5px;line-height:18px;margin:0}
+#appShell .dock-chat svg.nav-icon,#employeeWorkspace .lx-dock-msg svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8}
+.has-unread .nav-icon,.has-unread .lx-nav-icon,.has-unread .lx-dock-icon{color:var(--u-champ)}
+#employeeWorkspace .lx-nav-msg svg,#employeeWorkspace .lx-dock-msg svg{fill:none!important;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#appShell#appShell :is(#navigation,#adminDock) .th-nav-badge:not([hidden]){display:inline-grid;place-items:center;min-width:22px;height:22px;margin-inline-start:auto;padding:0 7px;border-radius:999px;background:var(--u-champ)!important;color:var(--u-black)!important;font:700 11.5px/1 var(--u-sans);font-style:normal;writing-mode:horizontal-tb;width:auto}
+#appShell#appShell #adminDock .th-nav-badge:not([hidden]){position:absolute;top:2px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px;font-size:10.5px;margin:0}
+#appShell#appShell #adminDock .dock-button{position:relative}
+#employeeWorkspace#employeeWorkspace .u-brand small,#appShell#appShell .u-brand small,#studentPortal#studentPortal .u-brand small{color:var(--u-champ)!important}

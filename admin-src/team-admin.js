@@ -100,6 +100,7 @@ function profileForm({api, mode, person = {}, onDone, notice}) {
   // Salario
   f.base_salary = input('number', person.base_salary ?? '', {min: 0, max: 10000000, step: '0.01', placeholder: 'Ej. 3000'});
   f.commission_rate = input('number', person.commission_rate ?? '', {min: 0, max: 1000000, step: '0.01', placeholder: 'Ej. 2000'});
+  f.contract_start = input('date', person.contract_start || '', {max: '2100-12-31'});
   f.currency = E('select'); for (const c of CURRENCIES) f.currency.append(new Option(c + ' · ' + currencyName(c), c)); f.currency.value = person.currency || 'MAD';
   // Estado
   const active = toggle('Activo', 'Activa su tarjeta digital, el código QR y el pase de wallet.', isEdit ? person.active : true);
@@ -124,9 +125,9 @@ function profileForm({api, mode, person = {}, onDone, notice}) {
   const g3 = E('div', undefined, 'th-grid');
   g3.append(field('Teléfono de trabajo', f.contact_phone), field('Email de contacto', f.contact_email), field('Presentación pública', f.public_bio, {wide: true}));
   c3.append(g3, publish.el); cards.push(c3);
-  const c4 = sectionCard('Salario', 'Se usa en su nómina y en la vista de nóminas del equipo.');
+  const c4 = sectionCard('Salario y contrato', 'Se usa en su nómina y en la vista de nóminas del equipo. Sin fecha de inicio, se paga el mes completo.');
   const g4 = E('div', undefined, 'th-grid th-grid-3');
-  g4.append(field('Salario base mensual', f.base_salary, {hint: 'Vacío = 3.000 MAD por defecto.'}), field('Comisión por lead verificado', f.commission_rate, {hint: 'Vacío = 2.000 MAD por defecto.'}), field('Moneda', f.currency));
+  g4.append(field('Salario base mensual', f.base_salary, {hint: 'Vacío = 3.000 MAD por defecto.'}), field('Comisión por lead verificado', f.commission_rate, {hint: 'Vacío = 2.000 MAD por defecto.'}), field('Moneda', f.currency), field('Inicio de contrato', f.contract_start, {hint: 'La nómina empieza este día: el primer mes se calcula por los días laborables (lunes a viernes) desde esta fecha.'}));
   c4.append(g4); cards.push(c4);
   const c5 = sectionCard('Estado');
   c5.append(active.el, web.el); if (access) c5.append(access.el); cards.push(c5);
@@ -136,7 +137,7 @@ function profileForm({api, mode, person = {}, onDone, notice}) {
   const bar = E('div', undefined, 'th-form-bar'); bar.append(msg, save);
   form.append(...cards, bar);
 
-  const fieldMap = {full_name: f.full_name, job_title: f.job_title, country_code: f.country, assigned_city: f.assigned_city, date_of_birth: f.date_of_birth, languages: langInput, email: f.email, password: f.password, contact_phone: f.contact_phone, contact_email: f.contact_email, public_bio: f.public_bio, base_salary: f.base_salary, commission_rate: f.commission_rate, currency: f.currency};
+  const fieldMap = {full_name: f.full_name, job_title: f.job_title, country_code: f.country, assigned_city: f.assigned_city, date_of_birth: f.date_of_birth, languages: langInput, email: f.email, password: f.password, contact_phone: f.contact_phone, contact_email: f.contact_email, public_bio: f.public_bio, base_salary: f.base_salary, commission_rate: f.commission_rate, currency: f.currency, contract_start: f.contract_start};
   let busy = false;
   form.onsubmit = async e => {
     e.preventDefault(); if (busy) return;
@@ -145,7 +146,7 @@ function profileForm({api, mode, person = {}, onDone, notice}) {
     if (f.country.value && !countryCode) { const exact = countryOptions().find(o => norm(o.label) === norm(f.country.value)); if (exact) countryCode = exact.value; else { f.country.setCustomValidity('Elige un país de la lista.'); } }
     if (!form.reportValidity()) return;
     const num = el => el.value === '' ? null : Number(el.value);
-    const v = {full_name: f.full_name.value.trim(), job_title: f.job_title.value.trim(), country_code: countryCode, assigned_city: f.assigned_city.value.trim(), languages: langs, date_of_birth: f.date_of_birth.value, contact_phone: f.contact_phone.value.trim(), contact_email: f.contact_email.value.trim(), publish_contact: publish.box.checked, public_bio: f.public_bio.value.trim(), base_salary: num(f.base_salary), commission_rate: num(f.commission_rate), currency: f.currency.value, active: active.box.checked, web_visible: web.box.checked};
+    const v = {full_name: f.full_name.value.trim(), job_title: f.job_title.value.trim(), country_code: countryCode, assigned_city: f.assigned_city.value.trim(), languages: langs, date_of_birth: f.date_of_birth.value, contact_phone: f.contact_phone.value.trim(), contact_email: f.contact_email.value.trim(), publish_contact: publish.box.checked, public_bio: f.public_bio.value.trim(), base_salary: num(f.base_salary), commission_rate: num(f.commission_rate), currency: f.currency.value, contract_start: f.contract_start.value, active: active.box.checked, web_visible: web.box.checked};
     if (!isEdit) { v.email = f.email.value.trim(); v.password = f.password.value; }
     if (access) v.account_active = access.box.checked;
     busy = true; save.disabled = true; msg.className = 'th-msg'; msg.textContent = isEdit ? 'Guardando…' : 'Creando la cuenta…';
@@ -238,6 +239,7 @@ async function listTab({host, api, notice, navigate}) {
       names.append(presenceLabel(p.user_id));
       const where = E('span', undefined, 'th-cell'); where.append(E('span', p.country_code ? countryName(p.country_code, 'es') : '—'), E('small', p.languages.map(langLabel).join(', ') || 'Sin idiomas'));
       const pay = E('span', undefined, 'th-cell'); pay.append(E('span', p.base_salary == null ? 'Por defecto' : money(p.base_salary, p.currency)), E('small', p.commission_rate == null ? '' : '+ ' + money(p.commission_rate, p.currency) + ' / lead'));
+      if (p.contract_start) pay.append(E('small', 'Desde ' + new Intl.DateTimeFormat('es-ES', {dateStyle: 'medium', timeZone: 'UTC'}).format(new Date(p.contract_start + 'T00:00:00Z'))));
       const st = E('span', undefined, 'th-states');
       st.append(p.active ? chip('Activo', 'green') : chip('Inactivo', 'grey'), p.web_visible ? chip('Web', 'blue') : chip('Oculto en web', 'grey'));
       if (!p.account_active) st.append(chip('Sin acceso', 'red'));

@@ -46,6 +46,7 @@ const profileShape = {
   base_salary: z.number().min(0).max(10000000).nullable().default(null),
   commission_rate: z.number().min(0).max(1000000).nullable().default(null),
   currency: z.string().regex(/^[A-Z]{3}$/).default('MAD'),
+  contract_start: z.union([z.literal(''), isoDate]).default(''), // v22 · nómina desde esta fecha
   active: z.boolean().default(false),          // tarjeta, QR y wallet
   web_visible: z.boolean().default(true)       // aparece en el equipo de la web pública
 };
@@ -68,7 +69,17 @@ async function saveProfile(req, client, id, v) {
     country_code: v.country_code, date_of_birth: v.date_of_birth, base_salary: v.base_salary == null ? '' : String(v.base_salary),
     salary_currency: v.currency, web_visible: v.web_visible
   }}));
+  await saveContractStart(client, id, v.contract_start);
   await ensureCard(client, id, v);
+}
+// v22 · Fecha de inicio de contrato (columna añadida por supabase/migrations/20261105150000_contract_start.sql).
+// Sin la migración, guardar una fecha devuelve un aviso claro; dejarla vacía no da error.
+async function saveContractStart(client, id, value) {
+  const r = await client.from('mt_employee_directory').update({contract_start: value || null}).eq('user_id', id);
+  if (r.error) {
+    if (['42703', 'PGRST204'].includes(r.error.code)) { if (value) throw Error('Falta la migración de la fecha de inicio de contrato (20261105150000_contract_start.sql).'); return; }
+    throw Error('Database operation failed');
+  }
 }
 // La tarjeta (mt_public_cards) alimenta el QR, el wallet y el carrusel de la web. Se sincroniza siempre,
 // aunque el trigger privado ya lo haga, para que "Activo" sea fiable.
@@ -120,6 +131,7 @@ async function teamRows(client, {includeRemoved = false} = {}) {
       contact_phone: d.contact_phone || '', contact_email: d.contact_email || '', publish_contact: !!d.publish_contact, public_bio: d.public_bio || '',
       base_salary: d.base_salary == null ? null : Number(d.base_salary), commission_rate: d.commission_rate == null ? null : Number(d.commission_rate),
       currency: d.salary_currency || d.commission_currency || 'MAD',
+      contract_start: d.contract_start ? String(d.contract_start).slice(0, 10) : '',
       active: !!d.card_enabled, card_published: !!c?.published, card_slug: c?.slug || null, web_visible: d.web_visible !== false,
       removed_at: d.removed_at || null, avatar_url: urls[avatar.get(s.user_id)] || null, docs_attention: attention.get(s.user_id) || 0
     };
