@@ -1,3 +1,4 @@
+import { presenceLabel, presenceDot, presenceBar, watchTeamPresence } from './presence.js';
 // team-admin-v16 · Sección Equipo del administrador:
 // Crear colaborador · Equipo (fotos → vista de su pantalla) · Empleados (editar, visibilidad, eliminar) · Documentos.
 import {E, avatar, countryName, COUNTRIES} from './gp-ui.js';
@@ -194,7 +195,8 @@ async function openWorkspace(api, person) {
 async function peopleTab({host, api}) {
   const intro = E('p', 'Toca una foto para ver su pantalla en modo lectura, tal y como la ve el empleado.', 'th-muted');
   const grid = E('div', undefined, 'th-gallery'); grid.setAttribute('aria-busy', 'true');
-  host.append(intro, grid);
+  const bar = presenceBar();
+  host.append(intro, bar, grid);
   for (let i = 0; i < 8; i++) grid.append(E('div', undefined, 'th-person th-skeleton'));
   const team = await loadTeam(api, true);
   grid.replaceChildren(); grid.removeAttribute('aria-busy');
@@ -206,24 +208,26 @@ async function peopleTab({host, api}) {
     if (!p.account_active) dots.append(chip('Sin acceso', 'red')); else if (!p.active) dots.append(chip('Inactivo', 'grey'));
     else dots.append(chip('Activo', 'green'));
     if (p.docs_attention) dots.append(chip(p.docs_attention + ' doc.', 'amber'));
-    card.append(photo, E('strong', p.full_name), E('small', p.job_title || (p.role === 'admin' ? 'Administración' : 'Colaborador')), dots);
+    card.append(presenceDot(p.user_id), photo, E('strong', p.full_name), E('small', p.job_title || (p.role === 'admin' ? 'Administración' : 'Colaborador')), dots, presenceLabel(p.user_id));
     card.onclick = () => openWorkspace(api, p);
     grid.append(card);
   }
+  watchTeamPresence(api, host, {team, bar, alive: grid});
 }
 
 async function listTab({host, api, notice, navigate}) {
   const tools = E('div', undefined, 'th-tools'), q = input('search', '', {placeholder: 'Buscar por nombre, puesto, país o idioma…'}); q.setAttribute('aria-label', 'Buscar empleados');
   const filter = E('select'); filter.setAttribute('aria-label', 'Filtrar');
-  for (const [v, l] of [['', 'Todos'], ['active', 'Activos (tarjeta y QR)'], ['inactive', 'Inactivos'], ['hidden', 'Ocultos en la web'], ['docs', 'Con documentos pendientes']]) filter.append(new Option(l, v));
+  for (const [v, l] of [['', 'Todos'], ['online', 'Conectados ahora'], ['active', 'Activos (tarjeta y QR)'], ['inactive', 'Inactivos'], ['hidden', 'Ocultos en la web'], ['docs', 'Con documentos pendientes']]) filter.append(new Option(l, v));
   const add = button('Crear colaborador', () => navigate('team-create'), 'th-btn th-primary');
   tools.append(q, filter, add);
   const list = E('div', undefined, 'th-list'); list.setAttribute('aria-live', 'polite');
   host.append(tools, list);
-  let team = [];
+  let team = [], presence = null;
+  const isOnline = p => ['online', 'away'].includes(presence?.get().get(p.user_id)?.status);
   const paint = () => {
     const term = norm(q.value), mode = filter.value;
-    const rows = team.filter(p => (!term || norm([p.full_name, p.job_title, p.employee_code, countryName(p.country_code || 'ZZ', 'es'), p.assigned_city, ...p.languages.map(langLabel), p.login_email].join(' ')).includes(term)) && (!mode || (mode === 'active' && p.active) || (mode === 'inactive' && !p.active) || (mode === 'hidden' && !p.web_visible) || (mode === 'docs' && p.docs_attention)));
+    const rows = team.filter(p => (!term || norm([p.full_name, p.job_title, p.employee_code, countryName(p.country_code || 'ZZ', 'es'), p.assigned_city, ...p.languages.map(langLabel), p.login_email].join(' ')).includes(term)) && (!mode || (mode === 'active' && p.active) || (mode === 'inactive' && !p.active) || (mode === 'hidden' && !p.web_visible) || (mode === 'docs' && p.docs_attention) || (mode === 'online' && isOnline(p))));
     list.replaceChildren();
     const head = E('div', undefined, 'th-row th-row-head'); for (const h of ['Empleado', 'País · idiomas', 'Salario', 'Estado', '']) head.append(E('span', h)); list.append(head);
     if (!rows.length) list.append(E('p', 'No hay empleados con este filtro.', 'th-muted th-pad'));
@@ -231,6 +235,7 @@ async function listTab({host, api, notice, navigate}) {
       const row = E('button', undefined, 'th-row'); row.type = 'button'; row.setAttribute('aria-label', 'Abrir ficha de ' + p.full_name);
       const who = E('span', undefined, 'th-who'); const names = E('span'); names.append(E('b', p.full_name), E('small', [p.job_title, p.employee_code].filter(Boolean).join(' · ')));
       who.append(avatar(p.full_name, p.avatar_url, 'th-avatar-sm'), names);
+      names.append(presenceLabel(p.user_id));
       const where = E('span', undefined, 'th-cell'); where.append(E('span', p.country_code ? countryName(p.country_code, 'es') : '—'), E('small', p.languages.map(langLabel).join(', ') || 'Sin idiomas'));
       const pay = E('span', undefined, 'th-cell'); pay.append(E('span', p.base_salary == null ? 'Por defecto' : money(p.base_salary, p.currency)), E('small', p.commission_rate == null ? '' : '+ ' + money(p.commission_rate, p.currency) + ' / lead'));
       const st = E('span', undefined, 'th-states');
@@ -242,10 +247,12 @@ async function listTab({host, api, notice, navigate}) {
       row.onclick = () => openEditor({api, person: p, notice, navigate, onChange: async () => { team = await loadTeam(api, true); paint(); }});
       list.append(row);
     }
+    presence?.repaint();
   };
   q.oninput = paint; filter.onchange = paint;
   list.append(E('p', 'Cargando empleados…', 'th-muted th-pad'));
   team = await loadTeam(api, true); paint();
+  presence = watchTeamPresence(api, host, {team, alive: list, onUpdate: () => { if (filter.value === 'online') paint(); }});
 }
 
 function openEditor({api, person, notice, navigate, onChange}) {

@@ -97,13 +97,13 @@ export const mailText = lang => T[lang] || T.en;
 function layout(lang, title, paragraphs, cta) {
   const t = mailText(lang);
   const body = paragraphs.map(p => `<p style="margin:0 0 14px;line-height:1.6">${p}</p>`).join("");
-  const button = cta ? `<p style="margin:22px 0"><a href="${esc(cta.href)}" style="background:#174C4B;color:#F6F5EF;text-decoration:none;padding:12px 22px;border-radius:999px;display:inline-block;font-weight:600">${esc(cta.label)}</a></p>` : "";
-  return `<!doctype html><html lang="${lang}" dir="${t.dir}"><body style="margin:0;background:#F6F5EF;font-family:Helvetica,Arial,sans-serif;color:#19364A">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F6F5EF;padding:28px 12px"><tr><td align="center">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#fff;border-radius:18px;overflow:hidden;border:1px solid #DCE6E8">
-<tr><td style="background:#174C4B;padding:22px 28px;color:#F6F5EF;font-size:13px;letter-spacing:.18em;text-transform:uppercase">MUKTalent <span style="color:#B99B68">Healthcare</span></td></tr>
-<tr><td style="padding:30px 28px 10px;font-size:15px" dir="${t.dir}"><h1 style="font-family:Georgia,serif;font-weight:500;font-size:22px;margin:0 0 18px;color:#19364A">${esc(title)}</h1>${body}${button}</td></tr>
-<tr><td style="padding:16px 28px 26px;font-size:12px;color:#5b6f7a;border-top:1px solid #DCE6E8" dir="${t.dir}">${esc(t.sign)}<br>${esc(t.footer)} <a href="${SITE()}/healthcare/candidate-privacy/" style="color:#174C4B">${SITE().replace(/^https?:\/\//, "")}/healthcare/candidate-privacy/</a></td></tr>
+  const button = cta ? `<p style="margin:22px 0"><a href="${esc(cta.href)}" style="background:#292929;color:#F7F5F0;text-decoration:none;padding:12px 22px;border-radius:999px;display:inline-block;font-weight:600">${esc(cta.label)}</a></p>` : "";
+  return `<!doctype html><html lang="${lang}" dir="${t.dir}"><body style="margin:0;background:#F7F5F0;font-family:Helvetica,Arial,sans-serif;color:#292929">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F7F5F0;padding:28px 12px"><tr><td align="center">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#fff;border-radius:18px;overflow:hidden;border:1px solid #E3E3E1">
+<tr><td style="background:#292929;padding:22px 28px;color:#F7F5F0;font-size:13px;letter-spacing:.18em;text-transform:uppercase">MUKTalent <span style="color:#B7A078">Healthcare</span></td></tr>
+<tr><td style="padding:30px 28px 10px;font-size:15px" dir="${t.dir}"><h1 style="font-family:Georgia,serif;font-weight:500;font-size:22px;margin:0 0 18px;color:#292929">${esc(title)}</h1>${body}${button}</td></tr>
+<tr><td style="padding:16px 28px 26px;font-size:12px;color:#6E6E67;border-top:1px solid #E3E3E1" dir="${t.dir}">${esc(t.sign)}<br>${esc(t.footer)} <a href="${SITE()}/healthcare/candidate-privacy/" style="color:#292929">${SITE().replace(/^https?:\/\//, "")}/healthcare/candidate-privacy/</a></td></tr>
 </table></td></tr></table></body></html>`;
 }
 const plain = html => html.replace(/<br>/g, "\n").replace(/<\/p>/g, "\n\n").replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\n{3,}/g, "\n\n").trim();
@@ -126,7 +126,7 @@ export function candidateMail(kind, lang, data) {
   switch (kind) {
     case "registered": {
       const p = [t.hello(esc(data.name)), ...t.regBody(esc(data.reference))];
-      if (data.restricted) p.push(`<span style="display:block;background:#F6F5EF;border-left:3px solid #B99B68;padding:10px 14px">${esc(t.restricted)}</span>`);
+      if (data.restricted) p.push(`<span style="display:block;background:#F7F5F0;border-left:3px solid #B7A078;padding:10px 14px">${esc(t.restricted)}</span>`);
       p.push(esc(t.regPortal));
       return { subject: t.regSubject(data.reference), html: layout(lang, t.regSubject(data.reference), p, portal) };
     }
@@ -148,6 +148,6 @@ export function candidateMail(kind, lang, data) {
 
 // Internal notification to the recruitment team (English).
 export function teamMail(title, rows, link) {
-  const table = `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;font-size:14px">${rows.filter(([, v]) => v !== null && v !== undefined && v !== "").map(([k, v]) => `<tr><td style="padding:7px 10px 7px 0;color:#5b6f7a;vertical-align:top;white-space:nowrap">${esc(k)}</td><td style="padding:7px 0;border-bottom:1px solid #eef2f3">${esc(v)}</td></tr>`).join("")}</table>`;
+  const table = `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;font-size:14px">${rows.filter(([, v]) => v !== null && v !== undefined && v !== "").map(([k, v]) => `<tr><td style="padding:7px 10px 7px 0;color:#6E6E67;vertical-align:top;white-space:nowrap">${esc(k)}</td><td style="padding:7px 0;border-bottom:1px solid #F7F5F0">${esc(v)}</td></tr>`).join("")}</table>`;
   return { subject: `[Healthcare] ${title}`, html: layout("en", title, [table], link ? { href: SITE() + link, label: "Open in Healthcare Management" } : null) };
 }

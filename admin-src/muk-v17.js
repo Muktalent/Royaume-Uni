@@ -54,9 +54,9 @@ export function applyV17({role = 'admin', lang = 'es'} = {}) {
   const html = document.documentElement; html.classList.add('v17'); html.dataset.v17Role = role;
   // v18 · Teclado abierto en el móvil: la barra inferior se oculta para no subir encima del teclado.
   if (!html.dataset.v17Kb && window.visualViewport) { html.dataset.v17Kb = '1'; const vv = window.visualViewport; let base = vv.height, bw = innerWidth; const kb = () => { if (innerWidth !== bw) { bw = innerWidth; base = vv.height; } base = Math.max(base, vv.height); const t = document.activeElement; const typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable); html.classList.toggle('v17-kb', !!typing && vv.height < base * 0.8); }; vv.addEventListener('resize', kb); addEventListener('focusin', () => setTimeout(kb, 300)); addEventListener('focusout', () => setTimeout(kb, 120)); }
-  if (!document.getElementById('mukV17Css')) { const l = E('link'); l.id = 'mukV17Css'; l.rel = 'stylesheet'; l.href = '/admin/muk-v17.css?v=18.0.0'; document.head.append(l); }
+  if (!document.getElementById('mukV17Css')) { const l = E('link'); l.id = 'mukV17Css'; l.rel = 'stylesheet'; l.href = '/admin/muk-v17.css?v=20.0.0'; document.head.append(l); }
   else document.head.append(document.getElementById('mukV17Css')); // siempre la última hoja
-  let m = document.querySelector('meta[name=theme-color]'); if (!m) { m = E('meta'); m.name = 'theme-color'; document.head.append(m); } m.content = '#15383D';
+  let m = document.querySelector('meta[name=theme-color]'); if (!m) { m = E('meta'); m.name = 'theme-color'; document.head.append(m); } m.content = '#292929';
   let mf = document.querySelector('link[rel=manifest]'); if (!mf) { mf = E('link'); mf.rel = 'manifest'; document.head.append(mf); } mf.href = '/admin/team.webmanifest?v=17';
   for (const [n, c] of [['apple-mobile-web-app-capable', 'yes'], ['mobile-web-app-capable', 'yes'], ['apple-mobile-web-app-status-bar-style', 'black-translucent'], ['apple-mobile-web-app-title', 'MUK Talent']]) { let x = document.querySelector(`meta[name="${n}"]`); if (!x) { x = E('meta'); x.name = n; document.head.append(x); } x.content = c; }
   if (!document.querySelector('link[rel=apple-touch-icon]')) { const a = E('link'); a.rel = 'apple-touch-icon'; a.href = '/icon-192.png'; document.head.append(a); }

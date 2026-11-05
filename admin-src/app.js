@@ -1,3 +1,5 @@
+import "./unified-theme.js";
+import { startPresence, stopPresence } from "./presence.js";
 import { mountAdminExperience, renderAdminPipeline } from "./admin-experience.js";
 import { requirePasswordChange } from "./employee-security.js";
 import { mountEmployee } from "./employee.js";
@@ -32,7 +34,7 @@ function valueText(key,value){
  return statusText[value]||String(value).replaceAll("_"," ");
 }
 function resetLogin(text=""){
- stopWatch();
+ stopWatch();stopPresence();
  document.getElementById("employeeWorkspace")?.remove();document.getElementById("studentPortal")?.remove();document.getElementById("gpControlOverlay")?.remove();
  state.epoch++;state.session=null;state.staff=null;state.config=null;state.staffOptions=[];state.detail=null;state.dirty=false;state.busy=false;state.loading=false;
  if($("recordDialog").open)$("recordDialog").close();
@@ -317,6 +319,8 @@ async function enter(session){
   if (!["admin", "collaborator"].includes(state.staff.role)) {
     throw new Error("Esta cuenta no tiene un rol de acceso válido.");
   }
+  // v20 · Heartbeat so administrators can see who is online (Admin → Equipo).
+  startPresence(api);
   stopMatrix();
   if (state.staff.role === "collaborator") {
     $("loginView").hidden = true;
@@ -333,7 +337,7 @@ async function enter(session){
       }
     });
     offerInstall({ lang: "en" });
-    api("/api/hc/me").then(hc=>{if(hc?.role!=="consultant"||document.getElementById("hcConsultantLink"))return;const a=document.createElement("a");a.id="hcConsultantLink";a.href="/healthcare/portal/";a.textContent="MUKTalent Healthcare →";a.setAttribute("style","position:fixed;right:18px;bottom:18px;z-index:60;background:#174C4B;color:#F6F5EF;padding:11px 18px;border-radius:999px;font:600 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 10px 30px rgba(23,76,75,.35)");document.body.append(a);}).catch(()=>{});
+    api("/api/hc/me").then(hc=>{if(hc?.role!=="consultant"||document.getElementById("hcConsultantLink"))return;const a=document.createElement("a");a.id="hcConsultantLink";a.href="/healthcare/portal/";a.textContent="MUKTalent Healthcare →";a.setAttribute("style","position:fixed;right:18px;bottom:18px;z-index:60;background:#292929;color:#F7F5F0;padding:11px 18px;border-radius:999px;font:600 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 10px 30px rgba(41,41,41,.35)");document.body.append(a);}).catch(()=>{});
     return;
   }
   state.config = await api("/api/admin-config");

@@ -1,0 +1,14 @@
+/* MUK Talent · v20 · Mobile stability for every public page (Education, Healthcare, cards, portfolio).
+   Loaded LAST on each page. It only prevents sideways movement and accidental zoom;
+   it does not change the layout or the design of any section. */
+html,body{max-width:100%;overflow-x:hidden}
+@supports (overflow:clip){html,body{overflow-x:clip}}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{overscroll-behavior-x:none}
+a,button,[role=button],label,summary,select{touch-action:manipulation}
+:where(p,h1,h2,h3,h4,li,dd,td,th,blockquote,figcaption){overflow-wrap:break-word}
+:where(pre,table){max-width:100%}
+@media (max-width:760px){
+  /* iOS zooms in, and the page slides sideways, when a form field uses a font smaller than 16px */
+  input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{font-size:max(16px,1em)!important}
+}

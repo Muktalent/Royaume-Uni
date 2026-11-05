@@ -268,7 +268,7 @@ export function employers() {
 <section class="hc-sec hc-sec-white"><div class="hc-wrap">
 <div class="hc-head-split"><div>${kicker("01", "How we support you")}<h2>Seven parts of one <em>accountable</em> service.</h2></div><p class="hc-lead">You remain the employer and make every hiring decision. We take care of the work that makes international recruitment safe, organised and predictable.</p></div>
 <div class="hc-grid-4">${svc.map(([ic, h, p], i) => `<div class="hc-card hc-rv"><span class="hc-card-num" translate="no">${String(i + 1).padStart(2, "0")}</span><span class="hc-ico">${icon(ic)}</span><h3>${h}</h3><p>${p}</p></div>`).join("")}
-<div class="hc-card hc-rv" style="background:var(--teal);border-color:transparent"><h3 style="color:#fff">Ready to plan?</h3><p style="color:rgba(246,245,239,.8);margin-bottom:22px">Tell us about the roles you need and we will propose a plan.</p>${btn("Send an enquiry", "/employers/#enquiry", "hc-btn-gold hc-btn-sm")}</div></div>
+<div class="hc-card hc-rv" style="background:var(--teal);border-color:transparent"><h3 style="color:#fff">Ready to plan?</h3><p style="color:rgba(247,245,240,.8);margin-bottom:22px">Tell us about the roles you need and we will propose a plan.</p>${btn("Send an enquiry", "/employers/#enquiry", "hc-btn-gold hc-btn-sm")}</div></div>
 </div></section>
 
 <section class="hc-sec"><div class="hc-wrap hc-split rev">

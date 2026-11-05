@@ -15,6 +15,7 @@ import { mountGlobalPassport } from "./global-passport.mjs";
 import { mountMukSocial } from "./muk-social.mjs";
 import { mountMukPublic } from "./muk-public.mjs";
 import { mountHealthcare } from "./healthcare.mjs";
+import { mountStaffPresence } from "./staff-presence.mjs";
 import "dotenv/config";
 import express from "express";
 import helmet from "helmet";
@@ -83,6 +84,8 @@ mountCardLinks(app, { requireStaff });
 mountProfessionalWorkspace(app, { requireStaff, requireAdmin });
 mountPayroll(app, { requireStaff, requireAdmin });
 mountTeamHr(app, { requireStaff, requireAdmin });
+// v20 · Online status of the team (Admin → Equipo).
+mountStaffPresence(app, { requireStaff, requireAdmin });
 mountAdminPipeline(app, { requireStaff, requireAdmin });
 mountEvaluation(app);
 mountAssistant(app);

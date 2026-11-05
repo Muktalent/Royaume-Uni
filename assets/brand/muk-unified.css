@@ -1,0 +1,168 @@
+/* =====================================================================
+   MUK Talent · v20 · Unified dashboard design
+   One look for every private area (Education admin, team workspace,
+   Global Passport, counsellor centre) based on the Healthcare portal.
+   Palette: Elegant Black #171717 · Soft Black #292929 · Pure White #FFFFFF
+            Warm Ivory #F7F5F0 · Champagne #B7A078 · Silver Grey #D9D9D6
+   This file is always the LAST stylesheet (see admin-src/unified-theme.js),
+   so it only adjusts the look. Layout, data and behaviour are unchanged.
+   ===================================================================== */
+@font-face{font-family:"Fraunces";font-style:normal;font-weight:300 700;font-display:swap;src:url(/healthcare/assets/fonts/fraunces-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Fraunces";font-style:normal;font-weight:300 700;font-display:swap;src:url(/healthcare/assets/fonts/fraunces-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Instrument Sans";font-style:normal;font-weight:400 700;font-display:swap;src:url(/healthcare/assets/fonts/instrument-latin.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Instrument Sans";font-style:normal;font-weight:400 700;font-display:swap;src:url(/healthcare/assets/fonts/instrument-latin-ext.woff2) format("woff2");unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C4,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:"Plex Arabic";font-style:normal;font-weight:400;font-display:swap;src:url(/healthcare/assets/fonts/plex-arabic-400.woff2) format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200E,U+2010-2011,U+FB50-FDFF,U+FE70-FEFC}
+@font-face{font-family:"Plex Arabic";font-style:normal;font-weight:600;font-display:swap;src:url(/healthcare/assets/fonts/plex-arabic-600.woff2) format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200E,U+2010-2011,U+FB50-FDFF,U+FE70-FEFC}
+
+:root{
+  --u-black:#171717;--u-soft:#292929;--u-white:#FFFFFF;--u-ivory:#F7F5F0;--u-ivory-2:#F0ECE3;
+  --u-champ:#B7A078;--u-champ-deep:#816B44;--u-champ-soft:#E3D9C9;--u-silver:#D9D9D6;
+  --u-ink:#171717;--u-ink-2:#4A4A46;--u-ink-3:#6E6E68;--u-line:#D9D9D6;--u-line-2:rgba(23,23,23,.07);
+  --u-serif:"Fraunces","Plex Arabic",Georgia,"Times New Roman",serif;
+  --u-sans:"Instrument Sans","Plex Arabic",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --u-ease:cubic-bezier(.2,.7,.2,1);
+  /* existing design tokens, re-pointed to the palette */
+  --b-paper:#F7F5F0;--b-surface:#FFFFFF;--b-surface-2:#F0ECE3;--b-line:#D9D9D6;--b-ink:#171717;--b-text:#292929;--b-muted:#6E6E68;
+  --b-accent:#292929;--b-accent-2:#171717;--b-gold:#B7A078;--b-gold-soft:#B7A078;--b-gold-tint:#F0ECE3;--b-dark:#171717;
+  --b-font:"Instrument Sans","Plex Arabic",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+
+/* ---------- shared base (all private areas) ---------- */
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay,#loginView){font-family:var(--u-sans);color:var(--u-ink);-webkit-font-smoothing:antialiased}
+:is(#appShell#appShell .main,#employeeWorkspace#employeeWorkspace .lx-main,#studentPortal#studentPortal .gp-main){background:var(--u-ivory)}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay) :is(h1,h2,h3){font-family:var(--u-serif);font-weight:400;letter-spacing:-.01em;color:var(--u-ink)}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay) :is(input,select,textarea,button){font-family:var(--u-sans)}
+
+/* ---------- sidebars (desktop) ---------- */
+@media (min-width:701px){
+  #appShell#appShell .sidebar,#employeeWorkspace#employeeWorkspace .lx-sidebar,#studentPortal#studentPortal .gp-side{background:var(--u-black)!important;color:var(--u-ivory);border-color:rgba(247,245,240,.08)!important}
+  #studentPortal#studentPortal .gp-top{background:var(--u-black)!important;border-color:rgba(247,245,240,.08)!important}
+  #appShell#appShell .sidebar .wordmark,#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-brand{padding-bottom:18px;border-bottom:1px solid rgba(247,245,240,.1)}
+  #appShell#appShell .sidebar .nav-caption,#employeeWorkspace#employeeWorkspace .lx-sidebar>.lx-overline{font:600 10.5px/1 var(--u-sans);letter-spacing:.22em;text-transform:uppercase;color:var(--u-champ)}
+  #appShell#appShell #navigation .nav-button,#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav,#studentPortal#studentPortal .gp-side .gp-side-btn{min-height:44px;padding:0 12px;border-radius:10px;background:transparent;color:rgba(247,245,240,.78);font:500 14.5px/1.2 var(--u-sans);box-shadow:none;border:0;transition:background .2s,color .2s}
+  #appShell#appShell #navigation .nav-button:hover,#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav:hover,#studentPortal#studentPortal .gp-side .gp-side-btn:hover{background:rgba(247,245,240,.07);color:#fff}
+  #appShell#appShell #navigation .nav-button.active,#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav.active,#studentPortal#studentPortal .gp-side .gp-side-btn:is(.active,[aria-current=page],[aria-selected=true]){background:rgba(247,245,240,.12)!important;color:#fff!important;box-shadow:inset 3px 0 0 var(--u-champ)!important;border:0!important}
+  #appShell#appShell #navigation .nav-button :is(svg,.nav-icon),#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav svg,#studentPortal#studentPortal .gp-side .gp-side-btn svg{color:rgba(247,245,240,.72);opacity:.9}
+  #appShell#appShell #navigation .nav-button.active :is(svg,.nav-icon),#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav.active svg,#studentPortal#studentPortal .gp-side .gp-side-btn:is(.active,[aria-current=page]) svg{color:var(--u-champ)}
+  #appShell#appShell .sidebar-footer,#employeeWorkspace#employeeWorkspace .lx-sidebar-footer{border-top:1px solid rgba(247,245,240,.1)}
+  #appShell#appShell .sidebar-footer :is(p,small),#employeeWorkspace#employeeWorkspace .lx-sidebar-footer :is(strong,small){color:rgba(247,245,240,.72)}
+  #appShell#appShell .sidebar-footer #staffName,#employeeWorkspace#employeeWorkspace .lx-sidebar-footer strong{color:#fff}
+  #appShell#appShell .sidebar .muk-webback,#employeeWorkspace#employeeWorkspace .lx-sidebar .muk-webback{border-color:rgba(183,160,120,.45)!important;color:var(--u-champ-soft)!important;background:transparent!important}
+  #appShell#appShell .sidebar .nav-hc{border:1px solid rgba(183,160,120,.35)!important}
+}
+
+/* ---------- page headers ---------- */
+/* short pages were vertically centred inside the shell grid; keep content at the top */
+#appShell#appShell>.main{align-self:stretch;min-height:100vh;min-height:100dvh}
+#appShell#appShell .page-header,#employeeWorkspace#employeeWorkspace .lx-header,#studentPortal#studentPortal .gp-page-head{border-bottom:1px solid var(--u-line);padding-bottom:18px;margin-bottom:24px}
+#appShell#appShell .page-header .eyebrow,#employeeWorkspace#employeeWorkspace .lx-header .lx-overline,#studentPortal#studentPortal .gp-page-head .gp-kicker{font:600 11px/1.2 var(--u-sans);letter-spacing:.22em;text-transform:uppercase;color:var(--u-champ-deep)}
+#appShell#appShell .page-header h1,#employeeWorkspace#employeeWorkspace .lx-header h1,#studentPortal#studentPortal .gp-page-head h1{font:400 clamp(28px,2.6vw,38px)/1.12 var(--u-serif);letter-spacing:-.015em;color:var(--u-ink)}
+#appShell#appShell .page-header .muted,#employeeWorkspace#employeeWorkspace .lx-header .lx-muted{color:var(--u-ink-3);font-size:14.5px}
+
+/* ---------- hero banners (same as Healthcare "pt-hero") ---------- */
+#appShell#appShell .as-greet,#employeeWorkspace#employeeWorkspace .lx-hero-pay,#studentPortal#studentPortal .gp-pp2-band{background:linear-gradient(120deg,var(--u-black),var(--u-soft))!important;color:var(--u-ivory)}
+#appShell#appShell .as-greet{position:relative;overflow:hidden;border-radius:24px!important;border:0!important;box-shadow:none!important}
+#appShell#appShell .as-greet::after{content:"";position:absolute;right:-60px;top:-80px;width:280px;height:280px;border-radius:50%;border:1px solid rgba(183,160,120,.4);pointer-events:none}
+#appShell#appShell .as-greet h2{font:400 clamp(30px,3vw,44px)/1.1 var(--u-serif)!important;color:var(--u-ivory)!important}
+#appShell#appShell .as-greet .as-overline{color:var(--u-champ)!important;letter-spacing:.22em}
+#appShell#appShell .as-greet .as-muted{color:rgba(247,245,240,.78)!important}
+#appShell#appShell .as-quick-btn{border-radius:999px!important;border:1px solid rgba(247,245,240,.22)!important;background:rgba(247,245,240,.08)!important;color:var(--u-ivory)!important}
+#appShell#appShell .as-quick-btn:first-child{background:var(--u-champ)!important;border-color:var(--u-champ)!important;color:var(--u-black)!important}
+#employeeWorkspace#employeeWorkspace .lx-hero-pay{border-radius:20px!important;border:0!important}
+
+/* ---------- cards ---------- */
+:is(#appShell#appShell .main,#employeeWorkspace#employeeWorkspace .lx-main,#studentPortal#studentPortal .gp-main,#gpControlOverlay#gpControlOverlay) :is(.card,.as-pay,.v17-updates,.th-card,.th-person,.lx-fact,.lx-chart,.lx-card,.lx-panel,.gp-ready,.gp-card,.gp-panel){background:var(--u-white);border:1px solid var(--u-line)!important;border-radius:20px!important;box-shadow:none!important}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal) :is(.v17-updates){border-inline-start:1px solid var(--u-line)!important}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal) :is(.card,.th-card,.lx-chart,.gp-ready)>:is(h2,h3){font:400 20px/1.3 var(--u-serif)}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal) :is(.as-overline,.v17-overline,.gp-kicker,.lx-overline){font-family:var(--u-sans);letter-spacing:.2em;text-transform:uppercase;color:var(--u-champ-deep)}
+
+/* ---------- KPI tiles (Healthcare "pt-stat") ---------- */
+#appShell#appShell .metrics .metric{background:var(--u-white)!important;border:1px solid var(--u-line)!important;border-radius:18px!important;box-shadow:none!important;padding:20px 22px!important;transition:transform .25s var(--u-ease),box-shadow .25s}
+#appShell#appShell .metrics .metric:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(23,23,23,.08)!important}
+#appShell#appShell .metrics .metric .muted{font:600 11px/1.3 var(--u-sans)!important;letter-spacing:.14em;text-transform:uppercase;color:var(--u-ink-3)!important}
+#appShell#appShell .metrics .metric strong{font:400 40px/1.1 var(--u-serif)!important;color:var(--u-ink)!important;letter-spacing:-.01em}
+#appShell#appShell .metrics .metric:nth-child(4){background:var(--u-champ-soft)!important;border-color:transparent!important}
+#appShell#appShell .metrics .metric:nth-child(4) :is(strong,.muted){color:var(--u-black)!important}
+#employeeWorkspace#employeeWorkspace .lx-fact strong,#studentPortal#studentPortal .gp-ready strong{font-family:var(--u-serif);font-weight:400}
+
+/* ---------- buttons ---------- */
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay) :is(button.primary,.gp-btn.gp-primary,.th-btn.th-primary,.lx-button.lx-primary,.lx-primary){background:var(--u-black)!important;color:var(--u-ivory)!important;border:1px solid var(--u-black)!important;border-radius:999px!important;box-shadow:none!important;font-weight:600}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay) :is(button.primary,.gp-btn.gp-primary,.th-btn.th-primary,.lx-primary):hover{background:var(--u-soft)!important}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay) :is(button.secondary,button.ghost,.th-btn:not(.th-primary),.gp-btn.gp-ghost,.lx-button:not(.lx-primary)){background:var(--u-white);color:var(--u-ink);border:1px solid var(--u-line);border-radius:999px;box-shadow:none}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay) :is(button.secondary,button.ghost,.th-btn:not(.th-primary),.gp-btn.gp-ghost,.lx-button:not(.lx-primary)):hover{border-color:var(--u-champ);background:var(--u-ivory)}
+#appShell#appShell .sidebar button.ghost{background:transparent;border-color:transparent;color:rgba(247,245,240,.72)}
+#appShell#appShell #tableBody button{background:var(--u-white)!important;color:var(--u-ink)!important;border:1px solid var(--u-line)!important;border-radius:999px!important;min-height:36px;padding:0 16px}
+#appShell#appShell #tableBody button:hover{border-color:var(--u-black)!important}
+
+/* ---------- tabs (Healthcare underline tabs) ---------- */
+#appShell#appShell #adminTabs.admin-tabs{background:transparent!important;border:0!important;border-bottom:1px solid var(--u-line)!important;border-radius:0!important;padding:0!important;box-shadow:none!important;gap:6px;display:flex;flex-wrap:wrap;width:auto;margin-bottom:22px}
+#appShell#appShell #adminTabs .admin-tab{background:transparent!important;border:0!important;border-bottom:2px solid transparent!important;border-radius:0!important;color:var(--u-ink-3)!important;font:600 14px/1 var(--u-sans)!important;padding:12px 14px!important;margin-bottom:-1px;box-shadow:none!important;min-height:0}
+#appShell#appShell #adminTabs .admin-tab:is(.active,[aria-selected=true],[aria-current=page]){color:var(--u-black)!important;border-bottom-color:var(--u-champ)!important}
+
+/* ---------- tables ---------- */
+#appShell#appShell .table-wrap{border:1px solid var(--u-line);border-radius:16px;overflow:auto;background:var(--u-white)}
+#appShell#appShell .table-wrap table{border-collapse:collapse}
+#appShell#appShell .table-wrap thead th,#appShell#appShell .table-wrap thead tr{background:var(--u-ivory-2)!important;color:var(--u-ink-3)!important;font:600 11.5px/1.3 var(--u-sans)!important;letter-spacing:.1em;text-transform:uppercase}
+#appShell#appShell .table-wrap tbody td{border-top:1px solid var(--u-line)!important;background:var(--u-white)!important;padding-top:13px;padding-bottom:13px}
+#appShell#appShell .table-wrap tbody tr:hover td{background:#FAF9F6!important}
+
+/* ---------- badges / chips (Healthcare "pt-badge") ---------- */
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal) :is(.status-pill,.badge,.th-chip,.lx-chip,.gp-status,.gp-badge,.v17-chip){border-radius:999px;font-family:var(--u-sans);font-weight:600}
+#appShell#appShell .th-chip[data-tone=ink]{background:var(--u-black);color:var(--u-ivory)}
+#appShell#appShell .th-chip[data-tone=blue]{background:var(--u-ivory-2);color:var(--u-soft)}
+#appShell#appShell .th-chip[data-tone=grey]{background:#EFEDE7;color:#55554F}
+
+/* ---------- forms ---------- */
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay,.record-dialog) :is(input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),select,textarea){border:1px solid rgba(23,23,23,.2);border-radius:12px;background:var(--u-white);color:var(--u-ink)}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay,.record-dialog) :is(input,select,textarea):focus{outline:0;border-color:var(--u-black);box-shadow:0 0 0 4px rgba(23,23,23,.08)}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay,.record-dialog) :is(input[type=checkbox],input[type=radio]){accent-color:var(--u-black)}
+
+/* ---------- dialogs ---------- */
+dialog.record-dialog,#appShell#appShell~dialog,.th-dialog,.lx-dialog{border:1px solid var(--u-line)!important;border-radius:22px!important;background:var(--u-white)!important}
+dialog.record-dialog .dialog-header h2{font-family:var(--u-serif);font-weight:400}
+dialog::backdrop{background:rgba(23,23,23,.55);backdrop-filter:blur(3px)}
+
+/* ---------- team gallery ---------- */
+#appShell#appShell .th-person{transition:transform .25s var(--u-ease),box-shadow .25s}
+#appShell#appShell .th-person:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(23,23,23,.08)!important}
+#appShell#appShell .th-person strong{font:400 18px/1.3 var(--u-serif)}
+#appShell#appShell .th-person-photo{background:var(--u-ivory-2)!important;color:var(--u-black)!important;font-family:var(--u-serif)!important;font-weight:400!important}
+
+/* ---------- online presence (Equipo) ---------- */
+.mt-presence{display:inline-flex;align-items:center;gap:7px;font:600 12px/1.3 var(--u-sans);color:var(--u-ink-3);white-space:nowrap}
+.mt-presence i{width:9px;height:9px;border-radius:50%;background:#B9B9B4;flex:none;box-shadow:0 0 0 3px rgba(185,185,180,.18)}
+.mt-presence[data-state=online]{color:#1E4D35}
+.mt-presence[data-state=online] i{background:#2F9E5B;box-shadow:0 0 0 3px rgba(47,158,91,.18);animation:mtPulse 2.4s ease-in-out infinite}
+.mt-presence[data-state=away]{color:#7A4E12}
+.mt-presence[data-state=away] i{background:#D69A2D;box-shadow:0 0 0 3px rgba(214,154,45,.18)}
+@keyframes mtPulse{0%,100%{box-shadow:0 0 0 3px rgba(47,158,91,.18)}50%{box-shadow:0 0 0 6px rgba(47,158,91,.06)}}
+@media (prefers-reduced-motion:reduce){.mt-presence[data-state=online] i{animation:none}}
+.th-person{position:relative}
+.th-person .mt-presence-dot{position:absolute;top:16px;right:16px;width:12px;height:12px;border-radius:50%;background:#B9B9B4;border:2px solid #fff}
+.th-person .mt-presence-dot[data-state=online]{background:#2F9E5B}
+.th-person .mt-presence-dot[data-state=away]{background:#D69A2D}
+.mt-presence-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:0 0 16px;padding:12px 16px;background:var(--u-white);border:1px solid var(--u-line);border-radius:14px;font:500 14px/1.3 var(--u-sans);color:var(--u-ink-2)}
+.mt-presence-bar b{font:400 22px/1 var(--u-serif);color:var(--u-ink);margin-inline-end:4px}
+.mt-presence-bar small{margin-inline-start:auto;color:var(--u-ink-3);font-size:12.5px}
+
+/* =====================================================================
+   Mobile: content must never slide sideways while scrolling
+   ===================================================================== */
+html,body{max-width:100%;overflow-x:clip}
+@supports not (overflow:clip){html,body{overflow-x:hidden}}
+body{overscroll-behavior-x:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay) :is(img,video,canvas,iframe){max-width:100%}
+:is(#appShell#appShell .main,#employeeWorkspace#employeeWorkspace .lx-main,#studentPortal#studentPortal .gp-main){min-width:0;max-width:100%}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal) :is(p,h1,h2,h3,li,dd,td,strong,small,b){overflow-wrap:anywhere}
+@media (max-width:700px){
+  /* iOS zooms (and shifts the page) when a field is smaller than 16px */
+  :is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay,#loginView,.record-dialog) :is(input,select,textarea){font-size:16px!important}
+  #appShell#appShell .table-wrap,#appShell#appShell .th-list{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+  #appShell#appShell #adminTabs.admin-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain;max-width:100%}
+  #appShell#appShell #adminTabs.admin-tabs::-webkit-scrollbar{display:none}
+  #appShell#appShell #adminTabs .admin-tab{white-space:nowrap;flex:none}
+  #appShell#appShell .page-header h1,#employeeWorkspace#employeeWorkspace .lx-header h1,#studentPortal#studentPortal .gp-page-head h1{font-size:28px}
+  #appShell#appShell .metrics .metric strong{font-size:32px!important}
+  :is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal) :is(.dock,.mobile-dock,.lx-dock,.gp-dock,nav.sidebar,#navigation){background:var(--u-black)}
+  .mt-presence-bar small{margin-inline-start:0;width:100%}
+}

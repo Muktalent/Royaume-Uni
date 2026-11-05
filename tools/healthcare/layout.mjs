@@ -1,7 +1,7 @@
 // MUKTalent Healthcare · static page shell (header, footer, head). English source; translations applied client-side.
 export const SITE = "https://www.muktalent.com";
 export const BASE = "/healthcare";
-export const V = "19.0.0";
+export const V = "20.0.0";
 export const COMPANY = {
   legal: "MAGHREB UK TALENT LTD",
   number: "16987132",
@@ -101,13 +101,14 @@ export function page({ path, active = "", title, description, body, jsonld = nul
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${url}">
 ${noindex ? '<meta name="robots" content="noindex, follow">' : '<meta name="robots" content="index, follow, max-image-preview:large">'}
-<meta name="theme-color" content="#F6F5EF">
+<meta name="theme-color" content="#F7F5F0">
 <meta property="og:type" content="website"><meta property="og:site_name" content="MUKTalent Healthcare"><meta property="og:title" content="${esc(fullTitle)}"><meta property="og:description" content="${esc(description)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${SITE}${BASE}/assets/img/og.jpg"><meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="${BASE}/assets/img/mark.svg" type="image/svg+xml">
 <link rel="preload" href="${BASE}/assets/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="${BASE}/assets/fonts/instrument-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="${BASE}/assets/css/hc.css?v=${V}">
+<link rel="stylesheet" href="/assets/brand/muk-mobile.css?v=20.0.0">
 <script src="${BASE}/assets/js/hc-pre.js?v=${V}"></script>
 ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ""}
 </head>

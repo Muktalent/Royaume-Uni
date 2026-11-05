@@ -5,6 +5,7 @@ import { S, h, clear, $, api, setLang, pickLang, t } from './core.js';
 import { signIn, signUp, newPassword, unconfirmed, staffNoAccess, completeProfile, mfa } from './auth.js';
 import { candidateApp } from './candidate.js';
 import { teamApp } from './team.js';
+import { startPresence, stopPresence } from '../presence.js';
 
 const app = () => $('#app');
 const authHash = () => /(^|[#&])(access_token|error_description|type=recovery)/.test(location.hash) || new URLSearchParams(location.search).has('code');
@@ -23,7 +24,7 @@ function fatal(msg) {
 }
 
 S.signOut = async () => {
-  stopWatch();
+  stopWatch(); stopPresence();
   try { await S.sb.auth.signOut(); } catch {}
   S.session = null; S.me = null; S.onRoute = null;
   history.replaceState(null, '', location.pathname + location.search);
@@ -56,12 +57,23 @@ S.start = async () => {
   if (me.role === 'admin' || me.role === 'consultant') {
     document.body.className = 'pt pt-is-team';
     if (me.mfa_required && me.aal !== 'aal2') return mfa();
+    // v20 · Team members working in Healthcare also appear as online in Admin → Equipo.
+    startPresence(presenceApi);
     return teamApp(me);
   }
   if (!me.confirmed) return unconfirmed();
   if (me.is_education_staff) return staffNoAccess();
   return completeProfile(me);
 };
+
+// Minimal authenticated call for the shared presence heartbeat (/api/presence).
+async function presenceApi(url, opts = {}) {
+  const token = (await S.sb.auth.getSession()).data.session?.access_token;
+  if (!token) throw new Error('no session');
+  const r = await fetch(url, { ...opts, cache: 'no-store', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' } });
+  if (!r.ok) throw new Error('presence ' + r.status);
+  return r.json();
+}
 
 async function boot() {
   await setLang(pickLang(), { persist: false });

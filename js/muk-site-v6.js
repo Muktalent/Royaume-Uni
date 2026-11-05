@@ -18,7 +18,7 @@ const listeners=new Set();
 const themeMeta=document.querySelector('meta[name="theme-color"]');
 function applyTheme(t,save){
  d.dataset.theme=t;if(save)store.set("muk-theme",t);
- if(themeMeta)themeMeta.content=t==="dark"?"#0b1413":"#f6f4ef";
+ if(themeMeta)themeMeta.content=t==="dark"?"#171717":"#f6f4ef";
  for(const b of document.querySelectorAll("[data-v6-theme]")){b.setAttribute("aria-pressed",String(t==="dark"));b.setAttribute("aria-label",t==="dark"?ui("light"):ui("dark"));}
 }
 function toggleTheme(){

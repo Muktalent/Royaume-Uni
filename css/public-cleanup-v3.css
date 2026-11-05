@@ -7,6 +7,6 @@
  .mt-footer .muk-mobile-footer-brand{font-size:12px;font-weight:650;letter-spacing:1px;line-height:1.35;margin:0}
  .mt-footer .muk-mobile-footer nav{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 20px}
  .mt-footer .muk-mobile-footer a{display:inline-flex;align-items:center;min-height:36px;font-size:12px;line-height:1.4;text-decoration:none;color:inherit;margin:0}
- .mt-footer .muk-mobile-footer a:focus-visible{outline:2px solid #bd985e;outline-offset:4px}
+ .mt-footer .muk-mobile-footer a:focus-visible{outline:2px solid #B7A078;outline-offset:4px}
  .mt-footer .muk-mobile-footer small{font-size:10px;line-height:1.35;opacity:.7}
 }
