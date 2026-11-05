@@ -41,7 +41,7 @@ const listTime = (iso, lang) => { const d = new Date(iso); return d.toDateString
 const mmss = ms => { const s = Math.max(0, Math.round(ms / 1000)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
 const initials = n => String(n || 'M').split(/\s+/).filter(Boolean).map(w => w[0]).slice(0, 2).join('').toUpperCase();
 function avatar(name, url, cls = 'mkc-av') { const a = E('span', undefined, cls); a.dataset.tone = String([...String(name || '')].reduce((x, c) => x + c.charCodeAt(0), 0) % 5); if (url) { const i = E('img'); i.src = url; i.alt = ''; i.referrerPolicy = 'no-referrer'; i.onerror = () => { i.remove(); a.textContent = initials(name); }; a.append(i); } else a.textContent = initials(name); return a; }
-export function linkChatCss() { if (document.getElementById('mukChatCss')) return; const l = E('link'); l.id = 'mukChatCss'; l.rel = 'stylesheet'; l.href = '/admin/muk-chat.css?v=20.0.0'; document.head.append(l); }
+export function linkChatCss() { if (document.getElementById('mukChatCss')) return; const l = E('link'); l.id = 'mukChatCss'; l.rel = 'stylesheet'; l.href = '/admin/muk-chat.css?v=21.0.0'; document.head.append(l); }
 function toast(text) { const t = E('div', text, 'mkc-toast'); t.setAttribute('role', 'status'); document.body.append(t); setTimeout(() => t.remove(), 2600); }
 // v18 · On phones the keyboard shrinks the visible area. Keep the chat exactly on the visible part (no page showing underneath)
 // and freeze the page behind it, so the composer stays glued to the keyboard like WhatsApp.

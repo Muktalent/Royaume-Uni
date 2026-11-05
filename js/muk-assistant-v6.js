@@ -100,17 +100,17 @@ async function answer(text){
 /* ---------- DOM ---------- */
 const root=el("div",{class:"v6a","data-no-i18n":true});
 const launch=el("button",{class:"v6a-launch",type:"button","aria-expanded":"false","aria-controls":"v6a-panel"});
-launch.innerHTML='<img src="/assets/assistant-avatar.png?v=20.0.0" alt="" width="64" height="64" decoding="async"><span class="v6a-launch-dot" aria-hidden="true"></span>';
+launch.innerHTML='<img src="/assets/assistant-avatar.png?v=6.0.0" alt="" width="64" height="64" decoding="async"><span class="v6a-launch-dot" aria-hidden="true"></span>';
 const teaser=el("div",{class:"v6a-teaser",hidden:true});
 const teaserBtn=el("button",{class:"v6a-teaser-text",type:"button"});const teaserX=el("button",{class:"v6a-teaser-x",type:"button"},icon("close"));
 teaser.append(teaserBtn,teaserX);
 const panel=el("section",{class:"v6a-panel",id:"v6a-panel",role:"dialog","aria-modal":"false","aria-labelledby":"v6a-title",hidden:true});
-panel.innerHTML=`<header class="v6a-head"><span class="v6a-avatar"><img src="/assets/assistant-avatar.png?v=20.0.0" alt="" width="40" height="40"><i aria-hidden="true"></i></span><div class="v6a-head-copy"><h2 id="v6a-title"></h2><p><span class="v6a-sub"></span><span class="v6a-langs"></span></p></div><div class="v6a-head-actions"><button type="button" class="v6a-hbtn" data-a="call">${icon("call")}</button><button type="button" class="v6a-hbtn" data-a="reset">${icon("reset")}</button><button type="button" class="v6a-hbtn" data-a="close">${icon("close")}</button></div></header>
+panel.innerHTML=`<header class="v6a-head"><span class="v6a-avatar"><img src="/assets/assistant-avatar.png?v=6.0.0" alt="" width="40" height="40"><i aria-hidden="true"></i></span><div class="v6a-head-copy"><h2 id="v6a-title"></h2><p><span class="v6a-sub"></span><span class="v6a-langs"></span></p></div><div class="v6a-head-actions"><button type="button" class="v6a-hbtn" data-a="call">${icon("call")}</button><button type="button" class="v6a-hbtn" data-a="reset">${icon("reset")}</button><button type="button" class="v6a-hbtn" data-a="close">${icon("close")}</button></div></header>
 <div class="v6a-log" role="log" aria-live="polite" aria-relevant="additions"></div>
 <div class="v6a-chips" role="group"></div>
 <form class="v6a-form" autocomplete="off"><label class="v6a-sr" for="v6a-input"></label><textarea id="v6a-input" rows="1" maxlength="600" enterkeyhint="send"></textarea><button type="button" class="v6a-ibtn v6a-mic" data-a="mic">${icon("mic")}</button><button type="submit" class="v6a-send">${icon("send")}</button></form>
 <p class="v6a-disc"><span class="v6a-disc-text"></span> <a href="/privacy/" class="v6a-privacy"></a></p>
-<div class="v6a-call" hidden><div class="v6a-call-top"><span class="v6a-call-title"></span><span class="v6a-call-live"><i></i>LIVE</span></div><div class="v6a-orb" aria-hidden="true"><span></span><span></span><span></span><img src="/assets/assistant-avatar.png?v=20.0.0" alt="" width="96" height="96"></div><p class="v6a-call-status" aria-live="polite"></p><p class="v6a-call-text"></p><div class="v6a-call-ctrl"><button type="button" class="v6a-cbtn" data-a="mute">${icon("mic")}</button><button type="button" class="v6a-cbtn v6a-hang" data-a="hang">${icon("hang")}</button></div><div class="v6a-call-links"><a class="v6a-call-link" href="/evaluation/">${icon("video")}<span data-k="book"></span></a><a class="v6a-call-link" href="tel:+447311874281">${icon("phone")}<span data-k="phone"></span></a></div></div>`;
+<div class="v6a-call" hidden><div class="v6a-call-top"><span class="v6a-call-title"></span><span class="v6a-call-live"><i></i>LIVE</span></div><div class="v6a-orb" aria-hidden="true"><span></span><span></span><span></span><img src="/assets/assistant-avatar.png?v=6.0.0" alt="" width="96" height="96"></div><p class="v6a-call-status" aria-live="polite"></p><p class="v6a-call-text"></p><div class="v6a-call-ctrl"><button type="button" class="v6a-cbtn" data-a="mute">${icon("mic")}</button><button type="button" class="v6a-cbtn v6a-hang" data-a="hang">${icon("hang")}</button></div><div class="v6a-call-links"><a class="v6a-call-link" href="/evaluation/">${icon("video")}<span data-k="book"></span></a><a class="v6a-call-link" href="tel:+447311874281">${icon("phone")}<span data-k="phone"></span></a></div></div>`;
 root.append(teaser,panel,launch);
 const $=s=>panel.querySelector(s);
 const log=$(".v6a-log"),chips=$(".v6a-chips"),form=$(".v6a-form"),input=$("#v6a-input"),micBtn=$(".v6a-mic"),callBox=$(".v6a-call");
@@ -164,7 +164,7 @@ function inlineLinks(node,text){
 }
 function renderMsg(m){
  const row=el("div",{class:`v6a-msg v6a-${m.r}`});
- if(m.r==="a"){row.append(el("span",{class:"v6a-msg-av","aria-hidden":"true"},'<img src="/assets/assistant-avatar.png?v=20.0.0" alt="" width="28" height="28">'));}
+ if(m.r==="a"){row.append(el("span",{class:"v6a-msg-av","aria-hidden":"true"},'<img src="/assets/assistant-avatar.png?v=6.0.0" alt="" width="28" height="28">'));}
  const bub=el("div",{class:"v6a-bubble"});
  bub.append(el("span",{class:"v6a-sr",text:(m.r==="u"?ui("you"):ui("bot"))+" : "}));
  richText(bub,m.t);
@@ -207,7 +207,7 @@ async function ask(text,chipId){
  text=String(text||"").trim().slice(0,600);if(!text||busy)return null;
  busy=true;stopSpeak();await loadKB();
  push({r:"u",t:text});input.value="";autosize();chips.textContent="";
- const typing=el("div",{class:"v6a-msg v6a-a v6a-typing"},`<span class="v6a-msg-av" aria-hidden="true"><img src="/assets/assistant-avatar.png?v=20.0.0" alt="" width="28" height="28"></span><div class="v6a-bubble"><span class="v6a-sr">${ui("typing")}</span><i></i><i></i><i></i></div>`);
+ const typing=el("div",{class:"v6a-msg v6a-a v6a-typing"},`<span class="v6a-msg-av" aria-hidden="true"><img src="/assets/assistant-avatar.png?v=6.0.0" alt="" width="28" height="28"></span><div class="v6a-bubble"><span class="v6a-sr">${ui("typing")}</span><i></i><i></i><i></i></div>`);
  log.append(typing);scrollEnd();
  let res;
  try{

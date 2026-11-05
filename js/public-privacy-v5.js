@@ -49,7 +49,7 @@ function init(){
  const en=document.documentElement.lang==='en';
  const tr=(fr,eng)=>en?eng:fr;
  const style=document.createElement('style');
- style.textContent='.muk-cookie-info[hidden]{display:none!important}.muk-cookie-actions{display:flex;flex-wrap:wrap;gap:10px}.muk-cookie-actions button{background:#292929!important;color:#fff!important;border:1px solid #292929!important;padding:12px 16px!important;border-radius:4px;cursor:pointer;font:inherit}.muk-privacy-panel{max-width:640px;width:calc(100% - 40px);padding:24px;border:1px solid #ccc}.muk-privacy-panel::backdrop{background:rgba(0,0,0,.45)}';
+ style.textContent='.muk-cookie-info[hidden]{display:none!important}.muk-cookie-actions{display:flex;flex-wrap:wrap;gap:10px}.muk-cookie-actions button{background:#17283b!important;color:#fff!important;border:1px solid #17283b!important;padding:12px 16px!important;border-radius:4px;cursor:pointer;font:inherit}.muk-privacy-panel{max-width:640px;width:calc(100% - 40px);padding:24px;border:1px solid #ccc}.muk-privacy-panel::backdrop{background:rgba(0,0,0,.45)}';
  document.head.append(style);
  function el(tag,text){const n=document.createElement(tag);if(text)n.textContent=text;return n;}
  function link(url,text){const a=el('a',text);a.href=url;return a;}

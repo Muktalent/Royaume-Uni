@@ -1,13 +1,14 @@
-// MUK Talent · v20 · Unified palette (Education + Healthcare, web and dashboards).
-// Rewrites every colour in the site's own CSS / HTML / SVG / UI scripts to the brand palette:
-//   Elegant Black #171717 · Soft Black #292929 · Pure White #FFFFFF
-//   Warm Ivory #F7F5F0 · Champagne #B7A078 · Silver Grey #D9D9D6
-// Status colours (errors, warnings, success) are kept so their meaning does not change.
-// Third-party logos (certificates, partner brands, wallet passes) are never touched.
+// MUK Talent · v21 · Dashboard palette ("negros y blancos seda").
+// Applies ONLY to the private dashboards (admin, team workspace, Global Passport, counsellor centre,
+// Healthcare portal, personal admin). The public website keeps its own design and colours.
+//   Negro seda #161514 (navigation, main elements) · Grafito #2B2A28 (text, secondary)
+//   Blanco #FFFFFF (cards) · Blanco seda #F6F4F0 (backgrounds) · Oro satinado #B49B6C (small accents)
+//   Gris seda #E4E0D8 (lines, borders)
+// Status colours (errors, warnings, success/online) are kept so their meaning does not change.
 //
-// Usage:  node tools/palette-v20.mjs          → rewrite files in place
-//         node tools/palette-v20.mjs --check  → list files that still contain off-palette brand colours
-// The script is idempotent: running it twice gives the same result.
+// Usage:  node tools/palette-v20.mjs          → rewrite the dashboard files in place
+//         node tools/palette-v20.mjs --check  → list dashboard files with colours outside the palette
+// Idempotent: running it twice gives the same result.
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -15,15 +16,12 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const root = fileURLToPath(new URL("../", import.meta.url));
 const CHECK = process.argv.includes("--check");
 
-export const PALETTE = { black: "#171717", soft: "#292929", white: "#FFFFFF", ivory: "#F7F5F0", champagne: "#B7A078", silver: "#D9D9D6" };
+export const PALETTE = { black: "#161514", soft: "#2B2A28", white: "#FFFFFF", ivory: "#F6F4F0", champagne: "#B49B6C", silver: "#E4E0D8" };
 
-const SKIP_DIRS = new Set(["node_modules", "web-dist", ".git", "supabase", "server", "seed", "fonts", "video", "i18n"]);
-const SKIP_FILES = new Set([
-  "admin/app.js", "personal-admin/app.js", "healthcare/portal/app.js", // bundles (rebuilt from admin-src)
-  "assets/book/brands.js", "book/card-icons.js", // third-party brand colours
-  "tools/palette-v20.mjs", "tools/wallet-assets.mjs", "tools/wallet-configure.mjs", "tools/wallet-create-google-class.mjs", "package-lock.json"
-]);
-const EXTRA_FILES = ["server/healthcare-mail.mjs"]; // e-mail template colours
+// Dashboard files only. Shared/public styles (book/business-card.css, css/, healthcare/assets/css/hc.css…) are not listed.
+const DASHBOARD = [/^admin\/[^/]+\.css$/, /^admin\/(index\.html|team\.webmanifest)$/, /^admin-src\/[^/]+\.js$/,
+  /^healthcare\/portal\/portal\.css$/, /^assets\/book\/admin\.css$/, /^personal-admin\/index\.html$/];
+const SKIP_FILES = new Set(["admin/app.js"]);
 const EXT = /\.(css|html|svg|js|mjs|webmanifest)$/i;
 
 // ---------- colour maths ----------
@@ -58,8 +56,8 @@ export function mapColour(rgb) {
   if (r === g && g === b) return rgb;                       // pure greys / black / white stay
   const { h, s, l } = rgbToHsl(rgb);
   // Colours this script already produced (keeps it idempotent).
-  if (Math.abs(h - 60) < 3 && Math.abs(s - 3) < 1.5) return rgb;
-  if (l >= 88 && Math.abs(h - 42) < 7 && s > 14 && s < 35) return rgb;
+  if (Math.abs(h - 40) < 4 && Math.abs(s - 5) < 2) return rgb;
+  if (l >= 88 && Math.abs(h - 40) < 7 && s > 10 && s < 30) return rgb;
   if (Math.abs(h - 38) < 3 && Math.abs(s - 31) < 2.5) return rgb;
   const status =
     (s > 35 && (h < 25 || h >= 330) && l > 15 && l < 97) ||   // reds, oranges (errors, alerts)
@@ -71,18 +69,18 @@ export function mapColour(rgb) {
   if (l >= 90) {                                              // light tints → white / ivory family
     if (l >= 97.6) return P.white;
     if (l >= 94.2) return P.ivory;
-    return hslToRgb({ h: 43, s: warm ? 30 : 22, l });
+    return hslToRgb({ h: 40, s: warm ? 24 : 16, l });
   }
   if (warm && l >= 82) return hslToRgb({ h: 38, s: 31, l });  // light champagne tints
   if (warm && l > 26 && l < 82) {                             // golds
-    if (Math.abs(l - 59) <= 7) return P.champagne;
+    if (Math.abs(l - 56) <= 7) return P.champagne;
     return hslToRgb({ h: 38, s: 31, l });
   }
   if (s > 25 && l < 60 && h >= 158 && h < 300 && l >= 21) return P.soft; // brand accents (teal, navy, blue links) → Soft Black
   if (l < 13) return P.black;                                 // brand darks (teal, navy, ink)
   if (l < 21) return P.soft;
-  if (l >= 82 && l <= 88) return P.silver;                    // lines and separators
-  return hslToRgb({ h: 60, s: 3, l });                        // everything else → warm neutral grey
+  if (l >= 84 && l <= 90) return P.silver;                    // lines and separators
+  return hslToRgb({ h: 40, s: 5, l });                         // everything else → silk grey
 }
 
 // ---------- rewriting ----------
@@ -115,10 +113,10 @@ export function rewrite(text, ext) {
 
 async function* walk(dir, rel = "") {
   for (const e of await readdir(dir, { withFileTypes: true })) {
-    if (e.name.startsWith(".")) continue;
+    if (e.name.startsWith(".") || e.name === "node_modules" || e.name === "web-dist") continue;
     const r = path.posix.join(rel, e.name);
-    if (e.isDirectory()) { if (!SKIP_DIRS.has(e.name)) yield* walk(path.join(dir, e.name), r); }
-    else if (EXT.test(e.name) && !SKIP_FILES.has(r) && !/\.test\.mjs$/.test(e.name)) yield r;
+    if (e.isDirectory()) yield* walk(path.join(dir, e.name), r);
+    else if (EXT.test(e.name) && !SKIP_FILES.has(r) && DASHBOARD.some(re => re.test(r))) yield r;
   }
 }
 
@@ -126,12 +124,11 @@ async function main() {
   let changed = 0;
   const files = [];
   for await (const f of walk(root)) files.push(f);
-  files.push(...EXTRA_FILES);
   for (const f of files) {
     const full = path.join(root, f), before = await readFile(full, "utf8"), after = rewrite(before, path.extname(f).toLowerCase());
     if (after !== before) { changed++; if (CHECK) console.log("off-palette:", f); else await writeFile(full, after); }
   }
-  console.log(CHECK ? `${changed} file(s) still need the v20 palette.` : `v20 palette applied to ${changed} file(s).`);
+  console.log(CHECK ? `${changed} file(s) still need the dashboard palette.` : `dashboard palette applied to ${changed} file(s).`);
   if (CHECK && changed) process.exitCode = 1;
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();

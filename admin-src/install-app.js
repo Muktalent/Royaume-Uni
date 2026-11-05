@@ -19,13 +19,13 @@ const TX = {
 const E = (t, v, c) => { const n = document.createElement(t); if (v !== undefined) n.textContent = String(v); if (c) n.className = c; return n; };
 function css() {
   if (document.getElementById('mukInstallCss')) return; const s = E('style'); s.id = 'mukInstallCss';
-  s.textContent = `.mki{position:fixed;z-index:9500;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));display:grid;gap:12px;padding:16px;border-radius:22px;background:#292929;color:#F2EFE8;border:1px solid rgba(183,160,120,.4);box-shadow:0 24px 60px -20px rgba(23,23,23,.6);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;transform:translateY(130%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+  s.textContent = `.mki{position:fixed;z-index:9500;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));display:grid;gap:12px;padding:16px;border-radius:22px;background:#2B2A28;color:#F1EEE9;border:1px solid rgba(180,155,108,.4);box-shadow:0 24px 60px -20px rgba(22,21,20,.6);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;transform:translateY(130%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
 .mki.in{transform:none}.mki-top{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center}.mki img{width:52px;height:52px;border-radius:14px;display:block}
-.mki strong{display:block;font-size:15.5px}.mki p{margin:2px 0 0;color:#B6B6B2;font-size:13px}.mki-x{width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#D2D2CF;font-size:20px;line-height:1;cursor:pointer}
-.mki-row{display:flex;gap:10px}.mki-row button{flex:1;min-height:46px;border-radius:14px;border:1px solid rgba(233,240,236,.18);background:transparent;color:#F2EFE8;font:inherit;font-weight:650;cursor:pointer}
-.mki-row .mki-go{background:#B7A078;border-color:#B7A078;color:#292929}.mki ol{margin:0;padding:0;list-style:none;display:grid;gap:8px}.mki li{display:flex;gap:10px;align-items:center;color:#e9f0ec}
-.mki li b{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(183,160,120,.18);color:#CFBFA3;font-size:12px}.mki li svg{width:18px;height:18px;fill:none;stroke:#CFBFA3;stroke-width:2;vertical-align:-3px}
-.mki button:focus-visible{outline:2px solid #B7A078;outline-offset:2px}@media(min-width:700px){.mki{left:auto;right:20px;width:380px}}@media(prefers-reduced-motion:reduce){.mki{transition:none}}`;
+.mki strong{display:block;font-size:15.5px}.mki p{margin:2px 0 0;color:#B8B5B0;font-size:13px}.mki-x{width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.08);color:#D3D1CE;font-size:20px;line-height:1;cursor:pointer}
+.mki-row{display:flex;gap:10px}.mki-row button{flex:1;min-height:46px;border-radius:14px;border:1px solid rgba(233,240,236,.18);background:transparent;color:#F1EEE9;font:inherit;font-weight:650;cursor:pointer}
+.mki-row .mki-go{background:#B49B6C;border-color:#B49B6C;color:#2B2A28}.mki ol{margin:0;padding:0;list-style:none;display:grid;gap:8px}.mki li{display:flex;gap:10px;align-items:center;color:#e9f0ec}
+.mki li b{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:rgba(180,155,108,.18);color:#CFBFA3;font-size:12px}.mki li svg{width:18px;height:18px;fill:none;stroke:#CFBFA3;stroke-width:2;vertical-align:-3px}
+.mki button:focus-visible{outline:2px solid #B49B6C;outline-offset:2px}@media(min-width:700px){.mki{left:auto;right:20px;width:380px}}@media(prefers-reduced-motion:reduce){.mki{transition:none}}`;
   document.head.append(s);
 }
 export function offerInstall({ lang = 'en' } = {}) {

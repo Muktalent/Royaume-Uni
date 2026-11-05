@@ -3,7 +3,7 @@
 import {createClient} from '@supabase/supabase-js';
 import {E, linkCss} from './gp-ui.js';
 
-export const CSS_VERSION = '20.0.0';
+export const CSS_VERSION = '21.0.0';
 export function linkHrCss() { linkCss('teamHrCss', '/admin/team-hr.css?v=' + CSS_VERSION); }
 
 export const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
@@ -121,10 +121,10 @@ export function signaturePad() {
   const box = E('div', undefined, 'th-sign-pad'), canvas = E('canvas'), hint = E('span', 'Sign here', 'th-sign-hint');
   canvas.width = 1000; canvas.height = 400; canvas.setAttribute('aria-label', 'Signature drawing area');
   box.append(canvas, hint);
-  const ctx = canvas.getContext('2d'); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 4.5; ctx.strokeStyle = '#292929';
+  const ctx = canvas.getContext('2d'); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 4.5; ctx.strokeStyle = '#2B2A28';
   let strokes = [], current = null;
   const point = e => { const r = canvas.getBoundingClientRect(); return [Math.max(0, Math.min(1000, Math.round((e.clientX - r.left) / r.width * 1000))), Math.max(0, Math.min(400, Math.round((e.clientY - r.top) / r.height * 400)))]; };
-  canvas.addEventListener('pointerdown', e => { e.preventDefault(); canvas.setPointerCapture(e.pointerId); current = [point(e)]; strokes.push(current); hint.hidden = true; ctx.beginPath(); ctx.arc(current[0][0], current[0][1], 2, 0, Math.PI * 2); ctx.fillStyle = '#292929'; ctx.fill(); });
+  canvas.addEventListener('pointerdown', e => { e.preventDefault(); canvas.setPointerCapture(e.pointerId); current = [point(e)]; strokes.push(current); hint.hidden = true; ctx.beginPath(); ctx.arc(current[0][0], current[0][1], 2, 0, Math.PI * 2); ctx.fillStyle = '#2B2A28'; ctx.fill(); });
   canvas.addEventListener('pointermove', e => {
     if (!current) return; e.preventDefault();
     const p = point(e), last = current[current.length - 1];

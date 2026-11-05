@@ -1,13 +1,13 @@
 /* muk-soft-admin-v1 · Administration in the MUK Soft theme (sand glass + gold + charcoal). Loaded last; remove this file to restore the dark theme. */
 html.mt-soft,body:has(#appShell.admin-soft:not([hidden])),body:has(#loginView:not([hidden])){background:#f6f4ef;color-scheme:light}
-body:has(#appShell.admin-soft:not([hidden])){background:radial-gradient(1200px 700px at 8% -10%,#F7F5F0 0,transparent 60%),radial-gradient(900px 600px at 100% 0,#f3e3bf 0,transparent 55%),#f6f4ef;background-attachment:fixed}
-#appShell.admin-soft.admin-premium{--ink:#292929;--muted:#6A6A64;--line:rgba(41,41,41,.15);--glass:rgba(255,255,255,.66);--dark:#171717;--gold:#A28655;--gold2:#B7A078;--shadow:0 1px 0 rgba(255,255,255,.7) inset,0 12px 34px -14px rgba(23,23,23,.22);background:transparent;color:var(--ink)}
-#appShell.admin-soft.admin-premium .sidebar{background:rgba(255,255,255,.55);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);border-right:1px solid var(--line);color:#6A6A64}
+body:has(#appShell.admin-soft:not([hidden])){background:radial-gradient(1200px 700px at 8% -10%,#F6F4F0 0,transparent 60%),radial-gradient(900px 600px at 100% 0,#f3e3bf 0,transparent 55%),#f6f4ef;background-attachment:fixed}
+#appShell.admin-soft.admin-premium{--ink:#2B2A28;--muted:#6C6962;--line:rgba(43,42,40,.15);--glass:rgba(255,255,255,.66);--dark:#161514;--gold:#A28655;--gold2:#B49B6C;--shadow:0 1px 0 rgba(255,255,255,.7) inset,0 12px 34px -14px rgba(22,21,20,.22);background:transparent;color:var(--ink)}
+#appShell.admin-soft.admin-premium .sidebar{background:rgba(255,255,255,.55);backdrop-filter:blur(22px) saturate(1.4);-webkit-backdrop-filter:blur(22px) saturate(1.4);border-right:1px solid var(--line);color:#6C6962}
 #appShell.admin-soft.admin-premium .wordmark{color:var(--ink)} #appShell.admin-soft.admin-premium .wordmark span{color:#7F6943}
-#appShell.admin-soft.admin-premium .nav-caption{color:#A3A39D}
-#appShell.admin-soft.admin-premium .nav-button{color:#6A6A64;background:transparent;border:0;border-radius:14px;font-weight:600}
+#appShell.admin-soft.admin-premium .nav-caption{color:#A5A29B}
+#appShell.admin-soft.admin-premium .nav-button{color:#6C6962;background:transparent;border:0;border-radius:14px;font-weight:600}
 #appShell.admin-soft.admin-premium .nav-button:hover{background:rgba(255,255,255,.65);color:var(--ink)}
-#appShell.admin-soft.admin-premium .nav-button.active{background:var(--dark);color:#EEE9DF;box-shadow:0 10px 22px -12px rgba(23,23,23,.7)}
+#appShell.admin-soft.admin-premium .nav-button.active{background:var(--dark);color:#ECE8E0;box-shadow:0 10px 22px -12px rgba(22,21,20,.7)}
 #appShell.admin-soft.admin-premium .sidebar-footer{border-color:var(--line)} #appShell.admin-soft.admin-premium .sidebar-footer p{color:var(--ink);font-weight:700} #appShell.admin-soft.admin-premium .sidebar-footer small{color:var(--muted)}
 #appShell.admin-soft.admin-premium .page-header h1{color:var(--ink);font-weight:700;letter-spacing:-1px}
 #appShell.admin-soft.admin-premium .eyebrow,#appShell.admin-soft.admin-premium .as-overline{color:#7F6943;letter-spacing:1.8px;font-weight:700}
@@ -17,42 +17,42 @@ body:has(#appShell.admin-soft:not([hidden])){background:radial-gradient(1200px 7
 #appShell.admin-soft.admin-premium .metric{border-top:1px solid rgba(255,255,255,.8)}
 #appShell.admin-soft.admin-premium .metric strong,#appShell.admin-soft.admin-premium .admin-report-metric strong{color:var(--ink);font-weight:750;letter-spacing:-1px}
 #appShell.admin-soft.admin-premium .metric p,#appShell.admin-soft.admin-premium .admin-report-metric span{color:var(--muted)}
-#appShell.admin-soft.admin-premium .metric:nth-child(2){background:linear-gradient(145deg,#CDBC9F,#B7A078)} #appShell.admin-soft.admin-premium .metric:nth-child(2) :is(p,strong){color:#292929}
-#appShell.admin-soft.admin-premium .metric:nth-child(4){background:var(--dark);border-color:var(--dark)} #appShell.admin-soft.admin-premium .metric:nth-child(4) p{color:#A3A39D} #appShell.admin-soft.admin-premium .metric:nth-child(4) strong{color:#EEE9DF}
+#appShell.admin-soft.admin-premium .metric:nth-child(2){background:linear-gradient(145deg,#CDBC9F,#B49B6C)} #appShell.admin-soft.admin-premium .metric:nth-child(2) :is(p,strong){color:#2B2A28}
+#appShell.admin-soft.admin-premium .metric:nth-child(4){background:var(--dark);border-color:var(--dark)} #appShell.admin-soft.admin-premium .metric:nth-child(4) p{color:#A5A29B} #appShell.admin-soft.admin-premium .metric:nth-child(4) strong{color:#ECE8E0}
 #appShell.admin-soft.admin-premium button{border-radius:999px}
-#appShell.admin-soft.admin-premium .primary{background:var(--dark);color:#EEE9DF;border-color:var(--dark)}
-#appShell.admin-soft.admin-premium .secondary,#appShell.admin-soft.admin-premium .ghost{background:rgba(255,255,255,.75);border:1px solid rgba(41,41,41,.2);color:var(--ink)}
+#appShell.admin-soft.admin-premium .primary{background:var(--dark);color:#ECE8E0;border-color:var(--dark)}
+#appShell.admin-soft.admin-premium .secondary,#appShell.admin-soft.admin-premium .ghost{background:rgba(255,255,255,.75);border:1px solid rgba(43,42,40,.2);color:var(--ink)}
 #appShell.admin-soft.admin-premium .secondary:hover,#appShell.admin-soft.admin-premium .ghost:hover{background:#fff;filter:none}
-#appShell.admin-soft.admin-premium input,#appShell.admin-soft.admin-premium select,#appShell.admin-soft.admin-premium textarea{background:#fff;border:1px solid rgba(41,41,41,.22);color:var(--ink);border-radius:12px}
-#appShell.admin-soft.admin-premium label{color:#6A6A64}
-#appShell.admin-soft.admin-premium .message{background:rgba(255,255,255,.6);color:#5C5C56;border:1px solid var(--line)}
+#appShell.admin-soft.admin-premium input,#appShell.admin-soft.admin-premium select,#appShell.admin-soft.admin-premium textarea{background:#fff;border:1px solid rgba(43,42,40,.22);color:var(--ink);border-radius:12px}
+#appShell.admin-soft.admin-premium label{color:#6C6962}
+#appShell.admin-soft.admin-premium .message{background:rgba(255,255,255,.6);color:#5D5A55;border:1px solid var(--line)}
 #appShell.admin-soft.admin-premium .message:empty{display:none}
 #appShell.admin-soft.admin-premium .message.error{background:#f8e1dc;color:#8a2a22}
 #appShell.admin-soft.admin-premium .table-wrap{border-radius:16px;overflow:auto;background:#fff;border:1px solid var(--line)}
-#appShell.admin-soft.admin-premium th{background:var(--dark);color:var(--gold2);border-color:#292929}
-#appShell.admin-soft.admin-premium td{color:#393935;border-color:#f2f0ea}
-#appShell.admin-soft.admin-premium tbody tr:nth-child(even){background:#F7F5F0}
-#appShell.admin-soft.admin-premium tbody tr:hover{background:#F1EDE4}
+#appShell.admin-soft.admin-premium th{background:var(--dark);color:var(--gold2);border-color:#2B2A28}
+#appShell.admin-soft.admin-premium td{color:#3A3834;border-color:#f2f0ea}
+#appShell.admin-soft.admin-premium tbody tr:nth-child(even){background:#F6F4F0}
+#appShell.admin-soft.admin-premium tbody tr:hover{background:#EFECE6}
 #appShell.admin-soft.admin-premium .badge{background:rgba(162,134,85,.18);color:#685637}
 #appShell.admin-soft.admin-premium .table-action{background:var(--dark);color:var(--gold2)}
 #appShell.admin-soft.admin-premium .pagination{color:var(--muted)}
 #appShell.admin-soft.admin-premium .pipeline-row{padding:8px 0;border-bottom:1px solid var(--line)}
 #appShell.admin-soft.admin-premium .pipeline-row strong{color:var(--ink)}
-#appShell.admin-soft.admin-premium progress{appearance:none;-webkit-appearance:none;height:10px;border-radius:999px;overflow:hidden;border:0;background:rgba(41,41,41,.12);accent-color:#A28655}
-#appShell.admin-soft.admin-premium progress::-webkit-progress-bar{background:rgba(41,41,41,.12);border-radius:999px}
-#appShell.admin-soft.admin-premium progress::-webkit-progress-value{background:linear-gradient(90deg,#B7A078,#A28655);border-radius:999px}
-#appShell.admin-soft.admin-premium progress::-moz-progress-bar{background:linear-gradient(90deg,#B7A078,#A28655)}
+#appShell.admin-soft.admin-premium progress{appearance:none;-webkit-appearance:none;height:10px;border-radius:999px;overflow:hidden;border:0;background:rgba(43,42,40,.12);accent-color:#A28655}
+#appShell.admin-soft.admin-premium progress::-webkit-progress-bar{background:rgba(43,42,40,.12);border-radius:999px}
+#appShell.admin-soft.admin-premium progress::-webkit-progress-value{background:linear-gradient(90deg,#B49B6C,#A28655);border-radius:999px}
+#appShell.admin-soft.admin-premium progress::-moz-progress-bar{background:linear-gradient(90deg,#B49B6C,#A28655)}
 #appShell.admin-soft.admin-premium :focus-visible{outline:2px solid #7F6943;outline-offset:2px}
 /* Overview hero */
 #appShell.admin-soft.admin-premium .as-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:16px;margin-bottom:18px}
-#appShell.admin-soft.admin-premium .as-greet{background:var(--dark);color:#EEE9DF;border-radius:26px;padding:26px 28px;display:grid;align-content:space-between;gap:16px;box-shadow:0 22px 40px -22px rgba(0,0,0,.7);position:relative;overflow:hidden;min-height:220px}
-#appShell.admin-soft.admin-premium .as-greet::after{content:"";position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(183,160,120,.35),transparent 70%)}
-#appShell.admin-soft.admin-premium .as-greet h2{color:#EEE9DF;font-size:clamp(30px,3.4vw,44px);letter-spacing:-1.4px;margin:0}
+#appShell.admin-soft.admin-premium .as-greet{background:var(--dark);color:#ECE8E0;border-radius:26px;padding:26px 28px;display:grid;align-content:space-between;gap:16px;box-shadow:0 22px 40px -22px rgba(0,0,0,.7);position:relative;overflow:hidden;min-height:220px}
+#appShell.admin-soft.admin-premium .as-greet::after{content:"";position:absolute;right:-60px;top:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(180,155,108,.35),transparent 70%)}
+#appShell.admin-soft.admin-premium .as-greet h2{color:#ECE8E0;font-size:clamp(30px,3.4vw,44px);letter-spacing:-1.4px;margin:0}
 #appShell.admin-soft.admin-premium .as-greet .as-overline{color:var(--gold2);margin:0;font-size:10px}
-#appShell.admin-soft.admin-premium .as-greet .as-muted{color:#A3A39D;margin:4px 0 0}
+#appShell.admin-soft.admin-premium .as-greet .as-muted{color:#A5A29B;margin:4px 0 0}
 #appShell.admin-soft.admin-premium .as-quick{display:flex;flex-wrap:wrap;gap:8px;position:relative;z-index:1}
-#appShell.admin-soft.admin-premium .as-quick-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);color:#EEE9DF;min-height:38px;padding:8px 14px;font-weight:600}
-#appShell.admin-soft.admin-premium .as-quick-btn:first-child{background:linear-gradient(135deg,#B7A078,#A28655);color:#171717;border-color:transparent}
+#appShell.admin-soft.admin-premium .as-quick-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);color:#ECE8E0;min-height:38px;padding:8px 14px;font-weight:600}
+#appShell.admin-soft.admin-premium .as-quick-btn:first-child{background:linear-gradient(135deg,#B49B6C,#A28655);color:#161514;border-color:transparent}
 #appShell.admin-soft.admin-premium .as-pay{background:var(--glass);border:1px solid rgba(255,255,255,.8);border-radius:26px;padding:22px 24px;box-shadow:var(--shadow);display:grid;gap:10px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
 #appShell.admin-soft.admin-premium .as-pay .as-overline{margin:0;font-size:10px}
 #appShell.admin-soft.admin-premium .as-pay-total{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
@@ -61,12 +61,12 @@ body:has(#appShell.admin-soft:not([hidden])){background:radial-gradient(1200px 7
 #appShell.admin-soft.admin-premium .as-pills{display:flex;flex-wrap:wrap;gap:8px}
 #appShell.admin-soft.admin-premium .as-pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 6px 6px 12px;font-size:12px}
 #appShell.admin-soft.admin-premium .as-pill b{background:rgba(255,255,255,.55);padding:4px 10px;border-radius:999px}
-#appShell.admin-soft.admin-premium .as-pill-gold{background:linear-gradient(145deg,#CDBC9F,#B7A078);color:#292929}
-#appShell.admin-soft.admin-premium .as-pill-dark{background:var(--dark);color:#EEE9DF} #appShell.admin-soft.admin-premium .as-pill-dark b{background:rgba(255,255,255,.12)}
-#appShell.admin-soft.admin-premium .as-pill-grey{background:rgba(41,41,41,.14);color:#393935}
+#appShell.admin-soft.admin-premium .as-pill-gold{background:linear-gradient(145deg,#CDBC9F,#B49B6C);color:#2B2A28}
+#appShell.admin-soft.admin-premium .as-pill-dark{background:var(--dark);color:#ECE8E0} #appShell.admin-soft.admin-premium .as-pill-dark b{background:rgba(255,255,255,.12)}
+#appShell.admin-soft.admin-premium .as-pill-grey{background:rgba(43,42,40,.14);color:#3A3834}
 #appShell.admin-soft.admin-premium .as-pay-list{display:grid;gap:6px;margin-top:4px}
 #appShell.admin-soft.admin-premium .as-pay-row{position:relative;display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:9px 12px;border-radius:12px;background:rgba(255,255,255,.6);overflow:hidden;font-size:13px}
-#appShell.admin-soft.admin-premium .as-pay-row i{position:absolute;left:0;bottom:0;height:3px;width:var(--w,0);background:linear-gradient(90deg,#B7A078,#A28655)}
+#appShell.admin-soft.admin-premium .as-pay-row i{position:absolute;left:0;bottom:0;height:3px;width:var(--w,0);background:linear-gradient(90deg,#B49B6C,#A28655)}
 #appShell.admin-soft.admin-premium .as-pay-name{font-weight:600;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #appShell.admin-soft.admin-premium .as-pay-leads{font-size:11px;color:var(--muted)}
 #appShell.admin-soft.admin-premium .as-foot{font-size:11px;color:var(--muted);margin:2px 0 0}
@@ -80,60 +80,60 @@ body:has(#appShell.admin-soft:not([hidden])){background:radial-gradient(1200px 7
 #appShell.admin-soft.admin-premium .admin-stage-card strong{font-size:24px;letter-spacing:-.6px}
 #appShell.admin-soft.admin-premium .admin-stage-card small{font-size:10.5px;color:var(--muted)}
 #appShell.admin-soft.admin-premium .admin-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin:14px 0}
-#appShell.admin-soft.admin-premium .admin-legend-item{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#474743;cursor:help}
+#appShell.admin-soft.admin-premium .admin-legend-item{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#484642;cursor:help}
 #appShell.admin-soft.admin-premium .admin-dot{width:10px;height:10px;border-radius:50%;background:var(--c);display:inline-block}
-#appShell.admin-soft.admin-premium .admin-demo-banner{background:repeating-linear-gradient(135deg,#171717 0 14px,#292929 14px 28px);color:#B7A078;border-radius:12px;padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:1px}
+#appShell.admin-soft.admin-premium .admin-demo-banner{background:repeating-linear-gradient(135deg,#161514 0 14px,#2B2A28 14px 28px);color:#B49B6C;border-radius:12px;padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:1px}
 #appShell.admin-soft.admin-premium .admin-demo-banner[hidden]{display:none}
 #appShell.admin-soft.admin-premium .admin-demo-tag{font-size:10px;font-weight:700;color:#7F6943;letter-spacing:1px;text-transform:uppercase}
-#appShell.admin-soft.admin-premium .admin-sheet-wrap{position:relative;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 40px -26px rgba(23,23,23,.4);max-height:72dvh}
+#appShell.admin-soft.admin-premium .admin-sheet-wrap{position:relative;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 40px -26px rgba(22,21,20,.4);max-height:72dvh}
 #appShell.admin-soft.admin-premium .admin-sheet{border-collapse:separate!important;border-spacing:0}
-#appShell.admin-soft.admin-premium .admin-sheet th{background:var(--dark);color:var(--gold2);font-size:10.5px;letter-spacing:.3px;border-right:1px solid #292929;min-width:140px!important;padding:11px 12px!important}
-#appShell.admin-soft.admin-premium .admin-sheet td{min-width:140px!important;padding:9px 12px!important;border-bottom:1px solid #f2f0ea;border-right:1px solid #F2EEE6;color:#393935;white-space:nowrap!important;max-width:300px;overflow:hidden;text-overflow:ellipsis}
-#appShell.admin-soft.admin-premium .admin-sheet tbody tr:nth-child(even) td{background:#F7F5F0}
-#appShell.admin-soft.admin-premium .admin-sheet tbody tr:hover td{background:#F1EDE4}
-#appShell.admin-soft.admin-premium .admin-sheet .admin-col-num{min-width:44px!important;width:44px;text-align:right;color:#A3A39D;position:sticky;left:0;z-index:1;background:#fff;border-left:4px solid var(--c,#E9E2D5)}
+#appShell.admin-soft.admin-premium .admin-sheet th{background:var(--dark);color:var(--gold2);font-size:10.5px;letter-spacing:.3px;border-right:1px solid #2B2A28;min-width:140px!important;padding:11px 12px!important}
+#appShell.admin-soft.admin-premium .admin-sheet td{min-width:140px!important;padding:9px 12px!important;border-bottom:1px solid #f2f0ea;border-right:1px solid #F1EEE7;color:#3A3834;white-space:nowrap!important;max-width:300px;overflow:hidden;text-overflow:ellipsis}
+#appShell.admin-soft.admin-premium .admin-sheet tbody tr:nth-child(even) td{background:#F6F4F0}
+#appShell.admin-soft.admin-premium .admin-sheet tbody tr:hover td{background:#EFECE6}
+#appShell.admin-soft.admin-premium .admin-sheet .admin-col-num{min-width:44px!important;width:44px;text-align:right;color:#A5A29B;position:sticky;left:0;z-index:1;background:#fff;border-left:4px solid var(--c,#E9E2D5)}
 #appShell.admin-soft.admin-premium .admin-sheet .admin-col-select{min-width:44px!important;width:44px;position:sticky;left:48px;z-index:1;background:#fff}
-#appShell.admin-soft.admin-premium .admin-sheet .admin-col-ref{position:sticky;left:92px;z-index:1;background:#fff;font-weight:700;color:var(--ink);box-shadow:6px 0 10px -8px rgba(23,23,23,.35)}
+#appShell.admin-soft.admin-premium .admin-sheet .admin-col-ref{position:sticky;left:92px;z-index:1;background:#fff;font-weight:700;color:var(--ink);box-shadow:6px 0 10px -8px rgba(22,21,20,.35)}
 #appShell.admin-soft.admin-premium .admin-sheet th.admin-col-num,#appShell.admin-soft.admin-premium .admin-sheet th.admin-col-select,#appShell.admin-soft.admin-premium .admin-sheet th.admin-col-ref{background:var(--dark);color:var(--gold2);z-index:3}
-#appShell.admin-soft.admin-premium .admin-sheet tbody tr:nth-child(even) :is(.admin-col-num,.admin-col-select,.admin-col-ref){background:#F7F5F0}
+#appShell.admin-soft.admin-premium .admin-sheet tbody tr:nth-child(even) :is(.admin-col-num,.admin-col-select,.admin-col-ref){background:#F6F4F0}
 #appShell.admin-soft.admin-premium .admin-sheet td:last-child{min-width:190px!important}
 #appShell.admin-soft.admin-premium .admin-sheet td:last-child button{display:inline-block!important;margin:0 6px 0 0!important}
 #appShell.admin-soft.admin-premium .admin-sheet-ghost td{height:38px;background:#fff}
-#appShell.admin-soft.admin-premium .admin-sheet-ghost:nth-child(even) td{background:#F7F5F0}
+#appShell.admin-soft.admin-premium .admin-sheet-ghost:nth-child(even) td{background:#F6F4F0}
 #appShell.admin-soft.admin-premium .admin-report-empty{position:sticky;left:0;bottom:0;margin:0;display:grid;gap:4px;padding:16px 20px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff 40%);color:var(--muted);font-size:12.5px}
 #appShell.admin-soft.admin-premium .admin-report-empty strong{color:var(--ink);font-size:14px}
 #appShell.admin-soft.admin-premium .admin-stage-badge,#appShell.admin-soft.admin-premium .admin-status-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-weight:700;font-size:11px;background:var(--bgc);color:var(--f)}
 #appShell.admin-soft.admin-premium .admin-status-pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--c)}
-#appShell.admin-soft.admin-premium [data-tone=blue]{--c:#292929;--bgc:#EEECE5;--f:#292929}
+#appShell.admin-soft.admin-premium [data-tone=blue]{--c:#2B2A28;--bgc:#EDEBE6;--f:#2B2A28}
 #appShell.admin-soft.admin-premium [data-tone=amber]{--c:#e0a526;--bgc:#fcebc6;--f:#7a5410}
-#appShell.admin-soft.admin-premium [data-tone=violet]{--c:#292929;--bgc:#F0EDE7;--f:#292929}
+#appShell.admin-soft.admin-premium [data-tone=violet]{--c:#2B2A28;--bgc:#EFEDE8;--f:#2B2A28}
 #appShell.admin-soft.admin-premium [data-tone=green]{--c:#2f9a57;--bgc:#d8f0df;--f:#1e6b3a}
 #appShell.admin-soft.admin-premium [data-tone=orange]{--c:#e2733a;--bgc:#fbdcc8;--f:#8a3f12}
-#appShell.admin-soft.admin-premium [data-tone=teal]{--c:#292929;--bgc:#D9D9D6;--f:#292929}
-#appShell.admin-soft.admin-premium [data-tone=grey]{--c:#96968F;--bgc:#E3E3E2;--f:#52524E}
+#appShell.admin-soft.admin-premium [data-tone=teal]{--c:#2B2A28;--bgc:#E4E0D8;--f:#2B2A28}
+#appShell.admin-soft.admin-premium [data-tone=grey]{--c:#9a958b;--bgc:#e6e4df;--f:#55524b}
 #appShell.admin-soft.admin-premium [data-tone=red]{--c:#c4483c;--bgc:#f5d9d6;--f:#8a2a22}
 #appShell.admin-soft.admin-premium .admin-share-row{border-color:var(--line)}
 /* Dialogs */
-body:has(#appShell.admin-soft:not([hidden])) .record-dialog{background:#F7F5F0;border:1px solid rgba(41,41,41,.18);color:#292929;box-shadow:0 40px 90px -30px rgba(23,23,23,.5);border-radius:24px}
-body:has(#appShell.admin-soft:not([hidden])) .record-dialog::backdrop{background:rgba(23,23,23,.32);backdrop-filter:blur(6px)}
-body:has(#appShell.admin-soft:not([hidden])) .record-dialog .dialog-header,body:has(#appShell.admin-soft:not([hidden])) .record-dialog .form-actions{background:rgba(247,245,240,.94);border-color:rgba(41,41,41,.14)}
-body:has(#appShell.admin-soft:not([hidden])) .record-dialog :is(h2,h3,strong){color:#292929}
-body:has(#appShell.admin-soft:not([hidden])) .record-dialog label{color:#6A6A64}
-body:has(#appShell.admin-soft:not([hidden])) .record-dialog :is(input,select,textarea){background:#fff;border:1px solid rgba(41,41,41,.22);color:#292929}
+body:has(#appShell.admin-soft:not([hidden])) .record-dialog{background:#F6F4F0;border:1px solid rgba(43,42,40,.18);color:#2B2A28;box-shadow:0 40px 90px -30px rgba(22,21,20,.5);border-radius:24px}
+body:has(#appShell.admin-soft:not([hidden])) .record-dialog::backdrop{background:rgba(22,21,20,.32);backdrop-filter:blur(6px)}
+body:has(#appShell.admin-soft:not([hidden])) .record-dialog .dialog-header,body:has(#appShell.admin-soft:not([hidden])) .record-dialog .form-actions{background:rgba(246,244,240,.94);border-color:rgba(43,42,40,.14)}
+body:has(#appShell.admin-soft:not([hidden])) .record-dialog :is(h2,h3,strong){color:#2B2A28}
+body:has(#appShell.admin-soft:not([hidden])) .record-dialog label{color:#6C6962}
+body:has(#appShell.admin-soft:not([hidden])) .record-dialog :is(input,select,textarea){background:#fff;border:1px solid rgba(43,42,40,.22);color:#2B2A28}
 body:has(#appShell.admin-soft:not([hidden])) .record-dialog .notice{background:#fff6e2;border-color:rgba(162,134,85,.4);color:#625133}
-body:has(#appShell.admin-soft:not([hidden])) .record-dialog .secondary,body:has(#appShell.admin-soft:not([hidden])) .record-dialog .ghost{background:#fff;color:#292929;border:1px solid rgba(41,41,41,.2)}
-body:has(#appShell.admin-soft:not([hidden])) .record-dialog .primary{background:#171717;color:#EEE9DF;border-color:#171717}
-body:has(#appShell.admin-soft:not([hidden])) .record-dialog .related-card{background:#fff;border-color:rgba(41,41,41,.15)}
-body:has(#appShell.admin-soft:not([hidden])) .record-dialog .message{background:#fff;color:#5C5C56}
+body:has(#appShell.admin-soft:not([hidden])) .record-dialog .secondary,body:has(#appShell.admin-soft:not([hidden])) .record-dialog .ghost{background:#fff;color:#2B2A28;border:1px solid rgba(43,42,40,.2)}
+body:has(#appShell.admin-soft:not([hidden])) .record-dialog .primary{background:#161514;color:#ECE8E0;border-color:#161514}
+body:has(#appShell.admin-soft:not([hidden])) .record-dialog .related-card{background:#fff;border-color:rgba(43,42,40,.15)}
+body:has(#appShell.admin-soft:not([hidden])) .record-dialog .message{background:#fff;color:#5D5A55}
 body:has(#appShell.admin-soft:not([hidden])) .record-dialog .eyebrow{color:#7F6943}
 /* Login */
-body:has(#loginView:not([hidden])) .login-screen{background:radial-gradient(900px 600px at 10% 0,#F7F5F0,transparent 60%),radial-gradient(800px 600px at 100% 100%,#f3e3bf,transparent 60%),#f6f4ef}
-body:has(#loginView:not([hidden])) .login-card{background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.85);box-shadow:0 30px 70px -30px rgba(23,23,23,.4);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:#292929;border-radius:28px}
-body:has(#loginView:not([hidden])) .login-card :is(h1,.wordmark){color:#292929}
+body:has(#loginView:not([hidden])) .login-screen{background:radial-gradient(900px 600px at 10% 0,#F6F4F0,transparent 60%),radial-gradient(800px 600px at 100% 100%,#f3e3bf,transparent 60%),#f6f4ef}
+body:has(#loginView:not([hidden])) .login-card{background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.85);box-shadow:0 30px 70px -30px rgba(22,21,20,.4);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);color:#2B2A28;border-radius:28px}
+body:has(#loginView:not([hidden])) .login-card :is(h1,.wordmark){color:#2B2A28}
 body:has(#loginView:not([hidden])) .login-card .wordmark span,body:has(#loginView:not([hidden])) .login-card .eyebrow{color:#7F6943}
-body:has(#loginView:not([hidden])) .login-card .muted,body:has(#loginView:not([hidden])) .login-card label{color:#6A6A64}
-body:has(#loginView:not([hidden])) .login-card input{background:#fff;border:1px solid rgba(41,41,41,.22);color:#292929}
-body:has(#loginView:not([hidden])) .login-card .primary{background:#171717;color:#EEE9DF;border-color:#171717;border-radius:999px}
+body:has(#loginView:not([hidden])) .login-card .muted,body:has(#loginView:not([hidden])) .login-card label{color:#6C6962}
+body:has(#loginView:not([hidden])) .login-card input{background:#fff;border:1px solid rgba(43,42,40,.22);color:#2B2A28}
+body:has(#loginView:not([hidden])) .login-card .primary{background:#161514;color:#ECE8E0;border-color:#161514;border-radius:999px}
 @media(max-width:1100px){#appShell.admin-soft.admin-premium .as-hero{grid-template-columns:1fr}}
 /* Mobile: glass top bar + translucent bottom dock; nothing opaque at the screen edges. */
 @media(max-width:800px){
@@ -143,7 +143,7 @@ body:has(#loginView:not([hidden])) .login-card .primary{background:#171717;color
  #appShell.admin-soft.admin-premium .sidebar-footer{display:flex;align-items:center;gap:8px;border:0;padding:0;margin:0}
  #appShell.admin-soft.admin-premium .sidebar-footer p,#appShell.admin-soft.admin-premium .sidebar-footer small{display:none}
  #appShell.admin-soft.admin-premium .sidebar-footer .ghost{min-height:36px;padding:6px 12px;font-size:12px}
- #appShell.admin-soft.admin-premium #navigation{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;display:flex;gap:4px;overflow-x:auto;scroll-snap-type:x proximity;padding:6px;border-radius:24px;background:rgba(255,255,255,.6);backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);border:1px solid rgba(255,255,255,.8);box-shadow:0 18px 40px -18px rgba(23,23,23,.45);scrollbar-width:none}
+ #appShell.admin-soft.admin-premium #navigation{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;display:flex;gap:4px;overflow-x:auto;scroll-snap-type:x proximity;padding:6px;border-radius:24px;background:rgba(255,255,255,.6);backdrop-filter:blur(24px) saturate(1.6);-webkit-backdrop-filter:blur(24px) saturate(1.6);border:1px solid rgba(255,255,255,.8);box-shadow:0 18px 40px -18px rgba(22,21,20,.45);scrollbar-width:none}
  #appShell.admin-soft.admin-premium #navigation::-webkit-scrollbar{display:none}
  #appShell.admin-soft.admin-premium #navigation .nav-button{flex:none;scroll-snap-align:center;white-space:nowrap;min-height:46px;padding:10px 14px;font-size:12px;border-radius:18px}
  #appShell.admin-soft.admin-premium .main{padding:16px max(14px,env(safe-area-inset-right)) calc(100px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}

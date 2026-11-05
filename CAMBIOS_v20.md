@@ -1,3 +1,5 @@
+> **Aviso:** v20 queda sustituida por v21 (ver `CAMBIOS_v21.md`). La paleta de v20 se aplicó por error a la web pública; en v21 la web recupera su estilo original y la nueva paleta solo afecta a los paneles.
+
 # MUK Talent · Cambios v20 · Diseño unificado, nueva paleta y estado "en línea"
 
 ## 1. Paleta única (web + paneles, escritorio y móvil)

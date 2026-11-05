@@ -1,9 +1,9 @@
 /* =====================================================================
-   MUK Talent · v20 · Unified dashboard design
+   MUK Talent · v21 · Unified dashboard design (dashboards only)
    One look for every private area (Education admin, team workspace,
    Global Passport, counsellor centre) based on the Healthcare portal.
-   Palette: Elegant Black #171717 · Soft Black #292929 · Pure White #FFFFFF
-            Warm Ivory #F7F5F0 · Champagne #B7A078 · Silver Grey #D9D9D6
+   Palette "negros y blancos seda": Negro seda #161514 · Grafito #2B2A28
+            Blanco #FFFFFF · Blanco seda #F6F4F0 · Oro satinado #B49B6C · Gris seda #E4E0D8
    This file is always the LAST stylesheet (see admin-src/unified-theme.js),
    so it only adjusts the look. Layout, data and behaviour are unchanged.
    ===================================================================== */
@@ -15,15 +15,15 @@
 @font-face{font-family:"Plex Arabic";font-style:normal;font-weight:600;font-display:swap;src:url(/healthcare/assets/fonts/plex-arabic-600.woff2) format("woff2");unicode-range:U+0600-06FF,U+0750-077F,U+0870-08FF,U+200C-200E,U+2010-2011,U+FB50-FDFF,U+FE70-FEFC}
 
 :root{
-  --u-black:#171717;--u-soft:#292929;--u-white:#FFFFFF;--u-ivory:#F7F5F0;--u-ivory-2:#F0ECE3;
-  --u-champ:#B7A078;--u-champ-deep:#816B44;--u-champ-soft:#E3D9C9;--u-silver:#D9D9D6;
-  --u-ink:#171717;--u-ink-2:#4A4A46;--u-ink-3:#6E6E68;--u-line:#D9D9D6;--u-line-2:rgba(23,23,23,.07);
+  --u-black:#161514;--u-soft:#2B2A28;--u-white:#FFFFFF;--u-ivory:#F6F4F0;--u-ivory-2:#EFECE6;
+  --u-champ:#B49B6C;--u-champ-deep:#7A6545;--u-champ-soft:#ECE4D6;--u-silver:#E4E0D8;
+  --u-ink:#161514;--u-ink-2:#4A4844;--u-ink-3:#6F6B64;--u-line:#E4E0D8;--u-line-2:rgba(22,21,20,.07);
   --u-serif:"Fraunces","Plex Arabic",Georgia,"Times New Roman",serif;
   --u-sans:"Instrument Sans","Plex Arabic",system-ui,-apple-system,"Segoe UI",sans-serif;
   --u-ease:cubic-bezier(.2,.7,.2,1);
   /* existing design tokens, re-pointed to the palette */
-  --b-paper:#F7F5F0;--b-surface:#FFFFFF;--b-surface-2:#F0ECE3;--b-line:#D9D9D6;--b-ink:#171717;--b-text:#292929;--b-muted:#6E6E68;
-  --b-accent:#292929;--b-accent-2:#171717;--b-gold:#B7A078;--b-gold-soft:#B7A078;--b-gold-tint:#F0ECE3;--b-dark:#171717;
+  --b-paper:#F6F4F0;--b-surface:#FFFFFF;--b-surface-2:#EFECE6;--b-line:#E4E0D8;--b-ink:#161514;--b-text:#2B2A28;--b-muted:#6F6B64;
+  --b-accent:#2B2A28;--b-accent-2:#161514;--b-gold:#B49B6C;--b-gold-soft:#B49B6C;--b-gold-tint:#EFECE6;--b-dark:#161514;
   --b-font:"Instrument Sans","Plex Arabic",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 
@@ -35,20 +35,20 @@
 
 /* ---------- sidebars (desktop) ---------- */
 @media (min-width:701px){
-  #appShell#appShell .sidebar,#employeeWorkspace#employeeWorkspace .lx-sidebar,#studentPortal#studentPortal .gp-side{background:var(--u-black)!important;color:var(--u-ivory);border-color:rgba(247,245,240,.08)!important}
-  #studentPortal#studentPortal .gp-top{background:var(--u-black)!important;border-color:rgba(247,245,240,.08)!important}
-  #appShell#appShell .sidebar .wordmark,#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-brand{padding-bottom:18px;border-bottom:1px solid rgba(247,245,240,.1)}
+  #appShell#appShell .sidebar,#employeeWorkspace#employeeWorkspace .lx-sidebar,#studentPortal#studentPortal .gp-side{background:var(--u-black)!important;color:var(--u-ivory);border-color:rgba(246,244,240,.08)!important}
+  #studentPortal#studentPortal .gp-top{background:var(--u-black)!important;border-color:rgba(246,244,240,.08)!important}
+  #appShell#appShell .sidebar .wordmark,#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-brand{padding-bottom:18px;border-bottom:1px solid rgba(246,244,240,.1)}
   #appShell#appShell .sidebar .nav-caption,#employeeWorkspace#employeeWorkspace .lx-sidebar>.lx-overline{font:600 10.5px/1 var(--u-sans);letter-spacing:.22em;text-transform:uppercase;color:var(--u-champ)}
-  #appShell#appShell #navigation .nav-button,#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav,#studentPortal#studentPortal .gp-side .gp-side-btn{min-height:44px;padding:0 12px;border-radius:10px;background:transparent;color:rgba(247,245,240,.78);font:500 14.5px/1.2 var(--u-sans);box-shadow:none;border:0;transition:background .2s,color .2s}
-  #appShell#appShell #navigation .nav-button:hover,#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav:hover,#studentPortal#studentPortal .gp-side .gp-side-btn:hover{background:rgba(247,245,240,.07);color:#fff}
-  #appShell#appShell #navigation .nav-button.active,#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav.active,#studentPortal#studentPortal .gp-side .gp-side-btn:is(.active,[aria-current=page],[aria-selected=true]){background:rgba(247,245,240,.12)!important;color:#fff!important;box-shadow:inset 3px 0 0 var(--u-champ)!important;border:0!important}
-  #appShell#appShell #navigation .nav-button :is(svg,.nav-icon),#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav svg,#studentPortal#studentPortal .gp-side .gp-side-btn svg{color:rgba(247,245,240,.72);opacity:.9}
+  #appShell#appShell #navigation .nav-button,#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav,#studentPortal#studentPortal .gp-side .gp-side-btn{min-height:44px;padding:0 12px;border-radius:10px;background:transparent;color:rgba(246,244,240,.78);font:500 14.5px/1.2 var(--u-sans);box-shadow:none;border:0;transition:background .2s,color .2s}
+  #appShell#appShell #navigation .nav-button:hover,#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav:hover,#studentPortal#studentPortal .gp-side .gp-side-btn:hover{background:rgba(246,244,240,.07);color:#fff}
+  #appShell#appShell #navigation .nav-button.active,#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav.active,#studentPortal#studentPortal .gp-side .gp-side-btn:is(.active,[aria-current=page],[aria-selected=true]){background:rgba(246,244,240,.12)!important;color:#fff!important;box-shadow:inset 3px 0 0 var(--u-champ)!important;border:0!important}
+  #appShell#appShell #navigation .nav-button :is(svg,.nav-icon),#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav svg,#studentPortal#studentPortal .gp-side .gp-side-btn svg{color:rgba(246,244,240,.72);opacity:.9}
   #appShell#appShell #navigation .nav-button.active :is(svg,.nav-icon),#employeeWorkspace#employeeWorkspace .lx-sidebar .lx-nav.active svg,#studentPortal#studentPortal .gp-side .gp-side-btn:is(.active,[aria-current=page]) svg{color:var(--u-champ)}
-  #appShell#appShell .sidebar-footer,#employeeWorkspace#employeeWorkspace .lx-sidebar-footer{border-top:1px solid rgba(247,245,240,.1)}
-  #appShell#appShell .sidebar-footer :is(p,small),#employeeWorkspace#employeeWorkspace .lx-sidebar-footer :is(strong,small){color:rgba(247,245,240,.72)}
+  #appShell#appShell .sidebar-footer,#employeeWorkspace#employeeWorkspace .lx-sidebar-footer{border-top:1px solid rgba(246,244,240,.1)}
+  #appShell#appShell .sidebar-footer :is(p,small),#employeeWorkspace#employeeWorkspace .lx-sidebar-footer :is(strong,small){color:rgba(246,244,240,.72)}
   #appShell#appShell .sidebar-footer #staffName,#employeeWorkspace#employeeWorkspace .lx-sidebar-footer strong{color:#fff}
-  #appShell#appShell .sidebar .muk-webback,#employeeWorkspace#employeeWorkspace .lx-sidebar .muk-webback{border-color:rgba(183,160,120,.45)!important;color:var(--u-champ-soft)!important;background:transparent!important}
-  #appShell#appShell .sidebar .nav-hc{border:1px solid rgba(183,160,120,.35)!important}
+  #appShell#appShell .sidebar .muk-webback,#employeeWorkspace#employeeWorkspace .lx-sidebar .muk-webback{border-color:rgba(180,155,108,.45)!important;color:var(--u-champ-soft)!important;background:transparent!important}
+  #appShell#appShell .sidebar .nav-hc{border:1px solid rgba(180,155,108,.35)!important}
 }
 
 /* ---------- page headers ---------- */
@@ -62,11 +62,11 @@
 /* ---------- hero banners (same as Healthcare "pt-hero") ---------- */
 #appShell#appShell .as-greet,#employeeWorkspace#employeeWorkspace .lx-hero-pay,#studentPortal#studentPortal .gp-pp2-band{background:linear-gradient(120deg,var(--u-black),var(--u-soft))!important;color:var(--u-ivory)}
 #appShell#appShell .as-greet{position:relative;overflow:hidden;border-radius:24px!important;border:0!important;box-shadow:none!important}
-#appShell#appShell .as-greet::after{content:"";position:absolute;right:-60px;top:-80px;width:280px;height:280px;border-radius:50%;border:1px solid rgba(183,160,120,.4);pointer-events:none}
+#appShell#appShell .as-greet::after{content:"";position:absolute;right:-60px;top:-80px;width:280px;height:280px;border-radius:50%;border:1px solid rgba(180,155,108,.4);pointer-events:none}
 #appShell#appShell .as-greet h2{font:400 clamp(30px,3vw,44px)/1.1 var(--u-serif)!important;color:var(--u-ivory)!important}
 #appShell#appShell .as-greet .as-overline{color:var(--u-champ)!important;letter-spacing:.22em}
-#appShell#appShell .as-greet .as-muted{color:rgba(247,245,240,.78)!important}
-#appShell#appShell .as-quick-btn{border-radius:999px!important;border:1px solid rgba(247,245,240,.22)!important;background:rgba(247,245,240,.08)!important;color:var(--u-ivory)!important}
+#appShell#appShell .as-greet .as-muted{color:rgba(246,244,240,.78)!important}
+#appShell#appShell .as-quick-btn{border-radius:999px!important;border:1px solid rgba(246,244,240,.22)!important;background:rgba(246,244,240,.08)!important;color:var(--u-ivory)!important}
 #appShell#appShell .as-quick-btn:first-child{background:var(--u-champ)!important;border-color:var(--u-champ)!important;color:var(--u-black)!important}
 #employeeWorkspace#employeeWorkspace .lx-hero-pay{border-radius:20px!important;border:0!important}
 
@@ -78,7 +78,7 @@
 
 /* ---------- KPI tiles (Healthcare "pt-stat") ---------- */
 #appShell#appShell .metrics .metric{background:var(--u-white)!important;border:1px solid var(--u-line)!important;border-radius:18px!important;box-shadow:none!important;padding:20px 22px!important;transition:transform .25s var(--u-ease),box-shadow .25s}
-#appShell#appShell .metrics .metric:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(23,23,23,.08)!important}
+#appShell#appShell .metrics .metric:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(22,21,20,.08)!important}
 #appShell#appShell .metrics .metric .muted{font:600 11px/1.3 var(--u-sans)!important;letter-spacing:.14em;text-transform:uppercase;color:var(--u-ink-3)!important}
 #appShell#appShell .metrics .metric strong{font:400 40px/1.1 var(--u-serif)!important;color:var(--u-ink)!important;letter-spacing:-.01em}
 #appShell#appShell .metrics .metric:nth-child(4){background:var(--u-champ-soft)!important;border-color:transparent!important}
@@ -90,7 +90,7 @@
 :is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay) :is(button.primary,.gp-btn.gp-primary,.th-btn.th-primary,.lx-primary):hover{background:var(--u-soft)!important}
 :is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay) :is(button.secondary,button.ghost,.th-btn:not(.th-primary),.gp-btn.gp-ghost,.lx-button:not(.lx-primary)){background:var(--u-white);color:var(--u-ink);border:1px solid var(--u-line);border-radius:999px;box-shadow:none}
 :is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay) :is(button.secondary,button.ghost,.th-btn:not(.th-primary),.gp-btn.gp-ghost,.lx-button:not(.lx-primary)):hover{border-color:var(--u-champ);background:var(--u-ivory)}
-#appShell#appShell .sidebar button.ghost{background:transparent;border-color:transparent;color:rgba(247,245,240,.72)}
+#appShell#appShell .sidebar button.ghost{background:transparent;border-color:transparent;color:rgba(246,244,240,.72)}
 #appShell#appShell #tableBody button{background:var(--u-white)!important;color:var(--u-ink)!important;border:1px solid var(--u-line)!important;border-radius:999px!important;min-height:36px;padding:0 16px}
 #appShell#appShell #tableBody button:hover{border-color:var(--u-black)!important}
 
@@ -104,27 +104,27 @@
 #appShell#appShell .table-wrap table{border-collapse:collapse}
 #appShell#appShell .table-wrap thead th,#appShell#appShell .table-wrap thead tr{background:var(--u-ivory-2)!important;color:var(--u-ink-3)!important;font:600 11.5px/1.3 var(--u-sans)!important;letter-spacing:.1em;text-transform:uppercase}
 #appShell#appShell .table-wrap tbody td{border-top:1px solid var(--u-line)!important;background:var(--u-white)!important;padding-top:13px;padding-bottom:13px}
-#appShell#appShell .table-wrap tbody tr:hover td{background:#FAF9F6!important}
+#appShell#appShell .table-wrap tbody tr:hover td{background:#FAF8F5!important}
 
 /* ---------- badges / chips (Healthcare "pt-badge") ---------- */
 :is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal) :is(.status-pill,.badge,.th-chip,.lx-chip,.gp-status,.gp-badge,.v17-chip){border-radius:999px;font-family:var(--u-sans);font-weight:600}
 #appShell#appShell .th-chip[data-tone=ink]{background:var(--u-black);color:var(--u-ivory)}
 #appShell#appShell .th-chip[data-tone=blue]{background:var(--u-ivory-2);color:var(--u-soft)}
-#appShell#appShell .th-chip[data-tone=grey]{background:#EFEDE7;color:#55554F}
+#appShell#appShell .th-chip[data-tone=grey]{background:#EFECE6;color:#57534C}
 
 /* ---------- forms ---------- */
-:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay,.record-dialog) :is(input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),select,textarea){border:1px solid rgba(23,23,23,.2);border-radius:12px;background:var(--u-white);color:var(--u-ink)}
-:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay,.record-dialog) :is(input,select,textarea):focus{outline:0;border-color:var(--u-black);box-shadow:0 0 0 4px rgba(23,23,23,.08)}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay,.record-dialog) :is(input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),select,textarea){border:1px solid rgba(22,21,20,.2);border-radius:12px;background:var(--u-white);color:var(--u-ink)}
+:is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay,.record-dialog) :is(input,select,textarea):focus{outline:0;border-color:var(--u-black);box-shadow:0 0 0 4px rgba(22,21,20,.08)}
 :is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal,#gpControlOverlay#gpControlOverlay,.record-dialog) :is(input[type=checkbox],input[type=radio]){accent-color:var(--u-black)}
 
 /* ---------- dialogs ---------- */
 dialog.record-dialog,#appShell#appShell~dialog,.th-dialog,.lx-dialog{border:1px solid var(--u-line)!important;border-radius:22px!important;background:var(--u-white)!important}
 dialog.record-dialog .dialog-header h2{font-family:var(--u-serif);font-weight:400}
-dialog::backdrop{background:rgba(23,23,23,.55);backdrop-filter:blur(3px)}
+dialog::backdrop{background:rgba(22,21,20,.55);backdrop-filter:blur(3px)}
 
 /* ---------- team gallery ---------- */
 #appShell#appShell .th-person{transition:transform .25s var(--u-ease),box-shadow .25s}
-#appShell#appShell .th-person:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(23,23,23,.08)!important}
+#appShell#appShell .th-person:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(22,21,20,.08)!important}
 #appShell#appShell .th-person strong{font:400 18px/1.3 var(--u-serif)}
 #appShell#appShell .th-person-photo{background:var(--u-ivory-2)!important;color:var(--u-black)!important;font-family:var(--u-serif)!important;font-weight:400!important}
 
@@ -166,3 +166,75 @@ body{overscroll-behavior-x:none;-webkit-text-size-adjust:100%;text-size-adjust:1
   :is(#appShell#appShell,#employeeWorkspace#employeeWorkspace,#studentPortal#studentPortal) :is(.dock,.mobile-dock,.lx-dock,.gp-dock,nav.sidebar,#navigation){background:var(--u-black)}
   .mt-presence-bar small{margin-inline-start:0;width:100%}
 }
+
+/* =====================================================================
+   v21 · Healthcare portal FRAME for Education dashboards (desktop/tablet)
+   Same structure as .pt-app: dark sidebar with brand block + section label,
+   sticky top bar with page title and user chip, body with the same gutters.
+   Mobile keeps each dashboard's own bottom navigation.
+   ===================================================================== */
+.u-brand{display:flex;align-items:center;gap:12px;padding:0 10px 22px;margin:0 0 18px;border-bottom:1px solid rgba(246,244,240,.1);color:var(--u-ivory)!important;text-decoration:none!important}
+.u-brand img{width:38px;height:38px;flex:none}
+.u-brand b{display:block;font:600 15px/1 var(--u-sans);letter-spacing:.16em;color:var(--u-ivory)}
+.u-brand small{display:block;margin-top:6px;font:600 10px/1 var(--u-sans);letter-spacing:.32em;text-transform:uppercase;color:var(--u-champ)}
+.u-side-label{margin:6px 0 12px;padding:0 12px;font:600 10.5px/1 var(--u-sans);letter-spacing:.22em;text-transform:uppercase;color:var(--u-champ)}
+.u-user{display:flex;align-items:center;gap:10px;font:500 13.5px/1.25 var(--u-sans);color:var(--u-ink-3);flex:none}
+.u-avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;background:var(--u-ivory-2);color:var(--u-black);font:600 14px/1 var(--u-sans);border:1px solid var(--u-line)}
+.u-user b{display:block;color:var(--u-ink);font-weight:600;white-space:nowrap}
+.u-user small{display:block;font-size:12.5px;color:var(--u-ink-3);white-space:nowrap}
+.u-top-title{display:none}
+
+@media (min-width:701px){
+  /* ---- sidebars: same width, padding and stacking as .pt-side ---- */
+  #appShell#appShell.u-shell .sidebar,#employeeWorkspace#employeeWorkspace.u-shell .lx-sidebar{position:sticky;top:0;height:100vh;height:100dvh;overflow-y:auto;display:flex;flex-direction:column;padding:26px 18px 20px!important;gap:0}
+  #appShell#appShell.u-shell .sidebar .wordmark,#employeeWorkspace#employeeWorkspace.u-shell .lx-sidebar .lx-brand{display:none!important}
+  #appShell#appShell.u-shell .sidebar .nav-caption,#employeeWorkspace#employeeWorkspace.u-shell .lx-sidebar>.lx-overline{margin:6px 0 12px;padding:0 12px}
+  #appShell#appShell.u-shell #navigation,#employeeWorkspace#employeeWorkspace.u-shell .lx-sidebar nav{display:grid;gap:2px}
+  /* "back to website" goes to the foot of the sidebar, like "Healthcare website" */
+  #appShell#appShell.u-shell .sidebar .muk-webback,#employeeWorkspace#employeeWorkspace.u-shell .lx-sidebar .muk-webback{order:90;margin:auto 0 0!important;padding:9px 12px!important;border:0!important;border-top:1px solid rgba(246,244,240,.1)!important;border-radius:0!important;background:none!important;color:rgba(246,244,240,.72)!important;font:500 13.5px/1.2 var(--u-sans)!important;justify-content:flex-start;width:100%}
+  #appShell#appShell.u-shell .sidebar .muk-webback:hover,#employeeWorkspace#employeeWorkspace.u-shell .lx-sidebar .muk-webback:hover{color:#fff!important}
+  #appShell#appShell.u-shell .sidebar-footer,#employeeWorkspace#employeeWorkspace.u-shell .lx-sidebar-footer{order:95;margin-top:0!important;padding-top:6px!important;border-top:0!important;display:grid;gap:4px}
+  #appShell#appShell.u-shell .sidebar-footer :is(#staffName,small),#employeeWorkspace#employeeWorkspace.u-shell .lx-sidebar-footer>:is(strong,small){display:none}
+  #appShell#appShell.u-shell .sidebar-footer button,#employeeWorkspace#employeeWorkspace.u-shell .lx-sidebar-footer button{justify-content:flex-start;width:100%;min-height:0;padding:9px 12px!important;border:0!important;border-radius:10px!important;background:none!important;color:rgba(246,244,240,.72)!important;font:500 13.5px/1.2 var(--u-sans)!important;text-align:start}
+  #appShell#appShell.u-shell .sidebar-footer button:hover,#employeeWorkspace#employeeWorkspace.u-shell .lx-sidebar-footer button:hover{background:rgba(246,244,240,.07)!important;color:#fff!important}
+  /* link to the Healthcare area = Healthcare's "Back to Education dashboard" button */
+  #appShell#appShell.u-shell #navigation .nav-hc{margin-top:10px;border:1px solid rgba(180,155,108,.45)!important;color:var(--u-champ-soft)!important}
+
+  /* ---- top bar: same as .pt-top ---- */
+  #appShell#appShell.u-shell>.main,#employeeWorkspace#employeeWorkspace.u-shell .lx-main{padding:0 0 48px!important;max-width:none!important}
+  #appShell#appShell.u-shell .page-header,#employeeWorkspace#employeeWorkspace.u-shell .lx-header{position:sticky!important;top:0;z-index:20;display:flex!important;align-items:center!important;gap:16px;margin:0 0 clamp(18px,2.4vw,32px)!important;padding:18px clamp(18px,3vw,40px)!important;background:rgba(246,244,240,.92)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border:0!important;border-bottom:1px solid var(--u-line)!important;border-radius:0!important;box-shadow:none!important}
+  #appShell#appShell.u-shell .page-header>div:first-child,#employeeWorkspace#employeeWorkspace.u-shell .lx-header>div:first-child{flex:1;min-width:0;padding:0!important}
+  #appShell#appShell.u-shell .page-header .eyebrow,#employeeWorkspace#employeeWorkspace.u-shell .lx-header .lx-overline{display:none!important}
+  #appShell#appShell.u-shell .page-header h1,#employeeWorkspace#employeeWorkspace.u-shell .lx-header h1{margin:0!important;font:400 clamp(22px,2.2vw,30px)/1.15 var(--u-serif)!important;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #appShell#appShell.u-shell .page-header .muted,#employeeWorkspace#employeeWorkspace.u-shell .lx-header .lx-muted{margin:4px 0 0!important;font-size:13px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #appShell#appShell.u-shell .page-header #createRecord{margin:0!important;max-width:none;min-height:40px;padding:0 18px;font-size:13.5px}
+  #appShell#appShell.u-shell .page-header .admin-heart{position:static!important;flex:none}
+  #employeeWorkspace#employeeWorkspace.u-shell .lx-header .lx-actions{display:flex;align-items:center;gap:10px;flex:none}
+  /* ---- body gutters: same as .pt-body ---- */
+  #appShell#appShell.u-shell>.main>:not(.page-header),#employeeWorkspace#employeeWorkspace.u-shell .lx-main>:not(.lx-header){margin-inline:clamp(18px,3vw,40px)!important;max-width:1240px}
+  /* ---- overview blocks: Healthcare grid rhythm ---- */
+  #appShell#appShell.u-shell .metrics{display:grid!important;grid-template-columns:repeat(auto-fit,minmax(190px,1fr))!important;gap:20px!important}
+  #appShell#appShell.u-shell .dashboard-grid,#appShell#appShell.u-shell #adminSoftHero{gap:20px!important}
+  #appShell#appShell.u-shell .as-greet{padding:30px 32px!important}
+}
+@media (min-width:1101px){
+  #appShell#appShell.u-shell,#employeeWorkspace#employeeWorkspace.u-shell{grid-template-columns:276px minmax(0,1fr)!important}
+}
+
+/* ---- Global Passport: sidebar full height, title in the top bar ---- */
+@media (min-width:821px){
+  #studentPortal#studentPortal.u-shell{grid-template-columns:276px minmax(0,1fr)!important;grid-template-rows:auto 1fr}
+  #studentPortal#studentPortal.u-shell .gp-side{grid-column:1;grid-row:1/span 2;position:sticky;top:0;height:100vh;height:100dvh;padding:26px 18px 20px!important;background:var(--u-black)!important;border:0!important;overflow-y:auto}
+  #studentPortal#studentPortal.u-shell .gp-top{grid-column:2;grid-row:1;padding:18px clamp(18px,3vw,40px)!important;background:rgba(246,244,240,.92)!important;color:var(--u-ink)!important;border-bottom:1px solid var(--u-line)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+  #studentPortal#studentPortal.u-shell .gp-main{grid-column:2;grid-row:2;padding:clamp(18px,2.4vw,32px) clamp(18px,3vw,40px) 60px!important;max-width:1320px}
+  #studentPortal#studentPortal.u-shell .gp-top-brand{display:none!important}
+  #studentPortal#studentPortal.u-shell .u-top-title{display:block;flex:1;min-width:0;margin:0;font:400 clamp(22px,2.2vw,30px)/1.15 var(--u-serif);color:var(--u-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #studentPortal#studentPortal.u-shell .gp-page-head h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+  #studentPortal#studentPortal.u-shell .gp-page-head{border:0!important;padding:0!important;margin-bottom:16px!important}
+  #studentPortal#studentPortal.u-shell .gp-top-right{display:flex;align-items:center;gap:12px}
+  #studentPortal#studentPortal.u-shell .gp-top-right :is(.gp-langm-btn,.gp-heart){background:var(--u-white)!important;color:var(--u-ink)!important;border:1px solid var(--u-line)!important;box-shadow:none!important}
+  #studentPortal#studentPortal.u-shell .gp-side .gp-side-web{margin-top:auto;border-top:1px solid rgba(246,244,240,.1)!important;border-radius:0!important}
+}
+@media (max-width:700px){ .u-user{display:none!important} #appShell .u-brand,#employeeWorkspace .u-brand{display:none} }
+@media (max-width:820px){ #studentPortal .u-brand,#studentPortal .u-side-label,#studentPortal .u-user{display:none} }
+#employeeWorkspace#employeeWorkspace .u-brand b,#appShell#appShell .u-brand b,#studentPortal#studentPortal .u-brand b{color:var(--u-ivory)!important}

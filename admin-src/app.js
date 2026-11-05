@@ -1,4 +1,5 @@
 import "./unified-theme.js";
+import "./shell-v21.js";
 import { startPresence, stopPresence } from "./presence.js";
 import { mountAdminExperience, renderAdminPipeline } from "./admin-experience.js";
 import { requirePasswordChange } from "./employee-security.js";
@@ -337,7 +338,7 @@ async function enter(session){
       }
     });
     offerInstall({ lang: "en" });
-    api("/api/hc/me").then(hc=>{if(hc?.role!=="consultant"||document.getElementById("hcConsultantLink"))return;const a=document.createElement("a");a.id="hcConsultantLink";a.href="/healthcare/portal/";a.textContent="MUKTalent Healthcare →";a.setAttribute("style","position:fixed;right:18px;bottom:18px;z-index:60;background:#292929;color:#F7F5F0;padding:11px 18px;border-radius:999px;font:600 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 10px 30px rgba(41,41,41,.35)");document.body.append(a);}).catch(()=>{});
+    api("/api/hc/me").then(hc=>{if(hc?.role!=="consultant"||document.getElementById("hcConsultantLink"))return;const a=document.createElement("a");a.id="hcConsultantLink";a.href="/healthcare/portal/";a.textContent="MUKTalent Healthcare →";a.setAttribute("style","position:fixed;right:18px;bottom:18px;z-index:60;background:#2B2A28;color:#F6F4F0;padding:11px 18px;border-radius:999px;font:600 14px/1.2 system-ui,sans-serif;text-decoration:none;box-shadow:0 10px 30px rgba(43,42,40,.35)");document.body.append(a);}).catch(()=>{});
     return;
   }
   state.config = await api("/api/admin-config");
