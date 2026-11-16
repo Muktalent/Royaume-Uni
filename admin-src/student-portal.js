@@ -134,13 +134,13 @@ export async function mountStudentPortal({api,client,who,onLogout}){
   const facts=E('section',undefined,'gp-facts');
   facts.append(fact('globe',L('destination'),destName(s.destination)),fact('cap',L('university'),s.university||L('toChoose'),!s.university),fact('book',L('programme'),s.programme||s.subject||L('toChoose'),!s.programme),fact('calendar',L('intake'),s.intake||'—'));
   mainEl.append(facts);
-  const grid=E('div',undefined,'gp-grid');
+  const grid=E('div',undefined,'gp-grid gp-grid-2');
   const cc=E('section',undefined,'gp-panel gp-counsellor');cc.append(E('p',L('counsellor'),'gp-kicker'));
   if(c){const row=E('div',undefined,'gp-c-row');const txt=E('div');txt.append(E('strong',c.full_name),E('span',c.job_title,'gp-muted'));if(c.languages)txt.append(E('small',[].concat(c.languages).join(' · '),'gp-muted'));row.append(avatar(c.full_name,c.avatar_url,'gp-avatar gp-avatar-lg'),txt);cc.append(row);const acts=E('div',undefined,'gp-actions');acts.append(btn(L('message'),()=>go('messages'),'gp-btn gp-primary','chat'));if(c.email){const a=E('a',undefined,'gp-btn gp-ghost');a.href='mailto:'+c.email;a.append(gi('send'),E('span',c.email));acts.append(a);}cc.append(acts);}
   else{cc.append(E('strong',L('noCounsellor')),E('p',L('noCounsellorText'),'gp-muted'));}
   grid.append(cc);
   const pend=E('section',undefined,'gp-panel');pend.append(panelHead(L('pendingDocs'),()=>go('documents')));const pd=data.documents.filter(d=>['requested','rejected'].includes(d.status)).slice(0,4);for(const d of pd)pend.append(docRow(d,true));if(!pd.length)pend.append(E('p',fill(L('docsDone'),{a:done,b:req}),'gp-muted'));grid.append(pend);
-  const steps=E('section',undefined,'gp-panel gp-steps-panel');steps.append(panelHead(L('nextSteps'),()=>go('plan')));const ns=nextSteps();ns.slice(0,4).forEach((u,i)=>steps.append(stepRow(u,i)));if(!ns.length)steps.append(E('p',L('noSteps'),'gp-muted'));else if(ns.length>4){const more=btn(L('seeAll')+' ('+ns.length+')',()=>go('plan'),'gp-btn gp-ghost gp-sm');steps.append(more);}grid.append(steps);
+  
   mainEl.append(grid);
   const map=E('section',undefined,'gp-panel gp-map-panel');map.append(E('p',L('journeyTitle'),'gp-kicker'));map.append(journeyMap(false));mainEl.append(map);
   const last=data.messages.filter(m=>m.sender_role!=='student').slice(-1)[0];if(last){const l=E('section',undefined,'gp-panel gp-latest');l.append(E('p',L('latest'),'gp-kicker'),E('p',last.body,'gp-latest-body'),E('small',ago(last.created_at,lang),'gp-muted'));l.onclick=()=>go('messages');mainEl.append(l);}
@@ -232,7 +232,7 @@ export async function mountStudentPortal({api,client,who,onLogout}){
   catch(e){meta.textContent=e.message;b.disabled=false;}}
 
  // ---------------- Plan ----------------
- function plan(){const d=E('section',undefined,'gp-panel gp-steps-panel');d.append(E('h2',L('nextSteps')));const u=nextSteps();u.forEach((x,i)=>d.append(stepRow(x,i)));if(!u.length)d.append(E('p',L('noSteps'),'gp-muted'));mainEl.append(d);const p=E('section',undefined,'gp-panel');p.append(journeyMap(true));mainEl.append(p);}
+ function plan(){const p=E('section',undefined,'gp-panel');p.append(journeyMap(true));mainEl.append(p);}
  // v24 · Prochaines étapes / Upcoming steps: lo que el estudiante tiene que hacer ahora, en orden de prioridad.
  function nextSteps(){const out=[];const cur=data.stages.find(x=>x.status==='in_progress')||data.stages.find(x=>x.status==='pending');const curKey=cur?.stage_key;
   const toTask=t=>()=>{openStage=t.stage_key;page==='plan'?render():go('plan');};
