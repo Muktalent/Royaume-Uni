@@ -142,7 +142,7 @@
   }
 
   /* ---------------- Speak to Our Team ---------------- */
-  const COUNTRIES = [["Maghreb", ["Maroc", "Algérie", "Tunisie", "Libye", "Mauritanie"]], ["Asie", ["Inde", "Pakistan", "Bangladesh", "Népal", "Sri Lanka", "Chine", "Vietnam", "Indonésie", "Malaisie", "Philippines"]], ["Amérique latine", ["Mexique", "Colombie", "Pérou", "Chili", "Argentine", "Brésil", "Équateur"]], ["Europe", ["Royaume-Uni", "France", "Espagne"]]];
+  const COUNTRIES = [["Amérique latine", ["Mexique", "Colombie", "Pérou", "Chili", "Argentine", "Équateur", "Venezuela", "Bolivie", "Paraguay", "Uruguay", "Brésil", "Costa Rica", "Panama", "Guatemala", "Honduras", "Salvador", "Nicaragua", "République dominicaine", "Cuba"]], ["Afrique du Nord et Moyen-Orient", ["Maroc", "Algérie", "Tunisie", "Libye", "Mauritanie", "Égypte", "Jordanie", "Liban", "Arabie saoudite", "Émirats arabes unis", "Turquie"]], ["Afrique subsaharienne", ["Sénégal", "Côte d’Ivoire", "Cameroun", "Nigeria", "Ghana", "Kenya"]], ["Asie", ["Inde", "Pakistan", "Bangladesh", "Népal", "Sri Lanka", "Chine", "Vietnam", "Indonésie", "Malaisie", "Philippines"]], ["Europe", ["Royaume-Uni", "Espagne", "France", "Portugal", "Italie", "Belgique"]]];
   const PRIOS = [["budget", "Budget et frais"], ["university", "Choix de l’université"], ["visa", "Visa"], ["housing", "Logement"], ["scholarships", "Bourses"], ["safety", "Sécurité et bien-être"], ["follow_up", "Suivi et communication"], ["english", "Anglais / IELTS"]];
   let dlg = null, lastFocus = null, ctx = {};
   function field(label, input) { const l = el("label", "v13-field"); l.append(el("span", "", label), input); return l; }

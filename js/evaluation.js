@@ -42,6 +42,9 @@ function success(){
  const max=new Date();max.setUTCDate(max.getUTCDate()+60);$('booking-day').max=dayInMorocco(max);$('success-panel').focus();
 }
 function dayInMorocco(date){const parts=new Intl.DateTimeFormat('en',{timeZone:'Africa/Casablanca',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(date);return ['year','month','day'].map(k=>parts.find(p=>p.type===k).value).join('-');}
+// v26 · Hora local del visitante (cualquier país) + hora del Reino Unido.
+const LOCAL_TZ=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/London';}catch{return 'Europe/London';}})();
+function zoneLabels(){const l=(document.documentElement.lang||'fr').slice(0,2);return {fr:['votre heure','Royaume-Uni'],en:['your time','UK'],es:['tu hora','Reino Unido'],ar:['بتوقيتك','المملكة المتحدة']}[l]||['votre heure','Royaume-Uni'];}
 function timeText(iso,zone){const l=(document.documentElement.lang||'fr').slice(0,2);return new Intl.DateTimeFormat({en:'en-GB',es:'es-ES',ar:'ar-MA'}[l]||'fr-FR',{timeZone:zone,dateStyle:'medium',timeStyle:'short'}).format(new Date(iso));}
 $('next').addEventListener('click',()=>{if(!busy&&validateCurrent()){step++;showStep();steps[step].querySelector('input,select,textarea')?.focus();}});
 $('previous').addEventListener('click',()=>{if(!busy){step--;showStep();}});
@@ -66,7 +69,7 @@ $('load-slots').addEventListener('click',async()=>{
  try{const result=await api('/api/evaluation/slots',{token,day:$('booking-day').value});if(epoch!==slotsEpoch)return;
  const slots=result.slots.filter((v,i,a)=>a.findIndex(t=>t.starts_at===v.starts_at)===i);
  for(const slot of slots){const b=document.createElement('button');b.type='button';b.className='slot';b.setAttribute('aria-pressed','false');
- b.textContent=timeText(slot.starts_at,'Africa/Casablanca')+' · Maroc';const small=document.createElement('small');small.textContent=timeText(slot.starts_at,'Europe/London')+' · Royaume-Uni';b.append(small);
+ const [zl,zu]=zoneLabels();b.textContent=timeText(slot.starts_at,LOCAL_TZ)+' · '+(LOCAL_TZ==='Europe/London'?zu:zl);if(LOCAL_TZ!=='Europe/London'){const small=document.createElement('small');small.textContent=timeText(slot.starts_at,'Europe/London')+' · '+zu;b.append(small);}
  b.addEventListener('click',()=>{selected=slot;for(const n of $('slots').children)n.setAttribute('aria-pressed',String(n===b));$('confirm-booking').disabled=!$('booking-consent').checked;});$('slots').append(b);}
  notice('booking-message',slots.length?'Choisissez votre créneau.':'Aucun créneau disponible pour cette date. Essayez un autre jour ouvré.');
  }catch(e){if(epoch===slotsEpoch)notice('booking-message',e.message,true);}finally{$('load-slots').disabled=false;}
@@ -78,7 +81,7 @@ $('confirm-booking').addEventListener('click',async()=>{
  notice('booking-message','Réservation en cours…');
  try{const {data,email_confirmation}=await api('/api/evaluation/book',{token,...selected,privacy_acknowledged:true});
  const box=$('booking-confirmed');const title=document.createElement('h3');title.textContent='Votre entretien est réservé.';
- const p=document.createElement('p');p.textContent=timeText(data.starts_at,'Africa/Casablanca')+' (Maroc) · '+timeText(data.starts_at,'Europe/London')+' (Royaume-Uni). Durée : 30 minutes.';
+ const p=document.createElement('p');{const [zl,zu]=zoneLabels();p.textContent=timeText(data.starts_at,LOCAL_TZ)+' ('+(LOCAL_TZ==='Europe/London'?zu:zl)+')'+(LOCAL_TZ==='Europe/London'?'':' · '+timeText(data.starts_at,'Europe/London')+' ('+zu+')')+'. Durée : 30 minutes.';}
  const note=document.createElement('p');note.textContent=(email_confirmation==='sent'?'Un e-mail de confirmation a été envoyé.':email_confirmation==='failed'?'Votre réservation est enregistrée, mais l’envoi de l’e-mail a échoué. Conservez cette confirmation.':'Conservez cette confirmation : l’envoi automatique d’e-mails n’est pas configuré.')+' Pour modifier ou annuler : agents@muktalent.com, référence '+data.reference+'.';
  box.replaceChildren(title,p,note);box.hidden=false;box.focus();$('slots').hidden=true;$('confirm-booking').hidden=true;$('load-slots').hidden=true;notice('booking-message','Réservation confirmée dans notre calendrier.');
  }catch(e){notice('booking-message',e.message,true);$('confirm-booking').disabled=false;$('load-slots').disabled=false;$('booking-day').disabled=false;for(const b of $('slots').children)b.disabled=false;}
