@@ -377,10 +377,10 @@ async function initialise(){
  initGateway({getClient:()=>state.client,onSignedIn:async session=>{try{await enter(session);}catch(e){resetLogin(e.message);}}});
  try{
   const response=await fetch("/api/public-config",{cache:"no-store"});if(!response.ok)throw new Error("Configuration unavailable.");const cfg=await response.json();if(!cfg.supabaseUrl||!cfg.supabasePublicKey)throw new Error("Incomplete configuration.");
-  const fromLink=/(access_token|error_description|type=recovery|type=signup)/.test(location.hash)||/[?&]code=/.test(location.search);
+  const fromLink=/(access_token|error_description|type=recovery|type=signup|type=invite)/.test(location.hash)||/[?&]code=/.test(location.search);
   const linkError=/error_description=([^&]+)/.exec(location.hash);
   state.client=createClient(cfg.supabaseUrl,cfg.supabasePublicKey,{auth:{...AUTH_OPTIONS,detectSessionInUrl:fromLink}});
-  let recovery=/type=recovery/.test(location.hash);
+  let recovery=/type=(recovery|invite)/.test(location.hash);
   state.client.auth.onAuthStateChange((event,session)=>{state.session=session;if(event==="PASSWORD_RECOVERY"){recovery=true;showReset();}if(event==="SIGNED_OUT"&&(state.staff||document.getElementById("studentPortal")))resetLogin("Session ended.");});
   showLoginMessage();$("loginSubmit").disabled=false;$("signupSubmit").disabled=false;
   if(linkError){showLoginMessage(t("linkError"),"error");history.replaceState(null,"",location.pathname);}

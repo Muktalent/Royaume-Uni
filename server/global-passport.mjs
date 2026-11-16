@@ -3,7 +3,7 @@
 // All data lives in private gp_* tables; only this server (service role) touches them,
 // after verifying the Supabase session and the caller's relationship to the file.
 import { createClient } from "@supabase/supabase-js";
-import { candidateFor, syncCandidateFromStudent } from "./student-link.mjs";
+import { candidateFor, syncCandidateFromStudent, normEmail } from "./student-link.mjs";
 import { mountGpSign, signDocsFor } from "./gp-sign.mjs";
 import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import { randomUUID } from "node:crypto";
@@ -329,7 +329,46 @@ export function mountGlobalPassport(app, { requireStaff, db = service }) {
     for (const r of rows) { r.photo_url = r.photo_path ? photos.get(r.photo_path) || null : null; delete r.photo_path; }
     const counsellors = req.staff.role === "admin" ? ok(await client.from("crm_staff").select("user_id,full_name,role,active").eq("active", true).order("full_name")) : [];
     const settings = ok(await client.from("gp_counsellor_settings").select("accepting,capacity").eq("user_id", req.staff.user_id).maybeSingle()) || { accepting: true, capacity: 60 };
-    res.json({ data: rows, metrics: caseload(rows, today), counsellors, settings, scope: all ? "all" : "mine", stage_titles: Object.fromEntries(STAGES) });
+    // v25 · Estudiantes con counsellor asignado en «Leads y casos» que todavía no tienen Global Passport:
+    // aparecen también (admin: todos los asignados · counsellor: los suyos), con opción de invitarlos.
+    const pending = await pendingStudents(client, { all, me: req.staff.user_id, known: new Set(students.map(s => normEmail(s.email))) });
+    res.json({ data: rows, pending, metrics: { ...caseload(rows, today), pending: pending.length }, counsellors, settings, scope: all ? "all" : "mine", stage_titles: Object.fromEntries(STAGES) });
+  }));
+  async function authUsers(client) {
+    const users = [];
+    for (let page = 1; page <= 5; page++) {
+      const r = await client.auth.admin.listUsers({ page, perPage: 200 });
+      if (r.error) break; users.push(...(r.data?.users || [])); if ((r.data?.users || []).length < 200) break;
+    }
+    return users;
+  }
+  async function pendingStudents(client, { all, me, known }) {
+    try {
+      let q = client.from("crm_candidates").select("id,reference,first_name,last_name,email,whatsapp_phone_e164,phone_e164,residence_country_code,residence_city,subject_interest,target_study_level,intended_intake,assigned_to,status,created_at").is("archived_at", null).not("assigned_to", "is", null).order("created_at", { ascending: false }).limit(300);
+      if (!all) q = q.eq("assigned_to", me);
+      const leads = ((await q).data || []).filter(c => c.status !== "closed" && !(c.email && known.has(normEmail(c.email))));
+      const users = await authUsers(client), byEmail = new Map(users.map(u => [normEmail(u.email), u]));
+      const out = leads.map(c => { const u = c.email ? byEmail.get(normEmail(c.email)) : null; return { kind: "lead", id: c.id, reference: c.reference, full_name: [c.first_name, c.last_name].filter(x => x && x !== "-").join(" "), email: c.email, whatsapp: c.whatsapp_phone_e164 || c.phone_e164, country_residence: c.residence_country_code, city: c.residence_city, subject: c.subject_interest, level: c.target_study_level, intake: c.intended_intake, counsellor_id: c.assigned_to, created_at: c.created_at, account: u ? (u.email_confirmed_at || u.confirmed_at ? "confirmed" : "unconfirmed") : "none" }; });
+      if (all) {
+        // Cuentas creadas sin Global Passport ni lead.
+        const ids = users.map(u => u.id), seen = new Set(out.map(x => normEmail(x.email)));
+        const taken = new Set();
+        for (let i = 0; i < ids.length; i += 300) { const part = ids.slice(i, i + 300); const [a, b, h] = await Promise.all([client.from("crm_staff").select("user_id").in("user_id", part), client.from("gp_students").select("user_id").in("user_id", part), client.from("hc_candidates").select("user_id").in("user_id", part)]); for (const r of [a, b, h]) for (const x of r.data || []) taken.add(x.user_id); }
+        for (const u of users) if (!taken.has(u.id) && u.user_metadata?.division !== "healthcare" && !seen.has(normEmail(u.email))) out.push({ kind: "account", id: u.id, full_name: u.user_metadata?.full_name || "", email: u.email, created_at: u.created_at, account: u.email_confirmed_at || u.confirmed_at ? "confirmed" : "unconfirmed", counsellor_id: null });
+      }
+      return out;
+    } catch { return []; }
+  }
+  // v25 · Invitar por correo a abrir su Global Passport (crea la cuenta; el estudiante elige su contraseña).
+  app.post("/api/gp/leads/:id/invite", limiter(30), requireStaff, wrap(async (req, res) => {
+    const client = db(), c = ok(await client.from("crm_candidates").select("id,email,first_name,last_name,assigned_to,preferred_language").eq("id", uuid.parse(req.params.id)).maybeSingle());
+    if (!c) throw new PassportError("Lead not found.", 404);
+    if (req.staff.role !== "admin" && c.assigned_to !== req.staff.user_id) throw new PassportError("This student is assigned to another counsellor.", 403);
+    if (!c.email) throw new PassportError("This lead has no e-mail address. Add it in Leads y casos first.", 400);
+    const site = (process.env.PUBLIC_SITE_URL || "https://www.muktalent.com").replace(/\/$/, "");
+    const r = await client.auth.admin.inviteUserByEmail(normEmail(c.email), { redirectTo: site + "/portal/", data: { full_name: [c.first_name, c.last_name].filter(x => x && x !== "-").join(" "), account: "student", lang: c.preferred_language || "fr" } });
+    if (r.error) throw new PassportError(/registered|exists/i.test(r.error.message) ? "This student already has an account. Ask them to sign in at muktalent.com/portal and finish the 4 steps." : "The invitation could not be sent: " + r.error.message, 400);
+    res.json({ ok: true });
   }));
   // v24 · Cuentas creadas que aún no han abierto su Global Passport (solo administradores).
   app.get("/api/gp/pending-accounts", requireStaff, wrap(async (req, res) => {

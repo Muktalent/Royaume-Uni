@@ -6,7 +6,7 @@ const STAGES=[['registration','Registration'],['university','University'],['docu
 const STATUS={profile:'Profile in progress',preparing:'Preparing application',submitted:'Application submitted',awaiting:'Awaiting university',offer:'Offer received',visa:'Visa in progress',travel:'Preparing travel',enrolled:'Enrolled',on_hold:'On hold',withdrawn:'Withdrawn'};
 const LEVELS=["Foundation","Undergraduate","Postgraduate taught (Master's)","Postgraduate research (PhD)","English language course","Not sure yet"];
 const DOC={requested:'Requested',uploaded:'To review',approved:'Approved',rejected:'Needs changes'};
-const FILTERS=[['all','All'],['attention','Needs attention'],['review','Docs to review'],['preparing','Preparing'],['awaiting','Awaiting university'],['unread','Unread']];
+const FILTERS=[['all','All'],['pending','Without Global Passport'],['attention','Needs attention'],['review','Docs to review'],['preparing','Preparing'],['awaiting','Awaiting university'],['unread','Unread']];
 
 export async function renderControlCentre({host,api,admin=false,notice=()=>{}}){
  linkCss('gpCentreCss','/admin/counsellor-centre.css');
@@ -29,13 +29,33 @@ export async function renderControlCentre({host,api,admin=false,notice=()=>{}}){
   const listPanel=E('section',undefined,'cc-panel cc-list');const bar=E('div',undefined,'cc-list-bar');const search=E('input');search.type='search';search.placeholder='Search name, reference, university…';search.value=query;search.setAttribute('aria-label','Search students');search.oninput=()=>{query=search.value;paint();};const sw=E('div',undefined,'cc-search');sw.append(gi('search'),search);
   const chips=E('div',undefined,'cc-chips gp-hscroll');for(const [id,label]of FILTERS){const c=E('button',label,'cc-chip');c.type='button';c.setAttribute('aria-pressed',String(filter===id));c.onclick=()=>{filter=id;draw();};chips.append(c);}bar.append(sw,chips);listPanel.append(bar);
   const body=E('div',undefined,'cc-rows');listPanel.append(body);wrap.append(listPanel);
-  if(admin&&scope==='all')wrap.append(pendingPanel());
   function paint(){body.replaceChildren();const q=query.toLowerCase().trim();const att=new Set(m.attention_ids||[]);const shown=rows.filter(r=>filter==='all'||(filter==='attention'&&att.has(r.user_id))||(filter==='review'&&r.docs_to_review)||(filter==='preparing'&&['profile','preparing'].includes(r.application_status))||(filter==='awaiting'&&['submitted','awaiting'].includes(r.application_status))||(filter==='unread'&&r.unread)).filter(r=>!q||[r.full_name,r.reference,r.email,r.university,r.subject,countryName(r.country_residence)].join(' ').toLowerCase().includes(q)).sort((a,b)=>(att.has(b.user_id)-att.has(a.user_id))||(b.unread-a.unread)||(b.docs_to_review-a.docs_to_review));
-   for(const r of shown)body.append(studentRow(r,att.has(r.user_id)));if(!shown.length)body.append(E('p',rows.length?'No students match this view.':'No students yet. New Global Passport sign-ups are assigned to you automatically.','cc-empty'));}
+   const pend=(list.pending||[]).filter(()=>filter==='all'||filter==='pending').filter(r=>!q||[r.full_name,r.reference,r.email,r.subject].join(' ').toLowerCase().includes(q));
+   for(const r of (filter==='pending'?[]:shown))body.append(studentRow(r,att.has(r.user_id)));
+   for(const r of pend)body.append(pendingRow(r));
+   if(!(filter==='pending'?0:shown.length)&&!pend.length)body.append(E('p',rows.length||(list.pending||[]).length?'No students match this view.':'No students yet. New Global Passport sign-ups are assigned to you automatically.','cc-empty'));}
   paint();
   if(openId){const id=openId;openId=null;openFile(id);}
  }
- // v24 · Cuentas creadas que todavía no han abierto su Global Passport.
+ // v25 · Estudiantes sin Global Passport todavía (lead con counsellor asignado, o cuenta sin terminar).
+ const ACC={none:'No account yet',unconfirmed:'Account · e-mail not confirmed',confirmed:'Account · 4 steps not finished'};
+ function pendingRow(r){const row=E('button',undefined,'cc-row cc-row-pending');row.type='button';
+  const who=E('div',undefined,'cc-who');const txt=E('div');txt.append(E('strong',r.full_name||r.email),E('small',[r.reference,r.subject].filter(Boolean).join(' · ')||r.email));who.append(avatar(r.full_name||r.email,null,'gp-avatar cc-av'),txt);
+  const geo=E('div',undefined,'cc-geo');if(r.country_residence){geo.append(iso(r.country_residence),E('span','→'),iso('UK'));}
+  const stage=E('div',undefined,'cc-stage');stage.append(E('small',r.kind==='lead'?'Lead · Leads y casos':'Account'),E('span','No Global Passport yet','cc-status cc-st-on_hold'));
+  const owner=E('div',undefined,'cc-ready');const cn=(list.counsellors||[]).find(c=>c.user_id===r.counsellor_id);owner.append(E('small',cn?cn.full_name:(r.counsellor_id?'Assigned':'No counsellor'),'cc-muted'));
+  const flags=E('div',undefined,'cc-flags');flags.append(tag(ACC[r.account]||ACC.none,r.account==='confirmed'?'gold':'grey',r.account==='none'?'send':'user'));
+  row.append(who,geo,stage,owner,flags,gi('chevron','gp-i cc-go'));row.onclick=()=>pendingFile(r);return row;}
+ function pendingFile(r){const d=E('dialog',undefined,'cc-file cc-file-sm');document.body.append(d);d.addEventListener('close',()=>d.remove());d.addEventListener('click',e=>{if(e.target===d)d.close();});
+  const p=E('div',undefined,'cc-file-in cc-pad');const close=btn('',()=>d.close(),'cc-icon cc-close','x');close.setAttribute('aria-label','Close');
+  const h=E('div',undefined,'cc-file-id');const t=E('div');t.append(E('p',(r.reference||'')+(r.reference?' · ':'')+'NO GLOBAL PASSPORT YET','cc-kicker'),E('h2',r.full_name||r.email),E('p',[r.city,countryName(r.country_residence)].filter(Boolean).join(', ')||'','cc-muted'));h.append(avatar(r.full_name||r.email,null,'gp-avatar cc-av-lg'),t);
+  const dl=E('dl',undefined,'cc-pending-dl');const add=(k,v,href)=>{if(!v)return;dl.append(E('dt',k));const dd=E('dd');if(href){const a=E('a',v);a.href=href;a.target='_blank';a.rel='noopener';dd.append(a);}else dd.textContent=v;dl.append(dd);};
+  add('E-mail',r.email,r.email?'mailto:'+r.email:null);add('WhatsApp',r.whatsapp,r.whatsapp?'https://wa.me/'+String(r.whatsapp).replace(/\D/g,''):null);add('Study plan',[r.level,r.subject,r.intake].filter(Boolean).join(' · '));add('Account',ACC[r.account]||ACC.none);
+  const help=E('p',r.account==='none'?'This student has no account yet. Send the invitation: they choose a password, complete the 4 steps and their Global Passport opens assigned to their counsellor.':r.account==='unconfirmed'?'The student created an account but has not confirmed the e-mail yet. Ask them to check their inbox (and spam).':'The student has an account but has not finished the 4 steps. Ask them to sign in at muktalent.com/portal; their file will be assigned automatically.','cc-muted');
+  const acts=E('div',undefined,'cc-actions');const msg=E('p','','cc-muted');
+  if(r.kind==='lead'&&r.account==='none'&&r.email){const inv=btn('Send Global Passport invitation',async()=>{inv.disabled=true;msg.textContent='Sending…';try{await api('/api/gp/leads/'+r.id+'/invite',{method:'POST',body:'{}'});msg.textContent='Invitation sent to '+r.email+'.';notice('Invitation sent.');}catch(e){msg.textContent=e.message;inv.disabled=false;}},'cc-btn cc-primary','send');acts.append(inv);}
+  acts.append(btn('Close',()=>d.close(),'cc-btn'));
+  p.append(close,h,dl,help,acts,msg);d.append(p);d.showModal();}
  function pendingPanel(){const p=E('details',undefined,'cc-panel cc-pending');const sm=E('summary');sm.append(E('h3','Accounts without a Global Passport yet'),E('small','Loading…','cc-muted'));p.append(sm);const box=E('div',undefined,'cc-pending-list');p.append(box);
   api('/api/gp/pending-accounts').then(r=>{const n=r.data.length;sm.querySelector('small').textContent=n?n+' account'+(n===1?'':'s')+' · they signed up but did not finish the first steps':'None · every student account has its Global Passport';p.hidden=false;
    for(const u of r.data){const row=E('div',undefined,'cc-pending-row');const t=E('div');t.append(E('strong',u.name||u.email),E('small',[u.name?u.email:null,'Signed up '+fmtDate(u.created_at.slice(0,10),'en',{day:'numeric',month:'short',year:'numeric'}),u.confirmed?'Email confirmed':'Email not confirmed yet'].filter(Boolean).join(' · ')));row.append(avatar(u.name||u.email,null,'gp-avatar cc-av'),t,E('span',u.confirmed?'Needs to complete the 4 steps':'Waiting for email confirmation','cc-tag cc-tag-'+(u.confirmed?'gold':'grey')));box.append(row);}
@@ -81,11 +101,24 @@ export async function renderControlCentre({host,api,admin=false,notice=()=>{}}){
     if(doc.status==='uploaded'){a.append(btn('Approve',()=>act(()=>api('/api/gp/documents/'+doc.id+'/review',{method:'POST',body:JSON.stringify({status:'approved'})}),'Document approved.'),'cc-btn cc-sm cc-ok','check'),btn('Request changes',()=>{const note=prompt('What should the student change?');if(note&&note.trim())act(()=>api('/api/gp/documents/'+doc.id+'/review',{method:'POST',body:JSON.stringify({status:'rejected',note:note.trim()})}),'Change request sent.');},'cc-btn cc-sm cc-warn','alert'));}
     r.append(gi(doc.status==='approved'?'check':doc.status==='rejected'?'alert':'doc','gp-i cc-doc-i'),t,a);body.append(r);}
    const form=E('form',undefined,'cc-inline');const label=E('input');label.placeholder='Request a document, e.g. CAS letter';label.required=true;label.maxLength=160;label.setAttribute('aria-label','Document to request');const stage=E('select');stage.setAttribute('aria-label','Stage');for(const [k]of STAGES)stage.append(new Option(f.stage_titles[k],k));stage.value='documents';const msg=E('input');msg.placeholder='Message (optional)';msg.maxLength=600;msg.setAttribute('aria-label','Message');const go=E('button','Send request','cc-btn cc-primary');go.type='submit';form.append(label,stage,msg,go);
-   form.onsubmit=e=>{e.preventDefault();act(()=>api('/api/gp/students/'+id+'/documents',{method:'POST',body:JSON.stringify({label:label.value,stage_key:stage.value,message:msg.value||null,doc_type:'other'})}),'Document requested · the student has been notified.');};
-   body.append(E('h3','Request documentation'),form);
+   // v25 · «Requiere firma»: se adjunta el PDF y el estudiante lo firma a mano en su sección Documents.
+   const sigL=E('label',undefined,'cc-switch cc-sign-toggle');const sig=E('input');sig.type='checkbox';sigL.append(sig,E('i'),E('span','Requires signature'));
+   const pdf=E('input');pdf.type='file';pdf.accept='application/pdf';pdf.hidden=true;pdf.setAttribute('aria-label','PDF to sign');
+   const fmsg=E('p','','cc-muted cc-sign-msg');
+   sig.onchange=()=>{pdf.hidden=!sig.checked;pdf.required=sig.checked;stage.hidden=sig.checked;label.placeholder=sig.checked?'Document to sign, e.g. Service agreement':'Request a document, e.g. CAS letter';go.textContent=sig.checked?'Send for signature':'Send request';};
+   form.insertBefore(sigL,go);form.insertBefore(pdf,go);
+   form.onsubmit=async e=>{e.preventDefault();
+    if(!sig.checked)return act(()=>api('/api/gp/students/'+id+'/documents',{method:'POST',body:JSON.stringify({label:label.value,stage_key:stage.value,message:msg.value||null,doc_type:'other'})}),'Document requested · the student has been notified.');
+    const fl=pdf.files?.[0];if(!fl){fmsg.textContent='Attach the PDF the student must sign.';return;}if(fl.type!=='application/pdf'){fmsg.textContent='Use a PDF file.';return;}if(fl.size>10*1024*1024){fmsg.textContent='The PDF is larger than 10 MB.';return;}
+    go.disabled=true;fmsg.textContent='Uploading…';
+    try{const st=(await api('/api/gp/students/'+id+'/sign-docs/start',{method:'POST',body:JSON.stringify({title:label.value.trim(),note:(msg.value||'').trim(),name:fl.name.slice(0,200),mime:'application/pdf',bytes:fl.size})})).data;
+     const up=await fetch(st.signed_url,{method:'PUT',headers:{'Content-Type':'application/pdf','x-upsert':'false'},body:fl});if(!up.ok)throw new Error('Upload interrupted. Try again.');
+     await api('/api/gp/sign-docs/'+st.id+'/finish',{method:'POST',body:'{}'});notice('Sent for signature · the student has been notified.');await reload('documents');}
+    catch(err){fmsg.textContent=err.message;go.disabled=false;}};
+   body.append(E('h3','Request documentation'),form,fmsg);
    body.prepend(signSection());}
   // v24 · Documentos para firmar: el equipo envía un PDF, el estudiante lo firma a mano y vuelve firmado.
-  function signSection(){linkHrCss();const sec=E('section',undefined,'cc-sign');const head=E('div',undefined,'cc-sign-head');head.append(E('h3','Documents to sign'),E('p','Send a PDF. The student reads it and signs it by hand in their Global Passport; the signed copy comes back here.','cc-muted'));sec.append(head);
+  function signSection(){linkHrCss();const sec=E('section',undefined,'cc-sign');const head=E('div',undefined,'cc-sign-head');head.append(E('h3','Documents to sign'),E('p','To send one, use “Request documentation” below and turn on “Requires signature”. The student signs it by hand and the signed copy comes back here.','cc-muted'));sec.append(head);
    const list=E('div',undefined,'cc-sign-list');list.append(E('p','Loading…','cc-muted'));sec.append(list);
    const ST={sent:['Sent · not opened','grey'],viewed:['Opened · not signed yet','gold'],signed:['Signed','green']};
    const paint=async()=>{try{const r=await api('/api/gp/students/'+id+'/sign-docs');list.replaceChildren();
@@ -96,7 +129,7 @@ export async function renderControlCentre({host,api,admin=false,notice=()=>{}}){
       if(d.status!=='signed')a.append(btn('Withdraw',()=>{if(confirm('Withdraw this document? The student will no longer see it.'))act(()=>api('/api/gp/sign-docs/'+d.id,{method:'DELETE'}),'Document withdrawn.');},'cc-btn cc-sm cc-warn','x'));
       row.append(gi(d.status==='signed'?'check':'doc','gp-i cc-doc-i'),t,a);list.append(row);}
      if(!r.data.length)list.append(E('p','Nothing sent for signature yet.','cc-muted'));}catch(e){list.replaceChildren(E('p',e.message,'cc-bad'));}};
-   const form=E('form',undefined,'cc-inline cc-sign-form');const title=E('input');title.placeholder='Title, e.g. Service agreement';title.required=true;title.maxLength=200;title.setAttribute('aria-label','Document title');const note=E('input');note.placeholder='Message (optional)';note.maxLength=1000;note.setAttribute('aria-label','Message');const file=E('input');file.type='file';file.accept='application/pdf';file.required=true;file.setAttribute('aria-label','PDF to sign');const go=E('button','Send for signature','cc-btn cc-primary');go.type='submit';const msg=E('p','','cc-muted cc-sign-msg');form.append(title,note,file,go);sec.append(form,msg);
+   const form=E('form',undefined,'cc-inline cc-sign-form');const title=E('input');title.placeholder='Title, e.g. Service agreement';title.required=true;title.maxLength=200;title.setAttribute('aria-label','Document title');const note=E('input');note.placeholder='Message (optional)';note.maxLength=1000;note.setAttribute('aria-label','Message');const file=E('input');file.type='file';file.accept='application/pdf';file.required=true;file.setAttribute('aria-label','PDF to sign');const go=E('button','Send for signature','cc-btn cc-primary');go.type='submit';const msg=E('p','','cc-muted cc-sign-msg');form.append(title,note,file,go);form.hidden=true;
    form.onsubmit=async e=>{e.preventDefault();const fl=file.files?.[0];if(!fl)return;if(fl.type!=='application/pdf'){msg.textContent='Use a PDF file.';return;}if(fl.size>10*1024*1024){msg.textContent='The PDF is larger than 10 MB.';return;}
     go.disabled=true;msg.textContent='Uploading…';
     try{const st=(await api('/api/gp/students/'+id+'/sign-docs/start',{method:'POST',body:JSON.stringify({title:title.value.trim(),note:note.value.trim(),name:fl.name.slice(0,200),mime:'application/pdf',bytes:fl.size})})).data;

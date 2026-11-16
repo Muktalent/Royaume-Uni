@@ -229,3 +229,13 @@
 .cc-sign-form input[type=file]{max-width:260px;font-size:13px}
 .cc-sign-msg{margin:8px 0 0;font-size:13px}
 .cc-signed-note{color:#24533A;font-weight:600}
+
+/* v25 · Estudiantes sin Global Passport */
+.cc-row-pending{opacity:.92}
+.cc-row-pending .cc-av{filter:grayscale(.4)}
+.cc-file-sm{max-width:620px}
+.cc-file-sm .cc-close{float:right}
+.cc-pending-dl{display:grid;grid-template-columns:120px 1fr;gap:8px 14px;margin:18px 0 12px;font-size:14px}
+.cc-pending-dl dt{color:var(--c-muted,#6F6B64)}
+.cc-pending-dl dd{margin:0;overflow-wrap:anywhere}
+.cc-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
