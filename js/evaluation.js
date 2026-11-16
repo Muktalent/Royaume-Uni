@@ -11,7 +11,7 @@ const notice=(id,text,error=false)=>{$(id).textContent=text;$(id).classList.togg
 function showStep(){steps.forEach((s,i)=>{s.hidden=i!==step;});$('previous').hidden=step===0;$('next').hidden=step===3;$('submit').hidden=step!==3;$('progress').value=step+1;$('step-label').textContent=`Étape ${step+1} sur 4`;notice('form-message','');if(step===3)review();}
 function validateCurrent(){
  const country=form.elements.namedItem('other_country');country.required=val('residence_country_code')==='other';
- if(step===2){const cur=form.elements.namedItem('budget_currency');cur.required=val('budget_amount')!=='';}
+ 
  for(const field of steps[step].querySelectorAll('input,select,textarea'))if(!field.checkValidity()){field.reportValidity();return false;}
  return true;
 }
@@ -20,7 +20,7 @@ function payload(){return {
  first_name:val('first_name'),last_name:val('last_name'),email:val('email'),whatsapp_phone_e164:val('whatsapp_phone_e164'),
  residence_country_code:val('residence_country_code')==='other'?val('other_country').toUpperCase():val('residence_country_code'),residence_city:val('residence_city'),
  target_study_level:val('target_study_level'),subject_interest:val('subject_interest'),intended_intake:val('intended_intake'),
- budget_amount:val('budget_amount')===''?null:Number(val('budget_amount')),budget_currency:val('budget_amount')===''?null:val('budget_currency')||null,
+ budget_amount:null,budget_currency:null,
  funding_plan:val('funding_plan')||null,education:{institution_name:val('institution_name'),qualification:val('qualification'),
  field_of_study:val('field_of_study')||null,is_current:val('is_current')==='true',result_text:val('result_text')||null},
  english_level:val('english_level'),english_test:val('english_test')||null,message:val('message')||null
@@ -28,7 +28,7 @@ function payload(){return {
 function review(){
  const dl=document.createElement('dl');
  const display=n=>{const e=form.elements.namedItem(n);return e.tagName==='SELECT'?e.selectedOptions[0]?.textContent:e.value;};
- const pairs=[['Nom',val('first_name')+' '+val('last_name')],['E-mail',val('email')],['WhatsApp',val('whatsapp_phone_e164')],['Résidence',(val('residence_country_code')==='other'?val('other_country'):display('residence_country_code'))+' · '+val('residence_city')],['Établissement',val('institution_name')],['Diplôme',val('qualification')],['Spécialité',val('field_of_study')],['Études en cours',display('is_current')],['Résultats',val('result_text')],['Anglais',display('english_level')],['Test d’anglais',val('english_test')],['Niveau visé',display('target_study_level')],['Domaine',val('subject_interest')],['Rentrée',val('intended_intake')],['Budget annuel',val('budget_amount')?val('budget_amount')+' '+val('budget_currency'):'À définir'],['Financement',val('funding_plan')],['Précisions',val('message')]];
+ const pairs=[['Nom',val('first_name')+' '+val('last_name')],['E-mail',val('email')],['WhatsApp',val('whatsapp_phone_e164')],['Résidence',(val('residence_country_code')==='other'?val('other_country'):display('residence_country_code'))+' · '+val('residence_city')],['Établissement',val('institution_name')],['Diplôme',val('qualification')],['Spécialité',val('field_of_study')],['Études en cours',display('is_current')],['Résultats',val('result_text')],['Anglais',display('english_level')],['Test d’anglais',val('english_test')],['Niveau visé',display('target_study_level')],['Domaine',val('subject_interest')],['Rentrée',val('intended_intake')],['Financement',val('funding_plan')],['Précisions',val('message')]];
  for(const [label,value] of pairs){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value||'Non précisé';dl.append(dt,dd);}$('review').replaceChildren(dl);
 }
 async function api(url,body){

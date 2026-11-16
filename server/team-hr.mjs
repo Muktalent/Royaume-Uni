@@ -189,7 +189,7 @@ export async function stampSignature(originalBytes, info) {
   row('Document ID', info.documentId);
   row('Signed by', info.signerName);
   row('Account', info.signerEmail || '-');
-  row('Employee code', info.employeeCode || '-');
+  row(info.codeLabel || 'Employee code', info.employeeCode || '-');
   row('Signed at', when);
   row('Method', info.method === 'drawn' ? 'Handwritten signature drawn on screen' : 'Typed full legal name');
   row('IP address', info.ip || '-');

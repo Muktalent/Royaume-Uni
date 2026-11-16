@@ -1,3 +1,4 @@
+import { renderCandidateProfile } from "./candidate-profile.js";
 import "./unified-theme.js";
 import "./shell-v21.js";
 import { startPresence, stopPresence } from "./presence.js";
@@ -215,11 +216,14 @@ async function openRecord(name,id=null,candidateId=null){
    state.detail={name,id,record,candidateId};$("backCandidate").hidden=!candidateId;
    $("detailEyebrow").textContent=r.title;$("detailTitle").textContent=record.reference||record.full_name||record.title||record.original_filename||(id===null?"Nuevo registro":r.title);
    $("detailNotice").textContent=r.readonly?"Vista de consulta. Esta entrega no sube, descarga ni revisa archivos ni genera enlaces privados.":name==="staff"?"Vincula colaboradores mediante el UUID de un usuario ya creado en Authentication. No crea cuentas, contraseñas ni administradores. No permite desactivar administradores.":name==="appointments"?"Gestión de citas existentes. Aquí no se crean, reactivan ni reprograman reservas.":name==="blocks"?"Un bloqueo registra una indisponibilidad. No cancela ni modifica citas existentes.":name==="settings"?"Se mantienen Africa/Casablanca, citas de 30 minutos y margen de 10 minutos. Cambiar este horario no modifica citas existentes.":name==="notes"?"Notas compartidas: se añaden como historial, sin edición ni borrado.":"";
-   if(id!==null){for(const key of r.select.split(",").filter(k=>!r.fields.includes(k))){if(record[key]===undefined)continue;const item=el("div");item.append(el("small",label(key)),el("p",valueText(key,record[key])));$("detailMetadata").append(item);}}
+   $("detailMetadata").classList.toggle("is-profile",name==="candidates"&&id!==null);
+   if(name==="candidates"&&id!==null)$("detailMetadata").append(renderCandidateProfile(record,{staffName:v=>state.staffOptions.find(x=>x.user_id===v)?.full_name||"Empleado"}));
+   else if(id!==null){for(const key of r.select.split(",").filter(k=>!r.fields.includes(k))){if(record[key]===undefined)continue;const item=el("div");item.append(el("small",label(key)),el("p",valueText(key,record[key])));$("detailMetadata").append(item);}}
    const editable=!r.readonly&&!(id!==null&&r.immutable);
    $("recordForm").hidden=!editable;
    if(editable){
      const fields=[...r.fields];if(name==="staff"&&id===null)fields.unshift("user_id");
+     if(name==="candidates"&&id!==null)$("formFields").append(el("h3","Editar datos del caso","cp-edit-title"));
      for(const key of fields)$("formFields").append(inputFor(name,key,r.columns[key],record,id===null));
      $("saveRecord").textContent=id===null?"Crear registro":"Guardar cambios";$("saveRecord").disabled=false;
    }else if(r.immutable){for(const key of r.fields){const item=el("div");item.append(el("small",label(key)),el("p",valueText(key,record[key])));$("detailMetadata").append(item);}}

@@ -20,3 +20,4 @@ test('rejects oversized field',()=>assert.equal(evaluationSchema.safeParse({...v
 test('rejects impossible calendar day',()=>assert.equal(dateSchema.safeParse('2026-02-30').success,false));
 test('accepts real calendar day',()=>assert.equal(dateSchema.safeParse('2026-10-26').success,true));
 test('rejects arbitrary booking token',()=>assert.equal(bookingSchema.safeParse({token:'wrong',advisor_id:valid().submission_id,starts_at:'2026-10-27T10:00:00Z',privacy_acknowledged:true}).success,false));
+test('v24: budget is no longer required by the form',()=>{const v=valid();delete v.budget_amount;delete v.budget_currency;const r=evaluationSchema.safeParse(v);assert.equal(r.success,true);assert.equal(r.data.budget_amount,null);assert.equal(r.data.budget_currency,null);});

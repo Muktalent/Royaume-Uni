@@ -3,6 +3,8 @@
 // All data lives in private gp_* tables; only this server (service role) touches them,
 // after verifying the Supabase session and the caller's relationship to the file.
 import { createClient } from "@supabase/supabase-js";
+import { candidateFor, syncCandidateFromStudent } from "./student-link.mjs";
+import { mountGpSign, signDocsFor } from "./gp-sign.mjs";
 import { rateLimit, ipKeyGenerator } from "express-rate-limit";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -188,6 +190,7 @@ export function mountGlobalPassport(app, { requireStaff, db = service }) {
     ]);
     const out = { student, stages: ok(stages), tasks: ok(tasks), documents: ok(documents), events: ok(events), messages: ok(messages).reverse(), counsellor: await counsellorCard(client, student.counsellor_id) };
     out.photo_url = student.photo_path ? ((await client.storage.from(BUCKET).createSignedUrl(student.photo_path, 3600)).data?.signedUrl || null) : null;
+    out.sign_docs = await signDocsFor(client, id);
     out.readiness = readiness(out);
     out.stage_titles = Object.fromEntries(STAGES);
     out.destinations = DESTINATIONS;
@@ -224,7 +227,11 @@ export function mountGlobalPassport(app, { requireStaff, db = service }) {
     ok(await client.from("gp_stages").insert(seedStages(u.id)));
     ok(await client.from("gp_documents").insert(seedDocuments(u.id)));
     ok(await client.from("gp_tasks").insert(seedTasks(u.id)));
+    // v24 · Si el estudiante ya era un lead con responsable, ese counsellor lleva su Global Passport.
+    const lead = await candidateFor(client, u.email);
+    if (lead?.assigned_to) { const st = ok(await client.from("crm_staff").select("active").eq("user_id", lead.assigned_to).maybeSingle()); if (st?.active) ok(await client.from("gp_students").update({ counsellor_id: lead.assigned_to }).eq("user_id", u.id)); }
     const assigned = ok(await client.rpc("gp_assign_counsellor", { p_student: u.id }));
+    await syncCandidateFromStudent(client, { ...row, email: u.email }, assigned);
     const counsellor = assigned ? await counsellorCard(client, assigned) : null;
     await post(client, u.id, "system", null, `Welcome to your Global Passport, ${values.full_name.split(" ")[0]}. Your file ${row.reference} is open for the United Kingdom.` + (counsellor ? ` ${counsellor.full_name} is your counsellor and will contact you within 2 working days.` : " A counsellor will be assigned to you shortly."), "system");
     const fresh = ok(await client.from("gp_students").select("*").eq("user_id", u.id).single());
@@ -294,7 +301,7 @@ export function mountGlobalPassport(app, { requireStaff, db = service }) {
   // ---------- Counsellor Control Centre ----------
   app.get("/api/gp/students", requireStaff, wrap(async (req, res) => {
     const client = db(), all = req.staff.role === "admin" && req.query.scope === "all";
-    let q = client.from("gp_students").select("user_id,reference,full_name,email,country_residence,nationality,destination,study_level,subject,intake,university,programme,phone,date_of_birth,english_test,counsellor_id,application_status,urgent,created_at,updated_at,counsellor_seen_at").order("updated_at", { ascending: false }).limit(500);
+    let q = client.from("gp_students").select("user_id,reference,full_name,email,country_residence,nationality,destination,study_level,subject,intake,university,programme,phone,date_of_birth,english_test,counsellor_id,application_status,urgent,created_at,updated_at,counsellor_seen_at,photo_path").order("updated_at", { ascending: false }).limit(500);
     if (!all) q = q.eq("counsellor_id", req.staff.user_id);
     const students = ok(await q), ids = students.map(s => s.user_id);
     const today = new Date().toISOString().slice(0, 10);
@@ -313,9 +320,35 @@ export function mountGlobalPassport(app, { requireStaff, db = service }) {
         overdue_tasks: by(tasks, s.user_id).filter(t => t.due_date && t.due_date < today).length, open_tasks: by(tasks, s.user_id).length, next_event: by(events, s.user_id)[0] || null,
         unread: un.length, unread_since: un.map(m => m.created_at).sort()[0] || null, current_stage: current?.stage_key || "registration", stages_done: st.filter(x => x.status === "done").length };
     });
+    // v24 · Documentos para firmar: pendientes del estudiante y firmas nuevas sin ver.
+    const sg = ids.length ? await client.from("gp_sign_requests").select("student_id,status,staff_seen_at").in("student_id", ids).in("status", ["sent", "viewed", "signed"]) : { data: [] };
+    for (const r of rows) { const mine = (sg.data || []).filter(x => x.student_id === r.user_id); r.sign_pending = mine.filter(x => x.status !== "signed").length; r.signed_new = mine.filter(x => x.status === "signed" && !x.staff_seen_at).length; }
+    // v24 · Foto del estudiante en la lista (enlaces firmados de 1 hora).
+    const withPhoto = students.filter(x => x.photo_path), photos = new Map();
+    if (withPhoto.length) { const r = await client.storage.from(BUCKET).createSignedUrls(withPhoto.map(x => x.photo_path), 3600); for (const x of r.data || []) if (x.signedUrl) photos.set(x.path, x.signedUrl); }
+    for (const r of rows) { r.photo_url = r.photo_path ? photos.get(r.photo_path) || null : null; delete r.photo_path; }
     const counsellors = req.staff.role === "admin" ? ok(await client.from("crm_staff").select("user_id,full_name,role,active").eq("active", true).order("full_name")) : [];
     const settings = ok(await client.from("gp_counsellor_settings").select("accepting,capacity").eq("user_id", req.staff.user_id).maybeSingle()) || { accepting: true, capacity: 60 };
     res.json({ data: rows, metrics: caseload(rows, today), counsellors, settings, scope: all ? "all" : "mine", stage_titles: Object.fromEntries(STAGES) });
+  }));
+  // v24 · Cuentas creadas que aún no han abierto su Global Passport (solo administradores).
+  app.get("/api/gp/pending-accounts", requireStaff, wrap(async (req, res) => {
+    if (req.staff.role !== "admin") throw new PassportError("Administrator access required.", 403);
+    const client = db(), users = [];
+    for (let page = 1; page <= 5; page++) {
+      const r = await client.auth.admin.listUsers({ page, perPage: 200 });
+      if (r.error) throw new PassportError("Accounts could not be listed.", 503);
+      users.push(...(r.data?.users || [])); if ((r.data?.users || []).length < 200) break;
+    }
+    const ids = users.map(u => u.id);
+    const known = new Set();
+    for (let i = 0; i < ids.length; i += 300) {
+      const part = ids.slice(i, i + 300);
+      const [a, b, c] = await Promise.all([client.from("crm_staff").select("user_id").in("user_id", part), client.from("gp_students").select("user_id").in("user_id", part), client.from("hc_candidates").select("user_id").in("user_id", part)]);
+      for (const r of [a, b, c]) for (const x of r.data || []) known.add(x.user_id);
+    }
+    const data = users.filter(u => !known.has(u.id) && u.user_metadata?.division !== "healthcare").map(u => ({ email: u.email, name: u.user_metadata?.full_name || null, created_at: u.created_at, confirmed: Boolean(u.email_confirmed_at || u.confirmed_at), last_sign_in_at: u.last_sign_in_at || null })).sort((x, y) => String(y.created_at).localeCompare(String(x.created_at))).slice(0, 200);
+    res.json({ data });
   }));
   app.get("/api/gp/students/:id", requireStaff, wrap(async (req, res) => {
     const { client, student } = await caseFor(req, req.params.id);
@@ -336,7 +369,7 @@ export function mountGlobalPassport(app, { requireStaff, db = service }) {
     const row = ok(await client.from("gp_students").update({ ...v, updated_at: new Date().toISOString() }).eq("user_id", student.user_id).select("*").single());
     if (v.application_status && v.application_status !== student.application_status) await post(client, student.user_id, "system", req.staff.user_id, `Application status updated: ${v.application_status.replace("_", " ")}`, "update");
     if (v.university && v.university !== student.university) await post(client, student.user_id, "system", req.staff.user_id, `University selected: ${v.university}${v.programme ? " · " + v.programme : ""}`, "update");
-    if (v.counsellor_id && v.counsellor_id !== student.counsellor_id) { const c = await counsellorCard(client, v.counsellor_id); await post(client, student.user_id, "system", req.staff.user_id, `Your file is now managed by ${c?.full_name || "a new counsellor"}.`, "update"); }
+    if (v.counsellor_id && v.counsellor_id !== student.counsellor_id) { const c = await counsellorCard(client, v.counsellor_id); await post(client, student.user_id, "system", req.staff.user_id, `Your file is now managed by ${c?.full_name || "a new counsellor"}.`, "update"); await syncCandidateFromStudent(client, row, v.counsellor_id); }
     res.json({ data: await bundle(client, row, { forStaff: true }) });
   }));
   app.put("/api/gp/students/:id/stages/:key", requireStaff, wrap(async (req, res) => {
@@ -404,4 +437,6 @@ export function mountGlobalPassport(app, { requireStaff, db = service }) {
     const v = settingsSchema.parse(req.body);
     ok(await db().from("gp_counsellor_settings").upsert({ user_id: req.staff.user_id, ...v, updated_at: new Date().toISOString() })); res.json({ data: v });
   }));
+  // v24 · Documentos para firmar (admin/counsellor → estudiante → vuelve firmado).
+  mountGpSign(app, { wrap, limiter, requireStaff, requireStudent, caseFor, post, db, ok, PassportError, BUCKET, ip });
 }

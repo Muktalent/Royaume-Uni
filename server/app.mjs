@@ -12,6 +12,7 @@ import { mountAssistant } from "./assistant.mjs";
 import { mountCardLinks } from "./card-links.mjs";
 import { mountPayroll } from "./payroll.mjs";
 import { mountGlobalPassport } from "./global-passport.mjs";
+import { syncStudentFromCandidate } from "./student-link.mjs";
 import { mountMukSocial } from "./muk-social.mjs";
 import { mountMukPublic } from "./muk-public.mjs";
 import { mountHealthcare } from "./healthcare.mjs";
@@ -195,7 +196,9 @@ for(const [name,r] of Object.entries(resources)){
      if(s.error)dbError(s.error,req);if(!s.data?.active)throw new InputError("Selecciona un empleado activo.");
    }
    const {data,error}=await req.db.from(r.table).insert(values).select(r.select).single();
-   if(error)dbError(error,req);res.status(201).json({data});
+   if(error)dbError(error,req);
+   if(name==="candidates"&&data.assigned_to)await syncStudentFromCandidate(req.db,data,{by:req.staff.user_id});
+   res.status(201).json({data});
  });
  if(!r.readonly&&!r.immutable)app.patch(`${url}/:id`,async(req,res)=>{
    const id=validId(name,req.params.id);
@@ -226,6 +229,8 @@ for(const [name,r] of Object.entries(resources)){
    }
    const {data,error}=await q.select(r.select).maybeSingle();if(error)dbError(error,req);
    if(!data)throw new InputError("Otro usuario modificó el registro. Vuelve a abrirlo.",409);
+   // v24 · El responsable del lead pasa a ser el counsellor de su Global Passport (mismo correo).
+   if(name==="candidates"&&values.assigned_to&&values.assigned_to!==current.data.assigned_to)await syncStudentFromCandidate(req.db,data,{by:req.staff.user_id});
    res.json({data});
  });
 }

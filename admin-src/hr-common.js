@@ -97,7 +97,7 @@ const isPdf = (blob, r) => blob.type === 'application/pdf' || r?.mime === 'appli
 
 async function renderPdf(stage, blob, {onEnd, labels}) {
   const lib = await loadPdfJs();
-  const doc = await lib.getDocument({data: new Uint8Array(await blob.arrayBuffer()), isEvalSupported: false, enableScripting: false, standardFontDataUrl: PDFJS + 'standard_fonts/', wasmUrl: PDFJS + 'wasm/'}).promise;
+  const task = lib.getDocument({data: new Uint8Array(await blob.arrayBuffer()), isEvalSupported: false, enableScripting: false, standardFontDataUrl: PDFJS + 'standard_fonts/', wasmUrl: PDFJS + 'wasm/'}), doc = await task.promise;
   const pages = E('div', undefined, 'th-pages'); stage.replaceChildren(pages);
   let zoom = 1, ended = false;
   const slots = [];
@@ -123,7 +123,7 @@ async function renderPdf(stage, blob, {onEnd, labels}) {
   const endIo = new IntersectionObserver(entries => { if (!ended && entries.some(e => e.isIntersecting)) { ended = true; endIo.disconnect(); onEnd?.(); } }, {root: pages, threshold: .35});
   endIo.observe(slots[slots.length - 1]);
   const redraw = async () => { for (const s of slots) { delete s.dataset.done; delete s.dataset.busy; s.replaceChildren(); io.unobserve(s); } await sizeSlots(); for (const s of slots) io.observe(s); };
-  return {pages: doc.numPages, zoom: async d => { zoom = Math.min(3, Math.max(.5, +(zoom + d).toFixed(2))); await redraw(); return zoom; }, destroy: () => { io.disconnect(); endIo.disconnect(); doc.destroy(); }};
+  return {pages: doc.numPages, zoom: async d => { zoom = Math.min(3, Math.max(.5, +(zoom + d).toFixed(2))); await redraw(); return zoom; }, destroy: () => { io.disconnect(); endIo.disconnect(); task.destroy?.(); }};
 }
 
 async function renderImage(stage, blob, {viewOnly, title, onEnd, src}) {
@@ -137,6 +137,8 @@ export async function openViewer({title, subtitle = '', load, actions = [], lang
   linkHrCss();
   const t = lang === 'es'
     ? {loading: 'Cargando documento…', close: 'Cerrar', open: 'Abrir en otra pestaña', download: 'Descargar', fail: 'No se pudo abrir el documento.', page: 'Página', pages: n => n === 1 ? '1 página' : n + ' páginas', ro: 'Solo lectura', roHint: 'Este documento se puede leer aquí, pero no descargar ni imprimir.', zin: 'Ampliar', zout: 'Reducir'}
+    : lang === 'fr'
+    ? {loading: 'Chargement du document…', close: 'Fermer', open: 'Ouvrir dans un nouvel onglet', download: 'Télécharger', fail: 'Impossible d’ouvrir le document.', page: 'Page', pages: n => n === 1 ? '1 page' : n + ' pages', ro: 'Lecture seule', roHint: 'Vous pouvez lire ce document ici, mais pas le télécharger ni l’imprimer.', zin: 'Agrandir', zout: 'Réduire'}
     : {loading: 'Loading document…', close: 'Close', open: 'Open in a new tab', download: 'Download', fail: 'The document could not be opened.', page: 'Page', pages: n => n === 1 ? '1 page' : n + ' pages', ro: 'Read-only', roHint: 'You can read this document here, but it cannot be downloaded or printed.', zin: 'Zoom in', zout: 'Zoom out'};
   const dialog = E('dialog', undefined, 'th-viewer'); dialog.lang = lang;
   const head = E('header', undefined, 'th-viewer-head'), titles = E('div');
@@ -194,9 +196,9 @@ export async function openViewer({title, subtitle = '', load, actions = [], lang
 }
 
 // Lienzo de firma (ratón, dedo o lápiz). Coordenadas normalizadas a 1000 x 400.
-export function signaturePad() {
-  const box = E('div', undefined, 'th-sign-pad'), canvas = E('canvas'), hint = E('span', 'Sign here', 'th-sign-hint');
-  canvas.width = 1000; canvas.height = 400; canvas.setAttribute('aria-label', 'Signature drawing area');
+export function signaturePad({hint: hintText = 'Sign here', label = 'Signature drawing area'} = {}) {
+  const box = E('div', undefined, 'th-sign-pad'), canvas = E('canvas'), hint = E('span', hintText, 'th-sign-hint');
+  canvas.width = 1000; canvas.height = 400; canvas.setAttribute('aria-label', label);
   box.append(canvas, hint);
   const ctx = canvas.getContext('2d'); ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 4.5; ctx.strokeStyle = '#2B2A28';
   let strokes = [], current = null;

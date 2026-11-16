@@ -13,8 +13,9 @@ export const evaluationSchema=z.object({
  residence_country_code:z.string().regex(/^[A-Z]{2}$/),residence_city:text(150),
  target_study_level:z.enum(['foundation','undergraduate','postgraduate','phd','english_course','other']),
  subject_interest:text(500),intended_intake:text(100),
- budget_amount:z.number().finite().min(0).max(9999999999.99).nullable(),
- budget_currency:z.enum(['GBP','EUR','MAD','DZD','TND','USD']).nullable(),funding_plan:optional(2000),
+ // v24 · El formulario ya no pide presupuesto; se aceptan por compatibilidad con versiones en caché.
+ budget_amount:z.number().finite().min(0).max(9999999999.99).nullable().optional().default(null),
+ budget_currency:z.enum(['GBP','EUR','MAD','DZD','TND','USD']).nullable().optional().default(null),funding_plan:optional(2000),
  education:z.object({institution_name:text(300),qualification:text(300),field_of_study:optional(500),
  is_current:z.boolean(),result_text:optional(500)}).strict(),
  english_level:z.enum(['beginner','intermediate','advanced','certified','unknown']),

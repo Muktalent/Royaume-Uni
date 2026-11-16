@@ -33,8 +33,6 @@
         "target_study_level",
         "subject_interest",
         "intended_intake",
-        "budget_amount",
-        "budget_currency",
         "funding_plan",
         "next_action",
         "next_action_at"

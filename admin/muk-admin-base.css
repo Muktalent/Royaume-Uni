@@ -343,3 +343,23 @@ body:has(#loginView:not([hidden])) .login-card .primary{background:#161514;color
 @media(max-width:520px){.gp-brand span{font-size:8.5px;letter-spacing:.14em;white-space:nowrap}#forgotPassword{white-space:nowrap;flex:none;font-size:13px}#forgotPassword{margin-inline-start:auto}}
 @media(max-width:380px){.gp-brand span{display:none}}
 @media(max-width:520px){#loginView .gp-row{flex-wrap:wrap;row-gap:8px}#loginView .gp-row .gp-remember{min-width:0}}
+
+/* v24 · Ficha estructurada de leads y casos */
+.metadata.is-profile{display:block;margin-bottom:22px}
+.cp-head{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.cp-chip{display:inline-flex;align-items:center;padding:6px 11px;border-radius:999px;font-size:12.5px;font-weight:600;background:#F6F4F0;border:1px solid #E4E0D8;color:#2B2A28}
+.cp-chip[data-tone=gold]{background:#ECE4D6;border-color:#D9C9AA;color:#5E4C2E}
+.cp-chip[data-tone=green]{background:#E7F0E8;border-color:#C6DCC9;color:#24533A}
+.cp-chip[data-tone=red]{background:#F8E7E4;border-color:#EBC8C1;color:#8A2E22}
+.cp-chip[data-tone=grey]{color:#6F6B64}
+.cp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.cp-card{background:#fff;border:1px solid #E4E0D8;border-radius:16px;padding:16px 18px}
+.cp-card h4{margin:0 0 10px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#7A6545}
+.cp-card dl{display:grid;grid-template-columns:minmax(96px,auto) 1fr;gap:7px 14px;margin:0}
+.cp-card dt{color:#6F6B64;font-size:13px}
+.cp-card dd{margin:0;font-size:14px;color:#161514;overflow-wrap:anywhere;white-space:pre-line}
+.cp-card dd a{color:inherit;text-decoration:underline;text-decoration-color:#B49B6C;text-underline-offset:3px}
+.cp-wide{grid-column:1/-1}
+.cp-message blockquote{margin:0;padding:2px 0 2px 14px;border-left:3px solid #B49B6C;white-space:pre-line;font-size:14px;line-height:1.55;color:#2B2A28}
+.cp-edit-title{grid-column:1/-1;margin:6px 0 2px;font-size:15px;color:#161514}
+@media(max-width:640px){.cp-card dl{grid-template-columns:1fr;gap:2px}.cp-card dd{margin-bottom:8px}}

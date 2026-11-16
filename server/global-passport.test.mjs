@@ -18,7 +18,7 @@ function fakeDb(tables, users) {
     const q = {
       select() { return q; }, insert(v) { op = "insert"; payload = v; return q; }, update(v) { op = "update"; payload = v; return q; }, delete() { op = "delete"; return q; }, upsert(v) { op = "insert"; payload = v; return q; },
       eq(k, v) { filters.push(r => r[k] === v); return q; }, neq(k, v) { filters.push(r => r[k] !== v); return q; }, is(k, v) { filters.push(r => (r[k] ?? null) === v); return q; },
-      in(k, v) { filters.push(r => v.includes(r[k])); return q; }, gte(k, v) { filters.push(r => r[k] >= v); return q; }, order() { return q; }, limit() { return q; },
+      in(k, v) { filters.push(r => v.includes(r[k])); return q; }, ilike(k, v) { const t = String(v).replace(/\\(.)/g, "$1").toLowerCase(); filters.push(r => String(r[k] ?? "").toLowerCase() === t); return q; }, not(k, o, v) { const list = String(v).replace(/[()]/g, "").split(","); filters.push(r => !list.includes(r[k])); return q; }, gte(k, v) { filters.push(r => r[k] >= v); return q; }, order() { return q; }, limit() { return q; },
       maybeSingle() { single = true; return Promise.resolve(run()); }, single() { single = true; return Promise.resolve(run()); },
       then(res, rej) { return Promise.resolve(run()).then(res, rej); }
     };
@@ -28,7 +28,7 @@ function fakeDb(tables, users) {
     from: builder,
     auth: { getUser: async token => (users[token] ? { data: { user: users[token] }, error: null } : { data: null, error: { message: "bad" } }) },
     rpc: async (fn, args) => { const s = tables.gp_students.find(x => x.user_id === args.p_student); s.counsellor_id = "c1111111-1111-4111-8111-111111111111"; return { data: s.counsellor_id, error: null }; },
-    storage: { from: () => ({ createSignedUrl: async () => ({ data: { signedUrl: "https://x" }, error: null }) }) }
+    storage: { from: () => ({ createSignedUrl: async () => ({ data: { signedUrl: "https://x" }, error: null }), createSignedUrls: async paths => ({ data: paths.map(p => ({ path: p, signedUrl: "https://x/" + p })), error: null }) }) }
   });
 }
 const STUDENT = "a1111111-1111-4111-8111-111111111111", OTHER = "b1111111-1111-4111-8111-111111111111", COUNSELLOR = "c1111111-1111-4111-8111-111111111111";

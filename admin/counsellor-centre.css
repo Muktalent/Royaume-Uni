@@ -207,3 +207,25 @@
  .cc-overlay-body{padding:14px}
 }
 @media(prefers-reduced-motion:reduce){.cc-file{animation:none}.cc-metric,.cc-pipe-bar i{transition:none}}
+
+/* v24 · Cuentas sin Global Passport */
+.cc-pending{margin-top:18px}
+.cc-pending>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px}
+.cc-pending>summary::-webkit-details-marker{display:none}
+.cc-pending>summary::after{content:"+";margin-left:auto;font-size:20px;line-height:1;color:var(--cc-muted,#6f6b64)}
+.cc-pending[open]>summary::after{content:"−"}
+.cc-pending>summary h3{margin:0}
+.cc-pending-list{display:grid;gap:8px;margin-top:14px}
+.cc-pending-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--c-line);border-radius:14px;background:var(--c-panel)}
+.cc-pending-row strong{display:block;font-size:14px}
+.cc-pending-row small{display:block;color:var(--cc-muted,#6f6b64);font-size:12px;margin-top:2px}
+@media (max-width:640px){.cc-pending-row{grid-template-columns:auto 1fr}.cc-pending-row .cc-tag{grid-column:2}}
+
+/* v24 · Documentos para firmar */
+.cc-sign{margin:0 0 22px;padding:16px 18px;border:1px solid var(--c-line);border-radius:18px;background:var(--c-panel)}
+.cc-sign-head h3{margin:0 0 4px}
+.cc-sign-head p{margin:0 0 12px;font-size:13px}
+.cc-sign-list{display:grid;gap:8px;margin-bottom:12px}
+.cc-sign-form input[type=file]{max-width:260px;font-size:13px}
+.cc-sign-msg{margin:8px 0 0;font-size:13px}
+.cc-signed-note{color:#24533A;font-weight:600}
